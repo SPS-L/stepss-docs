@@ -5,14 +5,15 @@ description: Licensing information for the STEPSS suite
 
 ## Component Licenses
 
-The source code of the STEPSS suite components is licensed under the Apache License 2.0:
-
 | Component | License | Repository |
 |-----------|---------|------------|
 | STEPSS GUI | Apache License 2.0 | [SPS-L/STEPSS](https://github.com/SPS-L/STEPSS) |
 | PyRAMSES | Apache License 2.0 | [SPS-L/stepss-PyRAMSES](https://github.com/SPS-L/stepss-PyRAMSES) |
 | URAMSES | Apache License 2.0 | [SPS-L/stepss-URAMSES](https://github.com/SPS-L/stepss-URAMSES) |
 | RAMSES-Eigenanalysis | Apache License 2.0 | [SPS-L/RAMSES-Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis) |
+| RAMSES | Proprietary — free for non-commercial use | See [RAMSES Solver License](#ramses-solver-license) below |
+| PFC | Proprietary — free to use (compiled executable) | See [PFC and CODEGEN License](#pfc-and-codegen-license) below |
+| CODEGEN | Proprietary — free to use (compiled executable) | See [PFC and CODEGEN License](#pfc-and-codegen-license) below |
 
 ## RAMSES Solver License
 
