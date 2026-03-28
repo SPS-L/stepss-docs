@@ -89,7 +89,7 @@ Trigger a manual deployment from the GitHub Actions tab → "Deploy to GitHub Pa
 
 | Repository | Description |
 |------------|-------------|
-| [STEPSS](https://github.com/SPS-L/STEPSS) | Java GUI |
+| [STEPSS-GUI](https://github.com/SPS-L/STEPSS-GUI) | Java GUI |
 | [stepss-PyRAMSES](https://github.com/SPS-L/stepss-PyRAMSES) | Python API |
 | [STEPSS-Userguide](https://github.com/SPS-L/STEPSS-Userguide) | LaTeX source docs |
 | [stepss-URAMSES](https://github.com/SPS-L/stepss-URAMSES) | User-defined models |

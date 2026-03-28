@@ -7,7 +7,7 @@ description: Licensing information for the STEPSS suite
 
 | Component | License | Repository |
 |-----------|---------|------------|
-| STEPSS GUI | Apache License 2.0 | [SPS-L/STEPSS](https://github.com/SPS-L/STEPSS) |
+| STEPSS GUI | Apache License 2.0 | [SPS-L/STEPSS-GUI](https://github.com/SPS-L/STEPSS-GUI) |
 | PyRAMSES | Apache License 2.0 | [SPS-L/stepss-PyRAMSES](https://github.com/SPS-L/stepss-PyRAMSES) |
 | URAMSES | Apache License 2.0 | [SPS-L/stepss-URAMSES](https://github.com/SPS-L/stepss-URAMSES) |
 | RAMSES-Eigenanalysis | Apache License 2.0 | [SPS-L/RAMSES-Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis) |

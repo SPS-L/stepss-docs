@@ -9,7 +9,7 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 
 | Repository | Role | Language | Visibility |
 |------------|------|----------|------------|
-| [STEPSS](https://github.com/SPS-L/STEPSS) | Java-based GUI front-end (v3.40) | Java | Public |
+| [STEPSS-GUI](https://github.com/SPS-L/STEPSS-GUI) | Java-based GUI front-end (v3.40) | Java | Public |
 | [stepss-PyRAMSES](https://github.com/SPS-L/stepss-PyRAMSES) | Python API/wrapper for RAMSES | Python | Public |
 | [STEPSS-Userguide](https://github.com/SPS-L/STEPSS-Userguide) | LaTeX user documentation and models reference | LaTeX | Public |
 | [stepss-URAMSES](https://github.com/SPS-L/stepss-URAMSES) | User-defined device models framework | Fortran | Public |
@@ -26,7 +26,7 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 
 The main graphical user interface for STEPSS, built with Java (Swing/AWT) and the Ant build system.
 
-- **Repository**: [github.com/SPS-L/STEPSS](https://github.com/SPS-L/STEPSS)
+- **Repository**: [github.com/SPS-L/STEPSS-GUI](https://github.com/SPS-L/STEPSS-GUI)
 - **License**: Apache License 2.0
 - **Requirements**: Java 20 (64-bit)
 - **Build**: `ant build`
