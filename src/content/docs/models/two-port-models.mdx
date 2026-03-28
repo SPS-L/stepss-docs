@@ -10,8 +10,20 @@ Two-port models in RAMSES connect **two AC (or AC/DC) buses** and inject current
 The RAMSES data keyword is `TWOPOR`:
 
 ```
-TWOPOR  name  bus1  bus2  'model_name'  param1  param2  ... ;
+TWOPOR name bus1 bus2 model_name
+       param1 param2 ... ;
 ```
+
+:::note[Usage in Dynamic Data Files]
+Two-port models are defined with the `TWOPOR` keyword as standalone records in the dynamic data file. The syntax is:
+
+```
+TWOPOR name bus1 bus2 model_name
+       param1 param2 ... ;
+```
+
+Where `name` is a unique instance name, `bus1` and `bus2` are the two connection buses, `model_name` is the two-port model type (e.g., `HVDC_LCC`, `HVDC_VSC`), and the remaining parameters are model-specific.
+:::
 
 ---
 
@@ -140,7 +152,7 @@ The rectifier minimises $\alpha$ (advances firing) to maintain the current order
 #### Usage Example
 
 ```
-TWOPOR  HVDClink  BUS_RECT  BUS_INV  'HVDC_LCC'
+TWOPOR  HVDClink  BUS_RECT  BUS_INV  HVDC_LCC
         2          ! p: bipolar
         1          ! rec_ctl: current control
         1          ! inv_ctl: voltage control
@@ -303,7 +315,7 @@ FRT boost ────► iqref2 ───────────────�
 #### Usage Example
 
 ```
-TWOPOR  VSC1  AC_BUS  DC_BUS  'HVDC_VSC'
+TWOPOR  VSC1  AC_BUS  DC_BUS  HVDC_VSC
         0.003   ! R (pu)
         0.15    ! L (pu)
         3.5     ! Hdc (s)
@@ -403,7 +415,7 @@ P0, ΔP ─► ΔP/Snom ──────────────┼─► N1 �
 #### Usage Example
 
 ```
-TWOPOR  VSC_SC1  AC_BUS  DC_BUS  'HVDC_VSC_SC'
+TWOPOR  VSC_SC1  AC_BUS  DC_BUS  HVDC_VSC_SC
         0.003   ! R (pu)
         0.15    ! L (pu)
         3.5     ! Hdc (s)
@@ -617,7 +629,7 @@ The offshore converter establishes the AC voltage and frequency for the wind far
 #### Usage Example
 
 ```
-TWOPOR  WF_HVDC  OFFSHORE_BUS  ONSHORE_BUS  'DCL_WCL'
+TWOPOR  WF_HVDC  OFFSHORE_BUS  ONSHORE_BUS  DCL_WCL
         0.003    ! R_1 (pu)
         0.15     ! L_1 (pu)
         3.5      ! Hdc_1 (s)

@@ -13,6 +13,16 @@ The RAMSES data keyword is `DCTL`:
 DCTL  model_name  controller_name  field1  field2  ... ;
 ```
 
+:::note[Usage in Dynamic Data Files]
+Discrete controllers are defined with the `DCTL` keyword as standalone records in the dynamic data file. The syntax is:
+
+```
+DCTL model_name ctl_name param1 param2 ... ;
+```
+
+Where `model_name` is the controller type (e.g., `LTC2`, `uvls`, `FRT`), `ctl_name` is a unique instance name, and the remaining parameters are model-specific.
+:::
+
 ---
 
 ## Tap Changers
@@ -68,7 +78,7 @@ where $\tau_{delay} = \tau_{first}$ for the first operation, $\tau_{next}$ there
 #### Usage Example
 
 ```
-DCTL  ltc  LTC_TR1  'TR1-HV-MV'  'BUS_MV'  1  0.85  1.15  33  0.01  30.0  10.0 ;
+DCTL  ltc  LTC_TR1  TR1-HV-MV  BUS_MV  1  0.85  1.15  33  0.01  30.0  10.0 ;
 ```
 
 ---
@@ -105,7 +115,7 @@ $$
 #### Usage Example
 
 ```
-DCTL  ltc2  LTC2_TR1  'TR1-HV-MV'  'BUS_MV'  1  0.85  1.15  33  0.01  1.025  30.0  10.0 ;
+DCTL  LTC2  LTC2_TR1  TR1-HV-MV  BUS_MV  -1  88.  120.  33  0.01  1.0  30  8 ;
 ```
 
 ---
@@ -154,7 +164,7 @@ where $\tau_{max}$ is the maximum delay and `accel` is the acceleration factor (
 #### Usage Example
 
 ```
-DCTL  ltcinv  LTCINV_TR1  'TR1-HV-MV'  'BUS_MV'  1  0.85  1.15  33  0.01  1.025  60.0  0.1 ;
+DCTL  ltcinv  LTCINV_TR1  TR1-HV-MV  BUS_MV  1  0.85  1.15  33  0.01  1.025  60.0  0.1 ;
 ```
 
 ---
@@ -202,7 +212,7 @@ End-stop flags `w(15)` and `w(16)` prevent further tap changes when the ratio is
 #### Usage Example
 
 ```
-DCTL  oltc2  OLTC_TR2  'FROM_BUS'  'TO_BUS'  '1'  1  0.88  1.12  25  0.0075
+DCTL  oltc2  OLTC_TR2  FROM_BUS  TO_BUS  1  1  0.88  1.12  25  0.0075
              1.02  45.0  15.0  0.0  0.0 ;
 ```
 
@@ -243,7 +253,7 @@ Internal variables: `w(5)` = measured voltage, `w(6)` = start time of violation,
 #### Usage Example
 
 ```
-DCTL  uvprot  UV_GEN1  'BUS_HV'  'GEN1'  0.85  0.5 ;
+DCTL  uvprot  UV_GEN1  BUS_HV  GEN1  0.85  0.5 ;
 ```
 
 ---
@@ -299,7 +309,7 @@ Internal variables: `w(12)`–`w(18)` (previous voltage, timers, area accumulato
 #### Usage Example
 
 ```
-DCTL  uvls  UVLS1  'BUS_MV'  'LOAD1'  0.90  0.5  5.0  20.0  0.3  2.0  5.0  50.0  5 ;
+DCTL  uvls  UVLS1  BUS_MV  LOAD1  0.90  0.5  5.0  20.0  0.3  2.0  5.0  50.0  5 ;
 ```
 
 ---
@@ -344,7 +354,7 @@ Two internal timers (`w(8)`, `w(9)`) track time spent in violation zones.
 #### Usage Example
 
 ```
-DCTL  FRT  FRT_WTG1  'WT1'  0.90  0.15  0.70  0.5  0.20  1.0  0.05 ;
+DCTL  FRT  FRT_WTG1  WT1  0.90  0.15  0.70  0.5  0.20  1.0  0.05 ;
 ```
 
 ---
@@ -386,7 +396,7 @@ The controller latches once tripped and cannot reset. State variable `w(7)`:
 #### Usage Example
 
 ```
-DCTL  injprot  PROT_WTG1  'WT1'  'I'  0.0  1.2  0.1 ;
+DCTL  injprot  PROT_WTG1  WT1  I  0.0  1.2  0.1 ;
 ```
 
 ---
@@ -421,7 +431,7 @@ The timer resets if the speed returns within bounds. The controller latches perm
 #### Usage Example
 
 ```
-DCTL  losprot  LOS_GEN2  'GEN2'  1.05  0.2 ;
+DCTL  losprot  LOS_GEN2  GEN2  1.05  0.2 ;
 ```
 
 ---
@@ -455,7 +465,7 @@ The action is immediate (no time delay); the oversize factor allows temporary ov
 #### Usage Example
 
 ```
-DCTL  dctl_line_prot  LINEPROT1  1.05  2  'L1-L2'  'L3-L4' ;
+DCTL  dctl_line_prot  LINEPROT1  1.05  2  L1-L2  L3-L4 ;
 ```
 
 ---
@@ -536,7 +546,7 @@ The cumulated susceptance change is bounded by `LMLN` (maximum increase) and `LM
 #### Usage Example
 
 ```
-DCTL  mais  MAIS1  'BUS_735'
+DCTL  mais  MAIS1  BUS_735
       0.90  0.5  0.05
       0.85  1.0  0.10
       0.05  0.3  0.05
@@ -587,7 +597,7 @@ The direction parameter defines whether increasing the tap increases or decrease
 #### Usage Example
 
 ```
-DCTL  pst  PST_L1  'PST-TR1'  'LINE-MON'  1  -0.5  0.5  21  0.02  30.0  10.0 ;
+DCTL  pst  PST_L1  PST-TR1  LINE-MON  1  -0.5  0.5  21  0.02  30.0  10.0 ;
 ```
 
 ---
@@ -668,7 +678,7 @@ It interacts directly with the HVDC two-port model's internal parameters.
 #### Usage Example
 
 ```
-DCTL  hvdc_lim  HVDCLIM1  'HVDClink'
+DCTL  hvdc_lim  HVDCLIM1  HVDClink
       0.85  1.15  0.00625
       0.85  1.15  0.00625
       15.0  18.0  15.0  18.0

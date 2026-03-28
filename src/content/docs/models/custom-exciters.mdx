@@ -7,6 +7,17 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 This page documents the custom excitation system models available in RAMSES. These models range from a trivial constant-voltage source to full-featured AVR with PSS and OEL. Models without a `.txt` definition file are implemented directly in Fortran and are described from their source headers.
 
+:::note[Usage in Dynamic Data Files]
+Exciter models in RAMSES are defined as sub-records within a `SYNC_MACH` block using the `EXC` keyword, followed by the model name and its parameters. They are not standalone records. The `EXC` line appears after the machine parameters and before the `TOR` (torque/governor) line. The entire block ends with a single `;` after the `TOR` record.
+
+```
+SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
+                    XT  Xl  Xd  X'd  X"d  Xq  X'q  X"q  m  n  Ra  T'do  T"do  T'qo  T"qo
+              EXC model_name  param1  param2  ...
+              TOR model_name  param1  param2  ... ;
+```
+:::
+
 ---
 
 ## exc_constant
@@ -43,13 +54,16 @@ This model is useful for open-loop tests, for machines that are not equipped wit
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-exc exc_constant GEN1
-;
+SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
+                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
+              EXC CONSTANT
+              TOR CONSTANT ;
 ```
 </TabItem>
 <TabItem label="Notes">
 - No parameters need to be supplied; the model self-initialises to the load-flow $V_f$ value.
 - Useful for simulation of machines operating in manual excitation mode.
+- The model name in the data file is `CONSTANT` (not `exc_constant`).
 </TabItem>
 </Tabs>
 
@@ -99,17 +113,17 @@ $$
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-exc exc_1storder GEN1
-  200.0  ! KA: AVR gain
-  0.05   ! TA: time constant (s)
-  0.0    ! Vfmin (pu)
-  6.0    ! Vfmax (pu)
-;
+SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
+                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
+              EXC 1storder  200.0  0.05  0.0  6.0
+                            ! KA    TA    Vfmin Vfmax
+              TOR CONSTANT ;
 ```
 </TabItem>
 <TabItem label="Notes">
 - This model is the Fortran-coded equivalent of a simple `tf1plim` block with input $V_{ref} - V$.
 - `KA` and `TA` together set the closed-loop bandwidth.
+- The model name in the data file is `1storder` (not `exc_1storder`).
 </TabItem>
 </Tabs>
 
@@ -178,24 +192,18 @@ This is the standard two-stage phase-compensating PSS structure. The CODEGEN blo
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-exc exc_kundur GEN1
-  0.02   ! TR: voltage filter (s)
-  200.0  ! KA: AVR gain
-  0.02   ! TA: TGR lead (s)
-  10.0   ! TB: TGR lag (s)
-  9.5    ! KSTAB: PSS gain
-  1.41   ! TW: washout (s)
-  0.154  ! T1: PSS lead 1 (s)
-  0.033  ! T2: PSS lag 1 (s)
-  0.154  ! T3: PSS lead 2 (s)
-  0.033  ! T4: PSS lag 2 (s)
-;
+SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
+                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
+              EXC kundur  0.02  200.0  0.02  10.0  9.5  1.41  0.154  0.033  0.154  0.033
+                          ! TR   KA     TA    TB    KSTAB TW    T1     T2     T3     T4
+              TOR CONSTANT ;
 ```
 </TabItem>
 <TabItem label="Notes">
 - Parameters match the Example 12.6 from Kundur (1994), applicable to a medium-speed generator.
 - The PSS stabilises local modes in the 0.5–2 Hz range.
 - No output limiter is defined in the base model; add clipping externally if required.
+- The model name in the data file is `kundur` (not `exc_kundur`).
 </TabItem>
 </Tabs>
 
@@ -265,31 +273,13 @@ The OEL monitors field current $I_f$. When $I_f > IFLIM$, a timer begins accumul
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-exc exc_generic1 GEN1
-  1.05   ! IFLIM: OEL threshold (pu)
-  0.02   ! d: dead zone
-  0.5    ! f: OEL characteristic
-  0.0    ! S
-  1.0    ! K1
-  1.0    ! K2
-  0.0    ! L1: OEL lower limit
-  0.5    ! L2: OEL upper limit
-  200.0  ! G: AVR gain
-  0.02   ! TA (s)
-  0.10   ! TB (s)
-  0.05   ! TE (s)
-  0.0    ! L3: AVR lower limit
-  6.0    ! L4: AVR upper limit
-  1.0    ! SPEEDIN: use speed
-  9.5    ! KPSS: PSS gain
-  1.40   ! Tw: PSS washout (s)
-  0.15   ! T1 (s)
-  0.03   ! T2 (s)
-  0.15   ! T3 (s)
-  0.03   ! T4 (s)
-  -0.10  ! DVMIN (pu)
-  0.10   ! DVMAX (pu)
-;
+SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
+                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
+              EXC GENERIC1  1.05  -0.1  0.5  0.0  1.0  1.0  0.0  0.5  200.0  0.02  0.10  0.05  0.0  6.0
+                            ! IFLIM  d    f    S   K1   K2   L1   L2   G      TA    TB    TE    L3   L4
+                            1     9.5   1.40  0.15  0.03  0.15  0.03  -0.10  0.10
+                            ! SPEEDIN KPSS  Tw    T1    T2    T3    T4    DVMIN  DVMAX
+              TOR CONSTANT ;
 ```
 </TabItem>
 </Tabs>
@@ -381,47 +371,15 @@ The OEL uses a three-level piecewise-linear characteristic $(s_1, T_{oel1})$, $(
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-exc exc_generic2 GEN1
-  0.0    ! Xc: line-drop compensation
-  0.02   ! Tr: voltage filter (s)
-  1.0    ! C: TGR gain
-  0.10   ! Tc: TGR lead (s)
-  1.00   ! Tb: TGR lag (s)
-  200.0  ! Ka: AVR gain
-  0.05   ! Ta: AVR time constant (s)
-  5.0    ! Ki: integral gain
-  1.0    ! Kp: proportional gain
-  6.0    ! VrmaxD (pu)
-  -6.0   ! VrminD (pu)
-  1.0    ! G: exciter gain
-  0.0    ! Ke
-  0.50   ! Te: exciter lag (s)
-  3.10   ! E1
-  0.066  ! SeE1
-  4.18   ! E2
-  0.91   ! SeE2
-  6.0    ! Vrmax
-  -6.0   ! Vrmin
-  1.0    ! typss: speed input
-  1.0    ! W
-  0.05   ! Tf
-  9.5    ! Kpss
-  1.40   ! Tw
-  0.154  ! T1
-  0.033  ! T2
-  0.154  ! T3
-  0.033  ! T4
-  0.10   ! Lim
-  0.10   ! LimSup
-  1.1    ! s1
-  200.   ! toel1
-  1.2    ! s2
-  60.    ! toel2
-  1.5    ! s3
-  10.    ! toel3
-  1.05   ! perm
-  -0.10  ! LimInf
-;
+SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
+                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
+              EXC generic2  0.0  0.02  1.0  0.10  1.00  200.0  0.05  5.0  1.0  6.0  -6.0  1.0  0.0  0.50
+                            ! Xc   Tr   C    Tc    Tb    Ka     Ta    Ki   Kp  VrmaxD VrminD G   Ke  Te
+                            3.10  0.066  4.18  0.91  6.0  -6.0  1.0  1.0  0.05  9.5  1.40  0.154  0.033  0.154  0.033
+                            ! E1   SeE1   E2   SeE2  Vrmax Vrmin typss W   Tf   Kpss  Tw    T1     T2     T3     T4
+                            0.10  0.10  1.1  200.  1.2  60.  1.5  10.  1.05  -0.10
+                            ! Lim  LimSup s1  toel1 s2  toel2 s3  toel3 perm  LimInf
+              TOR CONSTANT ;
 ```
 </TabItem>
 </Tabs>
@@ -521,28 +479,15 @@ The CODEGEN block structure from the `.txt` file:
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-exc exc_GENERIC3 GEN1
-  200.0  ! G: AVR gain
-  0.05   ! Ta: AVR lead (s)
-  10.0   ! Tb: AVR lag (s)
-  0.04   ! Te: exciter (s)
-  0.0    ! vfmin (pu)
-  5.0    ! vfmax (pu)
-  9.5    ! Kpss: PSS gain
-  1.40   ! Tw: washout (s)
-  0.154  ! T1 (s)
-  0.033  ! T2 (s)
-  0.154  ! T3 (s)
-  0.033  ! T4 (s)
-  0.10   ! C: PSS limit (pu)
-  1.05   ! if1lim (pu)
-  0.30   ! if2lim (pu)
-  30.0   ! Toel (s)
-  1.0    ! Koel
-  0.0    ! L1
-  1.0    ! L2
-  2.0    ! L3
-;
+SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
+                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
+              EXC GENERIC3  200.0  0.05  10.0  0.04  0.0  5.0
+                            ! G     Ta    Tb    Te    vfmin vfmax
+                            9.5  1.40  0.154  0.033  0.154  0.033  0.10
+                            ! Kpss Tw   T1     T2     T3     T4     C
+                            1.05  0.30  30.0  1.0  0.0  1.0  2.0
+                            ! if1lim if2lim Toel Koel L1  L2  L3
+              TOR CONSTANT ;
 ```
 </TabItem>
 </Tabs>
@@ -599,32 +544,20 @@ The OEL integrates the overcurrent error $(I_f - if_{1lim})$, capped at $if_{2li
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-exc exc_GENERIC4 GEN1
-  200.0  ! G
-  0.05   ! Ta (s)
-  10.0   ! Tb (s)
-  0.04   ! Te (s)
-  0.0    ! vfmin
-  5.0    ! vfmax
-  9.5    ! Kpss
-  1.40   ! Tw (s)
-  0.154  ! T1 (s)
-  0.033  ! T2 (s)
-  0.154  ! T3 (s)
-  0.033  ! T4 (s)
-  0.10   ! C (pu)
-  1.05   ! if1lim (pu)
-  0.30   ! if2lim (pu)
-  30.0   ! Toel (s)
-  1.0    ! Koel
-  0.0    ! L1
-  1.0    ! L2
-  2.0    ! L3
-;
+SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
+                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
+              EXC GENERIC4  200.0  0.05  10.0  0.04  0.0  5.0
+                            ! G     Ta    Tb    Te    vfmin vfmax
+                            9.5  1.40  0.154  0.033  0.154  0.033  0.10
+                            ! Kpss Tw   T1     T2     T3     T4     C
+                            1.05  0.30  30.0  1.0  0.0  1.0  2.0
+                            ! if1lim if2lim Toel Koel L1  L2  L3
+              TOR CONSTANT ;
 ```
 </TabItem>
 <TabItem label="Notes">
 - `exc_GENERIC4` is the compiled-code equivalent of `exc_GENERIC3`. Use when simulation speed is a priority, as the Fortran subroutine is faster than the interpreted CODEGEN version.
 - Parameter order and meaning are identical to `exc_GENERIC3`.
+- The model name in the data file is `GENERIC4` (not `exc_GENERIC4`).
 </TabItem>
 </Tabs>

@@ -7,6 +7,17 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 This page documents the IEEE-standard turbine-governor models available in RAMSES, all using the `tor_` prefix. These models implement standardised transfer-function blocks for diesel, gas-turbine, steam-turbine, hydraulic, and simplified ENTSO-E governors.
 
+:::note[Usage in Dynamic Data Files]
+Governor/torque models in RAMSES are defined as sub-records within a `SYNC_MACH` block using the `TOR` keyword, followed by the model name and its parameters. They are not standalone records. The `TOR` line appears after the `EXC` (exciter) line, and the `;` at the end closes the entire `SYNC_MACH` block.
+
+```
+SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
+                    XT  Xl  Xd  X'd  X"d  Xq  X'q  X"q  m  n  Ra  T'do  T"do  T'qo  T"qo
+              EXC model_name  param1  param2  ...
+              TOR model_name  param1  param2  ... ;
+```
+:::
+
 ---
 
 ## tor_DEGOV1
@@ -90,21 +101,23 @@ $$
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-tor tor_DEGOV1 GEN1
-  0     ! SWM: use torque input
-  0.02  ! T1 (s)
-  0.02  ! T2 (s)
-  0.20  ! T3 (s)
-  1.0   ! K
-  0.25  ! T4 (s)
-  0.009 ! T5 (s)
-  0.038 ! T6 (s)
-  0.0   ! TMIN (pu)
-  1.05  ! TMAX (pu)
-  0.01  ! TD (s)
-  0.05  ! R (droop)
-  0.05  ! TE (s)
-;
+SYNC_MACH g1  g1  1. 1.  0.  0.   600. 570. 6. 0. 2.05
+                    XT   0.15  2.2  0.3   0.2   2.   0.4  0.2  0.1  6.0257  0.  7.00  0.05  1.5  0.05
+              EXC GENERIC1   3.0618 -0.1  1.  0.  100. -1. -20.0  10.  120. 5.  12.5 0.1  0.  5.
+                                1     75.   15.    0.22    0.012     0.22    0.012    -0.1    0.1
+              TOR DEGOV1  0      ! SWM: 0 = torque input, 1 = power input
+                          0.02   ! T1: governor lead time constant (s)
+                          0.02   ! T2: governor lag time constant (s)
+                          0.20   ! T3: governor second-order denominator (s)
+                          1.0    ! K: actuator gain
+                          0.25   ! T4: actuator lead time constant (s)
+                          0.009  ! T5: first-order actuator lag (s)
+                          0.038  ! T6: actuator lag time constant (s)
+                          0.0    ! TMIN: minimum fuel/torque limit (pu)
+                          1.05   ! TMAX: maximum fuel/torque limit (pu)
+                          0.01   ! TD: engine dead time (s)
+                          0.05   ! R: speed droop (pu/pu)
+                          0.05 ; ! TE: engine time constant (s)
 ```
 </TabItem>
 <TabItem label="Notes">
@@ -112,6 +125,7 @@ tor tor_DEGOV1 GEN1
 - `TMIN` and `TMAX` are per-unit limits on the integrator output (fuel demand / valve position).
 - `R` is the permanent droop; typical values are 0.04–0.05 pu/pu.
 - The Padé approximation of the dead time $T_D$ is a second-order filter.
+- Parameters are listed in order: `SWM T1 T2 T3 K T4 T5 T6 TMIN TMAX TD R TE`.
 </TabItem>
 </Tabs>
 
@@ -165,20 +179,23 @@ $$
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-tor tor_ENTSOE_simp GEN1
-  0.05  ! R: droop (pu/pu)
-  0.50  ! T1: valve time constant (s)
-  0.0   ! VMIN (pu)
-  1.1   ! VMAX (pu)
-  0.0   ! T2: turbine lead (s)
-  10.0  ! T3: turbine lag (s)
-;
+SYNC_MACH g1  g1  1. 1.  0.  0.   400. 360. 6. 0. 2.05
+                    XT   0.15  2.2  0.3   0.2   2.   0.4  0.2  0.1  6.0257  0.  7.00  0.05  1.5  0.05
+              EXC GENERIC1   3.0618 -0.1  1.  0.  100. -1. -20.0  10.  120. 5.  12.5 0.1  0.  5.
+                                1     75.   15.    0.22    0.012     0.22    0.012    -0.1    0.1
+              TOR ENTSOE_simp  0.05   ! R: permanent droop (pu/pu)
+                               0.50   ! T1: governor/valve time constant (s)
+                               0.0    ! VMIN: minimum valve position (pu)
+                               1.1    ! VMAX: maximum valve position (pu)
+                               0.0    ! T2: turbine lead time constant (s)
+                               10.0 ; ! T3: turbine lag time constant (s)
 ```
 </TabItem>
 <TabItem label="Notes">
 - Typical primary-frequency response studies use $R = 0.04$–$0.05$.
 - Setting $T_2 = 0$ simplifies the turbine to a pure first-order lag $1/(1+sT_3)$.
 - This model is commonly used as a simplified equivalent for aggregated generation.
+- Parameters are listed in order: `R T1 VMIN VMAX T2 T3`.
 </TabItem>
 </Tabs>
 
@@ -257,23 +274,26 @@ $$
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-tor tor_GAST GEN1
-  0.05  ! R: droop (pu/pu)
-  0.40  ! T1: governor lag (s)
-  0.10  ! T2: compressor discharge (s)
-  3.00  ! T3: exhaust temperature lag (s)
-  1.00  ! AT: ambient temperature limit (pu)
-  2.50  ! KT: temperature gain
-  1.05  ! VMAX (pu)
-  0.0   ! VMIN (pu)
-  0.0   ! DTURB: damping factor
-;
+SYNC_MACH g1  g1  1. 1.  0.  0.   400. 360. 6. 0. 2.05
+                    XT   0.15  2.2  0.3   0.2   2.   0.4  0.2  0.1  6.0257  0.  7.00  0.05  1.5  0.05
+              EXC GENERIC1   3.0618 -0.1  1.  0.  100. -1. -20.0  10.  120. 5.  12.5 0.1  0.  5.
+                                1     75.   15.    0.22    0.012     0.22    0.012    -0.1    0.1
+              TOR GAST  0.05   ! R: permanent droop (pu/pu)
+                        0.40   ! T1: governor/valve time constant (s)
+                        0.10   ! T2: compressor discharge time constant (s)
+                        3.00   ! T3: exhaust temperature lag (s)
+                        1.00   ! AT: ambient temperature load limit (pu)
+                        2.50   ! KT: temperature control loop gain
+                        1.05   ! VMAX: maximum valve position (pu)
+                        0.0    ! VMIN: minimum valve position (pu)
+                        0.0  ; ! DTURB: turbine damping factor
 ```
 </TabItem>
 <TabItem label="Notes">
 - Based on the IEEE Committee Report on "Dynamic Models for Steam and Hydro Turbines in Power System Studies" (1973), later adapted for gas turbines.
 - `AT` and `KT` define the exhaust-temperature protection characteristic.
 - `DTURB = 0` disables speed-dependent damping.
+- Parameters are listed in order: `R T1 T2 T3 AT KT VMAX VMIN DTURB`.
 </TabItem>
 </Tabs>
 
@@ -336,21 +356,24 @@ $$
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-tor tor_TGOV1D GEN1
-  0.05  ! R: droop (pu/pu)
-  0.50  ! T1: valve time constant (s)
-  1.05  ! VMAX (pu)
-  0.0   ! VMIN (pu)
-  2.10  ! T2: lead (s)
-  7.00  ! T3: lag (s)
-  0.0   ! Dt: turbine damping
-;
+SYNC_MACH g1  g1  1. 1.  0.  0.   400. 360. 6. 0. 2.05
+                    XT   0.15  2.2  0.3   0.2   2.   0.4  0.2  0.1  6.0257  0.  7.00  0.05  1.5  0.05
+              EXC GENERIC1   3.0618 -0.1  1.  0.  100. -1. -20.0  10.  120. 5.  12.5 0.1  0.  5.
+                                1     75.   15.    0.22    0.012     0.22    0.012    -0.1    0.1
+              TOR TGOV1D  0.05   ! R: permanent droop (pu/pu)
+                          0.50   ! T1: steam chest/valve actuator time constant (s)
+                          1.05   ! VMAX: maximum valve position (pu)
+                          0.0    ! VMIN: minimum valve position (pu)
+                          2.10   ! T2: lead time constant — reheater zero (s)
+                          7.00   ! T3: lag time constant — reheater pole (s)
+                          0.0  ; ! Dt: turbine damping coefficient
 ```
 </TabItem>
 <TabItem label="Notes">
 - This is essentially the IEEE TGOV1 model with an additional damping term $D_t$.
 - Setting $T_2 = 0$ gives a pure first-order turbine $1/(1+sT_3)$.
 - $D_t > 0$ adds a stabilising speed-dependent power correction (useful for islanded operation).
+- Parameters are listed in order: `R T1 VMAX VMIN T2 T3 Dt`.
 </TabItem>
 </Tabs>
 
@@ -444,26 +467,29 @@ $$
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-tor tor_hygov GEN1
-  0.05  ! R: permanent droop
-  0.30  ! r: transient droop
-  5.00  ! Tr: transient droop reset time (s)
-  0.05  ! Tf: filter time constant (s)
-  0.20  ! Tg: gate servo time constant (s)
-  0.20  ! VELM: gate velocity limit (pu/s)
-  1.00  ! Gmax (pu)
-  0.0   ! Gmin (pu)
-  1.50  ! Tw: water starting time (s)
-  1.10  ! At: turbine gain
-  0.50  ! Dturb: damping factor
-  0.05  ! Qnl: no-load flow (pu)
-;
+SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
+                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
+              EXC GENERIC1   1.8991 -0.1  0.  1.  100. -1. -11  10.  70.  10.  20. 0.1  0.  4.
+                                1     75.   15.    0.2    0.01     0.2    0.01    -0.1    0.1
+              TOR hygov  0.05   ! R: permanent droop (pu/pu)
+                         0.30   ! r: transient droop (pu/pu)
+                         5.00   ! Tr: transient droop reset time (s)
+                         0.05   ! Tf: filter time constant for speed error (s)
+                         0.20   ! Tg: gate servo time constant (s)
+                         0.20   ! VELM: gate velocity limit (pu/s)
+                         1.00   ! Gmax: maximum gate opening (pu)
+                         0.0    ! Gmin: minimum gate opening (pu)
+                         1.50   ! Tw: water starting time (s)
+                         1.10   ! At: turbine gain (pu power / pu flow)
+                         0.50   ! Dturb: turbine damping factor
+                         0.05 ; ! Qnl: no-load water flow (pu)
 ```
 </TabItem>
 <TabItem label="Notes">
 - `Tw` (water starting time) is the dominant parameter controlling frequency response; typical values are 0.5–2 s.
-- `r > R` is required for stable regulation; set $r \approx 2$–$5 \times R$.
+- `r > R` is required for stable regulation; set $r \approx 2$–5 $\times R$.
 - `Tr` is the reset time for transient droop; values of 5–30 s are typical.
 - Non-linear head-flow equation makes this model suitable for large transients.
+- Parameters are listed in order: `R r Tr Tf Tg VELM Gmax Gmin Tw At Dturb Qnl`.
 </TabItem>
 </Tabs>

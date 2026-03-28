@@ -7,6 +7,17 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 This page documents the custom turbine-governor (`tor_`) models in RAMSES. These models are implemented in Fortran using the legacy multi-subroutine API and cover a wide range of prime-mover types: thermal (steam), gas turbine, hydraulic, nuclear, and simplified equivalents.
 
+:::note[Usage in Dynamic Data Files]
+Governor/torque models in RAMSES are defined as sub-records within a `SYNC_MACH` block using the `TOR` keyword, followed by the model name and its parameters. They are not standalone records. The `TOR` line appears after the `EXC` (exciter) line, and the `;` at the end closes the entire `SYNC_MACH` block.
+
+```
+SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
+                    XT  Xl  Xd  X'd  X"d  Xq  X'q  X"q  m  n  Ra  T'do  T"do  T'qo  T"qo
+              EXC model_name  param1  param2  ...
+              TOR model_name  param1  param2  ... ;
+```
+:::
+
 ---
 
 ## tor_constant
@@ -47,13 +58,17 @@ $$
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-tor tor_constant GEN1
-;
+SYNC_MACH g6  g6  1. 1.  0.  0.   400. 360. 6. 0. 2.05
+                    XT   0.15  2.2  0.3    0.2   2.   0.4  0.2  0.1  6.0257  0.  7.00  0.05  1.5  0.05
+              EXC GENERIC1   3.0618 -0.1  1.  0.  100. -1. -20.0  10.  120. 5.  12.5 0.1  0.  5.
+                                1     75.   15.    0.22    0.012     0.22    0.012    -0.1    0.1
+              TOR CONSTANT ;
 ```
 </TabItem>
 <TabItem label="Notes">
 - Useful for machines operating at fixed setpoint, for testing generator models in isolation, or as a placeholder.
 - The mechanical power observable $P_m = T_m \cdot \omega$ will vary slightly with speed changes.
+- `TOR CONSTANT` takes no parameters — $T_{m0}$ is set automatically from the load-flow initialisation.
 </TabItem>
 </Tabs>
 
@@ -116,11 +131,11 @@ i.e.:
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-tor tor_1storder GEN1
-  0.30   ! FHP: HP fraction
-  0.50   ! T2: time constant (s)
-  0.05   ! R: droop (pu/pu)
-;
+SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
+                    XT   0.15  1.1  0.25   0.2   0.7   *   0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
+              EXC GENERIC1   1.8991 -0.1  0.  1.  100. -1. -11  10.  70.  10.  20. 0.1  0.  4.
+                                1     75.   15.    0.2    0.01     0.2    0.01    -0.1    0.1
+              TOR 1STORDER  0.30  0.50  0.05 ;  ! FHP  T2  R
 ```
 </TabItem>
 <TabItem label="Notes">
@@ -199,20 +214,12 @@ $$
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-tor tor_thermal_generic1 GEN1
-  0.05   ! sigma: droop (pu/pu)
-  0.02   ! Tmes: speed filter (s)
-  0.20   ! Tsm: servo time constant (s)
-  -0.10  ! zdotmin: max closing rate (pu/s)
-  0.10   ! zdotmax: max opening rate (pu/s)
-  0.0    ! zmin: gate lower limit (pu)
-  1.05   ! zmax: gate upper limit (pu)
-  0.30   ! Thp: HP lag (s)
-  0.30   ! Fhp: HP fraction
-  7.0    ! Tr: reheater (s)
-  0.40   ! Fmp: MP fraction
-  0.50   ! Tlp: LP lag (s)
-;
+SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
+                    XT   0.15  1.1  0.25   0.2   0.7   *   0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
+              EXC GENERIC1   1.8991 -0.1  0.  1.  100. -1. -11  10.  70.  10.  20. 0.1  0.  4.
+                                1     75.   15.    0.2    0.01     0.2    0.01    -0.1    0.1
+              TOR THERMAL_GENERIC1  0.05  0.02  0.20  -0.10  0.10  0.0  1.05  0.30  0.30  7.0  0.40  0.50 ;
+              !                     sigma Tmes  Tsm  zdotmin zdotmax zmin zmax  Thp   Fhp   Tr   Fmp   Tlp
 ```
 </TabItem>
 <TabItem label="Notes">
@@ -299,22 +306,19 @@ $$
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-tor tor_hydro_generic1 GEN1
-  0.04   ! SIGMA: droop (pu/pu)
-  0.02   ! Tmes: speed filter (s)
-  0.05   ! Qv: no-load flow fraction
-  2.0    ! KP: proportional gain
-  0.5    ! KI: integral gain
-  0.20   ! TSM: servo time constant (s)
-  0.15   ! LIMZDOT: gate velocity limit (pu/s)
-  1.50   ! TW: water starting time (s)
-;
+SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
+                    XT   0.15  1.1  0.25   0.2   0.7   *   0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
+              EXC GENERIC1   1.8991 -0.1  0.  1.  100. -1. -11  10.  70.  10.  20. 0.1  0.  4.
+                                1     75.   15.    0.2    0.01     0.2    0.01    -0.1    0.1
+              TOR HYDRO_GENERIC1  0.04  2.0  0.  2.00  0.40  0.2  0.1  1.0 ;
+              !                   SIGMA  TP  Qv   KP    KI   TSM LIMZDOT TW
 ```
 </TabItem>
 <TabItem label="Notes">
 - `TW` (water-starting time) is the most influential parameter; typical values are 0.5–3 s.
 - Increase `KP` / `KI` carefully: large values can cause governor instability with high `TW`.
 - `Qv = 0` assumes no no-load losses.
+- Parameters follow the order in `dyn_A.txt`: `SIGMA TP Qv KP KI TSM LIMZDOT TW`.
 </TabItem>
 </Tabs>
 
@@ -385,23 +389,12 @@ Additional thermodynamic correction terms involve $TF$ (flame lag) and $ECR$ (ex
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-tor tor_gasturbm GEN1
-  0.05   ! TDSP: droop lag (s)
-  1.0    ! STAT: steady-state gain
-  25.0   ! ZZ: proportional gain
-  0.50   ! XX: lead factor
-  1.0    ! YY: lag factor
-  1.0    ! SACC
-  0.0    ! MIN: min fuel (pu)
-  1.0    ! MAX: max fuel (pu)
-  0.05   ! TVALVE: fuel valve (s)
-  0.40   ! TGAZ: combustion lag (s)
-  0.01   ! TF: flame lag (s)
-  0.0    ! ECR
-  0.20   ! TCD: compressor discharge (s)
-  1.0    ! BF2: output slope
-  0.0    ! AF2: output intercept
-;
+SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
+                    XT   0.15  1.1  0.25   0.2   0.7   *   0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
+              EXC GENERIC1   1.8991 -0.1  0.  1.  100. -1. -11  10.  70.  10.  20. 0.1  0.  4.
+                                1     75.   15.    0.2    0.01     0.2    0.01    -0.1    0.1
+              TOR GASTURBM  0.05  1.0  25.0  0.50  1.0  1.0  0.0  1.0  0.05  0.40  0.01  0.0  0.20  1.0  0.0 ;
+              !              TDSP STAT  ZZ    XX   YY  SACC MIN  MAX TVALVE TGAZ   TF   ECR   TCD  BF2  AF2
 ```
 </TabItem>
 </Tabs>
@@ -466,30 +459,12 @@ The valve demand passes through:
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-tor tor_govclasm GEN1
-  1.0    ! STAT
-  0.003  ! DEADB (pu)
-  0.001  ! DBON (pu)
-  0.10   ! TSM (s)
-  1.0    ! V0 (pu)
-  1.0    ! VFN (pu)
-  0.30   ! TFV (s)
-  0.5    ! VFR (pu/s)
-  1.0    ! MAXINT (pu)
-  1.0    ! ALPHA
-  5.0    ! TRES (s)
-  25.0   ! GOMP
-  0.10   ! PVARMAX (pu)
-  -0.10  ! PVARMIN (pu)
-  0.05   ! GPVAR
-  1.0    ! KCR
-  0.20   ! TCR (s)
-  0.05   ! MINFUEL (pu)
-  0.30   ! TDELAY (s)
-  1.05   ! PMAX (pu)
-  0.30   ! TCH (s)
-  0.05   ! PMIN (pu)
-;
+SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
+                    XT   0.15  1.1  0.25   0.2   0.7   *   0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
+              EXC GENERIC1   1.8991 -0.1  0.  1.  100. -1. -11  10.  70.  10.  20. 0.1  0.  4.
+                                1     75.   15.    0.2    0.01     0.2    0.01    -0.1    0.1
+              TOR GOVCLASM  1.0  0.003  0.001  0.10  1.0  1.0  0.30  0.5  1.0  1.0  5.0  25.0  0.10  -0.10  0.05  1.0  0.20  0.05  0.30  1.05  0.30  0.05 ;
+              !              STAT DEADB  DBON   TSM   V0  VFN   TFV  VFR MAXINT ALPHA TRES  GOMP PVARMAX PVARMIN GPVAR KCR  TCR MINFUEL TDELAY PMAX  TCH  PMIN
 ```
 </TabItem>
 </Tabs>
@@ -551,16 +526,12 @@ derived from the non-linear head-flow curve approximated at initialisation.
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-tor tor_govhydr GEN1
-  1.0    ! STAT
-  2.0    ! KP: proportional gain
-  0.5    ! KI: integral gain
-  0.10   ! TC: servo (s)
-  1.0    ! V0: reference
-  1.0    ! VF: flow gain
-  1.0    ! TCE2 (s)
-  5.0    ! TCE1 (s)
-;
+SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
+                    XT   0.15  1.1  0.25   0.2   0.7   *   0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
+              EXC GENERIC1   1.8991 -0.1  0.  1.  100. -1. -11  10.  70.  10.  20. 0.1  0.  4.
+                                1     75.   15.    0.2    0.01     0.2    0.01    -0.1    0.1
+              TOR GOVHYDR  1.0  2.0  0.5  0.10  1.0  1.0  1.0  5.0 ;
+              !             STAT  KP   KI   TC   V0   VF  TCE2 TCE1
 ```
 </TabItem>
 <TabItem label="Notes">
@@ -628,22 +599,12 @@ The fuel valve dynamics use time constants $TFV$ (valve), $V0$ (reference), and 
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-tor tor_govnuc GEN1
-  1.0    ! STAT
-  0.005  ! DEADB (pu)
-  0.002  ! DBON (pu)
-  0.02   ! GRADMAX: max load rate (pu/s)
-  -0.02  ! GRADMIN: max unload rate (pu/s)
-  10.0   ! TGRAD: ramp filter (s)
-  5.0    ! TSM: servo (s)
-  1.0    ! V0 (pu)
-  1.0    ! VFN (pu)
-  0.50   ! TFV: valve actuator (s)
-  0.10   ! VFR: valve rate (pu/s)
-  1.0    ! ALPHA: integral gain
-  20.0   ! TRES: reset time (s)
-  1.0    ! GOMP: output gain
-;
+SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
+                    XT   0.15  1.1  0.25   0.2   0.7   *   0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
+              EXC GENERIC1   1.8991 -0.1  0.  1.  100. -1. -11  10.  70.  10.  20. 0.1  0.  4.
+                                1     75.   15.    0.2    0.01     0.2    0.01    -0.1    0.1
+              TOR GOVNUC  1.0  0.005  0.002  0.02  -0.02  10.0  5.0  1.0  1.0  0.50  0.10  1.0  20.0  1.0 ;
+              !            STAT DEADB   DBON GRADMAX GRADMIN TGRAD TSM  V0  VFN   TFV   VFR ALPHA  TRES  GOMP
 ```
 </TabItem>
 <TabItem label="Notes">
