@@ -1,0 +1,173 @@
+---
+title: URAMSES
+description: Compiling and linking user-defined Fortran models with RAMSES
+---
+
+import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
+
+[URAMSES](https://github.com/SPS-L/stepss-URAMSES) provides the framework and tools needed to compile and link custom Fortran models with PyRAMSES and STEPSS.
+
+## Prerequisites
+
+<Tabs>
+<TabItem label="Windows">
+
+- **Microsoft Visual Studio** 2019 or later
+- **Intel oneAPI Fortran Compiler** (see [Installation](/stepss-docs/getting-started/installation/))
+- **PyRAMSES** or **STEPSS**
+
+</TabItem>
+<TabItem label="Linux">
+
+- **gfortran** (GNU Fortran compiler)
+- **OpenBLAS** (optimized BLAS library)
+- **PyRAMSES**
+
+```bash
+# Ubuntu/Debian
+sudo apt install gfortran libopenblas-dev
+
+# Fedora/RHEL
+sudo dnf install gcc-gfortran openblas-devel
+
+# Arch Linux
+sudo pacman -S gcc-fortran openblas
+```
+
+</TabItem>
+</Tabs>
+
+## Project Structure
+
+```
+URAMSES/
+├── src/                         # Source code (common)
+│   ├── c_interface.f90          # C interface for Python integration
+│   ├── main.f90                 # Main entry point (executable only)
+│   ├── FUNCTIONS_IN_MODELS.f90  # Helper functions for models
+│   ├── usr_exc_models.f90       # Exciter model associations
+│   ├── usr_inj_models.f90       # Injector model associations
+│   ├── usr_tor_models.f90       # Torque model associations
+│   ├── usr_twop_models.f90      # Two-port model associations
+│   └── usr_dctl_models.f90      # Discrete controller associations
+├── my_models/                   # Custom models
+│   ├── exc_*.f90                # Exciter models
+│   ├── inj_*.f90                # Injector models
+│   ├── tor_*.f90                # Torque models
+│   ├── twop_*.f90               # Two-port models
+│   └── *.txt                    # Model parameter files
+├── modules/                     # Pre-compiled modules (Windows/Intel)
+│   ├── *.mod                    # Module interface files
+│   └── libramses.lib            # Pre-compiled RAMSES library
+├── modules_lin/                 # Pre-compiled modules (Linux/gfortran)
+│   ├── *.mod                    # Module interface files
+│   └── libramses.a              # Pre-compiled RAMSES library
+├── URAMSES.sln                  # Visual Studio solution (Windows)
+├── Makefile.gfortran            # Makefile (Linux)
+├── Release_intel_w64/           # Build output (Windows)
+└── Release_gnu_l/               # Build output (Linux)
+```
+
+## Model Types
+
+| Type | Prefix | Description |
+|------|--------|-------------|
+| Exciters | `exc_*` | Generator excitation system models |
+| Injectors | `inj_*` | Current/voltage injection models |
+| Torque | `tor_*` | Mechanical torque models |
+| Two-port | `twop_*` | Two-port network models (SVC, STATCOM, HVDC) |
+| Discrete Control | `dctl_*` | Discrete control system models |
+
+## Building
+
+<Tabs>
+<TabItem label="Linux">
+
+```bash
+# Build shared library + executable
+make -f Makefile.gfortran all
+
+# Build only the shared library (for PyRAMSES)
+make -f Makefile.gfortran lib
+
+# Build only the executable
+make -f Makefile.gfortran exe
+
+# Clean build artifacts
+make -f Makefile.gfortran clean
+```
+
+The shared library (`ramses.so`) will be in `Release_gnu_l/`.
+
+</TabItem>
+<TabItem label="Windows">
+
+<Steps>
+
+1. Open `URAMSES.sln` in Visual Studio
+2. Select the desired project:
+   - `dllramses` — builds `ramses.dll` (for PyRAMSES)
+   - `exeramses` — builds `dynsim.exe` (standalone)
+3. Build the solution (Release x64 configuration)
+4. Output will be in `Release_intel_w64/`
+
+</Steps>
+
+</TabItem>
+</Tabs>
+
+## Adding Custom Models
+
+<Steps>
+
+1. **Write the model source**: Create a `.f90` file in `my_models/` following the naming convention (`exc_`, `inj_`, `tor_`, `twop_`, or `dctl_` prefix)
+
+2. **Register the model**: Add the model association in the corresponding `usr_*_models.f90` file in `src/`
+
+3. **Rebuild**: Compile and link the modified URAMSES
+
+</Steps>
+
+### Example: Registering an Exciter Model
+
+In `src/usr_exc_models.f90`, add a case for your model:
+
+```txt
+case ('MY_EXCITER')
+    call exc_MY_EXCITER(...)
+```
+
+### Included Example Models
+
+The repository includes several example models:
+
+| File | Description |
+|------|-------------|
+| `exc_ENTSOE_lim.f90` | ENTSO-E exciter with limits |
+| `exc_GENERIC3.f90` | Generic exciter type 3 |
+| `exc_ST1A.f90` | IEEE ST1A exciter |
+| `tor_ENTSOE_simp.f90` | ENTSO-E simplified torque controller |
+| `inj_AIR_COND1_mod.f90` | Air conditioning load injector |
+
+## Using Custom Models
+
+### With PyRAMSES
+
+Point PyRAMSES to your custom library:
+
+```python
+import pyramses
+ram = pyramses.sim(custLibDir="path/to/Release_gnu_l")
+```
+
+### With STEPSS GUI
+
+Replace the default RAMSES DLL/executable with your custom-built version.
+
+## Helper Functions
+
+The `FUNCTIONS_IN_MODELS.f90` module provides utility functions available in all models. Refer to the source code for the complete list of available helper routines.
+
+## Repository
+
+Source code: [SPS-L/stepss-URAMSES](https://github.com/SPS-L/stepss-URAMSES)

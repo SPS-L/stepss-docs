@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 40" fill="none">
+  <rect x="2" y="8" width="24" height="24" rx="4" fill="#2b6cb0"/>
+  <path d="M8 20 L14 14 L20 20 L14 26Z" fill="white"/>
+  <circle cx="14" cy="20" r="3" fill="#2b6cb0"/>
+  <text x="32" y="28" font-family="system-ui, sans-serif" font-weight="700" font-size="22" fill="#1a365d">STEPSS</text>
+</svg>

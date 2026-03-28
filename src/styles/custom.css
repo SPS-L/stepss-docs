@@ -1,0 +1,55 @@
+/* STEPSS Documentation Custom Styles */
+
+:root {
+	--sl-color-accent-low: #1a365d;
+	--sl-color-accent: #2b6cb0;
+	--sl-color-accent-high: #bee3f8;
+	--sl-font: 'Inter', system-ui, -apple-system, sans-serif;
+	--sl-text-code: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-low: #bee3f8;
+	--sl-color-accent: #2b6cb0;
+	--sl-color-accent-high: #1a365d;
+}
+
+/* Code blocks */
+.expressive-code pre {
+	font-size: 0.85rem;
+}
+
+/* Better table styling */
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+th {
+	background: var(--sl-color-gray-6);
+	font-weight: 600;
+}
+
+/* KaTeX overrides for dark mode */
+:root[data-theme='dark'] .katex {
+	color: var(--sl-color-white);
+}
+
+/* Hero section on index */
+.hero-banner {
+	background: linear-gradient(135deg, #1a365d 0%, #2b6cb0 100%);
+	padding: 2rem;
+	border-radius: 0.75rem;
+	color: white;
+	margin-bottom: 2rem;
+}
+
+.hero-banner h1 {
+	color: white;
+	margin-top: 0;
+}
+
+/* Admonitions / callout boxes */
+.sl-markdown-content :is(aside) {
+	border-radius: 0.5rem;
+}

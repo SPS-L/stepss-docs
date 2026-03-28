@@ -1,0 +1,54 @@
+---
+title: STEPSS Documentation
+description: Static and Transient Electric Power Systems Simulation
+template: splash
+hero:
+  tagline: A comprehensive power system simulation suite for static and dynamic analysis of electrical grids, developed by the Sustainable Power Systems Lab (SPS-L).
+  image:
+    dark: ../../assets/logo-dark.svg
+    light: ../../assets/logo-light.svg
+  actions:
+    - text: Get Started
+      link: /stepss-docs/getting-started/overview/
+      icon: right-arrow
+      variant: primary
+    - text: PyRAMSES API
+      link: /stepss-docs/pyramses/overview/
+      icon: external
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Core Modules
+
+<CardGrid stagger>
+  <Card title="PFC — Power Flow" icon="document">
+    Newton-Raphson power flow computation in polar coordinates. Determines the initial operating point for dynamic simulations.
+  </Card>
+  <Card title="RAMSES — Dynamic Simulator" icon="rocket">
+    Time-domain simulation of power system dynamics under the phasor approximation. Supports Backward Euler, Trapezoidal, and BDF2 integration with OpenMP parallelism.
+  </Card>
+  <Card title="CODEGEN — Model Generator" icon="pencil">
+    Translates user-defined models into Fortran 2003 code for compilation and linking with RAMSES.
+  </Card>
+  <Card title="PyRAMSES — Python Interface" icon="seti:python">
+    Modern Python API for scripting simulations, extracting results, and integrating with the scientific Python ecosystem.
+  </Card>
+</CardGrid>
+
+## Quick Links
+
+<CardGrid>
+  <Card title="Installation" icon="laptop">
+    [Set up STEPSS on Windows →](/stepss-docs/getting-started/installation/)
+  </Card>
+  <Card title="Quick Start" icon="open-book">
+    [Run your first simulation →](/stepss-docs/getting-started/quickstart/)
+  </Card>
+  <Card title="User-Defined Models" icon="setting">
+    [Create custom models with CODEGEN →](/stepss-docs/developer/user-models/)
+  </Card>
+  <Card title="URAMSES" icon="puzzle">
+    [Compile and link Fortran models →](/stepss-docs/developer/uramses/)
+  </Card>
+</CardGrid>

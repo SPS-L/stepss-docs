@@ -1,0 +1,93 @@
+// @ts-check
+import { defineConfig } from 'astro/config';
+import starlight from '@astrojs/starlight';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+
+// https://astro.build/config
+export default defineConfig({
+	site: 'https://sps-l.github.io',
+	base: '/stepss-docs',
+	markdown: {
+		remarkPlugins: [remarkMath],
+		rehypePlugins: [rehypeKatex],
+	},
+	integrations: [
+		starlight({
+			title: 'STEPSS',
+			description: 'Static and Transient Electric Power Systems Simulation — Documentation',
+			logo: {
+				light: './src/assets/logo-light.svg',
+				dark: './src/assets/logo-dark.svg',
+				replacesTitle: false,
+			},
+			social: [
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/SPS-L/STEPSS' },
+			],
+			editLink: {
+				baseUrl: 'https://github.com/SPS-L/stepss-docs/edit/main/',
+			},
+			customCss: [
+				'./src/styles/custom.css',
+				'katex/dist/katex.min.css',
+			],
+			head: [
+				{
+					tag: 'meta',
+					attrs: {
+						name: 'keywords',
+						content: 'power systems, simulation, RAMSES, PyRAMSES, dynamic simulation, STEPSS',
+					},
+				},
+			],
+			sidebar: [
+				{
+					label: 'Getting Started',
+					items: [
+						{ label: 'Overview', slug: 'getting-started/overview' },
+						{ label: 'Installation', slug: 'getting-started/installation' },
+						{ label: 'Quick Start', slug: 'getting-started/quickstart' },
+						{ label: 'License', slug: 'getting-started/license' },
+					],
+				},
+				{
+					label: 'User Guide',
+					items: [
+						{ label: 'File Formats', slug: 'user-guide/file-formats' },
+						{ label: 'Network Modeling', slug: 'user-guide/network' },
+						{ label: 'Power Flow (PFC)', slug: 'user-guide/pfc' },
+						{ label: 'Reference Frames & Initialization', slug: 'user-guide/reference-frames' },
+						{ label: 'Dynamic Models', slug: 'user-guide/dynamic-models' },
+						{ label: 'Disturbances', slug: 'user-guide/disturbances' },
+						{ label: 'Solver Settings', slug: 'user-guide/solver-settings' },
+						{ label: 'Eigenanalysis', slug: 'user-guide/eigenanalysis' },
+					],
+				},
+				{
+					label: 'PyRAMSES',
+					items: [
+						{ label: 'Overview', slug: 'pyramses/overview' },
+						{ label: 'Installation', slug: 'pyramses/installation' },
+						{ label: 'API Reference', slug: 'pyramses/api-reference' },
+						{ label: 'Examples', slug: 'pyramses/examples' },
+					],
+				},
+				{
+					label: 'Developer Guide',
+					items: [
+						{ label: 'User-Defined Models', slug: 'developer/user-models' },
+						{ label: 'CODEGEN Blocks Library', slug: 'developer/codegen-library' },
+						{ label: 'URAMSES', slug: 'developer/uramses' },
+					],
+				},
+				{
+					label: 'Resources',
+					items: [
+						{ label: 'References', slug: 'resources/references' },
+						{ label: 'Repositories', slug: 'resources/repositories' },
+					],
+				},
+			],
+		}),
+	],
+});
