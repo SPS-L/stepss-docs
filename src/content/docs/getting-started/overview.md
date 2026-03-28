@@ -90,7 +90,7 @@ STEPSS modules can be run through three interfaces:
 
 | Interface | RAMSES (Dynamic) | PFC (Static) | CODEGEN |
 |-----------|:----------------:|:------------:|:-------:|
-| **Command Line** | `ramses.exe -t cmd.txt` | `pfc.exe -t cmd.txt` | Via STEPSS GUI |
+| **Command Line** | `ramses -t cmd.txt` | `pfc -t cmd.txt` | `codegen model.txt` |
 | **GUI (Java)** | Full support | Full support | Full support |
 | **Python (PyRAMSES)** | Full support | — | — |
 
