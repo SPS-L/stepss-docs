@@ -98,6 +98,7 @@ export default defineConfig({
 					items: [
 						{ label: 'User-Defined Models', slug: 'developer/user-models' },
 						{ label: 'CODEGEN Blocks Library', slug: 'developer/codegen-library' },
+						{ label: 'CODEGEN Model Examples', slug: 'developer/codegen-examples' },
 						{ label: 'URAMSES', slug: 'developer/uramses' },
 					],
 				},

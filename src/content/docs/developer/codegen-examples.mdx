@@ -1,0 +1,743 @@
+---
+title: CODEGEN Model Examples
+description: Complete CODEGEN model files for each model type — exciter, governor, injector, and two-port
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+This page provides complete, annotated CODEGEN model files for each of the four model categories. These are real models from the RAMSES model library and can serve as templates for developing your own models.
+
+For the block reference, see the [CODEGEN Blocks Library](/stepss-docs/developer/codegen-library/). For the model framework (states, equations, initialization), see [User-Defined Models](/stepss-docs/developer/user-models/).
+
+---
+
+## Exciter Model — `exc_ST1A`
+
+The IEEE ST1A is a bus-fed static excitation system. This model demonstrates the typical structure of an `exc`-type CODEGEN file: voltage compensation, AVR with lead-lag stages, field current limiting, UEL/OEL gating, and variable-limit output clamp.
+
+**Source:** [SPS-L/stepss-ramses — IEEE_models/exc_ST1A.txt](https://github.com/SPS-L/stepss-ramses/blob/master/IEEE_models/exc_ST1A.txt)
+
+<Tabs>
+<TabItem label="Full Model File">
+```
+exc
+ST1A
+
+%data
+
+Kv
+Rc
+Xc
+TR
+UEL
+VIMIN
+VIMAX
+VUEL    ERROR - Vuel is the UEL signal not a parameter!
+TC
+TB
+TC1
+TB1
+KA
+TA
+VAMIN
+VAMAX
+VRMIN
+VRMAX
+KC
+KF
+TF
+KLR
+ILR
+
+%parameters
+
+VREF     = vcomp([v],[p],[q],{Kv},{Rc},{Xc})+([vf]/{KA})
+
+%states
+
+Vc1      = vcomp([v],[p],[q],{Kv},{Rc},{Xc})
+Vc       = vcomp([v],[p],[q],{Kv},{Rc},{Xc})
+deltaV   = ([vf]/{KA})
+V1       = [vf]/{KA}
+V2       = [vf]/{KA}
+V3       = [vf]/{KA}
+V4       = [vf]/{KA}
+VA       = [vf]
+VLR      = {KLR}*([if]-{ILR})
+VLRlim   = 0.
+V5       = [vf]
+V6       = [vf]
+V7       = [vf]
+uplim    = [v]*{VRMAX}-{KC}*[if]
+lolim    = [v]*{VRMIN}
+VF       = 0.
+
+VOEL     = 99999.
+
+%observables
+
+VA
+Vc1
+Vc
+V1
+V2
+V3
+V4
+vf
+p
+q
+v
+VLRlim
+deltaV
+
+VREF
+VOEL
+
+%models
+& algeq                    fictitious over excitation limit
+[VOEL]-99999.
+& algeq                    line drop compensation
+[Vc1]-vcomp([v],[p],[q],{Kv},{Rc},{Xc})
+& tf1p                     voltage measurement time constant
+Vc1
+Vc
+1.d0
+{TR}
+& algeq                    summation point of AVR
+[deltaV]-{VREF}+[Vc]-equal({UEL},1.d0)*{VUEL}+[VF]
+& lim                      limiter on deltaV
+deltaV
+V1
+{VIMIN}
+{VIMAX}
+& max1v1c                  HV gate for VUEL if UEL=2
+V1
+V2
+{VUEL}*equal({UEL},2.d0) - 9999.*(1-equal({UEL},2.d0))
+& tf1p1z                   first lead-lag
+V2
+V3
+1.
+{TC}
+{TB}
+& tf1p1z                   second lead-lag
+V3
+V4
+1.
+{TC1}
+{TB1}
+& tf1plim                  amplifier
+V4
+VA
+{KA}
+{TA}
+{VAMIN}
+{VAMAX}
+& algeq                    immediate field current limiting signal
+[VLR]-{KLR}*([if]-{ILR})
+& lim                      ... lower limited to zero
+VLR
+VLRlim
+0.
+99999.
+& algeq                    ... and subtracted from main signal
+[V5]-[VA]+[VLRlim]
+& max1v1c                  HV gate for VUEL if UEL=3
+V5
+V6
+{VUEL}*equal({UEL},3.d0) - 9999.*(1-equal({UEL},3.d0))
+& min2v                    LV gate for VOEL
+V6
+VOEL
+V7
+& algeq                    variable lower limit of final limiter
+[v]*{VRMIN}-[lolim]
+& algeq                    variable upper limit of final limiter
+[v]*{VRMAX}-{KC}*[if]-[uplim]
+& limvb                    final limiter
+V7
+lolim
+uplim
+vf
+& tfder1p                  derivative feedback
+V7
+VF
+{KF}/{TF}
+{TF}
+```
+</TabItem>
+<TabItem label="Structure Guide">
+
+### File Header
+
+```
+exc          ← model type (exciter)
+ST1A         ← model name (used in the dynamic data file as EXC ST1A)
+```
+
+### `%data` Section
+
+Lists the parameters that the user provides in the dynamic data file. Each name becomes a `{name}` reference in expressions. The order here defines the order of values in the data file.
+
+### `%parameters` Section
+
+Operating-point parameters computed at initialization. The number of parameters must equal the number of output states (here 1: `vf`). `VREF` is the voltage setpoint, computed from the initial operating point so that the steady-state field voltage is matched.
+
+### `%states` Section
+
+All internal and output states with their initial values. The initialization expressions use system variables (`[v]`, `[p]`, `[q]`, `[if]`, `[vf]`) and data values (`{KA}`, etc.). The last state `vf` is the output state (field voltage).
+
+### `%observables` Section
+
+States that can be recorded during simulation.
+
+### `%models` Section — Signal Flow
+
+1. `algeq` — OEL placeholder (set to large value, overridden by OEL model if present)
+2. `algeq` — line drop compensation: $V_{c1} = \text{vcomp}(V, P, Q, K_v, R_c, X_c)$
+3. `tf1p` — voltage measurement filter with time constant $T_R$
+4. `algeq` — AVR summation: $\Delta V = V_{REF} - V_c - V_{UEL} + V_F$
+5. `lim` — error limiter $[V_{IMIN}, V_{IMAX}]$
+6. `max1v1c` — HV gate for UEL (active when UEL=2)
+7. `tf1p1z` — first lead-lag: $(1 + sT_C)/(1 + sT_B)$
+8. `tf1p1z` — second lead-lag: $(1 + sT_{C1})/(1 + sT_{B1})$
+9. `tf1plim` — amplifier with gain $K_A$, time constant $T_A$, limits $[V_{AMIN}, V_{AMAX}]$
+10. `algeq` + `lim` — instantaneous field current limiter $V_{LR} = K_{LR}(I_f - I_{LR})$, lower-limited to 0
+11. `algeq` — subtract limiter signal from main path
+12. `max1v1c` — HV gate for UEL (active when UEL=3)
+13. `min2v` — LV gate for OEL
+14. `algeq` × 2 — compute variable limits: $V_{RMIN} \cdot V_t$ and $V_{RMAX} \cdot V_t - K_C I_f$
+15. `limvb` — bus-fed variable-limit output clamp → `vf`
+16. `tfder1p` — derivative feedback: $sK_F/T_F / (1 + sT_F)$
+
+</TabItem>
+</Tabs>
+
+---
+
+## Governor Model — `tor_hygov`
+
+A hydraulic turbine-governor model with speed droop, PI controller, rate limiter, gate servo, and non-linear turbine (head-flow-power). This demonstrates a `tor`-type model with both differential and algebraic equations.
+
+**Source:** [SPS-L/stepss-ramses — IEEE_models/tor_hygov.txt](https://github.com/SPS-L/stepss-ramses/blob/master/IEEE_models/tor_hygov.txt)
+
+<Tabs>
+<TabItem label="Full Model File">
+```
+tor
+hygov
+
+%data
+
+R
+r
+Tr
+Tf
+Tg
+VELM
+Gmax
+Gmin
+Tw
+At
+Dturb
+Qnl
+
+%parameters
+
+Po = ([p]/{At})+{Qnl}    ! power setpoint
+
+%states
+
+Q = {Po}    ! water flow
+dH = 0.     ! deviation of head from 1.
+g = {Po}    ! gate opening
+c = {Po}    ! desired gate opening
+x5 = {Po}   ! output of PI controller
+x4 = {Po}   ! output of integrator of PI controller
+x3 = 0.     ! output of rate limiter = input of integrator of PI controller
+x2 = 0.     ! input of rate limiter of PI controller
+e = 0.      ! output of Tf time constant block
+x1 = 0.     ! input of Tf time constant block
+Pm = [p]    ! mechanical power
+
+%observables
+
+Pm
+Q
+dH
+g
+
+%models
+
+& algeq    ! input of Tf time constant block
+1.-[omega]-{R}*([c]-{Po}) - [x1]
+& tf1p     ! Tf time constant
+x1
+e
+1.
+{Tf}
+& algeq    ! input of rate limiter
+[e]/({r}*{Tr}) - [x2]
+& lim      ! rate limiter
+x2
+x3
+-{VELM}
+ {VELM}
+& inlim    ! integrator of PI controller
+x3
+x4
+1.
+{Gmin}
+{Gmax}
+& algeq    ! output of PI controller
+[x4]+([e]/{r}) - [x5]
+& lim      ! gate limiter
+x5
+c
+{Gmin}
+{Gmax}
+& tf1p     ! speed governor : time constant
+c
+g
+1.
+{Tg}
+
+& algeq                 ! hydro turbine: head as function of water flow and gate opening
+1. -([Q]/[g])**2 -[dH]
+& int                   ! hydro turbine: water column inertia
+dH
+Q
+{Tw}
+& algeq                 ! hydro turbine: mechanical torque
+{At}*(1.-[dH])*([Q]-{Qnl})-{Dturb}*(1.-[omega])*[g]  - [tm]*[omega]
+& algeq
+[tm]*[omega] - [Pm]
+```
+</TabItem>
+<TabItem label="Structure Guide">
+
+### File Header
+
+```
+tor          ← model type (torque/governor)
+hygov        ← model name (used as TOR hygov in the data file)
+```
+
+### Input/Output States
+
+- **Input:** `[omega]` (rotor speed), `[p]` (electrical power)
+- **Output:** `[tm]` (mechanical torque)
+
+### Signal Flow
+
+**Governor section:**
+1. Speed error with droop: $x_1 = 1 - \omega - R \cdot (g - P_0)$
+2. Filter: `tf1p` with time constant $T_f$
+3. PI controller path: rate limiter (`lim`) → integrator (`inlim`) with gate limits → proportional bypass
+4. Gate servo: `tf1p` with time constant $T_g$
+
+**Turbine section:**
+5. Head-flow relation: $\Delta H = 1 - (Q/g)^2$ (non-linear algebraic)
+6. Water column inertia: $T_w \dot{Q} = \Delta H$ (`int` block)
+7. Mechanical torque: $T_m \omega = A_t (1 - \Delta H)(Q - Q_{nl}) - D_{turb}(1 - \omega) g$
+8. Mechanical power: $P_m = T_m \omega$
+
+### Key Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `R` | Permanent droop |
+| `r` | Temporary droop |
+| `Tr` | Reset time |
+| `Tf` | Filter time constant |
+| `Tg` | Gate servo time constant |
+| `VELM` | Gate velocity limit |
+| `Gmax/Gmin` | Gate position limits |
+| `Tw` | Water starting time |
+| `At` | Turbine gain |
+| `Dturb` | Turbine damping |
+| `Qnl` | No-load flow |
+
+</TabItem>
+</Tabs>
+
+---
+
+## Injector Model — `inj_vfd_load`
+
+A voltage- and frequency-dependent load model with exponential characteristics and low-voltage protection (constant admittance below a threshold). This is the most widely used load model in RAMSES. It demonstrates an `inj`-type model with current injection equations.
+
+**Source:** [SPS-L/stepss-ramses — custom_models/inj_vfd_load.txt](https://github.com/SPS-L/stepss-ramses/blob/master/custom_models/inj_vfd_load.txt)
+
+<Tabs>
+<TabItem label="Full Model File">
+```
+inj
+vfd_load
+
+%data
+
+Dp         ! sensitivity of active power to frequency
+a1         ! proportion of type 1 in active power
+alpha1     ! exponent of type 1 in active power
+a2         ! proportion of type 2 in active power
+alpha2     ! exponent of type 2 in active power
+alpha3     ! exponent of type 3 in active power  (proportion = 1-a1-a2)
+Dq         ! sensitivity of reactive power to frequency
+b1         ! proportion of type 1 in reactive power
+beta1      ! exponent of type 1 in reactive power
+b2         ! proportion of type 2 in reactive power
+beta2      ! exponent of type 2 in reactive power
+beta3      ! exponent of type 3 in reactive power  (proportion = 1-b1-b2)
+Vinit      ! initial voltage at equivalent distribution bus
+Vlow       ! voltage below which the load behaves as constant admittance
+foption    ! set to 1 to use bus frequency; otherwise COI speed
+Tmes       ! measurement time constant for bus frequency estimation
+
+%parameters
+
+Vo = equal({Vinit},0.d0)*dsqrt([vx]**2+[vy]**2) + {Vinit}
+r =  dsqrt([vx]**2+[vy]**2)/{Vo}
+denomP = {a1}*{Vo}**{alpha1}+{a2}*{Vo}**{alpha2}+(1.d0-{a1}-{a2})*{Vo}**{alpha3}
+denomQ = {b1}*{Vo}**{beta1}+{b2}*{Vo}**{beta2}+(1.d0-{b1}-{b2})*{Vo}**{beta3}
+Po = -[vx]*[ix]-[vy]*[iy]
+Qo =  [vx]*[iy]-[vy]*[ix]
+Vmin = max(1.d-01,{Vlow})
+Geq = {Po}*({a1}*{Vmin}**{alpha1}+{a2}*{Vmin}**{alpha2}
+      +(1.d0-{a1}-{a2})*{Vmin}**{alpha3})/({denomP}*{Vmin}**2)
+Beq =-{Qo}*({b1}*{Vmin}**{beta1}+{b2}*{Vmin}**{beta2}
+      +(1.d0-{b1}-{b2})*{Vmin}**{beta3})/({denomQ}*{Vmin}**2)
+
+%states
+
+Vreal = {Vo}      ! voltage at equivalent distribution bus
+V = {Vo}          ! Vreal slightly delayed
+P = {Po}          ! active power
+Q = {Qo}          ! reactive power
+fbus = 1.d0       ! bus frequency
+df = 0.d0         ! frequency deviation
+u = 1             ! model switch: =1 if V > Vmin, =0 otherwise
+
+%observables
+
+P
+Q
+df
+u
+
+%models
+
+& f_inj
+fbus
+{Tmes}
+& algeq
+equal(1.d0,{foption})*([fbus]-1.d0)
+  + (1.d0-equal(1.d0,{foption}))*([omega]-1.d0) - [df]
+& algeq         ! voltage at distribution bus = network voltage / trfo ratio
+dsqrt([vx]**2+[vy]**2)/{r}-[Vreal]
+& tf1p          ! small measurement time constant
+Vreal
+V
+1.
+0.003
+& pwlin4        ! determine if u=1 or u=0
+V
+u
+-1.d0
+0.d0
+{Vmin}
+0.d0
+{Vmin}
+1.d0
+2.d0
+1.d0
+& algeq         ! active power function of V, u and f
+[u]*({Po}*(1.d0+{Dp}*[df])
+  *({a1}*[V]**{alpha1}+{a2}*[V]**{alpha2}
+    +(1.d0-{a1}-{a2})*[V]**{alpha3})/{denomP})
+  + (1.d0-[u])*{Geq}*[V]**2 -[P]
+& algeq         ! reactive power function of V, u and f
+[u]*({Qo}*(1.d0+{Dq}*[df])
+  *({b1}*[V]**{beta1}+{b2}*[V]**{beta2}
+    +(1.d0-{b1}-{b2})*[V]**{beta3})/{denomQ})
+  - (1.d0-[u])*{Beq}*[V]**2 -[Q]
+& algeq         ! ix component of injected current
+(-[P]*[vx] - [Q]*[vy])/max([V]**2,1.d-02) -[ix]
+& algeq         ! iy component of injected current
+( [Q]*[vx] - [P]*[vy])/max([V]**2,1.d-02) -[iy]
+```
+</TabItem>
+<TabItem label="Structure Guide">
+
+### File Header
+
+```
+inj          ← model type (injector)
+vfd_load     ← model name (used as INJEC vfd_load in the data file)
+```
+
+### Input/Output States
+
+- **Input:** `[vx]`, `[vy]` (bus voltage components), `[omega]` (COI frequency)
+- **Output:** `[ix]`, `[iy]` (injected current components)
+
+### Model Logic
+
+**Frequency estimation:**
+1. `f_inj` — estimates bus frequency from voltage phasor derivatives
+2. `algeq` — selects bus frequency or COI frequency based on `foption`
+
+**Voltage processing:**
+3. `algeq` — compute distribution bus voltage: $V_{real} = \sqrt{v_x^2 + v_y^2}/r$
+4. `tf1p` — small delay (3 ms) for numerical stability
+5. `pwlin4` — switch: $u = 1$ if $V > V_{min}$, $u = 0$ otherwise
+
+**Power computation:**
+6. Active power: $P = u \cdot P_0 (1 + D_p \Delta f) \frac{a_1 V^{\alpha_1} + a_2 V^{\alpha_2} + (1-a_1-a_2) V^{\alpha_3}}{\text{denom}_P} + (1-u) G_{eq} V^2$
+7. Reactive power: analogous with $b$/$\beta$ coefficients
+
+**Current injection:**
+8–9. Convert P, Q to rectangular currents: $i_x = (-PV_x - QV_y)/V^2$, $i_y = (QV_x - PV_y)/V^2$
+
+### Key Design Patterns
+
+- **Low-voltage protection**: below $V_{min}$, the load switches to constant admittance ($G_{eq}$, $B_{eq}$) to prevent numerical issues
+- **Distribution transformer**: the ratio $r$ models the voltage step-down to the load bus
+- **Frequency dependence**: $D_p$, $D_q$ scale power with frequency deviation
+
+</TabItem>
+</Tabs>
+
+---
+
+## Two-Port Model — `twop_HVDC_LCC`
+
+A Line-Commutated Converter (LCC) HVDC link model connecting two AC buses through a DC line. This demonstrates a `twop`-type model with complex AC/DC interaction, multiple control modes (current control, voltage control, gamma control), and non-linear commutation equations.
+
+**Source:** [SPS-L/stepss-ramses — custom_models/twop_HVDC_LCC.txt](https://github.com/SPS-L/stepss-ramses/blob/master/custom_models/twop_HVDC_LCC.txt)
+
+<Tabs>
+<TabItem label="Full Model File">
+```
+twop
+HVDC_LCC
+
+%data
+
+p          ! number of poles (1 or 2)
+rec_ctl    ! rectifier control: 1=current, 2=power, -1=alpha min, 3=blocked
+inv_ctl    ! inverter control: 1=voltage, 2=gamma, -2=gamma min, -1=reduced current, 3=blocked
+Br         ! number of bridges in series in rectifier
+Bi         ! number of bridges in series in inverter
+Er         ! phase-to-phase open-circuit voltage (kV) on DC side of rectifier transformer
+Ei         ! phase-to-phase open-circuit voltage (kV) on DC side of inverter transformer
+Rcr        ! rectifier commutating resistance per bridge (ohm)
+Xcr        ! rectifier commutating reactance per bridge (ohm)
+Rci        ! inverter commutating resistance per bridge (ohm)
+Xci        ! inverter commutating reactance per bridge (ohm)
+RL         ! DC line series resistance (ohm)
+Rcomp      ! compounding resistance for inverter voltage control (ohm)
+Tp         ! time constant of power control (s)
+Idset      ! initial DC current setpoint (kA)
+nr         ! initial rectifier transformer ratio (pu/pu)
+ni         ! initial inverter transformer ratio (pu/pu)
+
+%parameters
+
+Pset = -([vx1]*[ix1]+[vy1]*[iy1])*sbase1
+Vdr0 = {Pset}/({p}*{Idset})
+alpha0 = dacos( ({nr}/(1.3504745*{Er}*dsqrt([vx1]**2+[vy1]**2)))
+         * (({Vdr0}/{Br})+(0.9549297*{Xcr}+2*{Rcr})*{Idset}) )
+mur0 = dacos( dcos({alpha0})
+       - 1.4142136*{Xcr}*{nr}*{Idset}
+         /(dsqrt([vx1]**2+[vy1]**2)*{Er})) - {alpha0}
+Qhvdc1 = {Pset}*(2.d0*{mur0}+dsin(2*{alpha0})-dsin(2d0*({mur0}+{alpha0})))
+         /(dcos(2.d0*{alpha0})-dcos(2d0*({mur0}+{alpha0})))
+B1 = ({Qhvdc1}/sbase1-[vx1]*[iy1]+[vy1]*[ix1])/([vx1]**2+[vy1]**2)
+Vdi0 = {Vdr0}-{RL}*{Idset}
+gamma0 = dacos( ({ni}/(1.3504745*{Ei}*dsqrt([vx2]**2+[vy2]**2)))
+          * (({Vdi0}/{Bi})+(0.9549297*{Xci}+2*{Rci})*{Idset}) )
+mui0 = dacos( dcos({gamma0})
+       - 1.4142136*{Xci}*{ni}*{Idset}
+         /(dsqrt([vx2]**2+[vy2]**2)*{Ei})) - {gamma0}
+P2in = {p}*{Vdi0}*{Idset}
+G2 = ({P2in}/sbase2-[vx2]*[ix2]-[vy2]*[iy2])
+     /dsqrt([vx2]**2+[vy2]**2)
+Qhvdc2 = {P2in}*(2.d0*{mui0}+dsin(2*{gamma0})-dsin(2d0*({mui0}+{gamma0})))
+         /(dcos(2.d0*{gamma0})-dcos(2d0*({mui0}+{gamma0})))
+B2 = ({Qhvdc2}/sbase2-[vx2]*[iy2]+[vy2]*[ix2])/([vx2]**2+[vy2]**2)
+Vset = {Vdi0}+{Rcomp}*{Idset}
+alphamin = 0.d0
+Idred = 0.d0
+gammamin = 0.d0
+Td = 0.02
+
+%states
+
+Vdr = {Vdr0}         ! rectifier DC voltage (kV)
+alpha = {alpha0}      ! firing angle (rad)
+mur = {mur0}          ! overlap angle (rad)
+Id = {Idset}          ! DC current (kA)
+Vdi = {Vdi0}          ! inverter DC voltage (kV)
+gamma = {gamma0}      ! extinction angle (rad)
+mui = {mui0}          ! inverter overlap angle (rad)
+Ides = {Idset}        ! desired DC current (kA)
+Iord = {Idset}        ! DC current order (kA)
+P1 = (-[vx1]*[ix1]-[vy1]*[iy1])*sbase1
+Q1 = ([vx1]*[iy1]-[vy1]*[ix1])*sbase1
+P2 = ([vx2]*[ix2]+[vy2]*[iy2])*sbase2
+Q2 = ([vx2]*[iy2]-[vy2]*[ix2])*sbase2
+V1 = dsqrt([vx1]**2+[vy1]**2)
+V1d = dsqrt([vx1]**2+[vy1]**2)
+V2 = dsqrt([vx2]**2+[vy2]**2)
+V2d = dsqrt([vx2]**2+[vy2]**2)
+alphad = {alpha0}*57.2957795
+gammad = {gamma0}*57.2957795
+
+%observables
+
+Vdr
+alphad
+mur
+Vdi
+gammad
+mui
+Ides
+Iord
+Id
+P1
+Q1
+P2
+Q2
+Pset
+
+%models
+
+& algeq          ! Vdr: rectifier DC voltage equation
+[Vdr] - {Br}*( 1.3504745*[V1d]*{Er}*dcos([alpha])/{nr}
+  - (0.9549297*{Xcr}+2*{Rcr})*[Id] )
+& algeq          ! overlap angle at rectifier
+dcos([alpha]+[mur]) - dcos([alpha])
+  + 1.4142136*{Xcr}*{nr}*[Id]/(max([V1d],1.d-03)*{Er})
+& algeq          ! ix1: rectifier AC current (x-component)
+{B1}*[vy1]-([vx1]+[vy1]*(2*[mur]+dsin(2*[alpha])
+  -dsin(2*([mur]+[alpha])))/max((dcos(2*[alpha])
+  -dcos(2*([mur]+[alpha]))),1d-03))
+  *{p}*[Vdr]*[Id]/(sbase1*max([V1d]**2,1d-06)) - [ix1]
+& algeq          ! iy1: rectifier AC current (y-component)
+-{B1}*[vx1]-([vy1]-[vx1]*(2*[mur]+dsin(2*[alpha])
+  -dsin(2*([mur]+[alpha])))/max((dcos(2*[alpha])
+  -dcos(2*([mur]+[alpha]))),1d-03))
+  *{p}*[Vdr]*[Id]/(sbase1*max([V1d]**2,1d-06)) - [iy1]
+& algeq          ! Vdi: inverter DC voltage equation
+[Vdi] - {Bi}*( 1.3504745*[V2d]*{Ei}*dcos([gamma])/{ni}
+  - (0.9549297*{Xci}+2*{Rci})*[Id] )
+& algeq          ! overlap angle at inverter
+dcos([gamma]+[mui]) - dcos([gamma])
+  + 1.4142136*{Xci}*{ni}*[Id]/(max([V2d],1.d-03)*{Er})
+& algeq          ! ix2: inverter AC current (x-component)
+-{G2}*[vx2]+{B2}*[vy2]+([vx2]-[vy2]*(2*[mui]+dsin(2*[gamma])
+  -dsin(2*([mui]+[gamma])))/max((dcos(2*[gamma])
+  -dcos(2*([mui]+[gamma]))),1d-03))
+  *{p}*[Vdi]*[Id]/(sbase2*max([V2d]**2,1d-06)) - [ix2]
+& algeq          ! iy2: inverter AC current (y-component)
+-{B2}*[vx2]-{G2}*[vy2]+([vy2]+[vx2]*(2*[mui]+dsin(2*[gamma])
+  -dsin(2*([mui]+[gamma])))/max((dcos(2*[gamma])
+  -dcos(2*([mui]+[gamma]))),1d-03))
+  *{p}*[Vdi]*[Id]/(sbase2*max([V2d]**2,1d-06)) - [iy2]
+& algeq          ! DC link: Kirchhoff voltage law
+[Vdr]-[Vdi]-{RL}*[Id]
+
+& algeq          ! desired DC current (depends on control mode)
+(equal({rec_ctl},1.d0)*{Idset})
+  +(equal({rec_ctl},2.d0)*({Pset}/max([Vdr],1d-02)))
+  -(equal({rec_ctl},3.d0)*50.d0)
+  -(equal({rec_ctl},-1.d0)*50.d0) -[Ides]
+& tf1plim        ! current order (filtered and limited)
+Ides
+Iord
+1.d0
+Tp
+0.d0
+9999.d0
+
+& algeq          ! rectifier control equation
+equal({rec_ctl},1.d0)*([Iord]-[Id])
+  +equal({rec_ctl},2.d0)*([Iord]-[Id])
+  +equal({rec_ctl},-1d0)*({alphamin}-[alpha])
+  +equal({rec_ctl},3.d0)*[Id]
+& algeq          ! inverter control equation
+equal({inv_ctl},1.d0)*([Vdi]+{Rcomp}*[Id]-{Vset})
+  +equal({inv_ctl},2.d0)*({gamma0}-[gamma])
+  +equal({inv_ctl},-2d0)*({gammamin}-[gamma])
+  +equal({inv_ctl},-1d0)*({Idred}-[Id])
+  +equal({inv_ctl},3.d0)*(1.570796327-[gamma])
+
+& algeq          ! AC voltage at bus 1
+dsqrt([vx1]**2+[vy1]**2) - [V1]
+& tf1p           ! delayed AC voltage at bus 1
+V1
+V1d
+1.
+Td
+& algeq          ! AC voltage at bus 2
+dsqrt([vx2]**2+[vy2]**2) - [V2]
+& tf1p           ! delayed AC voltage at bus 2
+V2
+V2d
+1.
+Td
+& algeq          ! observable: P1
+(-[vx1]*[ix1]-[vy1]*[iy1])*sbase1-[P1]
+& algeq          ! observable: Q1
+( [vx1]*[iy1]-[vy1]*[ix1])*sbase1-[Q1]
+& algeq          ! observable: P2
+([vx2]*[ix2]+[vy2]*[iy2])*sbase2-[P2]
+& algeq          ! observable: Q2
+([vx2]*[iy2]-[vy2]*[ix2])*sbase2-[Q2]
+& algeq          ! alpha in degrees
+[alphad]-[alpha]*57.2957795
+& algeq          ! gamma in degrees
+[gammad]-[gamma]*57.2957795
+```
+</TabItem>
+<TabItem label="Structure Guide">
+
+### File Header
+
+```
+twop         ← model type (two-port)
+HVDC_LCC     ← model name (used as TWOPOR ... HVDC_LCC in data file)
+```
+
+### Input/Output States
+
+- **Input:** `[vx1]`, `[vy1]`, `[vx2]`, `[vy2]` (voltage at both buses)
+- **Output:** `[ix1]`, `[iy1]`, `[ix2]`, `[iy2]` (current injected at both buses)
+- System variables: `sbase1`, `sbase2` (base power at each bus)
+
+### Model Structure
+
+**DC equations (algebraic):**
+- Rectifier DC voltage: $V_{dr} = B_r \left(\frac{3\sqrt{2}}{\pi} V_1 E_r \cos\alpha / n_r - (R_{cr} + \frac{3}{\pi}X_{cr}) I_d\right)$
+- Inverter DC voltage: analogous with $\gamma$, $E_i$, $n_i$
+- Overlap angles: from commutation equations
+- DC link: $V_{dr} - V_{di} = R_L I_d$
+
+**AC current injection:**
+- Includes fundamental-frequency reactive power from commutation overlap
+- Shunt compensation ($B_1$, $B_2$, $G_2$) to match initial operating point
+
+**Control modes** (selected by `rec_ctl` and `inv_ctl` using `equal()` function):
+- Rectifier: constant current, constant power, minimum alpha, blocked
+- Inverter: constant voltage, constant gamma, minimum gamma, reduced current, blocked
+
+### Key Design Patterns
+
+- **`equal()` function**: used to switch between control modes without discrete variables — acts as a continuous selector
+- **`sbase1`/`sbase2`**: system variables for per-unit conversion at each bus
+- **`Td` delay**: small artificial time constant on terminal voltages for numerical robustness
+- **Initialization**: complex parameter expressions compute initial angles, overlap, and compensation from the power flow solution
+
+</TabItem>
+</Tabs>
