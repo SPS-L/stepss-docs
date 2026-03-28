@@ -33,6 +33,10 @@ The source code of the STEPSS suite components is licensed under the Apache Lice
 
 For extensions to larger models or execution using more than two cores, contact the Authors.
 
+## PFC and CODEGEN License
+
+**PFC** (power flow computation) and **CODEGEN** (model generator) are the property of **Dr. Thierry Van Cutsem**. They are distributed as compiled executables that are **free to use** but are not open-source. Their source code is not included in any of the STEPSS repositories.
+
 ## Authors
 
 STEPSS has been developed by:
@@ -43,4 +47,4 @@ STEPSS has been developed by:
 
 STEPSS is made up of three modules: **PFC** (power flow computations), **RAMSES** (the solver of differential-algebraic equations), and **CODEGEN** (a tool to develop models).
 
-PFC and CODEGEN are the property of the Authors. RAMSES is the property of the **University of Liège, Belgium**, which has granted to both Authors a personal, royalty-free, limited, non-exclusive, non-transferable and non-assignable license to distribute free of charge an executable version of RAMSES.
+PFC and CODEGEN are the property of Dr. Thierry Van Cutsem, distributed as compiled executables free to use. RAMSES is the property of the **University of Liège, Belgium**, which has granted to both Authors a personal, royalty-free, limited, non-exclusive, non-transferable and non-assignable license to distribute free of charge an executable version of RAMSES.
