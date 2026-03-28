@@ -57,6 +57,6 @@ For extensions to larger models or execution using more than two cores, contact 
 | Component | License | Repository |
 |-----------|---------|------------|
 | STEPSS GUI | Apache License 2.0 | [SPS-L/STEPSS](https://github.com/SPS-L/STEPSS) |
-| PyRAMSES | Proprietary | [SPS-L/stepss-PyRAMSES](https://github.com/SPS-L/stepss-PyRAMSES) |
+| PyRAMSES | Apache License 2.0 | [SPS-L/stepss-PyRAMSES](https://github.com/SPS-L/stepss-PyRAMSES) |
 | URAMSES | See license file | [SPS-L/stepss-URAMSES](https://github.com/SPS-L/stepss-URAMSES) |
 | RAMSES-Eigenanalysis | See license file | [SPS-L/RAMSES-Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis) |
