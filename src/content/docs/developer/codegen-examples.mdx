@@ -15,7 +15,7 @@ For the block reference, see the [CODEGEN Blocks Library](/stepss-docs/developer
 
 The IEEE ST1A is a bus-fed static excitation system. This model demonstrates the typical structure of an `exc`-type CODEGEN file: voltage compensation, AVR with lead-lag stages, field current limiting, UEL/OEL gating, and variable-limit output clamp.
 
-**Source:** [SPS-L/stepss-ramses — IEEE_models/exc_ST1A.txt](https://github.com/SPS-L/stepss-ramses/blob/master/IEEE_models/exc_ST1A.txt)
+**Source:** IEEE_models/exc_ST1A.txt (from the RAMSES model library)
 
 <Tabs>
 <TabItem label="Full Model File">
@@ -219,7 +219,7 @@ States that can be recorded during simulation.
 
 A hydraulic turbine-governor model with speed droop, PI controller, rate limiter, gate servo, and non-linear turbine (head-flow-power). This demonstrates a `tor`-type model with both differential and algebraic equations.
 
-**Source:** [SPS-L/stepss-ramses — IEEE_models/tor_hygov.txt](https://github.com/SPS-L/stepss-ramses/blob/master/IEEE_models/tor_hygov.txt)
+**Source:** IEEE_models/tor_hygov.txt (from the RAMSES model library)
 
 <Tabs>
 <TabItem label="Full Model File">
@@ -367,7 +367,7 @@ hygov        ← model name (used as TOR hygov in the data file)
 
 A voltage- and frequency-dependent load model with exponential characteristics and low-voltage protection (constant admittance below a threshold). This is the most widely used load model in RAMSES. It demonstrates an `inj`-type model with current injection equations.
 
-**Source:** [SPS-L/stepss-ramses — custom_models/inj_vfd_load.txt](https://github.com/SPS-L/stepss-ramses/blob/master/custom_models/inj_vfd_load.txt)
+**Source:** custom_models/inj_vfd_load.txt (from the RAMSES model library)
 
 <Tabs>
 <TabItem label="Full Model File">
@@ -514,7 +514,7 @@ vfd_load     ← model name (used as INJEC vfd_load in the data file)
 
 A Line-Commutated Converter (LCC) HVDC link model connecting two AC buses through a DC line. This demonstrates a `twop`-type model with complex AC/DC interaction, multiple control modes (current control, voltage control, gamma control), and non-linear commutation equations.
 
-**Source:** [SPS-L/stepss-ramses — custom_models/twop_HVDC_LCC.txt](https://github.com/SPS-L/stepss-ramses/blob/master/custom_models/twop_HVDC_LCC.txt)
+**Source:** custom_models/twop_HVDC_LCC.txt (from the RAMSES model library)
 
 <Tabs>
 <TabItem label="Full Model File">
