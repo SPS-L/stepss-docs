@@ -1,0 +1,1012 @@
+---
+title: IEEE Exciter Models
+description: IEEE-standard excitation system, PSS, and OEL models available in RAMSES
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+These excitation system models implement the IEEE Std 421.5-2016 "IEEE Recommended Practice for Excitation System Models for Power System Stability Studies" (and selected ENTSO-E variants) within RAMSES. Each model is defined using the CODEGEN domain-specific language (DSL) and compiled into Fortran for time-domain simulation. The DSL describes block diagrams as interconnected transfer function primitives (`tf1p`, `tf1p1z`, `tf1plim`, `tfder1p`, `inlim`, `pictl`, etc.), initial conditions, and algebraic constraints — forming a self-contained, portable model definition.
+
+---
+
+## Model Index
+
+| Model Name | Base Type | PSS | OEL / Limiter | IEEE Reference |
+|---|---|---|---|---|
+| `AC1A` | AC type 1 | — | — | IEEE 421.5 Type AC1A |
+| `AC1A_MAXEX2` | AC type 1 | — | MAXEX2 field current limiter | IEEE 421.5 Type AC1A |
+| `AC1A_OELHQ` | AC type 1 | — | OELHQ PID OEL | IEEE 421.5 Type AC1A |
+| `AC1A_RETRO` | AC type 1 (retrofit) | PSS4B (internal) | — | — |
+| `AC1A_RETRO_PSS4B` | AC type 1 (retrofit) | PSS4B | — | — |
+| `AC4A` | AC type 4 | — | — | IEEE 421.5 Type AC4A |
+| `AC8B` | AC type 8 | — | — | IEEE 421.5 Type AC8B |
+| `AC8B_PSS3B_lim` | AC type 8 | PSS3B | Integral OEL + SCL | IEEE 421.5 Type AC8B |
+| `AC8B_lim` | AC type 8 | — | Integral OEL + SCL | IEEE 421.5 Type AC8B |
+| `DC3A` | DC type 3 | — | — | IEEE 421.5 Type DC3A |
+| `ENTSOE_simp` | ENTSO-E simplified | IEEEST (internal) | — | ENTSO-E |
+| `ENTSOE_lim` | ENTSO-E simplified | IEEEST (internal) | Integral OEL | ENTSO-E |
+| `EXHQSC` | ST type (HQ) | — | Field current db | — |
+| `EXHQSC_MAXEX2` | ST type (HQ) | — | MAXEX2 + field db | — |
+| `EXHQSC_PSS4B` | ST type (HQ) | PSS4B | Field current db | — |
+| `EXHQSC_PSS4B_MAXEX2` | ST type (HQ) | PSS4B | MAXEX2 | — |
+| `EXHQSC_PSS4B_OELHQ` | ST type (HQ) | PSS4B | OELHQ PID OEL | — |
+| `EXPIC1` | AC/ST (PIC type) | — | — | — |
+| `EXPIC1_PSS2B` | AC/ST (PIC type) | PSS2B | — | — |
+| `EXPIC1_PSS2B_MAXEX2` | AC/ST (PIC type) | PSS2B | MAXEX2 | — |
+| `IEEET5` | DC type 5 | — | — | IEEE 421.5 Type DC5A (legacy) |
+| `SEXS` | ST simplified | — | — | CIGRÉ simplified |
+| `SEXS_IEEEST` | ST simplified | IEEEST | — | CIGRÉ simplified |
+| `SEXS_STAB3_lim` | ST simplified | STAB3 | Integral OEL | — |
+| `ST1A` | ST type 1 | — | — | IEEE 421.5 Type ST1A |
+| `ST1A_IEEEST` | ST type 1 | IEEEST | — | IEEE 421.5 Type ST1A |
+| `ST1A_IEEEST_MAXEX2` | ST type 1 | IEEEST | MAXEX2 | IEEE 421.5 Type ST1A |
+| `ST1A_PSS2B` | ST type 1 | PSS2B | — | IEEE 421.5 Type ST1A |
+| `ST1A_PSS2B_MAXEX2` | ST type 1 | PSS2B | MAXEX2 | IEEE 421.5 Type ST1A |
+| `ST1A_PSS2B_OELHQ` | ST type 1 | PSS2B | OELHQ PID OEL | IEEE 421.5 Type ST1A |
+| `ST1A_PSS3B` | ST type 1 | PSS3B | — | IEEE 421.5 Type ST1A |
+| `ST1A_PSS3B_OELHQ` | ST type 1 | PSS3B | OELHQ PID OEL | IEEE 421.5 Type ST1A |
+| `ST1A_PSS4B` | ST type 1 | PSS4B | — | IEEE 421.5 Type ST1A |
+| `ST1A_PSS4B_MAXEX2` | ST type 1 | PSS4B | MAXEX2 | IEEE 421.5 Type ST1A |
+| `ST1A_PSS4B_OELHQ` | ST type 1 | PSS4B | OELHQ PID OEL | IEEE 421.5 Type ST1A |
+| `ST1A_OELHQ` | ST type 1 | — | OELHQ PID OEL | IEEE 421.5 Type ST1A |
+| `ST1A_lim` | ST type 1 | — | Integral OEL + SCL | IEEE 421.5 Type ST1A |
+| `ST2A` | ST type 2 | — | — | IEEE 421.5 Type ST2A (via EXPIC1) |
+
+---
+
+## AC Exciter Models
+
+### AC1A
+
+The AC1A is a rotating AC exciter with a self-excited field winding and non-linear saturation. It corresponds to IEEE Std 421.5-2016 Type AC1A. The generator terminal voltage $V_t$ is compensated for line drop and filtered before being compared with the reference. An AC alternator supplies the field through a rectifier whose output depends on the commutation voltage $V_E$ and field current $I_{fd}$.
+
+#### Mathematical Description
+
+The voltage regulator processes the error signal through a lead-lag network and a limited amplifier:
+
+$$\Delta V = V_{REF} - V_c - V_F - \Delta V_{PSS}$$
+
+$$V_1(s) = \Delta V \cdot \frac{1 + sT_C}{1 + sT_B}$$
+
+$$V_A(s) = V_1 \cdot \frac{K_A}{1 + sT_A}, \quad V_{AMIN} \le V_A \le V_{AMAX}$$
+
+The AC exciter integrator with saturation and demagnetization:
+
+$$V_{FE} = K_D \cdot I_{fd} + \left(K_E + S_E(V_E)\right) V_E$$
+
+$$\dot{V}_E = \frac{1}{T_E}(V_R - V_{FE}), \quad 0 \le V_E$$
+
+$$E_{fd} = V_E \cdot \left(1 - \frac{K_C \cdot I_{fd}}{V_E}\right)$$
+
+The derivative feedback (rate feedback) path:
+
+$$V_F(s) = E_{fd} \cdot \frac{sK_F/T_F}{1 + sT_F}$$
+
+where $S_E(V_E)$ is the saturation function interpolated from the two-point saturation characteristic $(V_{E1}, SE_1)$ and $(V_{E2}, SE_2)$.
+
+#### Signal Flow
+
+1. **Line drop compensation** (`algeq`): $V_{c1} = vcomp(V_t, P, Q, K_v, R_c, X_c)$
+2. **Voltage measurement filter** (`tf1p`): $V_c \leftarrow V_{c1}$ with time constant $T_R$
+3. **AVR summation** (`algeq`): $\Delta V = V_{REF} - V_c - V_F$
+4. **Lead-lag compensator** (`tf1p1z`): $V_1 \leftarrow \Delta V$ with $(T_C, T_B)$
+5. **Amplifier with limits** (`tf1plim`): $V_2 \leftarrow V_1$ with gain $K_A$, time constant $T_A$, limits $[V_{AMIN}, V_{AMAX}]$
+6. **UEL high-value gate** (`max1v1c`): $V_3 = \max(V_2, V_{UEL})$
+7. **OEL low-value gate** (`min1v1c`): $V_4 = \min(V_3, V_{OEL})$
+8. **Output limiter** (`lim`): $V_R = \text{clamp}(V_4, V_{RMIN}, V_{RMAX})$
+9. **Exciter integrator** (`inlim`): $V_E \leftarrow (V_R - V_{FE})/T_E$
+10. **Saturation computation** (`algeq`): $V_{FE}$ from $K_D$, $K_E$, $S_E(V_E)$
+11. **Rectifier output** (`algeq`): $E_{fd} = vrectif(I_{fd}, V_E, K_C)$
+12. **Derivative feedback** (`tfder1p`): $V_F \leftarrow V_{FE}$ with gain $K_F/T_F$, time constant $T_F$
+
+#### Parameters
+
+| Parameter | Description | Unit/Type |
+|---|---|---|
+| `Kv` | Voltage compensation gain | pu |
+| `Rc` | Resistance for line drop compensation | pu |
+| `Xc` | Reactance for line drop compensation | pu |
+| `TR` | Voltage transducer time constant | s |
+| `KA` | Voltage regulator gain | pu |
+| `TA` | Voltage regulator time constant | s |
+| `TB` | Lead-lag denominator time constant | s |
+| `TC` | Lead-lag numerator time constant | s |
+| `VAMAX` | Maximum regulator output | pu |
+| `VAMIN` | Minimum regulator output | pu |
+| `KE` | Exciter constant (self-excitation term) | pu |
+| `TE` | Exciter time constant | s |
+| `KF` | Rate feedback gain | pu |
+| `TF` | Rate feedback time constant | s |
+| `VRMAX` | Maximum field voltage | pu |
+| `VRMIN` | Minimum field voltage | pu |
+| `VE1` | Saturation factor voltage point 1 | pu |
+| `SE1` | Saturation factor at $V_{E1}$ | pu |
+| `VE2` | Saturation factor voltage point 2 | pu |
+| `SE2` | Saturation factor at $V_{E2}$ | pu |
+| `KC` | Commutation factor (rectifier regulation) | pu |
+| `KD` | Demagnetization factor | pu |
+| `VUEL` | UEL input signal | pu |
+
+#### Variants
+
+| Model | Description |
+|---|---|
+| `AC1A` | Base model — IEEE Type AC1A |
+| `AC1A_MAXEX2` | Adds MAXEX2 field current limiter; VOEL moves to reference summation point (LV gate removed) |
+| `AC1A_OELHQ` | Adds Hydro-Québec PID over-excitation limiter (11-point timer) |
+| `AC1A_RETRO` | Retrofit variant with internal PSS4B; uses first-order AVR without separate exciter block |
+| `AC1A_RETRO_PSS4B` | Retrofit variant with external PSS4B speed input |
+
+#### Usage Example
+
+```
+SYNC genAC1A bus1 'AC1A' 0.0 0.0 0.0 0.02 200.0 0.02 10.0 1.0 7.32 -7.32 1.0 1.0 0.03 1.0 6.03 -5.43 4.18 0.1 3.14 0.033 0.2 0.38 99999 ;
+```
+
+---
+
+### AC4A
+
+The AC4A is a simplified static representation of an AC exciter system with an inner-loop voltage-dependent output limit. It corresponds to IEEE Std 421.5-2016 Type AC4A. The upper output limit is a function of field current: $V_{RMAX,eff} = V_{RMAX} - K_C \cdot I_{fd}$.
+
+#### Mathematical Description
+
+$$\Delta V = V_{REF} - V_c$$
+
+$$V_I = \text{clamp}(\Delta V, V_{IMIN}, V_{IMAX})$$
+
+$$V_1(s) = V_I \cdot \frac{1 + sT_C}{1 + sT_B}$$
+
+$$E_{fd}(s) = V_1 \cdot \frac{K_A}{1 + sT_A}, \quad V_{RMIN} \le E_{fd} \le V_{RMAX} - K_C \cdot I_{fd}$$
+
+The variable upper limit is updated algebraically at each time step, making AC4A a time-varying limited integrator system.
+
+#### Signal Flow
+
+1. **Line drop compensation** (`algeq`): $V_{c1}$ from terminal measurements
+2. **Voltage measurement filter** (`tf1p`): $V_c$ with $T_R$
+3. **AVR summation** (`algeq`): $\Delta V = V_{REF} - V_c$
+4. **Input limiter** (`lim`): $V_I = \text{clamp}(\Delta V, V_{IMIN}, V_{IMAX})$
+5. **Lead-lag** (`tf1p1z`): $V_1 \leftarrow V_I$ with $(T_C, T_B)$
+6. **UEL high-value gate** (`max1v1c`): $V_2 = \max(V_1, V_{UEL})$
+7. **Variable upper limit** (`algeq`): $uplim = V_{RMAX} - K_C \cdot I_{fd}$
+8. **Variable-limit amplifier** (`tf1pvlim`): $E_{fd} \leftarrow V_2$ with $K_A$, $T_A$, limits $[V_{RMIN}, uplim]$
+
+#### Parameters
+
+| Parameter | Description | Unit/Type |
+|---|---|---|
+| `Kv` | Voltage compensation gain | pu |
+| `Rc` | Line drop compensation resistance | pu |
+| `Xc` | Line drop compensation reactance | pu |
+| `TR` | Measurement filter time constant | s |
+| `VIMAX` | Maximum input error signal | pu |
+| `VIMIN` | Minimum input error signal | pu |
+| `TC` | Lead numerator time constant | s |
+| `TB` | Lag denominator time constant | s |
+| `VUEL` | UEL signal value | pu |
+| `KA` | Regulator gain | pu |
+| `TA` | Regulator time constant | s |
+| `VRMAX` | Maximum output (at zero field current) | pu |
+| `VRMIN` | Minimum output | pu |
+| `KC` | Field current derating factor | pu |
+
+#### Variants
+
+| Model | Description |
+|---|---|
+| `AC4A` | Base model — IEEE Type AC4A, no PSS or OEL |
+
+#### Usage Example
+
+```
+SYNC genAC4A bus2 'AC4A' 0.0 0.0 0.0 0.02 8.0 -8.0 1.0 10.0 0.0 200.0 0.015 4.44 -4.44 0.0 ;
+```
+
+---
+
+### AC8B
+
+The AC8B is a rotating AC exciter with a PID voltage regulator (rather than the proportional-integral amplifier of earlier types). It corresponds to IEEE Std 421.5-2016 Type AC8B. The PID structure — proportional gain $K_{PR}$, integral gain $K_{IR}$, and derivative gain $K_{DR}$ — provides improved transient response compared to Type AC1A.
+
+#### Mathematical Description
+
+The PID voltage regulator:
+
+$$\Delta V = V_c - V_{REF}$$
+
+$$V_{PID}(s) = K_{PR} \cdot \Delta V + \frac{K_{IR}}{s} \cdot \Delta V + \frac{sK_{DR}/T_{DR}}{1 + sT_{DR}} \cdot \Delta V$$
+
+$$V_R(s) = V_{PID} \cdot \frac{K_A}{1 + sT_A}, \quad V_{RMIN} \le V_R \le V_{RMAX}$$
+
+The AC exciter with variable limits based on maximum field excitation voltage $V_{FEMAX}$:
+
+$$V_{FE} = K_D \cdot I_{fd} + \left(K_E + S_E(V_E)\right) V_E$$
+
+$$\dot{V}_E = \frac{1}{T_E}(V_R - V_{FE}), \quad V_{EMIN} \le V_E \le \frac{V_{FEMAX} - K_D I_{fd}}{K_E + S_E(V_E)}$$
+
+#### Signal Flow
+
+1. **Voltage measurement** (`tf1p`): $V_c$ with $T_R$
+2. **Error signal** (`algeq`): $\Delta V = V_c - V_{REF}$
+3. **PID derivative part** (`tfder1p`): $x_{der} \leftarrow \Delta V$ with gain $K_{DR}/T_{DR}$
+4. **PID proportional-integral** (`pictl`): $x_{propint} \leftarrow \Delta V$ with $K_{IR}$, $K_{PR}$
+5. **PID sum** (`algeq`): $x_{pid} = x_{propint} + x_{der}$, limited to $[V_{PIDMIN}, V_{PIDMAX}]$
+6. **Amplifier** (`tf1plim`): $V_R \leftarrow x_{pid}$ with $K_A$, $T_A$
+7. **Exciter integrator** (`invlim`): $V_E$ with variable limits from $V_{FEMAX}$
+8. **Saturation and rectification** (`algeq`): $V_{FE}$, $E_{fd}$
+
+#### Parameters
+
+| Parameter | Description | Unit/Type |
+|---|---|---|
+| `Kv` | Voltage compensation gain | pu |
+| `Rc` | Line drop resistance | pu |
+| `Xc` | Line drop reactance | pu |
+| `TR` | Measurement time constant | s |
+| `KPR` | PID proportional gain | pu |
+| `KIR` | PID integral gain | pu/s |
+| `KDR` | PID derivative gain | pu·s |
+| `TDR` | PID derivative filter time constant | s |
+| `VPIDMAX` | PID output upper limit | pu |
+| `VPIDMIN` | PID output lower limit | pu |
+| `KA` | Amplifier gain | pu |
+| `TA` | Amplifier time constant | s |
+| `VRMAX` | Maximum regulator output | pu |
+| `VRMIN` | Minimum regulator output | pu |
+| `KC` | Rectifier commutation factor | pu |
+| `KD` | Demagnetization factor | pu |
+| `KE` | Exciter self-excitation constant | pu |
+| `TE` | Exciter time constant | s |
+| `VFEMAX` | Maximum field excitation voltage | pu |
+| `VEMIN` | Minimum exciter output | pu |
+| `VE1` | Saturation voltage point 1 | pu |
+| `SE1` | Saturation factor at $V_{E1}$ | pu |
+| `VE2` | Saturation voltage point 2 | pu |
+| `SE2` | Saturation factor at $V_{E2}$ | pu |
+
+#### Variants
+
+| Model | Description |
+|---|---|
+| `AC8B` | Base model — IEEE Type AC8B |
+| `AC8B_PSS3B_lim` | Adds PSS3B dual-input stabilizer and integral OEL + SCL (stator current limiter) |
+| `AC8B_lim` | Adds integral OEL and SCL without PSS |
+
+#### Usage Example
+
+```
+SYNC genAC8B bus3 'AC8B' 0.0 0.0 0.0 0.02 1.0 5.0 0.1 0.1 8.0 -8.0 1.0 0.1 6.5 -6.5 0.2 1.0 1.0 0.5 6.5 0.0 4.0 0.3 3.0 0.33 ;
+```
+
+---
+
+## DC Exciter Models
+
+### DC3A
+
+The DC3A represents a non-continuously acting (rheostat-type) DC excitation system. It corresponds to IEEE Std 421.5-2016 Type DC3A. Rather than a proportional amplifier, it uses a three-position switch (VRMIN / VRH / VRMAX) driven by an integrator that holds the rheostat position $V_{RH}$. The switch position is determined by whether the error signal $V_{ERR}$ falls inside or outside a deadband $\pm K_V$.
+
+#### Mathematical Description
+
+$$V_{ERR} = V_{REF} - V_c$$
+
+The rheostat integrator:
+
+$$\dot{V}_{RH} = \frac{K_V \cdot T_{RH}}{V_{RMAX} - V_{RMIN}} \cdot \text{clamp}(V_{ERR}, -K_V, K_V), \quad V_{RMIN} \le V_{RH} \le V_{RMAX}$$
+
+The three-position switch:
+
+$$V_R = \begin{cases} V_{RMIN} & V_{ERR} < -K_V \\ V_{RH} & |V_{ERR}| \le K_V \\ V_{RMAX} & V_{ERR} > K_V \end{cases}$$
+
+The DC exciter with saturation:
+
+$$\dot{E}_{fd} = \frac{1}{T_E}\left[V_R - \left(K_E + S_E(E_{fd})\right) E_{fd}\right]$$
+
+#### Parameters
+
+| Parameter | Description | Unit/Type |
+|---|---|---|
+| `Kvcomp` | Voltage compensation gain | pu |
+| `Rc` | Line drop resistance | pu |
+| `Xc` | Line drop reactance | pu |
+| `TR` | Measurement time constant | s |
+| `TRH` | Rheostat traversal time | s |
+| `KV` | Sensitivity of non-continuously acting controller | pu |
+| `VRMAX` | Maximum field voltage | pu |
+| `VRMIN` | Minimum field voltage | pu |
+| `TE` | Exciter time constant | s |
+| `KE` | Exciter self-excitation constant | pu |
+| `E1` | Saturation voltage point 1 | pu |
+| `SE1` | Saturation factor at $E_1$ | pu |
+| `E2` | Saturation voltage point 2 | pu |
+| `SE2` | Saturation factor at $E_2$ | pu |
+
+#### Variants
+
+| Model | Description |
+|---|---|
+| `DC3A` | Base model — IEEE Type DC3A, non-continuously acting rheostat controller |
+
+#### Usage Example
+
+```
+SYNC genDC3A bus4 'DC3A' 0.0 0.0 0.0 0.0 1.0 1.0 1.0 -1.0 0.8 1.0 3.1 0.33 2.3 0.1 ;
+```
+
+---
+
+## ST (Static) Exciter Models
+
+### ST1A
+
+The ST1A is a static (thyristor) excitation system with two cascaded lead-lag networks in the voltage regulator path and an inner field current limiter (KLR/ILR). It corresponds to IEEE Std 421.5-2016 Type ST1A. The output limits are proportional to terminal voltage $V_t$, and field current derating applies through $K_C$: $uplim = V_t \cdot V_{RMAX} - K_C \cdot I_{fd}$.
+
+#### Mathematical Description
+
+The voltage regulator with dual lead-lag and instantaneous field current limiting:
+
+$$\Delta V = V_{REF} - V_c + V_{PSS} + V_{UEL,path} + V_F$$
+
+$$V_1 = \text{clamp}(\Delta V, V_{IMIN}, V_{IMAX})$$
+
+$$V_2(s) = V_1 \cdot \frac{1 + sT_C}{1 + sT_B}$$
+
+$$V_3(s) = V_2 \cdot \frac{1 + sT_{C1}}{1 + sT_{B1}}$$
+
+$$V_A(s) = V_3 \cdot \frac{K_A}{1 + sT_A}, \quad V_{AMIN} \le V_A \le V_{AMAX}$$
+
+Instantaneous field current limiter:
+
+$$V_{LR} = K_{LR}(I_{fd} - I_{LR})$$
+
+$$V_5 = V_A - \max(V_{LR}, 0)$$
+
+Final output with terminal-voltage-dependent limits:
+
+$$E_{fd} = \text{clamp}(V_5, V_t \cdot V_{RMIN}, V_t \cdot V_{RMAX} - K_C \cdot I_{fd})$$
+
+Derivative feedback:
+
+$$V_F(s) = E_{fd} \cdot \frac{sK_F/T_F}{1 + sT_F}$$
+
+#### Signal Flow
+
+1. **Line drop** (`algeq`): $V_{c1}$
+2. **Measurement filter** (`tf1p`): $V_c$ with $T_R$
+3. **AVR summation** (`algeq`): $\Delta V$, including UEL (mode 1), PSS, and VF
+4. **Error limiter** (`lim`): $V_1 \in [V_{IMIN}, V_{IMAX}]$
+5. **UEL gate (mode 2)** (`max1v1c`): HV gate $V_2$
+6. **First lead-lag** (`tf1p1z`): $V_3$ with $(T_C, T_B)$
+7. **Second lead-lag** (`tf1p1z`): $V_4$ with $(T_{C1}, T_{B1})$
+8. **Amplifier** (`tf1plim`): $V_A$ with $K_A$, $T_A$, $[V_{AMIN}, V_{AMAX}]$
+9. **Field current limiter** (`algeq`, `lim`): $V_{LR}$, $V_{LRlim}$
+10. **Limiter subtraction** (`algeq`): $V_5 = V_A - V_{LRlim}$
+11. **UEL gate (mode 3)** (`max1v1c`): $V_6$
+12. **OEL gate** (`min2v`): $V_7 = \min(V_6, V_{OEL})$
+13. **Variable-limit output** (`limvb`): $E_{fd}$ with terminal-voltage-scaled limits
+14. **Derivative feedback** (`tfder1p`): $V_F$
+
+#### Parameters
+
+| Parameter | Description | Unit/Type |
+|---|---|---|
+| `Kv` | Voltage compensation gain | pu |
+| `Rc` | Line drop resistance | pu |
+| `Xc` | Line drop reactance | pu |
+| `TR` | Measurement filter time constant | s |
+| `UEL` | UEL connection mode (1=summation, 2=HV gate after V1, 3=HV gate after VA) | integer |
+| `VIMIN` | Input error lower limit | pu |
+| `VIMAX` | Input error upper limit | pu |
+| `VUEL` | UEL signal value | pu |
+| `TC` | First lead-lag numerator | s |
+| `TB` | First lead-lag denominator | s |
+| `TC1` | Second lead-lag numerator | s |
+| `TB1` | Second lead-lag denominator | s |
+| `KA` | Regulator gain | pu |
+| `TA` | Regulator time constant | s |
+| `VAMIN` | Regulator lower limit | pu |
+| `VAMAX` | Regulator upper limit | pu |
+| `VRMIN` | Output lower limit scaling factor | pu |
+| `VRMAX` | Output upper limit scaling factor | pu |
+| `KC` | Field current derating factor | pu |
+| `KF` | Rate feedback gain | pu |
+| `TF` | Rate feedback time constant | s |
+| `KLR` | Field current limiter gain | pu |
+| `ILR` | Field current limiter reference | pu |
+
+#### Variants
+
+| Model | Description |
+|---|---|
+| `ST1A` | Base model — IEEE Type ST1A |
+| `ST1A_IEEEST` | Adds IEEEST single-input PSS (speed or power input, selectable) |
+| `ST1A_IEEEST_MAXEX2` | Adds IEEEST PSS + MAXEX2 field current limiter |
+| `ST1A_PSS2B` | Adds PSS2B dual-input stabilizer |
+| `ST1A_PSS2B_MAXEX2` | Adds PSS2B + MAXEX2 |
+| `ST1A_PSS2B_OELHQ` | Adds PSS2B + Hydro-Québec PID OEL |
+| `ST1A_PSS3B` | Adds PSS3B two-channel second-order filter stabilizer |
+| `ST1A_PSS3B_OELHQ` | Adds PSS3B + OELHQ |
+| `ST1A_PSS4B` | Adds PSS4B three-band stabilizer |
+| `ST1A_PSS4B_MAXEX2` | Adds PSS4B + MAXEX2 |
+| `ST1A_PSS4B_OELHQ` | Adds PSS4B + OELHQ |
+| `ST1A_OELHQ` | Adds OELHQ PID OEL without PSS |
+| `ST1A_lim` | Integral OEL + stator current limiter (SCL), simplified structure without Kv/Rc/Xc |
+
+#### Usage Example
+
+```
+SYNC genST1A bus5 'ST1A' 0.0 0.0 0.0 0.02 1 -0.87 0.87 0.0 1.0 10.0 0.0 1.0 200.0 0.001 7.8 -6.7 0.038 0.0 999.0 0.0 99.0 ;
+```
+
+---
+
+### ST2A (via EXPIC1)
+
+The EXPIC1 model implements a static exciter with an AC rotating bus-fed rectifier and an integrating (PI-type) amplifier path: $K_A(1 + sT_A)/s$. The output $V_B$ is proportional to the AC voltage phasor magnitude, creating a bus-fed topology analogous to IEEE Type ST2A. When $K_P = K_I = 0$, the rectifier gain is unity.
+
+#### Mathematical Description
+
+The AC exciter voltage and rectifier:
+
+$$V_E = |K_P V_t + jK_I V_t|, \quad V_B = V_E \cdot \left(1 - \frac{K_C I_{fd}}{V_E}\right)^+$$
+
+The integrating amplifier:
+
+$$G_{amp}(s) = K_A \cdot \frac{1 + sT_A}{s}$$
+
+The field voltage integrator:
+
+$$\dot{E}_{fd} = \frac{1}{T_E}\left[V_R \cdot V_B - K_E \cdot E_{fd}\right], \quad E_{FDMIN} \le E_{fd} \le E_{FDMAX}$$
+
+#### Signal Flow
+
+1. **Voltage measurement** (`tf1p`): $V_c$ with $T_R$
+2. **Summation** (`algeq`): $\Delta V = V_{REF} - V_c - V_F - \Delta V_{PSS}$
+3. **UEL gate** (`max1v1c`): clamped to $V_{UEL}$
+4. **PI amplifier** (`pictl`): $V_A$ with $K_{gain} = K_A \cdot T_A$ and $K_A$
+5. **Output limiter** (`lim`): $V_R \in [V_{RMIN}, V_{RMAX}]$
+6. **Rectifier voltage** (`algeq`): $V_E$, $V_B$
+7. **Field integrator** (`inlim`): $E_{fd}$ from $V_R \cdot V_B - K_E \cdot E_{fd}$
+8. **Derivative feedback** (`tfder1p`): $V_F$
+
+#### Parameters
+
+| Parameter | Description | Unit/Type |
+|---|---|---|
+| `Kvcomp` | Voltage compensation gain | pu |
+| `Rc` | Line drop resistance | pu |
+| `Xc` | Line drop reactance | pu |
+| `TR` | Measurement time constant | s |
+| `VUEL` | UEL signal | pu |
+| `KA` | Amplifier gain | pu |
+| `TA` | Amplifier time constant | s |
+| `VRMAX` | Maximum regulator output | pu |
+| `VRMIN` | Minimum regulator output | pu |
+| `KF` | Rate feedback gain | pu |
+| `TF` | Rate feedback time constant | s |
+| `KE` | Exciter self-excitation constant | pu |
+| `EFDMAX` | Maximum field voltage | pu |
+| `EFDMIN` | Minimum field voltage | pu |
+| `TE` | Field integrator time constant | s |
+| `KP` | AC source voltage proportional factor | pu |
+| `KI` | AC source voltage quadrature factor | pu |
+| `KC` | Commutation voltage drop factor | pu |
+
+#### Variants
+
+| Model | Description |
+|---|---|
+| `EXPIC1` | Base bus-fed static exciter |
+| `EXPIC1_PSS2B` | Adds PSS2B dual-input stabilizer |
+| `EXPIC1_PSS2B_MAXEX2` | Adds PSS2B + MAXEX2 field current limiter |
+
+#### Usage Example
+
+```
+SYNC genEXPIC1 bus6 'EXPIC1' 0.0 0.0 0.0 0.02 0.0 200.0 0.02 99.0 -99.0 0.0 1.0 1.0 8.0 -8.0 0.5 0.0 1.0 0.0 ;
+```
+
+---
+
+## Other IEEE Models
+
+### IEEET5
+
+The IEEET5 (also referenced as DC5A in some conventions) is a non-continuously acting exciter similar to DC3A but uses an inner limiter block `lim_civ` that gates the integrator holding signal within a deadband $\pm K_V$. This creates the three-state (hold/raise/lower) behavior of rheostatic controllers.
+
+#### Mathematical Description
+
+$$V_{ERR} = V_{REF} - V_c$$
+
+The integrator for rheostat position:
+
+$$\dot{V}_{RH} = \frac{1}{T_{RH}} \cdot V_{ERR}, \quad V_{RMIN} \le V_{RH} \le V_{RMAX}$$
+
+The `lim_civ` block implements the deadband gating so that integration is active only when $|V_{ERR}| > K_V$:
+
+$$V_R = \begin{cases} V_{RMIN} & V_{ERR} < -K_V \\ V_{RH} & |V_{ERR}| \le K_V \\ V_{RMAX} & V_{ERR} > K_V \end{cases}$$
+
+$$\dot{E}_{fd} = \frac{1}{T_E}\left[V_R - \left(K_E + S_E(E_{fd})\right) E_{fd}\right]$$
+
+#### Parameters
+
+| Parameter | Description | Unit/Type |
+|---|---|---|
+| `Kvcomp` | Voltage compensation gain | pu |
+| `Rc` | Line drop resistance | pu |
+| `Xc` | Line drop reactance | pu |
+| `TRH` | Rheostat time | s |
+| `KV` | Controller sensitivity deadband | pu |
+| `VRMAX` | Maximum field voltage | pu |
+| `VRMIN` | Minimum field voltage | pu |
+| `TE` | Exciter integrator time constant | s |
+| `KE` | Exciter self-excitation constant | pu |
+| `E1` | Saturation point 1 | pu |
+| `SE1` | Saturation factor at $E_1$ | pu |
+| `E2` | Saturation point 2 | pu |
+| `SE2` | Saturation factor at $E_2$ | pu |
+
+#### Variants
+
+| Model | Description |
+|---|---|
+| `IEEET5` | Base model — non-continuously acting DC exciter |
+
+---
+
+### SEXS
+
+The SEXS (Simplified Excitation System) is a minimal two-parameter static exciter model from CIGRÉ publications, widely used for cases where detailed exciter data is unavailable. It has no measurement filter, no line drop compensation, and no rate feedback — just a lead-lag network and a limited first-order block.
+
+#### Mathematical Description
+
+$$\Delta V_{AVR} = V_t - V_o + V_{PSS}$$
+
+$$G_{lag}(s) = \frac{1 + sT_A}{1 + sT_B}$$
+
+$$E_{fd}(s) = G_{lag}(\Delta V_{AVR}) \cdot \frac{K_E}{1 + sT_E}, \quad E_{MIN} \le E_{fd} \le E_{MAX}$$
+
+where $V_o = V_t + E_{fd,0}/K_E$ is computed from initial conditions to achieve zero initial error.
+
+#### Parameters
+
+| Parameter | Description | Unit/Type |
+|---|---|---|
+| `TA` | Lead-lag numerator time constant | s |
+| `TB` | Lead-lag denominator time constant | s |
+| `KE` | Exciter gain | pu |
+| `TE` | Exciter time constant | s |
+| `EMIN` | Minimum field voltage | pu |
+| `EMAX` | Maximum field voltage | pu |
+
+#### Variants
+
+| Model | Description |
+|---|---|
+| `SEXS` | Base simplified exciter |
+| `SEXS_IEEEST` | Adds IEEEST PSS (multi-mode: speed, power, or accelerating power input) |
+| `SEXS_STAB3_lim` | Adds STAB3 PSS + integral OEL |
+
+#### Usage Example
+
+```
+SYNC genSEXS bus7 'SEXS' 0.1 10.0 25.0 0.5 -5.0 5.0 ;
+```
+
+---
+
+### EXPIC1 / EXHQSC
+
+The EXHQSC is a Hydro-Québec static exciter model based on the ST1A topology but extended with an internal field current deadband controller (`db` block). This controller measures the filtered field current $I_{ff}$ through a first-order filter with time constant $T_I$, compares it against asymmetric limits $[I_{FMIN}, I_{FMAX}]$, and feeds back a corrective signal $V_{lr}$ through a first-order lag, contributing to the amplifier output before the variable-limit clamp.
+
+#### Mathematical Description
+
+The main AVR path follows ST1A topology with two cascaded first-order blocks (instead of lead-lag):
+
+$$V_2(s) = \Delta V \cdot \frac{K_A}{1 + sT_A}$$
+
+$$V_4(s) = V_2 \cdot \frac{1 + sT_{A1}}{1 + sT_{A2}}$$
+
+The field current limiter deadband:
+
+$$I_{ff}(s) = I_{fd} \cdot \frac{1}{1 + sT_I}$$
+
+$$I_{fdb} = db(I_{ff}; I_{FMIN}, K_{MIN}, I_{FMAX}, K_{MAX})$$
+
+$$V_{lr}(s) = I_{fdb} \cdot \frac{1}{1 + sT_A}$$
+
+$$E_{fd} = \text{limvb}(V_4 + K_A \cdot V_{lr}; V_{vmin}, V_{vmax})$$
+
+where $V_{vmin} = V_t \cdot V_{RMIN} - K_C I_{fd}$ and $V_{vmax} = V_t \cdot V_{RMAX} - K_C I_{fd}$.
+
+#### Parameters
+
+| Parameter | Description | Unit/Type |
+|---|---|---|
+| `Kv` | Voltage compensation gain | pu |
+| `Rc` | Line drop resistance | pu |
+| `Xc` | Line drop reactance | pu |
+| `UEL` | UEL connection flag | integer |
+| `VUEL` | UEL signal | pu |
+| `TR` | Measurement time constant | s |
+| `VMIN` | Input error lower limit | pu |
+| `VMAX` | Input error upper limit | pu |
+| `TA1` | Second filter numerator | s |
+| `TA2` | Second filter denominator | s |
+| `KA` | Regulator gain | pu |
+| `TA` | Regulator time constant | s |
+| `VRMIN` | Output lower limit factor | pu |
+| `VRMAX` | Output upper limit factor | pu |
+| `KC` | Field current derating factor | pu |
+| `KF` | Derivative feedback gain | pu |
+| `TF` | Derivative feedback time constant | s |
+| `TI` | Field current filter time constant | s |
+| `IFMIN` | Lower deadband threshold | pu |
+| `IFMAX` | Upper deadband threshold | pu |
+| `KMIN` | Lower deadband gain | pu |
+| `KMAX` | Upper deadband gain | pu |
+
+#### Variants
+
+| Model | Description |
+|---|---|
+| `EXHQSC` | Base Hydro-Québec static exciter with field current deadband |
+| `EXHQSC_MAXEX2` | Adds MAXEX2 field current limiter |
+| `EXHQSC_PSS4B` | Adds PSS4B three-band stabilizer |
+| `EXHQSC_PSS4B_MAXEX2` | Adds PSS4B + MAXEX2 |
+| `EXHQSC_PSS4B_OELHQ` | Adds PSS4B + OELHQ PID OEL |
+
+---
+
+## ENTSO-E Models
+
+### ENTSOE_simp
+
+The ENTSO-E simplified exciter combines a built-in speed-signal PSS with a simple lead-lag AVR and first-order exciter block. It is the standard ENTSO-E model for dynamic studies where detailed exciter data is unavailable.
+
+#### Mathematical Description
+
+The PSS (speed input $\omega - 1$) uses two washout stages and two lead-lag stages:
+
+$$V_{PSS}(s) = (\omega - 1) \cdot \frac{sT_{W1}}{1+sT_{W1}} \cdot \frac{sT_{W2}}{1+sT_{W2}} \cdot K_{S1} \cdot \frac{1+sT_1}{1+sT_2} \cdot \frac{1+sT_3}{1+sT_4}$$
+
+The AVR:
+
+$$\Delta V_{AVR} = V_t - V_o + V_{PSS}$$
+
+$$G_{lag}(s) = \frac{1 + sT_A}{1 + sT_B}$$
+
+$$E_{fd}(s) = G_{lag}(\Delta V_{AVR}) \cdot \frac{K_E}{1 + sT_E}, \quad E_{MIN} \le E_{fd} \le E_{MAX}$$
+
+#### Parameters
+
+| Parameter | Description | Unit/Type |
+|---|---|---|
+| `TW1` | First washout time constant | s |
+| `TW2` | Second washout time constant | s |
+| `KS1` | PSS gain | pu |
+| `T1` | First lead-lag numerator | s |
+| `T2` | First lead-lag denominator | s |
+| `T3` | Second lead-lag numerator | s |
+| `T4` | Second lead-lag denominator | s |
+| `VSTMIN` | PSS output lower limit | pu |
+| `VSTMAX` | PSS output upper limit | pu |
+| `TA` | AVR lead-lag numerator | s |
+| `TB` | AVR lead-lag denominator | s |
+| `KE` | Exciter gain | pu |
+| `TE` | Exciter time constant | s |
+| `EMIN` | Minimum field voltage | pu |
+| `EMAX` | Maximum field voltage | pu |
+
+#### Variants
+
+| Model | Description |
+|---|---|
+| `ENTSOE_simp` | Base ENTSO-E simplified model with integrated PSS |
+| `ENTSOE_lim` | Adds integral OEL (same structure as `AC8B_lim` OEL) |
+
+#### Usage Example
+
+```
+SYNC genENTSOE bus8 'ENTSOE_simp' 10.0 3.0 10.0 0.2 0.1 0.1 0.1 -0.05 0.05 0.05 0.1 25.0 1.0 -10.0 10.0 ;
+```
+
+---
+
+## PSS Models
+
+Power System Stabilizers (PSS) inject an additional signal $V_{PSS}$ at the AVR summation point to damp electromechanical oscillations. All variants listed in the model index table include one of the PSS types described here.
+
+### PSS2B — Dual-Input Stabilizer
+
+PSS2B accepts two input signals (typically speed $\omega$ and electrical power $P_e$) and processes them through independent washout chains before combining. It corresponds to IEEE Std 421.5-2016 Type PSS2B.
+
+$$V_{S1} = \text{clamp}(VSI_1, V_{S1MIN}, V_{S1MAX})$$
+
+Channel 1 (input 1 washout):
+
+$$V_{S1} \xrightarrow{sT_{W1}/(1+sT_{W1})} \xrightarrow{sT_{W2}/(1+sT_{W2})} \xrightarrow{1/(1+sT_6)} pss_{3}$$
+
+Channel 2 (input 2 washout):
+
+$$V_{S2} \xrightarrow{sT_{W3}/(1+sT_{W3})} \xrightarrow{sT_{W4}/(1+sT_{W4})} \xrightarrow{K_{S2}/(1+sT_7)} pss_{6}$$
+
+Combination and lead-lag chain (variant M=5, N=1 implemented):
+
+$$pss_7 = pss_3 - K_{S3} \cdot pss_6$$
+
+$$pss_7 \xrightarrow{(1+sT_8)/(1+sT_9)} \xrightarrow{1/(1+sT_9)^4} pss_{12}$$
+
+$$pss_{13} = pss_{12} + pss_6$$
+
+$$pss_{13} \xrightarrow{K_{S1}(1+sT_1)/(1+sT_2)} \xrightarrow{(1+sT_3)/(1+sT_4)} \xrightarrow{(1+sT_{10})/(1+sT_{11})} V_{PSS}$$
+
+$$V_{PSS} = \text{clamp}(V_{PSS,unlim}, V_{STMIN}, V_{STMAX})$$
+
+**PSS2B Parameters (additional to base exciter):**
+
+| Parameter | Description |
+|---|---|
+| `speedinput` | Input selection (1=speed+power, 2=power+speed) |
+| `TW1`, `TW2` | Channel 1 washout time constants |
+| `T6` | Channel 1 filter |
+| `TW3`, `TW4` | Channel 2 washout time constants |
+| `T7`, `KS2` | Channel 2 filter gain and time constant |
+| `KS3` | Channel coupling gain |
+| `T8`, `T9` | Ramp-tracking filter |
+| `KS1` | Overall PSS gain |
+| `T1`–`T4`, `T10`, `T11` | Lead-lag time constants |
+| `VS1MIN`, `VS1MAX` | Input 1 limits |
+| `VS2MIN`, `VS2MAX` | Input 2 limits |
+| `VSTMIN`, `VSTMAX` | Output limits |
+
+---
+
+### PSS3B — Two-Input Second-Order Filter Stabilizer
+
+PSS3B processes two input channels through measurement filters and washout stages, then combines them and applies two cascaded second-order lead-lag filters. It corresponds to IEEE Std 421.5-2016 Type PSS3B.
+
+$$V_{SI1} \xrightarrow{1/(1+sT_1)} \xrightarrow{K_{S1} sT_{W1}/(1+sT_{W1})} pss_2$$
+
+$$V_{SI2} \xrightarrow{1/(1+sT_2)} \xrightarrow{K_{S2} sT_{W2}/(1+sT_{W2})} pss_4$$
+
+$$pss_5 = pss_2 - pss_4$$
+
+$$pss_5 \xrightarrow{K_S sT_{W3}/(sT_{W4}+1)} pss_6$$
+
+$$pss_6 \xrightarrow{\text{TF1: } \frac{A_2 + sA_1 + s^2/A_4}{A_4 + sA_3 + s^2/A_4}} \xrightarrow{\text{TF2: } \frac{A_6+sA_5+s^2/A_8}{A_8+sA_7+s^2/A_8}} V_{PSS}$$
+
+$$V_{PSS} = \text{clamp}(V_{PSS,unlim}, V_{STMIN}, V_{STMAX})$$
+
+**PSS3B Parameters (additional):**
+
+| Parameter | Description |
+|---|---|
+| `speedinput` | Input mode selection |
+| `T1`, `KS1`, `TW1` | Channel 1 filter, gain, washout |
+| `T2`, `KS2`, `TW2` | Channel 2 filter, gain, washout |
+| `KS`, `TW3`, `TW4` | Combined washout gain and time constants |
+| `A1`–`A8` | Second-order filter coefficients |
+| `VSTMIN`, `VSTMAX` | Output limits |
+
+---
+
+### PSS4B — Three-Band Multi-Input Stabilizer
+
+PSS4B is a three-band stabilizer that separates the speed deviation signal into low-, intermediate-, and high-frequency components. Each band uses a pair of lead-lag filters. This model corresponds to IEEE Std 421.5-2016 Type PSS4B.
+
+The speed signal $\Delta\omega = \omega - 1$ passes through a digital transducer (`tf2p2z`) to obtain the low/intermediate input. Electrical power $P_e$ passes through two washouts and a low-pass filter to derive the high-frequency component $\Delta\omega_H$.
+
+**Low-frequency band** ($\Delta\omega_{L-I}$ input):
+
+$$pss_4 = \Delta\omega_{L-I} \cdot \frac{K_{L1}(K_{L11} + sT_{L1})}{1 + sT_{L2}}$$
+
+$$pss_5 = \Delta\omega_{L-I} \cdot \frac{K_{L2}(K_{L17} + sT_{L7})}{1 + sT_{L8}}$$
+
+$$V_{PSSL} = \text{clamp}\!\left(K_L(pss_4 - pss_5),\, V_{LMin}, V_{LMax}\right)$$
+
+**Intermediate-frequency band** (same $\Delta\omega_{L-I}$ input):
+
+$$V_{PSSI} = \text{clamp}\!\left(K_I(pss_7 - pss_8),\, V_{IMin}, V_{IMax}\right)$$
+
+**High-frequency band** ($\Delta\omega_H$ input):
+
+$$V_{PSSH} = \text{clamp}\!\left(K_H(pss_{10} - pss_{11}),\, V_{HMin}, V_{HMax}\right)$$
+
+$$V_{PSS} = \text{clamp}(V_{PSSL} + V_{PSSI} + V_{PSSH},\, V_{STMin}, V_{STMax})$$
+
+**PSS4B Parameters (additional):**
+
+| Parameter | Description |
+|---|---|
+| `H` | Generator inertia constant (for high-freq path) |
+| `KL1`, `KL11`, `TL1`, `TL2` | Low-band filter 1 |
+| `KL2`, `KL17`, `TL7`, `TL8` | Low-band filter 2 |
+| `KL`, `VLMax`, `VLMin` | Low-band gain and limits |
+| `KI1`, `KI11`, `TI1`, `TI2` | Intermediate-band filter 1 |
+| `KI2`, `KI17`, `TI7`, `TI8` | Intermediate-band filter 2 |
+| `KI`, `VIMax`, `VIMin` | Intermediate-band gain and limits |
+| `KH1`, `KH11`, `TH1`, `TH2` | High-band filter 1 |
+| `KH2`, `KH17`, `TH7`, `TH8` | High-band filter 2 |
+| `KH`, `VHMax`, `VHMin` | High-band gain and limits |
+| `VSTMax`, `VSTMin` | Total output limits |
+
+---
+
+### IEEEST — Single-Input Stabilizer
+
+The IEEEST is a general-purpose single-input PSS with selectable input signal (speed deviation, electrical power, or computed accelerating power). It corresponds to IEEE Std 421.5-2016 Type PSS1A. Two second-order lead-lag filters provide frequency shaping before two first-order lead-lags and a washout stage.
+
+$$VS_1 \xrightarrow{\frac{1}{A_2 + sA_1 + s^2/(A_1 A_2)}} \xrightarrow{\frac{A_6 + sA_5 + s^2/(A_3 A_4)}{A_4 + sA_3 + s^2/(A_3 A_4)}} VS_3$$
+
+$$VS_3 \xrightarrow{\frac{1+sT_1}{1+sT_2}} \xrightarrow{\frac{1+sT_3}{1+sT_4}} \xrightarrow{\frac{K_S sT_5/T_6}{1+sT_6}} V_{PSS}$$
+
+$$V_{PSS} = \text{clamp}(V_{PSS,unlim}, V_{LSMIN}, V_{LSMAX})$$
+
+Input selection (`speedinput`): 1 = rotor speed deviation, 3 = electrical power, 4 = computed accelerating power ($2H \, d\omega/dt$).
+
+**IEEEST Parameters (additional):**
+
+| Parameter | Description |
+|---|---|
+| `speedinput` | Input mode (1, 3, or 4) |
+| `A1`–`A6` | Second-order filter coefficients |
+| `T1`–`T6` | Lead-lag and washout time constants |
+| `KS` | Overall PSS gain |
+| `LSMIN`, `LSMAX` | Output limits |
+| `KS4` | Inertia constant for accelerating power (= 2H) |
+| `TW4` | Derivative filter time constant |
+
+---
+
+### STAB3 — Power-Input Stabilizer
+
+The STAB3 is a simplified PSS that takes electrical power $P_e$ as input, applies two sequential first-order filters and a washout-type derivative block, producing a stabilizing signal.
+
+$$P_e \xrightarrow{1/(1+sT_t)} stab_1 \xrightarrow{1/(1+sT_{X1})} stab_2 \xrightarrow{-K_X s/(1+sT_{X2})} stab_3$$
+
+$$V_{PSS} = \text{clamp}(stab_3, -V_{LIM}, V_{LIM})$$
+
+**STAB3 Parameters:**
+
+| Parameter | Description |
+|---|---|
+| `Tt` | Input measurement time constant |
+| `TX1` | First filter time constant |
+| `KX` | Stabilizer gain |
+| `TX2` | Washout time constant |
+| `VLIM` | Output limit |
+
+---
+
+## OEL and Limiter Models
+
+Over-Excitation Limiters (OEL) prevent sustained field current overloads that would thermally damage the field winding. They generate a signal $V_{OEL}$ that reduces the AVR output when field current exceeds thermal limits.
+
+### OELHQ — Hydro-Québec PID OEL
+
+The OELHQ OEL is a sophisticated limiter developed by Hydro-Québec. It uses a piece-wise linear timer (11 operating points) to model the thermal capability curve, combined with a hysteresis latch and a full PID controller.
+
+**Timer phase:** The measured field current $I_{fd,mes}$ (filtered with time constant $T_m$) drives a `timer11` block with 11 $(I_{fd}, T_{limit})$ pairs defining the permitted over-current duration. When the accumulated timer exceeds 1.0, the `hyst` block locks the reference to $I_{FDPL}$ for the remainder of the simulation.
+
+**PID phase:** Once the timer triggers, the error signal drives a PID controller:
+
+$$e_{IFD} = I_{fd,ref} - I_{fd,mes}$$
+
+$$V_{OEL,der}(s) = e_{IFD} \cdot \frac{sK_{Doel}/T_{Doel}}{1 + sT_{Doel}}$$
+
+$$V_{OEL,PI}(s) = K_{Poel} \cdot e_{IFD} + \frac{K_{Ioel}}{s} \cdot e_{IFD}, \quad 0 \le V_{OEL,PI} \le V_{OELMAX}$$
+
+$$V_{OEL} = \text{clamp}(V_{OEL,der} + V_{OEL,PI},\, V_{OELMIN},\, V_{OELMAX})$$
+
+$V_{OEL}$ is applied at the AVR LV gate (`min2v`) or at the reference summation point, reducing the effective reference voltage.
+
+**OELHQ Parameters:**
+
+| Parameter | Description |
+|---|---|
+| `Tm` | Field current measurement filter time constant |
+| `IFDTH` | Hysteresis upper threshold (= $I_{FDDES}$ at steady state) |
+| `IFDPL` | Hysteresis lower threshold (permanent limit, e.g. 1.0 pu) |
+| `KIoel` | OEL integral gain |
+| `KPoel` | OEL proportional gain |
+| `KDoel` | OEL derivative gain |
+| `TDoel` | OEL derivative filter time constant |
+| `VOELMAX` | Maximum OEL output (= 0 pu in LV gate convention) |
+| `VOELMIN` | Minimum OEL output (negative, e.g. −0.95 pu) |
+| `IFD1`–`IFD11` | Thermal curve current points |
+| `TIFD1`–`TIFD11` | Thermal curve time limit points |
+
+---
+
+### MAXEX2 — Field Current Limiter with Timer and Hysteresis
+
+The MAXEX2 is a field current limiter derived from IEEE work, using a simplified three-point piece-wise linear timer instead of the full thermal curve of OELHQ. It is designed for the EXST1/ST1A topology where the OEL output is injected at the reference summation point (not the LV gate).
+
+**Timer phase:** The measured current $I_{fd,mes}$ (selected as either field current or $E_{fd}$ via parameter `IC`) drives a `timer3` block with three $(I_{fd}, T)$ operating points. The `hyst` block latches when timer ≥ 1.
+
+**Integral phase:** Once latched, the error drives a limited integrator:
+
+$$e_{IFD} = I_{fd,ref} - I_{fd,mes}$$
+
+$$\dot{V}_{OEL} = \frac{e_{IFD}}{K_{MX}}, \quad V_{LOW} \le V_{OEL} \le 0$$
+
+$V_{OEL}$ is subtracted from the reference ($V_{REF} - V_{OEL}$, i.e. negative reduces reference).
+
+**MAXEX2 Parameters:**
+
+| Parameter | Description |
+|---|---|
+| `IC` | Input selection: 0 = $E_{fd}$, 1 = $I_{fd}$ |
+| `IFDrated` | Rated field current (reference) |
+| `IFD1`, `TIME1` | Timer point 1 (current level, allowable duration) |
+| `IFD2`, `TIME2` | Timer point 2 |
+| `IFD3`, `TIME3` | Timer point 3 |
+| `IFDDES` | Desired steady-state field current after limiting |
+| `KMX` | Integrator time constant inverse (1/KMX = integration rate) |
+| `VLOW` | Lower limit of OEL output (e.g. −1.0 pu) |
+
+---
+
+### Integral OEL (\_lim variants)
+
+The simple integral OEL used in `AC8B_lim`, `ST1A_lim`, `SEXS_STAB3_lim`, and `ENTSOE_lim` variants computes the over-excitation signal through a clamped integrator acting on the difference between measured field current and $1.05 \cdot I_{FDN}$, with an input clamp at $0.35 \cdot I_{FDN}$.
+
+$$\Delta I_{fd,1} = I_{fd} - 1.05 \cdot I_{FDN}$$
+
+$$\Delta I_{fd,2} = \min(\Delta I_{fd,1},\, 0.35 \cdot I_{FDN})$$
+
+$$\dot{x}_{OEL} = \frac{\Delta I_{fd,2}}{T_{OEL}}, \quad L_{OEL} \le x_{OEL} \le U_{OEL}$$
+
+$$V_{OEL} = \text{clamp}(K_{OEL} \cdot x_{OEL},\, OEL_{LI},\, 0)$$
+
+A stator current limiter (SCL) with analogous structure acts on $I_{st} = \sqrt{P^2 + Q^2}/V_t$ relative to $1.025 \cdot I_{GN}$.
+
+**Integral OEL Parameters (in \_lim variants):**
+
+| Parameter | Description |
+|---|---|
+| `IFDN` | Nominal field current (OEL trigger at 1.05×) |
+| `TOEL` | OEL integrator time constant |
+| `LOEL` | OEL integrator lower limit |
+| `UOEL` | OEL integrator upper limit |
+| `KOEL` | OEL output gain |
+| `OELLI` | OEL output lower limit |
+| `IGN` | Nominal stator current (SCL trigger at 1.025×) |
+| `TSCL` | SCL integrator time constant |
+| `LSCL` | SCL integrator lower limit |
+| `USCL` | SCL integrator upper limit |
+| `KSCL` | SCL output gain |
+| `SCLLI` | SCL output lower limit |
+
+---
+
+## CODEGEN Block Reference
+
+The CODEGEN DSL primitives used in these models:
+
+| Block | Description | Signature |
+|---|---|---|
+| `tf1p` | First-order filter $K/(1+sT)$ | `in → out, K, T` |
+| `tf1p1z` | Lead-lag $(K(1+sT_z))/(1+sT_p)$ | `in → out, K, Tz, Tp` |
+| `tf1plim` | Lead-lag with output limits | `in → out, K, T, min, max` |
+| `tf1pvlim` | First-order with variable limits | `in → out, lo_var, hi_var, K, T` |
+| `tf2p2z` | Second-order filter | `in → out, b0, b1, b2, a1, a2` |
+| `tfder1p` | Derivative $sK/T/(1+s/T)$ | `in → out, K/T, T` |
+| `inlim` | Limited integrator | `in → out, T, lo, hi` |
+| `invlim` | Integrator with variable limits | `in → lo_var, hi_var, out, T` |
+| `pictl` | PI controller (no limit) | `in → out, Ki, Kp` |
+| `pictllim` | PI controller with limits | `in → out, Ki, Kp, lo, hi` |
+| `lim` | Algebraic clamp | `in → out, lo, hi` |
+| `limvb` | Variable-limit clamp | `in, lo_var, hi_var → out` |
+| `algeq` | Algebraic equation (residual = 0) | `expr` |
+| `max1v1c` | HV gate (max of signal and constant) | `in → out, const` |
+| `max2v` | HV gate (max of two signals) | `in1, in2 → out` |
+| `min1v1c` | LV gate (min of signal and constant) | `in → out, const` |
+| `min2v` | LV gate (min of two signals) | `in1, in2 → out` |
+| `timer3` / `timer11` | Piece-wise thermal timer | `in → out, (I1,T1), ..., (In,Tn)` |
+| `hyst` | Hysteresis latch | `in → out, ...thresholds...` |
+| `db` | Deadband with gain | `in → out, lo, g_lo, hi, g_hi` |
+| `switch3` | Three-position switch | `lo, mid, hi, selector → out` |
+| `pwlin6` | Piece-wise linear (6-point) indicator | `in → out, x1,y1,...,x6,y6` |

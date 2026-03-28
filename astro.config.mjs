@@ -73,6 +73,28 @@ export default defineConfig({
 					],
 				},
 				{
+					label: 'Model Library',
+					items: [
+						{
+							label: 'IEEE Models',
+							items: [
+								{ label: 'Exciter Models', slug: 'models/ieee-exciters' },
+								{ label: 'Governor Models', slug: 'models/ieee-governors' },
+							],
+						},
+						{
+							label: 'Custom Models',
+							items: [
+								{ label: 'Exciter Models', slug: 'models/custom-exciters' },
+								{ label: 'Governor Models', slug: 'models/custom-governors' },
+								{ label: 'Injector Models', slug: 'models/custom-injectors' },
+								{ label: 'Two-Port Models', slug: 'models/two-port-models' },
+							],
+						},
+						{ label: 'Discrete Controllers', slug: 'models/discrete-controllers' },
+					],
+				},
+				{
 					label: 'Developer Guide',
 					items: [
 						{ label: 'User-Defined Models', slug: 'developer/user-models' },

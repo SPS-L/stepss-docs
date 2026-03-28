@@ -1,0 +1,630 @@
+---
+title: Custom Exciter Models
+description: Custom and simplified excitation system models in RAMSES
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+This page documents the custom excitation system models available in RAMSES. These models range from a trivial constant-voltage source to full-featured AVR with PSS and OEL. Models without a `.txt` definition file are implemented directly in Fortran and are described from their source headers.
+
+---
+
+## exc_constant
+
+### Scientific Description
+
+The `exc_constant` model provides a **constant field voltage** source. The field voltage $V_f$ is fixed at its load-flow initialisation value and does not respond to any input:
+
+$$
+V_f(t) = V_{f0} \quad \forall t
+$$
+
+The single algebraic state satisfies:
+
+$$
+f(1) = x(1) - V_{f0} = 0
+$$
+
+This model is useful for open-loop tests, for machines that are not equipped with a voltage regulator, or as a placeholder during model development.
+
+**Implementation details (from Fortran source):**
+- `nbxvar = 1`, `nbzvar = 0`, `nbdata = 0`
+- One additional parameter: `prm(1) = Vf0` (set at initialisation from the load-flow field voltage)
+- Observables: `vf`, `if`
+
+### Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| *(none)* | No user-supplied data parameters. The field voltage is taken from the initialisation (load-flow) value automatically. |
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+exc exc_constant GEN1
+;
+```
+</TabItem>
+<TabItem label="Notes">
+- No parameters need to be supplied; the model self-initialises to the load-flow $V_f$ value.
+- Useful for simulation of machines operating in manual excitation mode.
+</TabItem>
+</Tabs>
+
+---
+
+## exc_1storder
+
+### Scientific Description
+
+The `exc_1storder` model is a **first-order automatic voltage regulator** (AVR). It represents the simplest dynamic exciter: a proportional gain $K_A$ acting on the terminal voltage error, filtered through a single first-order lag $T_A$, with output limits.
+
+The AVR computes the voltage error and drives the field voltage:
+
+$$
+\frac{d V_f}{dt} = \frac{1}{T_A}\left[K_A\left(V_{ref} - V\right) - V_f\right], \quad V_f \in [V_{f,min},\, V_{f,max}]
+$$
+
+The reference voltage $V_{ref}$ is initialised from:
+
+$$
+V_{ref} = V_0 + \frac{V_{f0}}{K_A}
+$$
+
+**Implementation details (from Fortran source):**
+- `nbxvar = 1`, `nbzvar = 1`, `nbdata = 4`
+- Parameters: `prm(1) = KA`, `prm(2) = TA`, `prm(3) = Vfmin`, `prm(4) = Vfmax`
+- Additional parameter: `prm(5) = V0` (voltage setpoint, computed at initialisation)
+- The ODE in the continuous mode is:
+
+$$
+f(1) = \frac{-V_f + K_A(V_{ref} - V)}{T_A}
+$$
+
+- With anti-windup: if the limiter is active, `f(1) = Vf - Vfmin` (or `Vfmax`).
+
+### Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `KA` | AVR gain (pu/pu) |
+| `TA` | AVR time constant (s) |
+| `Vfmin` | Minimum field voltage (pu) |
+| `Vfmax` | Maximum field voltage (pu) |
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+exc exc_1storder GEN1
+  200.0  ! KA: AVR gain
+  0.05   ! TA: time constant (s)
+  0.0    ! Vfmin (pu)
+  6.0    ! Vfmax (pu)
+;
+```
+</TabItem>
+<TabItem label="Notes">
+- This model is the Fortran-coded equivalent of a simple `tf1plim` block with input $V_{ref} - V$.
+- `KA` and `TA` together set the closed-loop bandwidth.
+</TabItem>
+</Tabs>
+
+---
+
+## exc_kundur
+
+### Scientific Description
+
+The `exc_kundur` model implements the **excitation system from Kundur's textbook** (*Power System Stability and Control*, 1994). It includes a first-order voltage transducer, a proportional AVR with transient gain reduction (TGR), and a two-stage PSS acting on rotor speed deviation.
+
+**Voltage transducer:**
+
+$$
+\frac{d V_{fil}}{dt} = \frac{1}{T_R}(V - V_{fil})
+$$
+
+**AVR with transient gain reduction (lead–lag):**
+
+$$
+V_f(s) = K_A \cdot \frac{1 + s T_A}{1 + s T_B} \cdot \left(V_{ref} - V_{fil} + V_s\right)
+$$
+
+where $V_{ref} = V + V_f / K_A$ is computed at initialisation and $V_s$ is the PSS output.
+
+**PSS (two-stage lead–lag with washout):**
+
+$$
+x_{wash}(s) = \frac{K_{STAB} \cdot s T_W}{1 + s T_W} \cdot \omega(s)
+$$
+
+$$
+V_s(s) = \frac{1 + s T_1}{1 + s T_2} \cdot \frac{1 + s T_3}{1 + s T_4} \cdot x_{wash}(s)
+$$
+
+This is the standard two-stage phase-compensating PSS structure. The CODEGEN blocks in the `.txt` file are:
+
+| Block | CODEGEN type | Function |
+|-------|-------------|----------|
+| Voltage filter | `tf1p` | $1/(1+sT_R)$ |
+| Main summing junction | `algeq` | $V_{ref} - V_{fil} + V_s - dv$ |
+| AVR (TGR) | `tf1p1z` | $K_A(1+sT_A)/(1+sT_B)$ |
+| PSS washout | `tfder1p` | $K_{STAB} \cdot sT_W/(1+sT_W)$ |
+| PSS lead–lag 1 | `tf1p1z` | $(1+sT_1)/(1+sT_2)$ |
+| PSS lead–lag 2 | `tf1p1z` | $(1+sT_3)/(1+sT_4)$ |
+
+### Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `TR` | Voltage measurement filter time constant (s) |
+| `KA` | AVR gain (pu/pu) |
+| `TA` | TGR lead time constant (s) |
+| `TB` | TGR lag time constant (s) |
+| `KSTAB` | PSS gain |
+| `TW` | PSS washout time constant (s) |
+| `T1` | PSS first lead–lag zero time constant (s) |
+| `T2` | PSS first lead–lag pole time constant (s) |
+| `T3` | PSS second lead–lag zero time constant (s) |
+| `T4` | PSS second lead–lag pole time constant (s) |
+
+**Computed at initialisation:** `Vref = V + Vf / KA`
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+exc exc_kundur GEN1
+  0.02   ! TR: voltage filter (s)
+  200.0  ! KA: AVR gain
+  0.02   ! TA: TGR lead (s)
+  10.0   ! TB: TGR lag (s)
+  9.5    ! KSTAB: PSS gain
+  1.41   ! TW: washout (s)
+  0.154  ! T1: PSS lead 1 (s)
+  0.033  ! T2: PSS lag 1 (s)
+  0.154  ! T3: PSS lead 2 (s)
+  0.033  ! T4: PSS lag 2 (s)
+;
+```
+</TabItem>
+<TabItem label="Notes">
+- Parameters match the Example 12.6 from Kundur (1994), applicable to a medium-speed generator.
+- The PSS stabilises local modes in the 0.5–2 Hz range.
+- No output limiter is defined in the base model; add clipping externally if required.
+</TabItem>
+</Tabs>
+
+---
+
+## exc_generic1
+
+### Scientific Description
+
+The `exc_generic1` model is a **generic AVR with OEL (Over-Excitation Limiter) and PSS**, implemented in Fortran. It includes a proportional–integral AVR, a PSS acting on rotor speed or active power, and an inverse-time OEL.
+
+**AVR:**
+
+The excitation system uses a first-order integrating controller (washout or PI-type, set by the gain $G$ and time constants $T_A$, $T_B$) with output limits $[L_3,\, L_4]$:
+
+$$
+V_f(s) = G \cdot \frac{1 + s T_A}{1 + s T_B} \cdot \left(V_{ref} - V\right) \cdot \frac{1}{1 + s T_E}
+$$
+
+**PSS (speed or power input, selectable):**
+
+Input signal is selected by `SPEEDIN`: 1 = rotor speed $\omega$, 0 = electrical power $P$.
+
+$$
+V_{PSS}(s) = K_{PSS} \cdot \frac{s T_W}{1 + s T_W} \cdot \frac{1 + s T_1}{1 + s T_2} \cdot \frac{1 + s T_3}{1 + s T_4} \cdot u(s)
+$$
+
+Output is clamped to $[DV_{MIN},\, DV_{MAX}]$.
+
+**OEL (inverse-time limiter):**
+
+The OEL monitors field current $I_f$. When $I_f > IFLIM$, a timer begins accumulating via:
+
+- Dead zone $d$ and phase $f$ parameters control OEL activation thresholds.
+- The OEL integrates the overcurrent error and reduces $V_{ref}$ once the timer reaches threshold $L_1$, with output range $[L_1, L_2]$.
+
+**Parameters from Fortran source** (`prm` array):
+
+| Index | Name | Description |
+|-------|------|-------------|
+| 1 | `IFLIM` | Field current OEL threshold (pu) |
+| 2 | `d` | OEL dead zone (pu) |
+| 3 | `f` | OEL phase characteristic |
+| 4 | `S` | AVR setpoint input (usually 0 = $V$) |
+| 5 | `K1` | AVR lead numerator gain |
+| 6 | `K2` | AVR lag denominator gain |
+| 7 | `L1` | OEL integrator lower limit (pu) |
+| 8 | `L2` | OEL integrator upper limit (pu) |
+| 9 | `G` | AVR overall gain |
+| 10 | `TA` | AVR lead time constant (s) |
+| 11 | `TB` | AVR lag time constant (s) |
+| 12 | `TE` | Exciter time constant (s) |
+| 13 | `L3` | AVR output lower limit (pu) |
+| 14 | `L4` | AVR output upper limit (pu) |
+| 15 | `SPEEDIN` | PSS input signal: 1 = speed, 0 = power |
+| 16 | `KPSS` | PSS gain |
+| 17 | `Tw` | PSS washout time constant (s) |
+| 18 | `T1` | PSS lead–lag 1 zero (s) |
+| 19 | `T2` | PSS lead–lag 1 pole (s) |
+| 20 | `T3` | PSS lead–lag 2 zero (s) |
+| 21 | `T4` | PSS lead–lag 2 pole (s) |
+| 22 | `DVMIN` | PSS output lower limit (pu) |
+| 23 | `DVMAX` | PSS output upper limit (pu) |
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+exc exc_generic1 GEN1
+  1.05   ! IFLIM: OEL threshold (pu)
+  0.02   ! d: dead zone
+  0.5    ! f: OEL characteristic
+  0.0    ! S
+  1.0    ! K1
+  1.0    ! K2
+  0.0    ! L1: OEL lower limit
+  0.5    ! L2: OEL upper limit
+  200.0  ! G: AVR gain
+  0.02   ! TA (s)
+  0.10   ! TB (s)
+  0.05   ! TE (s)
+  0.0    ! L3: AVR lower limit
+  6.0    ! L4: AVR upper limit
+  1.0    ! SPEEDIN: use speed
+  9.5    ! KPSS: PSS gain
+  1.40   ! Tw: PSS washout (s)
+  0.15   ! T1 (s)
+  0.03   ! T2 (s)
+  0.15   ! T3 (s)
+  0.03   ! T4 (s)
+  -0.10  ! DVMIN (pu)
+  0.10   ! DVMAX (pu)
+;
+```
+</TabItem>
+</Tabs>
+
+---
+
+## exc_generic2
+
+### Scientific Description
+
+The `exc_generic2` model is a more detailed **generic AVR** (formerly known as `exc_generic3` internally), developed and validated with Hydro-Québec data. It includes a voltage compensator, a combined PI–proportional regulator, an AC exciter with saturation, a PSS, and an OEL.
+
+**Voltage measurement with line-drop compensation:**
+
+$$
+V_c = V + X_c \cdot I_q - R_c \cdot I_d \quad (\text{or simplified})
+$$
+
+**PI–proportional AVR with transient gain reduction:**
+
+$$
+V_{AVR}(s) = \left(K_P + \frac{K_I}{s} + C \cdot \frac{1 + s T_C}{1 + s T_B}\right) \cdot K_A \cdot \frac{1}{1 + s T_A}(V_{ref} - V_c)
+$$
+
+**AC exciter with saturation:**
+
+$$
+\frac{d V_E}{dt} = \frac{1}{T_E}\left[V_R - K_E \cdot V_E - S_E(V_E)\right]
+$$
+
+where $S_E(V_E)$ is the piecewise-linear saturation function defined by $(E_1, S_{E1})$ and $(E_2, S_{E2})$.
+
+**PSS (type selectable by `typss`):**
+
+$$
+V_s(s) = K_{PSS} \cdot \frac{s T_W}{1 + s T_W} \cdot \frac{1 + s T_1}{1 + s T_2} \cdot \frac{1 + s T_3}{1 + s T_4} \cdot u(s)
+$$
+
+**OEL (inverse-time, three-segment):**
+
+The OEL uses a three-level piecewise-linear characteristic $(s_1, T_{oel1})$, $(s_2, T_{oel2})$, $(s_3, T_{oel3})$ to compute the allowable overcurrent time.
+
+**Parameters from Fortran `associate` block** (39 data parameters + 4 additional):
+
+| Index | Name | Description |
+|-------|------|-------------|
+| 1 | `Xc` | Line-drop compensation reactance (pu) |
+| 2 | `Tr` | Voltage measurement time constant (s) |
+| 3 | `C` | TGR numerator gain |
+| 4 | `Tc` | TGR lead time constant (s) |
+| 5 | `Tb` | TGR lag time constant (s) |
+| 6 | `Ka` | AVR proportional gain |
+| 7 | `Ta` | AVR time constant (s) |
+| 8 | `Ki` | AVR integral gain |
+| 9 | `Kp` | AVR proportional path gain |
+| 10 | `VrmaxD` | Regulator max (dynamic, pu) |
+| 11 | `VrminD` | Regulator min (dynamic, pu) |
+| 12 | `G` | Exciter overall gain |
+| 13 | `Ke` | Exciter self-excitation coefficient |
+| 14 | `Te` | Exciter time constant (s) |
+| 15 | `E1` | Saturation breakpoint 1 (pu) |
+| 16 | `SeE1` | Saturation factor at $E_1$ |
+| 17 | `E2` | Saturation breakpoint 2 (pu) |
+| 18 | `SeE2` | Saturation factor at $E_2$ |
+| 19 | `Vrmax` | Field voltage upper limit (pu) |
+| 20 | `Vrmin` | Field voltage lower limit (pu) |
+| 21 | `typss` | PSS input type (1 = speed, 2 = power) |
+| 22 | `W` | PSS input gain |
+| 23 | `Tf` | PSS derivative filter time constant (s) |
+| 24 | `Kpss` | PSS gain |
+| 25 | `Tw` | PSS washout time constant (s) |
+| 26 | `T1` | PSS lead–lag 1 zero (s) |
+| 27 | `T2` | PSS lead–lag 1 pole (s) |
+| 28 | `T3` | PSS lead–lag 2 zero (s) |
+| 29 | `T4` | PSS lead–lag 2 pole (s) |
+| 30 | `Lim` | PSS output symmetric limit (pu) |
+| 31 | `LimSup` | PSS upper asymmetric limit (pu) |
+| 32 | `s1` | OEL segment 1 (pu $I_f$) |
+| 33 | `toel1` | OEL time at segment 1 (s) |
+| 34 | `s2` | OEL segment 2 (pu $I_f$) |
+| 35 | `toel2` | OEL time at segment 2 (s) |
+| 36 | `s3` | OEL segment 3 (pu $I_f$) |
+| 37 | `toel3` | OEL time at segment 3 (s) |
+| 38 | `perm` | OEL permanent current limit (pu) |
+| 39 | `LimInf` | PSS lower asymmetric limit (pu) |
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+exc exc_generic2 GEN1
+  0.0    ! Xc: line-drop compensation
+  0.02   ! Tr: voltage filter (s)
+  1.0    ! C: TGR gain
+  0.10   ! Tc: TGR lead (s)
+  1.00   ! Tb: TGR lag (s)
+  200.0  ! Ka: AVR gain
+  0.05   ! Ta: AVR time constant (s)
+  5.0    ! Ki: integral gain
+  1.0    ! Kp: proportional gain
+  6.0    ! VrmaxD (pu)
+  -6.0   ! VrminD (pu)
+  1.0    ! G: exciter gain
+  0.0    ! Ke
+  0.50   ! Te: exciter lag (s)
+  3.10   ! E1
+  0.066  ! SeE1
+  4.18   ! E2
+  0.91   ! SeE2
+  6.0    ! Vrmax
+  -6.0   ! Vrmin
+  1.0    ! typss: speed input
+  1.0    ! W
+  0.05   ! Tf
+  9.5    ! Kpss
+  1.40   ! Tw
+  0.154  ! T1
+  0.033  ! T2
+  0.154  ! T3
+  0.033  ! T4
+  0.10   ! Lim
+  0.10   ! LimSup
+  1.1    ! s1
+  200.   ! toel1
+  1.2    ! s2
+  60.    ! toel2
+  1.5    ! s3
+  10.    ! toel3
+  1.05   ! perm
+  -0.10  ! LimInf
+;
+```
+</TabItem>
+</Tabs>
+
+---
+
+## exc_GENERIC3
+
+### Scientific Description
+
+The `exc_GENERIC3` model (note capital letters) is a **generic AVR with integrated PSS and OEL**, defined via the CODEGEN `.txt` description. It provides a clean, modular three-block structure: AVR, PSS, and OEL.
+
+**AVR (transient gain reduction + exciter):**
+
+$$
+\Delta V = V_0 - V + V_{PSS} - V_{OEL}
+$$
+
+$$
+V_1(s) = G \cdot \frac{1 + s T_a}{1 + s T_b} \cdot \Delta V(s)
+$$
+
+$$
+V_f(s) = \frac{1}{1 + s T_e} \cdot V_1(s), \quad V_f \in [V_{f,min},\, V_{f,max}]
+$$
+
+where $V_0 = V + V_f/G$ is computed at initialisation.
+
+**PSS (washout + two lead–lag stages):**
+
+$$
+V_{PSS}(s) = \frac{K_{PSS} \cdot s T_W}{1 + s T_W} \cdot \frac{1 + s T_1}{1 + s T_2} \cdot \frac{1 + s T_3}{1 + s T_4} \cdot \omega(s)
+$$
+
+Output is limited to $[-C,\, +C]$.
+
+**OEL (inverse-time integrator):**
+
+$$
+x_{oel1} = I_f - if_{1lim}
+$$
+
+$$
+\frac{d x_{oel2}}{dt} = \frac{1}{T_{oel}} \cdot \min(x_{oel1},\, if_{2lim}), \quad x_{oel2} \in [L_1,\, L_2]
+$$
+
+$$
+V_{OEL} = \text{clip}(K_{oel} \cdot x_{oel2},\, 0,\, L_3)
+$$
+
+The CODEGEN block structure from the `.txt` file:
+
+| Block | CODEGEN type | Signal |
+|-------|-------------|--------|
+| AVR summing junction | `algeq` | $V_0 - V + dv_{PSS} - dv_{OEL} - \Delta V$ |
+| Transient gain reduction | `tf1p1z` | $G(1+sT_a)/(1+sT_b)$ |
+| Exciter | `tf1plim` | $1/(1+sT_e)$ with $[V_{f,min}, V_{f,max}]$ |
+| PSS washout | `tfder1p` | $K_{PSS} \cdot sT_W / (1+sT_W)$ |
+| PSS lead–lag 1 | `tf1p1z` | $(1+sT_1)/(1+sT_2)$ |
+| PSS lead–lag 2 | `tf1p1z` | $(1+sT_3)/(1+sT_4)$ |
+| PSS limiter | `lim` | $[-C, +C]$ |
+| OEL error | `algeq` | $I_f - if_{1lim}$ |
+| OEL upper bound | `min1v1c` | $\min(\cdot,\, if_{2lim})$ |
+| OEL integrator | `inlim` | $1/T_{oel}$ with $[L_1, L_2]$ |
+| OEL multiplier | `algeq` | $K_{oel} \cdot x_{oel2}$ |
+| OEL output limiter | `lim` | $[0, L_3]$ |
+
+### Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `G` | AVR gain (pu/pu) |
+| `Ta` | AVR lead time constant / TGR zero (s) |
+| `Tb` | AVR lag time constant / TGR pole (s) |
+| `Te` | Exciter time constant (s) |
+| `vfmin` | Minimum field voltage (pu) |
+| `vfmax` | Maximum field voltage (pu) |
+| `Kpss` | PSS gain |
+| `Tw` | PSS washout time constant (s) |
+| `T1` | PSS first lead–lag zero (s) |
+| `T2` | PSS first lead–lag pole (s) |
+| `T3` | PSS second lead–lag zero (s) |
+| `T4` | PSS second lead–lag pole (s) |
+| `C` | PSS output symmetric limit (pu) |
+| `if1lim` | OEL field current threshold (pu) |
+| `if2lim` | OEL maximum overcurrent error (pu) |
+| `Toel` | OEL integrator time constant (s) |
+| `Koel` | OEL output gain |
+| `L1` | OEL integrator lower limit |
+| `L2` | OEL integrator upper limit |
+| `L3` | OEL output upper limit (pu) |
+
+**Computed at initialisation:** `Vo = V + Vf / G`
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+exc exc_GENERIC3 GEN1
+  200.0  ! G: AVR gain
+  0.05   ! Ta: AVR lead (s)
+  10.0   ! Tb: AVR lag (s)
+  0.04   ! Te: exciter (s)
+  0.0    ! vfmin (pu)
+  5.0    ! vfmax (pu)
+  9.5    ! Kpss: PSS gain
+  1.40   ! Tw: washout (s)
+  0.154  ! T1 (s)
+  0.033  ! T2 (s)
+  0.154  ! T3 (s)
+  0.033  ! T4 (s)
+  0.10   ! C: PSS limit (pu)
+  1.05   ! if1lim (pu)
+  0.30   ! if2lim (pu)
+  30.0   ! Toel (s)
+  1.0    ! Koel
+  0.0    ! L1
+  1.0    ! L2
+  2.0    ! L3
+;
+```
+</TabItem>
+</Tabs>
+
+---
+
+## exc_GENERIC4
+
+### Scientific Description
+
+The `exc_GENERIC4` model is a **compiled version of `exc_GENERIC3`**, implemented directly in Fortran using the new-style RAMSES API (single subroutine with `mode` selector). The mathematical structure is identical to `exc_GENERIC3`:
+
+$$
+V_f(s) = \frac{1}{1 + s T_e} \cdot G \cdot \frac{1 + s T_a}{1 + s T_b} \cdot \left(V_0 - V + V_{PSS} - V_{OEL}\right)
+$$
+
+$$
+V_{PSS}(s) = K_{PSS} \cdot \frac{s T_W}{1 + s T_W} \cdot \frac{1 + s T_1}{1 + s T_2} \cdot \frac{1 + s T_3}{1 + s T_4} \cdot \omega(s)
+$$
+
+The OEL integrates the overcurrent error $(I_f - if_{1lim})$, capped at $if_{2lim}$, then multiplies by $K_{oel}$ to produce $V_{OEL}$.
+
+**Implementation details (from Fortran source):**
+- `nbdata = 20`, `nbaddpar = 1` (Vo computed at init), `nbxvar = 16`, `nbzvar = 5`
+- The advantage over `exc_GENERIC3` is performance: all equations are compiled, not interpreted.
+
+### Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `G` | AVR gain |
+| `Ta` | Lead time constant (s) |
+| `Tb` | Lag time constant (s) |
+| `Te` | Exciter time constant (s) |
+| `vfmin` | Field voltage lower limit (pu) |
+| `vfmax` | Field voltage upper limit (pu) |
+| `Kpss` | PSS gain |
+| `Tw` | PSS washout time constant (s) |
+| `T1` | PSS lead–lag 1 zero (s) |
+| `T2` | PSS lead–lag 1 pole (s) |
+| `T3` | PSS lead–lag 2 zero (s) |
+| `T4` | PSS lead–lag 2 pole (s) |
+| `C` | PSS output symmetric limit (pu) |
+| `if1lim` | OEL threshold (pu) |
+| `if2lim` | OEL max overcurrent (pu) |
+| `Toel` | OEL time constant (s) |
+| `Koel` | OEL gain |
+| `L1` | OEL lower limit |
+| `L2` | OEL upper limit |
+| `L3` | OEL output limit (pu) |
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+exc exc_GENERIC4 GEN1
+  200.0  ! G
+  0.05   ! Ta (s)
+  10.0   ! Tb (s)
+  0.04   ! Te (s)
+  0.0    ! vfmin
+  5.0    ! vfmax
+  9.5    ! Kpss
+  1.40   ! Tw (s)
+  0.154  ! T1 (s)
+  0.033  ! T2 (s)
+  0.154  ! T3 (s)
+  0.033  ! T4 (s)
+  0.10   ! C (pu)
+  1.05   ! if1lim (pu)
+  0.30   ! if2lim (pu)
+  30.0   ! Toel (s)
+  1.0    ! Koel
+  0.0    ! L1
+  1.0    ! L2
+  2.0    ! L3
+;
+```
+</TabItem>
+<TabItem label="Notes">
+- `exc_GENERIC4` is the compiled-code equivalent of `exc_GENERIC3`. Use when simulation speed is a priority, as the Fortran subroutine is faster than the interpreted CODEGEN version.
+- Parameter order and meaning are identical to `exc_GENERIC3`.
+</TabItem>
+</Tabs>

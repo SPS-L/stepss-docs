@@ -1,0 +1,1245 @@
+---
+title: Injector Models
+description: Load, machine, renewable generation, and BESS injector models in RAMSES
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+RAMSES custom injector models represent loads, induction machines, inverter-based resources (IBR), and battery energy storage systems (BESS) connected to network buses. All injectors follow the RAMSES data-file syntax:
+
+```
+INJEC  <name>  <bus>  '<model_name>'  <p1>  <p2>  ...  ;
+```
+
+---
+
+## Load Models
+
+### `inj_load` — Exponential Recovery Load
+
+#### Description
+
+The exponential recovery load model captures the transient and steady-state voltage and frequency dependency of aggregated loads. Immediately after a voltage disturbance, the load behaves according to a transient voltage exponent; it then recovers exponentially to a steady-state behaviour described by a different exponent. The model supports separate active ($P$) and reactive ($Q$) power recovery dynamics, each with individual minimum/maximum limiters on the recovery variable.
+
+#### Scientific Description
+
+The model is parameterized in terms of initial active and reactive conductance/susceptance, $G_0 = P_0/V_0^2$ and $B_0 = -Q_0/V_0^2$. Two recovery state variables $x_P$ and $x_Q$ evolve according to:
+
+$$\dot{x}_P = \frac{1}{T_r}\left[\left(\frac{V}{V_0}\right)^{\alpha_s} \left(1 + D_P\,\Delta\omega\right) - x_P \left(\frac{V}{V_0}\right)^{\alpha_t}\right]$$
+
+$$\dot{x}_Q = \frac{1}{T_r}\left[\left(\frac{V}{V_0}\right)^{\beta_s} \left(1 + D_Q\,\Delta\omega\right) - x_Q \left(\frac{V}{V_0}\right)^{\beta_t}\right]$$
+
+where $\Delta\omega = \omega_{\mathrm{COI}} - 1$ is the per-unit speed deviation, $V$ is the bus voltage magnitude, $V_0$ is the initial voltage, $\alpha_t, \beta_t$ are transient exponents, $\alpha_s, \beta_s$ are steady-state exponents, and $T_r$ is the load recovery time constant. The injected currents are then:
+
+$$i_x = G_0\, x_P\, v_x\left(1 + D_P\,\Delta\omega\right) - B_0\, x_Q\, v_y\left(1 + D_Q\,\Delta\omega\right)$$
+
+$$i_y = G_0\, x_P\, v_y\left(1 + D_P\,\Delta\omega\right) + B_0\, x_Q\, v_x\left(1 + D_Q\,\Delta\omega\right)$$
+
+When the recovery variable hits its limit (due to e.g. stalling or complete voltage collapse), the limit is held until the direction of the derivative reverses.
+
+#### Parameters
+
+| # | Name | Description | Unit |
+|---|------|-------------|------|
+| 1 | `DP` | Frequency sensitivity of active power | pu/pu |
+| 2 | `A1` | Proportion of type-1 component in $P$ | — |
+| 3 | `alpha1` | Transient voltage exponent for $P$ (type 1) | — |
+| 4 | `A2` | Proportion of type-2 component in $P$ | — |
+| 5 | `alpha2` | Transient voltage exponent for $P$ (type 2) | — |
+| 6 | `alpha3` | Transient voltage exponent for $P$ (type 3, proportion $= 1-A_1-A_2$) | — |
+| 7 | `DQ` | Frequency sensitivity of reactive power | pu/pu |
+| 8 | `B1` | Proportion of type-1 component in $Q$ | — |
+| 9 | `beta1` | Transient voltage exponent for $Q$ (type 1) | — |
+| 10 | `B2` | Proportion of type-2 component in $Q$ | — |
+| 11 | `beta2` | Transient voltage exponent for $Q$ (type 2) | — |
+| 12 | `beta3` | Transient voltage exponent for $Q$ (type 3) | — |
+
+Internal computed parameters include the steady-state exponents for each component (derived from the transient exponents), initial conductance $G_0$, susceptance $B_0$, and initial voltage $V_0$.
+
+#### State Variables
+
+| Variable | Description |
+|----------|-------------|
+| `iy` | $y$-component of injected current (pu on system base) |
+| `ix` | $x$-component of injected current (pu on system base) |
+| `xp` | Active power recovery variable (dimensionless) |
+| `xq` | Reactive power recovery variable (dimensionless) |
+
+**Observables:** `P`, `Q`, `xp`, `xq`
+
+#### Usage Example
+
+```
+INJEC  LOAD1  BUS1  'inj_load'  1.5  0.3  1.0  0.2  2.0  0.5  1.8  0.4  2.5  0.1  3.0  2.0  ;
+```
+*Parameters: `DP A1 alpha1 A2 alpha2 alpha3 DQ B1 beta1 B2 beta2 beta3`*
+
+---
+
+### `inj_vfd_load` — Variable Frequency Drive Load
+
+#### Description
+
+The VFD load model represents aggregate industrial loads driven by variable-frequency drives, where the power consumption exhibits a composite voltage-dependent characteristic with multiple exponential components and frequency sensitivity. It also includes low-voltage protection: below a configurable threshold $V_{\min}$, the load switches to a constant-admittance representation, preventing numerical difficulties during deep voltage sags.
+
+#### Scientific Description
+
+The active and reactive powers depend on bus voltage $V$ and frequency deviation $\Delta f = f/f_0 - 1$:
+
+$$P = \left(1 + D_P\,\Delta f\right) P_0 \cdot \frac{a_1 V^{\alpha_1} + a_2 V^{\alpha_2} + (1-a_1-a_2)\, V^{\alpha_3}}{a_1 V_0^{\alpha_1} + a_2 V_0^{\alpha_2} + (1-a_1-a_2)\, V_0^{\alpha_3}}$$
+
+$$Q = \left(1 + D_Q\,\Delta f\right) Q_0 \cdot \frac{b_1 V^{\beta_1} + b_2 V^{\beta_2} + (1-b_1-b_2)\, V^{\beta_3}}{b_1 V_0^{\beta_1} + b_2 V_0^{\beta_2} + (1-b_1-b_2)\, V_0^{\beta_3}}$$
+
+Below $V_{\min}$, an equivalent constant admittance is used:
+
+$$P_{\mathrm{low}} = G_{\mathrm{eq}}\, V^2, \qquad Q_{\mathrm{low}} = -B_{\mathrm{eq}}\, V^2$$
+
+where $G_{\mathrm{eq}}$ and $B_{\mathrm{eq}}$ are computed at initialization to ensure continuity at $V = V_{\min}$. The switch between the two regimes is governed by a piecewise-linear function of $V$:
+
+$$u = \begin{cases} 0 & V < V_{\min} \\ 1 & V \geq V_{\min} \end{cases}$$
+
+A small voltage filter (time constant 0.003 s) smooths the transition. The frequency deviation can optionally be computed from the local bus frequency (measured via an `f_inj` block with time constant $T_{\mathrm{mes}}$) or from the system centre-of-inertia speed.
+
+The initial voltage $V_0$ can differ from the transmission bus voltage if a distribution transformer ratio is implied (set $V_{\mathrm{init}} \ne 0$ to specify the distribution-side voltage; otherwise the transmission voltage is used directly).
+
+#### Parameters
+
+| # | Name | Description | Unit |
+|---|------|-------------|------|
+| 1 | `Dp` | Frequency sensitivity of active power | pu/pu |
+| 2 | `a1` | Fraction of type-1 component in $P$ | — |
+| 3 | `alpha1` | Voltage exponent of type-1 $P$ component | — |
+| 4 | `a2` | Fraction of type-2 component in $P$ | — |
+| 5 | `alpha2` | Voltage exponent of type-2 $P$ component | — |
+| 6 | `alpha3` | Voltage exponent of type-3 $P$ component (fraction $= 1-a_1-a_2$) | — |
+| 7 | `Dq` | Frequency sensitivity of reactive power | pu/pu |
+| 8 | `b1` | Fraction of type-1 component in $Q$ | — |
+| 9 | `beta1` | Voltage exponent of type-1 $Q$ component | — |
+| 10 | `b2` | Fraction of type-2 component in $Q$ | — |
+| 11 | `beta2` | Voltage exponent of type-2 $Q$ component | — |
+| 12 | `beta3` | Voltage exponent of type-3 $Q$ component | — |
+| 13 | `Vinit` | Initial distribution-bus voltage (0 = use transmission voltage) | pu |
+| 14 | `Vlow` | Voltage threshold for constant-admittance regime (recommended 0.5–0.7) | pu |
+| 15 | `foption` | 1 = use local bus frequency; 0 = use COI speed | flag |
+| 16 | `Tmes` | Frequency measurement time constant | s |
+
+#### State Variables
+
+| Variable | Description |
+|----------|-------------|
+| `Vreal` | Voltage at equivalent distribution bus | pu |
+| `V` | Filtered distribution-bus voltage (3 ms filter) | pu |
+| `P` | Active power consumed | pu |
+| `Q` | Reactive power consumed | pu |
+| `fbus` | Local bus frequency (used if `foption=1`) | pu |
+| `df` | Frequency deviation $\Delta f$ | pu |
+| `u` | Regime switch (1 = above $V_{\min}$, 0 = constant admittance) | — |
+
+**Observables:** `P`, `Q`, `df`, `u`
+
+#### Usage Example
+
+```
+INJEC  VFD1  BUS_IND  'inj_vfd_load'  1.5  0.7  2.0  0.2  1.0  0.5
+                                       1.2  0.5  2.5  0.1  1.5  0.8
+                                       0.0  0.6  0  0.1  ;
+```
+
+---
+
+### `inj_restld` — Restorative Load
+
+#### Description
+
+The restorative load model represents loads that self-restore toward a nominal characteristic after a voltage disturbance. The load's active and reactive powers are governed by two internal recovery variables that evolve dynamically, allowing the simulation to capture the slow restoration of thermostatically controlled loads (heating, cooling) and similar self-restoring demand.
+
+#### Scientific Description
+
+The recovery variable $x_P$ for active power satisfies:
+
+$$\dot{x}_P = \frac{1}{T_r}\left[V^{\alpha_s}\left(1 + D_P\,\Delta\omega\right) - x_P\, V^{\alpha_t}\right]$$
+
+with analogous equation for $x_Q$. Here $\alpha_s$ and $\alpha_t$ are the steady-state and transient voltage exponents respectively. Limiters $[x_{P,\min},\, x_{P,\max}]$ are applied. The injected currents are expressed as:
+
+$$i_y = -B_0\left(1 + D_Q\,\Delta\omega\right) x_Q\, v_x + G_0\left(1 + D_P\,\Delta\omega\right) x_P\, v_y$$
+
+$$i_x = \phantom{-}B_0\left(1 + D_Q\,\Delta\omega\right) x_Q\, v_y + G_0\left(1 + D_P\,\Delta\omega\right) x_P\, v_x$$
+
+where the ratio $V/V_0$ governs the voltage dependence through `vrat`.
+
+#### Parameters
+
+| # | Name | Description | Unit |
+|---|------|-------------|------|
+| 1 | `DP` | Frequency sensitivity of active power | pu/pu |
+| 2 | `alphat` | Transient active power voltage exponent | — |
+| 3 | `alphas` | Steady-state active power voltage exponent | — |
+| 4 | `xP_min` | Minimum limit for $x_P$ | — |
+| 5 | `xP_max` | Maximum limit for $x_P$ | — |
+| 6 | `DQ` | Frequency sensitivity of reactive power | pu/pu |
+| 7 | `betat` | Transient reactive power voltage exponent | — |
+| 8 | `betas` | Steady-state reactive power voltage exponent | — |
+| 9 | `xQ_min` | Minimum limit for $x_Q$ | — |
+| 10 | `xQ_max` | Maximum limit for $x_Q$ | — |
+| 11 | `Tr` | Load recovery time constant | s |
+
+#### State Variables
+
+| Variable | Description |
+|----------|-------------|
+| `iy` | $y$-component of injected current | pu |
+| `ix` | $x$-component of injected current | pu |
+| `xp` | Active power recovery variable | — |
+| `xq` | Reactive power recovery variable | — |
+
+**Observables:** `P`, `Q`, `xp`, `xq`
+
+#### Usage Example
+
+```
+INJEC  RESTLD1  BUS2  'inj_restld'  1.5  0.5  2.0  0.0  2.0  1.2  0.5  2.5  0.0  2.0  60.0  ;
+```
+
+---
+
+### `inj_PQ` — Constant PQ Load
+
+#### Description
+
+The simplest injector model: maintains constant active and reactive power consumption regardless of bus voltage or frequency. The power is fixed at its initial operating-point value. A small first-order filter (time constant `Tout`) drives the injected currents smoothly to their target values, preventing algebraic loops.
+
+#### Scientific Description
+
+The current references are set to deliver the initial powers $P_0$ and $Q_0$ at the measured voltage $V$:
+
+$$I_{x,\mathrm{set}} = \frac{P_0 v_x + Q_0 v_y}{V^2}, \qquad I_{y,\mathrm{set}} = \frac{P_0 v_y - Q_0 v_x}{V^2}$$
+
+These references pass through a first-order filter with time constant $T_{\mathrm{out}}$ to produce the actual injected currents:
+
+$$T_{\mathrm{out}}\,\dot{i}_x + i_x = I_{x,\mathrm{set}}, \qquad T_{\mathrm{out}}\,\dot{i}_y + i_y = I_{y,\mathrm{set}}$$
+
+#### Parameters
+
+| # | Name | Description | Unit |
+|---|------|-------------|------|
+| 1 | `Tout` | Output filter time constant (recommended: 0.01 s) | s |
+
+Initial conditions $P_0$, $Q_0$, $V_0$ are computed automatically at initialization.
+
+#### State Variables
+
+| Variable | Description |
+|----------|-------------|
+| `ix` | Injected $x$-current | pu |
+| `iy` | Injected $y$-current | pu |
+| `Ixset` | Current reference $x$ | pu |
+| `Iyset` | Current reference $y$ | pu |
+| `P` | Observed active power | pu |
+| `Q` | Observed reactive power | pu |
+| `V` | Bus voltage magnitude | pu |
+
+**Observables:** `P`, `Q`
+
+#### Usage Example
+
+```
+INJEC  LOAD_PQ  BUS3  'inj_PQ'  0.01  ;
+```
+
+---
+
+### `inj_theveq` — Thévenin Equivalent
+
+#### Description
+
+Models an external network or generator cluster as a Thévenin equivalent: an ideal voltage source $\bar{E}_{\mathrm{th}}$ behind a pure reactance $X_{\mathrm{th}}$. The model computes the internal voltage magnitude and phase angle at initialization from the initial bus conditions and holds them constant during the simulation. It is useful for representing neighbouring system equivalents or simplified machine representations.
+
+#### Scientific Description
+
+The Thévenin reactance is obtained from the specified short-circuit power $S_{\mathrm{sc}}$ (MVA):
+
+$$X_{\mathrm{th}} = \frac{S_{\mathrm{base}}}{S_{\mathrm{sc}}}$$
+
+The internal voltage phasor is computed at $t=0$:
+
+$$E_{\mathrm{th},x} = v_x - X_{\mathrm{th}}\, i_y, \qquad E_{\mathrm{th},y} = v_y + X_{\mathrm{th}}\, i_x$$
+
+$$E_{\mathrm{th}} = \sqrt{E_{\mathrm{th},x}^2 + E_{\mathrm{th},y}^2}, \qquad \phi = \arctan\!\left(\frac{E_{\mathrm{th},y}}{E_{\mathrm{th},x}}\right)$$
+
+During simulation the injected currents satisfy:
+
+$$i_y = -\frac{E_{\mathrm{th}}\cos\phi - v_x}{X_{\mathrm{th}}}, \qquad i_x = \frac{E_{\mathrm{th}}\sin\phi - v_y}{X_{\mathrm{th}}}$$
+
+#### Parameters
+
+| # | Name | Description | Unit |
+|---|------|-------------|------|
+| 1 | `XTH` | Short-circuit power of the equivalent (converted to $X_{\mathrm{th}}$ at initialization) | MVA |
+
+Internal parameters `ETH` (Thévenin voltage magnitude, pu) and `phase` (internal angle, rad) are computed automatically.
+
+#### State Variables
+
+| Variable | Description |
+|----------|-------------|
+| `iy` | Injected $y$-current | pu |
+| `ix` | Injected $x$-current | pu |
+
+**Observables:** `P`, `Q` (in MW and Mvar at system base)
+
+#### Usage Example
+
+```
+INJEC  EQUIV1  SLACK_BUS  'inj_theveq'  2000.0  ;
+```
+
+---
+
+## Induction Machine Models
+
+### `inj_indmach1` — Single-Cage Induction Machine
+
+#### Description
+
+A single-cage (single-rotor-circuit) induction machine model for motor loads. The machine is represented on its own MVA base (or inferred from load factor `LF`) with a shunt capacitor $B_{\mathrm{sh}}$ to represent power factor correction. The mechanical torque is a quadratic function of rotor speed. At initialization, the model solves nonlinear algebraic equations to find the operating-point slip and flux linkages.
+
+#### Scientific Description
+
+The machine uses the standard $d$-$q$ reference-frame formulation with $L_{ss} = L_{sr} + L_{ls}$ and $L_{rr} = L_{sr} + L_{lr}$. The rotor flux-linkage equations are:
+
+$$\frac{d\psi_{dr}}{dt} = \omega_0\left(-\frac{R_r}{L_{rr}}\psi_{dr} + \frac{L_{sr} R_r}{L_{rr}} i_{ym} - (\omega - \omega_m)\psi_{qr}\right)$$
+
+$$\frac{d\psi_{qr}}{dt} = \omega_0\left(-\frac{R_r}{L_{rr}}\psi_{qr} + \frac{L_{sr} R_r}{L_{rr}} i_{xm} + (\omega - \omega_m)\psi_{dr}\right)$$
+
+where $\omega_0 = 2\pi f_{\mathrm{nom}}$ and $\omega_m$ is the rotor mechanical speed. The equations for the stator (with shunt susceptance $B_{\mathrm{sh}}$) are:
+
+$$R_s i_{ym} + \left(L_{ss} - \frac{L_{sr}^2}{L_{rr}}\right)\omega\, i_{xm} + \frac{L_{sr}}{L_{rr}}\omega\,\psi_{qr} = v_y$$
+
+$$R_s i_{xm} - \left(L_{ss} - \frac{L_{sr}^2}{L_{rr}}\right)\omega\, i_{ym} - \frac{L_{sr}}{L_{rr}}\omega\,\psi_{dr} = v_x$$
+
+The rotor speed dynamics follow the swing equation:
+
+$$\frac{d\omega_m}{dt} = \frac{T_e - T_m}{2H}$$
+
+where the electromagnetic torque is:
+
+$$T_e = \frac{L_{sr}}{L_{rr}}\left(-\psi_{dr} i_{xm} + \psi_{qr} i_{ym}\right)$$
+
+and the mechanical torque is the quadratic load curve:
+
+$$T_m = T_{m0}\left(A\,\omega_m^2 + B\,\omega_m + 1 - A - B\right)$$
+
+#### Parameters
+
+| # | Name | Description | Unit |
+|---|------|-------------|------|
+| 1 | `SNOM` | Machine nominal apparent power (0 = infer from `LF`) | MVA |
+| 2 | `RS` | Stator resistance | pu |
+| 3 | `Lls` | Stator leakage inductance | pu |
+| 4 | `LSR` | Magnetizing inductance | pu |
+| 5 | `RR` | Rotor resistance | pu |
+| 6 | `Llr` | Rotor leakage inductance | pu |
+| 7 | `H` | Machine inertia constant | s |
+| 8 | `A` | Quadratic torque-speed coefficient | — |
+| 9 | `B` | Linear torque-speed coefficient | — |
+| 10 | `LF` | Load factor (for SNOM inference) | — |
+
+#### State Variables
+
+| Variable | Description |
+|----------|-------------|
+| `iy` | $y$-component of stator current | pu |
+| `ix` | $x$-component of stator current | pu |
+| `psidr` | $d$-axis rotor flux linkage | pu |
+| `psiqr` | $q$-axis rotor flux linkage | pu |
+| `omegam` | Rotor mechanical speed | pu |
+
+**Observables:** `P`, `Qmot+comp`, `Qmot`, `omega`, `Tm`
+
+#### Usage Example
+
+```
+INJEC  MTR1  BUS_MV  'inj_indmach1'  10.0  0.01  0.10  2.50  0.015  0.10  1.5  0.8  0.1  0.0  ;
+```
+
+---
+
+### `inj_indmach2` — Double-Cage Induction Machine
+
+#### Description
+
+A double-cage (double-rotor-circuit) induction machine model following the Eurostag formulation. Two parallel rotor cages allow more accurate representation of the machine's impedance-vs-frequency characteristic, which is especially important for the starting transient. The model structure mirrors `inj_indmach1` but includes a second set of rotor flux states.
+
+#### Scientific Description
+
+The machine has parameters: stator resistance $R_1$, stator leakage $L_1$, magnetizing inductance $L_m$, cage-1 resistance $R_2$ and leakage $L_2$, cage-2 resistance $R_3$ and leakage $L_3$. The state vector is $(\psi_{dr1},\psi_{qr1},\psi_{dr2},\psi_{qr2},\omega_m)$ with flux-linkage equations for each cage:
+
+$$\frac{d\psi_{dr1}}{dt} = \omega_0\left(-\frac{R_2}{L_{A}}\psi_{dr1} + \frac{L_m R_2}{L_{A}} i_{ym} - (\omega - \omega_m)\psi_{qr1}\right)$$
+
+$$\frac{d\psi_{dr2}}{dt} = \omega_0\left(-\frac{R_3}{L_{B}}\psi_{dr2} + \frac{L_m R_3}{L_{B}} i_{ym} - (\omega - \omega_m)\psi_{qr2}\right)$$
+
+where $L_A = L_m + L_2$ and $L_B = L_m + L_3$. The total electromagnetic torque combines contributions from both cages:
+
+$$T_e = \frac{L_m}{L_A}\left(-\psi_{dr1} i_{xm} + \psi_{qr1} i_{ym}\right) + \frac{L_m}{L_B}\left(-\psi_{dr2} i_{xm} + \psi_{qr2} i_{ym}\right)$$
+
+The swing equation is identical to `inj_indmach1`.
+
+#### Parameters
+
+| # | Name | Description | Unit |
+|---|------|-------------|------|
+| 1 | `SNOM` | Machine MVA rating (0 = infer from `LF`) | MVA |
+| 2 | `R1` | Stator resistance | pu |
+| 3 | `L1` | Stator leakage inductance | pu |
+| 4 | `Lm` | Magnetizing inductance | pu |
+| 5 | `R2` | First cage resistance | pu |
+| 6 | `L2` | First cage leakage inductance | pu |
+| 7 | `R3` | Second cage resistance | pu |
+| 8 | `L3` | Second cage leakage inductance | pu |
+| 9 | `H` | Inertia constant | s |
+| 10 | `A` | Quadratic torque-speed coefficient | — |
+| 11 | `B` | Linear torque-speed coefficient | — |
+| 12 | `LF` | Load factor (for SNOM inference) | — |
+
+#### State Variables
+
+| Variable | Description |
+|----------|-------------|
+| `iy` | $y$-component of stator current | pu |
+| `ix` | $x$-component of stator current | pu |
+| `psidr1` | $d$-axis flux of first rotor cage | pu |
+| `psiqr1` | $q$-axis flux of first rotor cage | pu |
+| `psidr2` | $d$-axis flux of second rotor cage | pu |
+| `psiqr2` | $q$-axis flux of second rotor cage | pu |
+| `omegam` | Rotor mechanical speed | pu |
+
+**Observables:** `P`, `Qmot+comp`, `Qmot`, `omega`
+
+#### Usage Example
+
+```
+INJEC  MTR2  BUS_MV  'inj_indmach2'  10.0  0.01  0.08  2.00  0.02  0.06  0.04  0.10  1.5  0.8  0.1  0.0  ;
+```
+
+---
+
+### `inj_INDM1` — Alternative Induction Machine (INDM1)
+
+#### Description
+
+An alternative single-cage induction machine model that uses the `INI_indmach1` helper function for initialization. It is equivalent in physics to `inj_indmach1` but implements the equations using RAMSES `.txt`-style model syntax with explicit state initialization calls. This can simplify parameterization when the helper function's output is directly used.
+
+#### Scientific Description
+
+The model equations match those of `inj_indmach1`. The key distinction is the use of the `INI_indmach1` function at parameter-evaluation time to pre-compute $B_{\mathrm{sh}}$, $T_{m0}$, and the initial flux linkages and rotor speed, rather than solving the initialization system in Fortran. With $L_{ss} = L_{sr} + L_{ls}$ and $L_{rr} = L_{sr} + L_{lr}$, the rotor flux equations are:
+
+$$\frac{d\psi_{dr}}{dt} = 2\pi f_0 \left[ -\frac{R_R}{L_{rr}}\psi_{dr} + \frac{L_{SR} R_R}{L_{rr}} i_{ym} - (\omega - \omega_m)\psi_{qr} \right]$$
+
+$$\frac{d\psi_{qr}}{dt} = 2\pi f_0 \left[ -\frac{R_R}{L_{rr}}\psi_{qr} + \frac{L_{SR} R_R}{L_{rr}} i_{xm} + (\omega - \omega_m)\psi_{dr} \right]$$
+
+The rotor speed integral uses:
+
+$$\frac{d\omega_m}{dt} = \frac{1}{2H}\left[\frac{L_{SR}}{L_{rr}}(-\psi_{dr} i_{xm} + \psi_{qr} i_{ym}) - T_{m0}(A\omega_m^2 + B\omega_m + 1 - A - B)\right]$$
+
+with a lower limit of $\omega_m \ge 0$.
+
+#### Parameters
+
+| # | Name | Description | Unit |
+|---|------|-------------|------|
+| 1 | `SNOM` | Machine MVA rating | MVA |
+| 2 | `RS` | Stator resistance | pu |
+| 3 | `Lls` | Stator leakage inductance | pu |
+| 4 | `LSR` | Magnetizing inductance | pu |
+| 5 | `RR` | Rotor resistance | pu |
+| 6 | `Llr` | Rotor leakage inductance | pu |
+| 7 | `H` | Inertia constant | s |
+| 8 | `A` | Quadratic torque-speed coefficient | — |
+| 9 | `B` | Linear torque-speed coefficient | — |
+| 10 | `LF` | Load factor | — |
+
+Computed internally: `BSH` (shunt susceptance), `TM0` (initial mechanical torque), `LSS`, `LRR`.
+
+#### State Variables
+
+| Variable | Description |
+|----------|-------------|
+| `Psidr` | $d$-axis rotor flux linkage | pu |
+| `Psiqr` | $q$-axis rotor flux linkage | pu |
+| `omegam` | Rotor mechanical speed | pu |
+| `iym`, `ixm` | Stator current components (on machine base) | pu |
+| `dPsidr`, `dPsiqr`, `domegam` | Time-derivative auxiliary states | — |
+
+**Observables:** `omegam`
+
+#### Usage Example
+
+```
+INJEC  MTR3  BUS_MV  'inj_INDM1'  10.0  0.01  0.10  2.50  0.015  0.10  1.5  0.8  0.1  0.0  ;
+```
+
+---
+
+## Renewable Generation / Inverter-Based Resources
+
+### `inj_IBG` — Inverter-Based Generator (Generic IBR)
+
+#### Description
+
+A generic inverter-based generation model suitable for representing aggregated distributed generation or any grid-following IBR. The model includes a Phase-Locked Loop (PLL), inner current control with active ($I_p$) and reactive ($I_q$) current commands, LVRT/HVRT logic with voltage-dependent reactive current injection, frequency-responsive active power modulation, and reconnection logic after disconnection events.
+
+#### Scientific Description
+
+The PLL tracks the terminal voltage angle $\theta$ via a second-order PI controller with a freeze option below $V_{\mathrm{min,pll}}$:
+
+$$\frac{d\theta_{\mathrm{PLL}}}{dt} = \Delta\omega_{\mathrm{PLL}}, \qquad \frac{d\Delta\omega_{\mathrm{PLL}}}{dt} = k_{\mathrm{PLL}}\, v_q$$
+
+where $v_q$ is the $q$-axis terminal voltage in the PLL frame. The current commands $I_{p,\mathrm{cmd}}$ and $I_{q,\mathrm{cmd}}$ are derived from outer controls:
+
+- Active power is modulated by frequency according to frequency deadband `fdbd`:
+$$P = P_{\mathrm{ext}}\left(1 + b\,\mathrm{sat}(\Delta f - f_{\mathrm{start}}, f_{\mathrm{min}}, f_{\mathrm{max}})\right)$$
+
+- During voltage dips (LVRT), reactive current is boosted:
+$$I_{q,\mathrm{boost}} = k_{\mathrm{RCI}}\,(V_{\mathrm{ref}} - V_t)$$
+
+- Current magnitude is limited to $I_{\mathrm{max}}$ with priority to reactive current during LVRT.
+
+The injected currents in $x$-$y$ frame are:
+
+$$i_x = I_p \cos\theta_{\mathrm{PLL}} - I_q \sin\theta_{\mathrm{PLL}}$$
+$$i_y = I_p \sin\theta_{\mathrm{PLL}} + I_q \cos\theta_{\mathrm{PLL}}$$
+
+#### Parameters
+
+| # | Name | Description | Unit |
+|---|------|-------------|------|
+| 1 | `Imax` | Maximum current magnitude | pu |
+| 2 | `IN` | Nominal current | pu |
+| 3 | `Iprate` | Active current ramp rate | pu/s |
+| 4 | `Tg` | Generator time constant | s |
+| 5 | `Tm` | Measurement filter time constant | s |
+| 6 | `tLVRT1` | LVRT ride-through time threshold 1 | s |
+| 7 | `tLVRT2` | LVRT ride-through time threshold 2 | s |
+| 8 | `tLVRTint` | LVRT integration time | s |
+| 9 | `Vmax` | Maximum voltage for operation | pu |
+| 10 | `tau` | PLL response time | ms |
+| 11 | `Vminpll` | Voltage below which PLL is frozen | pu |
+| 12 | `a` | LVRT voltage-current curve slope | — |
+| 13 | `Vmin` | Minimum LVRT voltage | pu |
+| 14 | `Vint` | Intermediate LVRT voltage | pu |
+| 15 | `fmin` | Minimum frequency for operation | pu |
+| 16 | `fmax` | Maximum frequency for operation | pu |
+| 17 | `fstart` | Frequency threshold for P modulation | pu |
+| 18 | `b` | Frequency droop gain | — |
+| 19 | `fr` | Reference frequency | pu |
+| 20 | `Tr` | Reconnection delay after trip | s |
+| 21 | `Re` | Grid equivalent resistance | pu |
+| 22 | `Xe` | Grid equivalent reactance | pu |
+| 23 | `CM1` | LVRT control mode flag | — |
+| 24 | `kRCI` | Reactive current injection gain (LVRT) | — |
+| 25 | `kRCA` | Reactive current absorption gain (HVRT) | — |
+| 26 | `m` | Active-reactive current priority parameter | — |
+| 27 | `n` | Active-reactive current priority parameter | — |
+| 28 | `dbmin` | Frequency deadband lower limit | pu |
+| 29 | `dbmax` | Frequency deadband upper limit | pu |
+| 30 | `HVRT` | HVRT flag | — |
+| 31 | `LVRT` | LVRT flag | — |
+| 32 | `CM2` | Control mode 2 flag | — |
+| 33 | `Vtrip` | Trip voltage threshold | pu |
+
+#### State Variables
+
+| Variable | Description |
+|----------|-------------|
+| `vxl`, `vyl` | Filtered terminal voltage components | pu |
+| `Vt` | Terminal voltage magnitude | pu |
+| `PLLPhaseAngle` | PLL phase angle | rad |
+| `Vm` | Voltage magnitude measurement | pu |
+| `Ip`, `Iq` | Active and reactive current outputs | pu |
+| `Ipcmd`, `Iqcmd` | Current commands | pu |
+| `Iqmax`, `Iqmin` | Reactive current limits | pu |
+| `Ipmax`, `Ipmin` | Active current limits | pu |
+| `DeltaW`, `DeltaWf` | Frequency deviation and filtered value | pu |
+| `Pgen`, `Qgen` | Generated active and reactive power | pu |
+
+#### Usage Example
+
+```
+INJEC  IBG1  BUS_GEN  'inj_IBG'  1.2  1.0  0.5  0.02  0.01  0.5  1.0  0.05
+                                   1.1  20.0  0.1  2.0  0.1  0.5  0.95  1.05
+                                   0.0  2.0  1.0  1.0  0.0  0.05  1  2.0  1.5
+                                   2.0  2.0  -0.02  0.02  1  1  1  0.85  ;
+```
+
+---
+
+### `inj_WT3WithChanges` — Type 3 Wind Turbine (DFIG)
+
+#### Description
+
+A Type 3 wind turbine model implementing the WECC composite structure with four coupled sub-models:
+- **REPC_A**: Plant-level controller (reactive power / voltage regulation, frequency response)
+- **REEC_A**: Electrical controller (inner $d$-$q$ current control, LVRT/HVRT logic)
+- **WTGTRQ_A**: Generator torque controller (rotor speed regulation via electrical torque command)
+- **WTGPT_A**: Pitch controller (aerodynamic power limitation)
+- **WTGAR_A**: Aerodynamic rotor model
+- **WTGT_A**: Two-mass mechanical drivetrain (turbine inertia $H_t$, generator inertia $H_g$, shaft stiffness $K_{\mathrm{shaft}}$, damping $D_{\mathrm{shaft}}$)
+
+The doubly-fed induction generator (DFIG) topology allows decoupled control of active and reactive power via rotor-side converter injection.
+
+#### Scientific Description
+
+The two-mass drivetrain model governs rotor dynamics:
+
+$$2H_t \frac{d\omega_t}{dt} = T_m - K_{\mathrm{shaft}}(\theta_t - \theta_g) - D_{\mathrm{shaft}}(\omega_t - \omega_g)$$
+
+$$2H_g \frac{d\omega_g}{dt} = K_{\mathrm{shaft}}(\theta_t - \theta_g) + D_{\mathrm{shaft}}(\omega_t - \omega_g) - T_e$$
+
+The torque controller (WTGTRQ_A) uses a piecewise power-speed characteristic:
+
+$$T_{e,\mathrm{ref}} = \mathrm{interp}(\omega_g;\; [(\mathrm{spd}_1, p_1), (\mathrm{spd}_2, p_2), (\mathrm{spd}_3, p_3), (\mathrm{spd}_4, p_4)])$$
+
+The electrical controller (REEC_A) provides reactive current injection during voltage dips:
+
+$$I_{q,\mathrm{vdip}} = k_{qv}\left(V_{\mathrm{ref0}} - V_t\right)\quad \text{when } V_t < V_{\mathrm{dip}}$$
+
+with limiter $[I_{ql1}, I_{qh1}]$.
+
+The plant controller (REPC_A) optionally provides frequency response:
+
+$$\Delta P_{\mathrm{ref}} = D_{\mathrm{dn}}\,\mathrm{sat}(\Delta f, f_{\mathrm{dbd1}}, 0) + D_{\mathrm{up}}\,\mathrm{sat}(\Delta f, 0, f_{\mathrm{dbd2}})$$
+
+#### Parameters (selected key parameters)
+
+| # | Name | Sub-model | Description | Unit |
+|---|------|-----------|-------------|------|
+| 1 | `SNOM` | — | Nominal power | MW |
+| 2–32 | REPC_A | Plant controller | Reactive/voltage/frequency control | various |
+| 33–46 | WTGTRQ_A | Torque ctrl | Speed-torque lookup table, rate limits | various |
+| 47–56 | WTGPT_A | Pitch ctrl | Pitch PI gains, angle limits, rate limits | various |
+| 57–58 | WTGAR_A | Aero | Aerodynamic gain, initial pitch angle | — |
+| 59–62 | WTGT_A | Drivetrain | $H_t$, $H_g$, $D_{\mathrm{shaft}}$, $K_{\mathrm{shaft}}$ | s, pu |
+| 63–97 | REEC_A | Elec ctrl | LVRT/HVRT, current limits, inner PI | various |
+| 98+ | REGC_A | Generator | Generator electrical conversion | various |
+
+Full parameter list has 80+ entries; refer to the embedded Fortran header comments in `inj_WT3WithChanges.f90`.
+
+#### Usage Example
+
+```
+INJEC  WT3_1  BUS_WIND  'inj_WT3WithChanges'
+    100.0  0.0  0.02  0  0.0  0.05  0  0.0  0.3  -0.3  2.0  0.4  0.3  -0.3  0.0  0.15  0.9  0.05
+    0.0  -0.06  0.06  -0.05  0.05  0.05  -0.05  2.0  1.0  1.0  -1.0  0.02  0  0  0.8
+    1.5  1.5  0.01  0.5  ... ;
+```
+
+---
+
+### `inj_WT4WithChanges` — Type 4 Wind Turbine (Full Converter)
+
+#### Description
+
+A Type 4 wind turbine with full-rated converter. Unlike Type 3, the generator is fully decoupled from the grid through a back-to-back converter. The model implements the same WECC framework as WT3 but without the doubly-fed rotor circuit: the mechanical sub-model is a single-mass (or two-mass) drive train, and all electrical power passes through the converter. Sub-models include REPC_A (plant controller), REEC_A (electrical controller), WTGT_A (drivetrain), and REGC_A (generator/converter).
+
+#### Scientific Description
+
+The two-mass drivetrain is identical to WT3:
+
+$$2H_t \frac{d\omega_t}{dt} = T_m - K_{\mathrm{shaft}}\delta_{\mathrm{shaft}} - D_{\mathrm{shaft}}(\omega_t - \omega_g)$$
+
+$$2H_g \frac{d\omega_g}{dt} = K_{\mathrm{shaft}}\delta_{\mathrm{shaft}} + D_{\mathrm{shaft}}(\omega_t - \omega_g) - T_e$$
+
+$$\frac{d\delta_{\mathrm{shaft}}}{dt} = \omega_0(\omega_t - \omega_g)$$
+
+There is no pitch controller or aerodynamic rotor in the basic Type 4 configuration; the active power reference is supplied directly (or from REPC_A), and rate limits `dPmax`/`dPmin` apply to the power order ramp.
+
+The REEC_A electrical controller supplies current commands with the same LVRT/HVRT logic as WT3, with current limits through the converter lookup table (piecewise linear in voltage: $(V_{p1}, I_{p1}),\ldots,(V_{p4}, I_{p4})$ for active current and $(V_{q1}, I_{q1}),\ldots,(V_{q4}, I_{q4})$ for reactive).
+
+#### Parameters (selected key parameters)
+
+| # | Name | Sub-model | Description | Unit |
+|---|------|-----------|-------------|------|
+| 1 | `SNOM` | — | Nominal power | MW |
+| 2–32 | REPC_A | Plant ctrl | Same as WT3 | various |
+| 33–37 | WTGT_A | Drivetrain | $H_t$, $H_g$, $\omega_0$, $D_{\mathrm{shaft}}$, $K_{\mathrm{shaft}}$ | s, pu |
+| 38–80 | REEC_A | Elec ctrl | LVRT, current limits, PI gains | various |
+| 81+ | REGC_A | Generator | Converter electrical model | various |
+
+#### Usage Example
+
+```
+INJEC  WT4_1  BUS_WIND  'inj_WT4WithChanges'
+    100.0  0.0  0.02  0  0.0  0.05  0  0.0  0.3  -0.3  2.0  0.4  0.3  -0.3  0.0  0.15  0.9  0.05
+    0.0  -0.06  0.06  -0.05  0.05  0.05  -0.05  2.0  1.0  1.0  -1.0  0.02  0  0  5.0  1.5  1.0  1.5  20.0  ... ;
+```
+
+---
+
+### `inj_PVG` — Photovoltaic Generator
+
+#### Description
+
+A photovoltaic generator model with similar WECC-derived structure to the wind turbine models. The model includes a plant controller (voltage/reactive power regulation), an electrical controller (current limits, LVRT), and generator/converter representation. Unlike wind turbines, there is no mechanical drive train; the active power set-point follows an irradiance input or a fixed reference. LVRT/HVRT logic and current limiting are identical to the Type 4 wind model.
+
+#### Scientific Description
+
+The PV generator delivers active and reactive power through current commands:
+
+$$I_p = \frac{P_{\mathrm{ref}}}{V_t}, \qquad I_q = f_{\mathrm{QV}}(V_t, Q_{\mathrm{ref}})$$
+
+subject to the constraint $\sqrt{I_p^2 + I_q^2} \leq I_{\mathrm{max}}$. The inner current loop is a first-order filter:
+
+$$T_g \frac{dI_p}{dt} = I_{p,\mathrm{cmd}} - I_p, \qquad T_m \frac{dI_q}{dt} = I_{q,\mathrm{cmd}} - I_q$$
+
+Low-voltage power-logic (LVPL) limits active current during deep voltage sags via a piecewise-linear function of $V_t$ with breakpoints `lvpnt0`, `lvpnt1`, `Lvpl1`. HVRT and LVRT timers control disconnection and reconnection.
+
+#### Parameters (selected)
+
+| # | Name | Description | Unit |
+|---|------|-------------|------|
+| 1 | `Imax` | Maximum converter current | pu |
+| 2 | `IN` | Nominal current | pu |
+| 3 | `ratemax` | Reconnection ramp rate | pu/s |
+| 4 | `Tg` | Active current filter time constant | s |
+| 5 | `Tm` | Reactive current filter time constant | s |
+| 6–9 | LVRT timers | `tLVRT1`, `tLVRT2`, `tLVRTint`, `Vmax` | s, pu |
+| 10 | `kpll` | PLL gain | — |
+| 11 | `Vminpll` | PLL freeze voltage | pu |
+| 12–14 | LVRT curve | `a`, `Vmin`, `Vint` | — |
+| 21–22 | `Re`, `Xe` | Grid equivalent impedance | pu |
+| 23–29 | Current control | `CM1`, `kRCI`, `kRCA`, `m`, `n`, `dbmin`, `dbmax` | — |
+| 34 | `BM` | Battery module flag | — |
+
+#### Usage Example
+
+```
+INJEC  PV1  BUS_PV  'inj_PVG'  1.2  1.0  0.5  0.02  0.01  0.5  1.0  0.05  1.1
+                                 20.0  0.1  2.0  0.1  0.5  0.95  1.05  0.0  2.0  1.0
+                                 1.0  0.0  0.05  1  2.0  1.5  2.0  2.0  -0.02  0.02  1  1  1  0.85  0  ;
+```
+
+---
+
+### `inj_GFOR` — Grid-Forming Converter
+
+#### Description
+
+A grid-forming voltage source converter implementing Virtual Synchronous Machine (VSM) dynamics. The converter's output voltage phase angle and magnitude are controlled to mimic the behaviour of a synchronous machine: an inertia-like integrator creates a synthetic swing equation, a droop loop regulates frequency, and a current limiter protects against overcurrents using a virtual impedance that attenuates the modulated voltage.
+
+#### Scientific Description
+
+The phase reactor algebraic equations (pu on machine base) are:
+
+$$\frac{v_x}{r} + R_{\mathrm{pr}} i_{xt} - \omega_{\mathrm{ref}} L_{\mathrm{pr}} i_{yt} = V_m \cos(\delta_m)$$
+
+$$\frac{v_y}{r} + R_{\mathrm{pr}} i_{yt} + \omega_{\mathrm{ref}} L_{\mathrm{pr}} i_{xt} = V_m \sin(\delta_m)$$
+
+The VSM swing equation is:
+
+$$2H \frac{d\omega_P}{dt} = \Delta P = \left[P_0 + \frac{1 - \omega_m}{R_{\mathrm{VSC}}}\right]\gamma - P$$
+
+$$\omega_m = \omega_P - K_p P$$
+
+$$\frac{d\delta_m}{dt} = (\omega_m - \omega_{\mathrm{ref}})\cdot 2\pi f_0$$
+
+The attenuation factor $\gamma$ limits power during overcurrent:
+
+$$\gamma = \left(\frac{V_m}{V_{m0}}\right)^n$$
+
+When the current exceeds $I_{\mathrm{max}}$, the virtual impedance modifies the modulated voltage:
+
+$$\Delta I = I - I_{\mathrm{lim}}, \quad \Delta V_m = -\frac{1}{K_c}\Delta I \quad \text{(limited to } [L_1, L_2]\text{)}$$
+
+$$V_{m,\mathrm{cl}} = V_{m0} - \Delta V_m$$
+
+#### Parameters
+
+| # | Name | Description | Unit |
+|---|------|-------------|------|
+| 1 | `Rpr` | Phase reactor resistance | pu |
+| 2 | `Lpr` | Phase reactor inductance | pu |
+| 3 | `r` | Transformer turns ratio | — |
+| 4 | `Snom` | Nominal apparent power | MVA |
+| 5 | `H` | Inertia constant | s |
+| 6 | `RVSC` | Steady-state frequency droop | pu |
+| 7 | `Kp` | Proportional gain in active power control | — |
+| 8 | `Imax` | Maximum current | pu |
+| 9 | `n` | Exponent in attenuation factor $\gamma$ | — |
+| 10 | `Kc` | Gain of current limiter integral control | — |
+| 11 | `L1` | Lower limit of current correction | pu |
+| 12 | `L2` | Upper limit of current correction | pu |
+
+#### State Variables
+
+| Variable | Description |
+|----------|-------------|
+| `wref` | Angular speed of reference axes | pu |
+| `ixt`, `iyt` | Converter-side currents (on machine base) | pu |
+| `Vm` | Modulated voltage magnitude | pu |
+| `deltam` | Modulated voltage phase angle | rad |
+| `P` | Active power (on Snom base) | pu |
+| `gamma` | Attenuation factor | — |
+| `omegam1` | VSM inertia integrator output | pu |
+| `omegam` | VSM frequency estimate | pu |
+| `deltaomegam` | Phase-angle integrator input | rad/s |
+| `I` | Current magnitude | pu |
+| `deltaVm_un`, `deltaVm` | Voltage corrections (before/after limiter) | pu |
+| `Pout`, `Qout` | Active and reactive power (MW, Mvar) | — |
+
+#### Usage Example
+
+```
+INJEC  GFM1  BUS_BESS  'inj_GFOR'  0.005  0.15  1.0  50.0  5.0  0.05  0.01  1.1  2.0  0.5  0.0  0.05  ;
+```
+
+---
+
+### `inj_GFOR_v2` — Grid-Forming Converter v2
+
+#### Description
+
+An advanced grid-forming VSC model with three selectable active-power synchronization modes, comprehensive reactive-power control options, DC-link dynamics, and integrated battery storage. The model is suitable for detailed studies of grid-forming inverters in islanded or weak-grid conditions.
+
+**Synchronization mode** (selected by `delta_m_switch`):
+1. **VSM** — Virtual Synchronous Machine: swing equation with inertia constant $H$, droop $R_{\mathrm{vsm}}$, and damping $K_p$
+2. **Droop** — P-$\omega$ droop control filtered by $T_d$
+3. **Selfsync** — Self-synchronization using power error integration with gains $K_s$ and $K_s'$
+
+**Reactive power control** (selected by `QV_switch`):
+- 0: No reactive power control ($V_{m0} = V_{\mathrm{ref}}$)
+- 1: Q-V droop control (Options A, B, or C switchable via `QV_switch_state`)
+
+**Current limiting** (selected by `VI_CL_switch`):
+- 0: Virtual Impedance — attenuates modulated voltage using virtual $R_{vi}$ and $X_{vi}$
+- 1: Current Limiter — integral control corrects $V_m$ to enforce $I \le I_{\max}$
+
+**DC link and battery**: The DC voltage $v_{\mathrm{dc}}$ evolves according to capacitor dynamics. A PI controller regulates $v_{\mathrm{dc}}$ to its setpoint. Battery SOC is tracked via integration of battery current. SOC limits automatically clamp battery current.
+
+#### Scientific Description
+
+**VSM active power loop:**
+
+$$2H\frac{d\omega_P}{dt} = \left[P_0 + \frac{1-\omega_m}{R_{\mathrm{vsm}}}\right]\gamma - P = \Delta P$$
+
+$$\omega_m = \omega_P - K_p P$$
+
+$$\frac{d\delta_{m,\mathrm{vsm}}}{dt} = (\omega_m - \omega_{\mathrm{ref}})\cdot 2\pi f_0$$
+
+**Droop active power loop:**
+
+$$\frac{d\omega_{\mathrm{droop}}}{dt} = \frac{\omega_{\mathrm{meas}} - \omega_{\mathrm{droop}}}{T_d}$$
+
+$$\frac{d\delta_{m,\mathrm{droop}}}{dt} = \left[(P_0 - \omega_{\mathrm{droop}}) m_p + 1 - \omega_{\mathrm{ref}}\right] \cdot 2\pi f_0$$
+
+**Selfsync active power loop:**
+
+$$\frac{d P_s}{dt} = \frac{P - P_s}{T_s}, \qquad \Delta P_{\mathrm{ss}} = P_0 - P_s$$
+
+$$\frac{d\delta_{\mathrm{ss}}}{dt} = \left[K_s\Delta P_{\mathrm{ss}} + 1 - \omega_{\mathrm{ref}}\right]\cdot 2\pi f_0$$
+
+$$\delta_{m,\mathrm{sync}} = \delta_{\mathrm{ss}} + K_s'\Delta P_{\mathrm{ss}}$$
+
+**Phase reactor (algebraic):**
+
+$$\frac{v_x}{r} + R_{\mathrm{pr}} i_{xt} - \omega_{\mathrm{ref}} L_{\mathrm{pr}} i_{yt} = V_m \cos(\delta_m)$$
+
+$$\frac{v_y}{r} + R_{\mathrm{pr}} i_{yt} + \omega_{\mathrm{ref}} L_{\mathrm{pr}} i_{xt} = V_m \sin(\delta_m)$$
+
+**Virtual Impedance current limiting:**
+
+$$f_I = \max(0,\; I - I_{\mathrm{lim}}), \qquad R_{vi} = K_{pvi}\, f_I, \qquad X_{vi} = \sigma_{xr} K_{pvi}\, f_I$$
+
+$$\begin{pmatrix} V_{m0}\cos\delta_m'\\ V_{m0}\sin\delta_m' \end{pmatrix} = \begin{pmatrix} V_m\cos\delta_m + R_{vi}i_{xt} - X_{vi}i_{yt}\\ V_m\sin\delta_m + R_{vi}i_{yt} + X_{vi}i_{xt} \end{pmatrix}$$
+
+**Modulation index:**
+
+$$m = m_0 + \Delta m, \qquad f(m) = 1 + A\left(1 - e^{-(m-1)/A}\right), \qquad A = -1 + \frac{4}{\pi}$$
+
+$$V_{m,s} = m \cdot v_{\mathrm{dc}} \quad (\text{limited to } [0,\, m_{\max}])$$
+
+**DC link dynamics:**
+
+$$C_{\mathrm{dc}}\frac{dv_{\mathrm{dc}}}{dt} = i_{\mathrm{dcs}} - i_{\mathrm{dc}}$$
+
+$$i_{\mathrm{dcs}} = i_{\mathrm{res}} + I_{\mathrm{bat,f}}$$
+
+where $i_{\mathrm{res}}$ is the non-battery DC current (proportional to AC power) and $I_{\mathrm{bat,f}}$ is the battery current filtered by $T_{\mathrm{simp}}$.
+
+**Battery SOC:**
+
+$$\frac{d\mathrm{SOC}}{dt} = -\frac{I_{\mathrm{bat}}}{C_{\mathrm{bat}} \cdot I_{\mathrm{base,DC}}}$$
+
+Battery current is clamped by rated current and by SOC limits:
+
+$$I_{\mathrm{bat}} \in \left[\max\!\left(-I_{\mathrm{rated}}, I_{\mathrm{SOC-}}^{\min}\right),\; \min\!\left(I_{\mathrm{rated}}, I_{\mathrm{SOC+}}^{\max}\right)\right]$$
+
+#### Parameters
+
+| # | Name | Description | Unit |
+|---|------|-------------|------|
+| 1 | `Snom` | Nominal apparent power | MVA |
+| 2 | `Pnom` | Nominal DC-side power (base) | MW |
+| 3 | `VB` | AC base voltage | kV |
+| 4 | `Vdc0pu` | Initial DC link voltage | pu |
+| 5 | `Rpr` | Phase reactor resistance | pu |
+| 6 | `Lpr` | Phase reactor inductance | pu |
+| 7 | `r` | Transformer turns ratio | — |
+| 8 | `H` | VSM inertia constant | s |
+| 9 | `R_vsm` | VSM frequency droop | pu |
+| 10 | `Kp` | VSM damping constant | — |
+| 11 | `Td` | Droop filter time constant | s |
+| 12 | `Ts` | Selfsync filter time constant | s |
+| 13 | `Ks` | Selfsync integral gain | — |
+| 14 | `Ks_prime` | Selfsync feedforward gain | — |
+| 15 | `mp` | Droop proportional gain (P-$\omega$) | — |
+| 16 | `T_QF` | Reactive power filter time constant | s |
+| 17 | `Kq` | Reactive power control gain | — |
+| 18 | `Kqvp` | Q-V PI proportional gain | — |
+| 19 | `Kqvi` | Q-V PI integral gain | — |
+| 20 | `Tvf` | Voltage filter time constant | s |
+| 21 | `dv` | Voltage control proportional gain | — |
+| 22 | `Tconv` | Converter delay time constant | s |
+| 23 | `Imax` | Maximum current | pu |
+| 24 | `Ilim` | Current threshold for virtual impedance activation | pu |
+| 25 | `n` | Exponent in attenuation factor $\gamma$ | — |
+| 26 | `Kc` | Current limiter integral gain | — |
+| 27 | `L1` | Lower limit of current correction | pu |
+| 28 | `L2` | Upper limit of current correction | pu |
+| 29 | `Kpvi` | Virtual resistance gain | — |
+| 30 | `sigma_xr` | Virtual reactance-to-resistance ratio | — |
+| 31 | `QV_switch` | Reactive power control flag (0=none, 1=active) | flag |
+| 32 | `VI_CL_switch` | Current limiting mode (0=VI, 1=CL) | flag |
+| 33 | `delta_m_switch` | Synchronization mode (1=VSM, 2=Droop, 3=Selfsync) | flag |
+| 34 | `Cdcpu` | DC capacitance | pu |
+| 35 | `Kppi` | DC voltage PI proportional gain | — |
+| 36 | `Kipi` | DC voltage PI integral gain | — |
+| 37 | `Tsimp` | Battery source simplified transfer function time constant | s |
+| 38 | `m_max` | Upper limit on modulation index | — |
+| 39 | `SOC0` | Initial state of charge | — |
+| 40 | `Q_battery` | Battery nominal capacity | Ah |
+| 41 | `Vbat_pu` | Battery voltage | pu |
+| 42 | `I_batrated` | Battery rated current | kA |
+| 43 | `SOC_upperlimit` | SOC upper limit | % |
+| 44 | `SOC_lowerlimit` | SOC lower limit | % |
+| 45 | `BatFrac` | Fraction of power supplied by battery | — |
+
+#### State Variables (selected)
+
+| Variable | Description |
+|----------|-------------|
+| `Vmo_pu_machbase` | Modulated voltage setpoint (machine base) | pu |
+| `wref` | Reference angular speed | pu |
+| `ixt`, `iyt` | Converter-side currents | pu |
+| `delta_m_rad` | Modulated voltage phase angle | rad |
+| `delta_m_VSM` | Phase angle from VSM integrator | rad |
+| `delta_m_droop` | Phase angle from droop integrator | rad |
+| `delta_m_sync` | Phase angle from selfsync integrator | rad |
+| `P` | Active power (Snom base) | pu |
+| `P_m` | Droop-filtered active power | pu |
+| `P_s` | Selfsync-filtered active power | pu |
+| `omega_m` | VSM frequency (pu) | pu |
+| `I_pu_machbase` | Current magnitude | pu |
+| `Rvi`, `Xvi` | Virtual impedance components | pu |
+| `Vm_pu_machbase` | Modulated voltage magnitude | pu |
+| `vdc` | DC link voltage | pu |
+| `SOC` | Battery state of charge | — |
+| `i_int` | Integrated battery current (for SOC) | — |
+| `Pout_MW`, `Qout_MVAR` | Power outputs | MW, Mvar |
+
+**Observables:** `Vm_pu_machbase`, `delta_m_rad`, `omega_m`, `Pout_MW`, `Qout_MVAR`, `I_pu_machbase`, `i_dc`, `vdc`, `SOC`, and more.
+
+#### Usage Example
+
+<Tabs>
+  <TabItem label="VSM Mode">
+```
+INJEC  GFOR_V2_VSM  BUS_BESS  'inj_GFOR_v2'
+  50.0  50.0  20.0  1.0  0.005  0.15  1.0  5.0  0.05  0.01
+  0.5  0.5  1.0  0.0  0.02  0.5  1.0  1.0  5.0  0.1
+  0.0  0.05  1.1  0.9  2.0  0.5  0.0  0.05  0.5  1.5
+  1  0  1  0.005  0.5  5.0  0.05  1.05  0.5  100.0  1.0  0.1  90.0  10.0  0.5  ;
+```
+  </TabItem>
+  <TabItem label="Droop Mode">
+```
+INJEC  GFOR_V2_DRP  BUS_BESS  'inj_GFOR_v2'
+  50.0  50.0  20.0  1.0  0.005  0.15  1.0  5.0  0.05  0.01
+  0.5  0.5  1.0  0.0  0.02  0.5  1.0  1.0  5.0  0.1
+  0.0  0.05  1.1  0.9  2.0  0.5  0.0  0.05  0.5  1.5
+  1  0  2  0.005  0.5  5.0  0.05  1.05  0.5  100.0  1.0  0.1  90.0  10.0  0.5  ;
+```
+  </TabItem>
+  <TabItem label="Selfsync Mode">
+```
+INJEC  GFOR_V2_SS  BUS_BESS  'inj_GFOR_v2'
+  50.0  50.0  20.0  1.0  0.005  0.15  1.0  0.0  0.0  0.0
+  0.5  0.5  1.0  0.0  0.0  0.5  1.0  1.0  5.0  0.1
+  0.0  0.05  1.1  0.9  2.0  0.5  0.0  0.05  0.5  1.5
+  1  0  3  0.005  0.5  5.0  0.05  1.05  0.5  100.0  1.0  0.1  90.0  10.0  0.5  ;
+```
+  </TabItem>
+</Tabs>
+
+---
+
+### `inj_GFol` — Grid-Following Converter
+
+#### Description
+
+A grid-following VSC model for representing inverter-interfaced generation or storage in following mode. The converter synchronises to the grid via a PLL and regulates active and reactive power through outer PI controllers and an inner current loop. It includes low-voltage protection (PLL freeze), reactive current support during voltage dips, a DC link energy balance equation, and optional voltage-droop reactive support.
+
+#### Scientific Description
+
+The PLL tracks the terminal voltage angle using:
+
+$$\frac{d\theta_{\mathrm{pll}}}{dt} = \Delta\omega_{\mathrm{pll}}, \qquad \frac{d\Delta\omega_{\mathrm{pll}}}{dt} = \frac{K_{iw}}{\tau}\, v_q$$
+
+where $\tau$ is the PLL response time and $v_q$ is the $q$-axis voltage. The phase reactor in $d$-$q$ frame:
+
+$$L\frac{di_d}{dt} = -R\, i_d + v_{\mathrm{md}} - v_d + \omega\, L\, i_q$$
+
+$$L\frac{di_q}{dt} = -R\, i_q + v_{\mathrm{mq}} - v_q - \omega\, L\, i_d$$
+
+Active power outer loop:
+
+$$\frac{dP_B}{dt} = \frac{P_0 - P}{K_{ip}}, \qquad i_{d,\mathrm{ref}} = P_B + K_{pp}\, (P_0 - P)$$
+
+Reactive outer loop (voltage droop or Q control):
+
+$$\frac{dV_B}{dt} = \frac{V_{\mathrm{comp}} - V_0}{K_{iq}}, \qquad i_{q,\mathrm{ref}} = V_B + K_{pq}\, (V_{\mathrm{comp}} - V_0)$$
+
+During voltage dips below $V_{s1}$:
+
+$$i_{q,\mathrm{support}} = \frac{I_{\mathrm{max}}(V_{s1} - V_t)}{V_{s1} - V_{s2}}$$
+
+The DC power balance (assuming lossless converter):
+
+$$p_{\mathrm{dc}} = v_{\mathrm{dc}} \cdot i_{\mathrm{dc}} = v_{\mathrm{md}} i_d + v_{\mathrm{mq}} i_q$$
+
+#### Parameters
+
+| # | Name | Description | Unit |
+|---|------|-------------|------|
+| 1 | `R` | Series transformer resistance | pu |
+| 2 | `L` | Series transformer reactance/inductance | pu |
+| 3 | `Rc` | Virtual resistance for voltage control | pu |
+| 4 | `Xc` | Virtual reactance for voltage control | pu |
+| 5 | `Snom` | Nominal apparent power | MVA |
+| 6 | `Pnom` | Nominal active power | MW |
+| 7 | `Kpp` | Active power PI: proportional gain | — |
+| 8 | `Kip` | Active power PI: integral gain | — |
+| 9 | `T_filp` | Active power recovery filter time constant | s |
+| 10 | `dPdt_min` | Minimum active power ramp rate | pu/s |
+| 11 | `dPdt_max` | Maximum active power ramp rate | pu/s |
+| 12 | `Kpq` | Reactive power PI: proportional gain | — |
+| 13 | `Kiq` | Reactive power PI: integral gain | — |
+| 14 | `tau` | PLL response time | s |
+| 15 | `vdc` | DC voltage setpoint | pu |
+| 16 | `Vs_pll` | PLL freeze voltage threshold | pu |
+| 17 | `Imax` | Maximum current | pu |
+| 18 | `Vs1` | Voltage threshold for reactive support activation | pu |
+| 19 | `Vs2` | Voltage threshold for full reactive support | pu |
+| 20 | `qlim` | Reactive power limit (±) | pu |
+| 21 | `vqswitch` | 1 = voltage control, 0 = reactive power control | flag |
+
+#### State Variables
+
+| Variable | Description |
+|----------|-------------|
+| `P` | Active power delivered | pu |
+| `ix_1`, `iy_1` | VSC currents in $x$-$y$ frame (Snom base) | pu |
+| `w_pll`, `Dw_pll` | PLL speed and deviation | pu |
+| `theta_pll` | PLL angle | rad |
+| `id`, `iq` | $d$-$q$ currents | pu |
+| `vmd`, `vmq` | Modulated voltages | pu |
+| `PB`, `VB` | PI integrator states | — |
+| `idc` | DC current | pu |
+| `id_lim` | Limited active current | pu |
+| `Q` | Reactive power | pu |
+| `P_MW`, `Q_MVAr` | Power outputs | MW, Mvar |
+
+**Observables:** `Pdc`, `Q`, `P_MW`, `Q_MVAr`, `I`, `V`, `PSnom`
+
+#### Usage Example
+
+```
+INJEC  GFOL1  BUS_IBR  'inj_GFol'  0.005  0.15  0.0  0.0  100.0  100.0
+                                     2.0  20.0  0.1  -10.0  10.0  2.0  20.0
+                                     0.05  1.0  0.1  1.1  0.9  0.7  0.4  1  ;
+```
+
+---
+
+## Energy Storage
+
+### `inj_BESSWithChanges` — Battery Energy Storage System
+
+#### Description
+
+A comprehensive BESS model implementing the full WECC framework (REPC_A + REEC_C + REGC_A) plus battery state of charge (SOC) tracking. The model supports both grid-following operation (bidirectional active power dispatch) and reactive power / voltage regulation. It is built on the same REPC_A plant controller as the wind turbine models, and uses the REEC_C converter electrical controller which handles a piecewise-linear $I_q$-vs-$V$ and $I_p$-vs-$V$ characteristic for fault ride-through.
+
+The battery SOC evolves through integration of injected power:
+
+$$\frac{d\mathrm{SOC}}{dt} = -\frac{P_{\mathrm{bess}}}{C_{\mathrm{bat}} \cdot S_{\mathrm{nom}}}$$
+
+with hard clamps at `SOCmin` and `SOCmax` that modify the active power limits `Pmax`/`Pmin` dynamically:
+
+$$P_{\max} = \begin{cases} 0 & \mathrm{SOC} \ge \mathrm{SOC}_{\max}\\ P_{\max,\mathrm{rated}} & \text{otherwise}\end{cases}$$
+
+$$P_{\min} = \begin{cases} 0 & \mathrm{SOC} \le \mathrm{SOC}_{\min}\\ P_{\min,\mathrm{rated}} & \text{otherwise}\end{cases}$$
+
+#### Parameters (key parameters)
+
+| # | Name | Sub-model | Description | Unit |
+|---|------|-----------|-------------|------|
+| 1 | `SNOM` | — | Nominal power | MW |
+| 2–32 | — | REPC_A | Plant controller (same as WT3/WT4) | various |
+| 33–76 | — | REEC_C | Electrical controller with piecewise $I_q(V)$, $I_p(V)$ | various |
+| 68 | `CapBat` | BESS | Battery energy capacity | MWh |
+| 69 | `SOCini` | BESS | Initial state of charge | pu |
+| 70 | `SOCmax` | BESS | Maximum SOC limit | pu |
+| 71 | `SOCmin` | BESS | Minimum SOC limit | pu |
+| 72–73 | `dPmax`, `dPmin` | BESS | Active power ramp rate limits | pu/s |
+| 74–75 | `pmax`, `pmin` | REEC_C | Active current limits (pu on SNOM) | pu |
+| 76 | `Tpord` | REEC_C | Active power order time constant | s |
+
+Full parameter listing (125 parameters) is detailed in the embedded header of `inj_BESSWithChanges.f90`.
+
+#### State Variables
+
+The BESS model uses over 40 internal states reflecting the three sub-models. Key states include:
+
+| Variable | Description |
+|----------|-------------|
+| `SOC` | State of charge | pu |
+| `Pref` | Active power reference | pu |
+| `Qext` | Reactive power reference from REPC_A | pu |
+| `Ip`, `Iq` | Active/reactive current outputs | pu |
+| `PLLPhaseAngle` | PLL phase angle | rad |
+| `Pgen`, `Qgen` | Generated powers | pu |
+
+#### Usage Example
+
+```
+INJEC  BESS1  BUS_ST  'inj_BESSWithChanges'
+    100.0  0.0  0.02  0  0.0  0.05  0  0.0  0.3  -0.3  2.0  0.4
+    0.3  -0.3  0.0  0.15  0.9  0.05  0.0  -0.06  0.06  -0.05  0.05
+    0.05  -0.05  2.0  1.0  1.0  -1.0  0.02  0  0
+    0.1  0.1  0.02  1.0  0.0  -0.2  0.2  0.2  -0.2  0.6  0.4  0.6  -0.6  1.1  0.9
+    1.0  0.5  0.01  0.01  0.05  0.9  0.2  0.9  0.1  0.9  -0.1  0.5  -0.5  0.5  -0.5  1.0  -1.0  0.5  -0.5
+    50.0  0.7  0.9  0.1  5.0  -5.0  1.0  -1.0  0.05  1.1  0.0  2  0.01  ;
+```
+
+---
+
+## Special / Utility
+
+### `inj_svc_hq_generic1` — SVC (Hydro-Québec Generic)
+
+#### Description
+
+A Static VAr Compensator model based on the Hydro-Québec generic SVC structure. It consists of two lead-lag blocks (representing the measurement chain and voltage regulator), a PI voltage controller, and a susceptance limiter. An optional PSS (power system stabiliser) output can add a damping signal to the voltage reference. The model represents the reactive power exchange of the SVC as a variable susceptance $B_{\mathrm{svc}}$.
+
+#### Scientific Description
+
+The voltage measurement and regulator chain consists of two transfer functions in cascade:
+
+$$G_1(s) = \frac{K_1(1 + as)}{1 + T_1 s}, \qquad G_2(s) = \frac{K_2(1 + bs)}{1 + T_2 s}$$
+
+The PI voltage controller computes the susceptance command:
+
+$$B_{\mathrm{svc,cmd}}(s) = \left(K_p + \frac{K_i}{s}\right)\left(V_{\mathrm{ref}} + B_p B_{\mathrm{svc}} - V\right)$$
+
+The susceptance is limited to $[B_{\min}, B_{\max}]$, then normalised to the nominal susceptance $B_{\mathrm{nom}}$:
+
+$$Q_{\mathrm{svc}} = B_{\mathrm{svc}} \cdot B_{\mathrm{nom}} \cdot V^2$$
+
+The injected currents satisfy the reactive power balance:
+
+$$i_y = -B_{\mathrm{svc}} B_{\mathrm{nom}} v_x, \qquad i_x = B_{\mathrm{svc}} B_{\mathrm{nom}} v_y$$
+
+#### Parameters
+
+| # | Name | Description | Unit |
+|---|------|-------------|------|
+| 1 | `G1` | Gain of first regulator block | — |
+| 2 | `T1` | Time constant of first regulator block | s |
+| 3 | `a` | Zero time constant of first regulator block | s |
+| 4 | `K1` | Gain of second stage in first block | — |
+| 5 | `L1` | Saturation limit for first block output | pu |
+| 6 | `G2` | Gain of second regulator block | — |
+| 7 | `T2` | Time constant of second regulator block | s |
+| 8 | `b` | Zero time constant of second regulator block | s |
+| 9 | `K2` | Gain of second block | — |
+| 10 | `L2` | Saturation limit for second block output | pu |
+| 11 | `Ltot` | Total limit on regulator output | pu |
+| 12 | `Kp` | PI controller proportional gain | — |
+| 13 | `Ki` | PI controller integral gain | — |
+| 14 | `Bp` | Slope of V-Q droop characteristic | pu/pu |
+| 15 | `Bmax` | Maximum susceptance | pu |
+| 16 | `Bmin` | Minimum susceptance | pu |
+| 17 | `Bnom` | Nominal susceptance (MVAr at 1 pu) | MVAr |
+
+**Computed parameter:** `Vref` (voltage setpoint, computed at initialization)
+
+#### State Variables
+
+| Variable | Description |
+|----------|-------------|
+| `iy` | $y$-component of injected current | pu |
+| `ix` | $x$-component of injected current | pu |
+| Regulator states (×3) | Outputs of lead-lag and PI blocks | — |
+| PSS states (×2) | PSS washout and lead-lag output | — |
+| `Bsvc` | SVC susceptance (normalised) | pu |
+
+**Observables:** `Q`, `dvpss`, `Bsvc`, `Vref`, `Vb`
+
+#### Usage Example
+
+```
+INJEC  SVC1  BUS_SVC  'inj_svc_hq_generic1'
+    1.0  0.02  0.01  1.0  0.5  1.0  0.05  0.02  1.0  0.5  0.8  100.0  500.0  0.03  200.0  -100.0  100.0  ;
+```
+
+---
+
+### `inj_vfault` — Voltage Fault Injector
+
+#### Description
+
+A utility model for testing LVRT behaviour and fault-ride-through capabilities. It injects a shunt admittance into the network at a specified bus, driving the bus voltage to a target value `vfault_val` set externally (through the RAMSES disturbance interface). The admittance is updated iteratively using a secant method until the voltage target is reached to within ±0.5%. This model requires no user parameters in the data file — all control is through the disturbance mechanism.
+
+#### Scientific Description
+
+The injected currents implement a shunt admittance $B_{\mathrm{fault}}$:
+
+$$i_x = B_{\mathrm{fault}}\, v_x, \qquad i_y = -B_{\mathrm{fault}}\, v_y$$
+
+The fault admittance is updated via the secant iteration:
+
+$$B_{\mathrm{fault}}^{(k+1)} = B_{\mathrm{fault}}^{(k)} + \frac{V_{\mathrm{target}} - V^{(k)}}{\partial V / \partial B_{\mathrm{fault}}}$$
+
+where the derivative is estimated numerically from consecutive iteration steps. The discrete state $z(1)$ tracks convergence: $z(1) = 1$ when $|V_{\mathrm{target}} - V| \le 0.005$ pu. Up to 10 correction steps are attempted; if convergence is not reached, the simulation halts with an error message.
+
+#### Parameters
+
+No user parameters required. The target voltage `vfault_val` and injector number are set via the RAMSES disturbance module.
+
+#### State Variables
+
+| Variable | Description |
+|----------|-------------|
+| `ix` | $x$-component of injected current | pu |
+| `iy` | $y$-component of injected current | pu |
+
+**Discrete state:** `z(1)` — convergence flag (0 = iterating, 1 = converged)
+
+**Observable:** `Xfault` — current fault admittance $B_{\mathrm{fault}}$
+
+#### Usage Example
+
+```
+INJEC  FAULT_TEST  BUS_FAULT  'inj_vfault'  ;
+```
+
+The fault voltage level is set through the RAMSES disturbance file or programmatically via `vfault_val`.

@@ -1,0 +1,785 @@
+---
+title: Discrete Controller Models
+description: Protection, tap changer, and discrete control models in RAMSES
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Discrete controllers (DCTL) in RAMSES implement **event-driven logic** rather than continuous differential equations. They fire at specific simulation events (voltage crossing a threshold, a timer expiring, a tap position changing) and execute discrete actions such as tripping a generator, shedding load, or adjusting a transformer tap. They run inside RAMSES' event-driven loop and can call `disp_disc` to log switching actions.
+
+The RAMSES data keyword is `DCTL`:
+
+```
+DCTL  model_name  controller_name  field1  field2  ... ;
+```
+
+---
+
+## Tap Changers
+
+### `dctl_ltc` — Load Tap Changer (Standard)
+
+#### Description
+
+Controls the ratio of a transformer to regulate voltage at a **monitored bus**. It monitors the voltage, compares it against a deadband around the setpoint (initialised to the voltage at $t=0$), and initiates a tap change after a delay if the voltage remains outside the deadband.
+
+The first tap change uses a longer delay (`delay_first`); subsequent changes use a shorter delay (`delay_next`), implementing the standard IEC/IEEE slow-start behaviour.
+
+#### Logic Description
+
+Let $V$ be the monitored bus voltage and $V_{set}$ the setpoint:
+
+$$
+\text{Error} = V_{set} - V
+$$
+
+**Deadband check**: No action if $|V - V_{set}| \le \delta V$ (half-deadband).
+
+**Direction logic**: If `direction > 0`, increasing the ratio increases the voltage.
+
+**Timer logic**:
+
+$$
+\text{if } |V - V_{set}| > \delta V \text{ and } (t - t_{last}) \ge \tau_{delay}:
+\quad \text{tap} \leftarrow \text{tap} \pm \Delta r, \quad t_{last} \leftarrow t
+$$
+
+where $\tau_{delay} = \tau_{first}$ for the first operation, $\tau_{next}$ thereafter, and the tap is clamped to $[r_{\min}, r_{\max}]$.
+
+**State variable** `w(13)`:
+- `0`: voltage within deadband
+- `+1`: $V < V_{set} - \delta V$ (tap must increase)
+- `−1`: $V > V_{set} + \delta V$ (tap must decrease)
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `branch_name` | `w(1)` | Transformer branch name (must be type `trfo`) |
+| `bus_name` | `w(2)` | Monitored (controlled) bus name |
+| `direction` | `w(3)` | Sign convention: >0 means increasing ratio raises voltage |
+| `ratio_min` | `w(4)` | Minimum transformer ratio (pu/pu) |
+| `ratio_max` | `w(5)` | Maximum transformer ratio (pu/pu) |
+| `nb_positions` | `w(6)` | Number of tap positions (step = (max−min)/(nb−1)) |
+| `half_deadband` | `w(7)` | Voltage half-deadband $\delta V$ (pu) |
+| `delay_first` | `w(8)` | Delay before first tap change (s) |
+| `delay_next` | `w(9)` | Delay between subsequent tap changes (s) |
+
+#### Usage Example
+
+```
+DCTL  ltc  LTC_TR1  'TR1-HV-MV'  'BUS_MV'  1  0.85  1.15  33  0.01  30.0  10.0 ;
+```
+
+---
+
+### `dctl_ltc2` — Load Tap Changer (Variant 2)
+
+#### Description
+
+Identical logic to `dctl_ltc` but the **voltage setpoint is an explicit input parameter** rather than being taken from the initial operating point. This allows prescribing a setpoint different from the initial bus voltage, which is useful when the initial load-flow voltage differs from the desired operating voltage.
+
+#### Logic Description
+
+Same deadband, direction, and timer logic as `dctl_ltc`. The voltage setpoint $V_{set}$ is read directly from the data field `Vset` instead of being captured at $t = 0$.
+
+$$
+\text{if } |V - V_{set}| > \delta V \text{ and } (t - t_{last}) \ge \tau_{delay}: \quad \text{tap change}
+$$
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `branch_name` | `w(1)` | Transformer branch (type `trfo`) |
+| `bus_name` | `w(2)` | Monitored bus |
+| `direction` | `w(3)` | >0: ratio increase raises voltage |
+| `ratio_min` | `w(4)` | Minimum ratio (pu) |
+| `ratio_max` | `w(5)` | Maximum ratio (pu) |
+| `nb_positions` | `w(6)` | Number of tap positions |
+| `half_deadband` | `w(7)` | Voltage half-deadband (pu) |
+| `Vset` | `w(8)` | Voltage setpoint (pu) |
+| `delay_first` | `w(9)` | First tap change delay (s) |
+| `delay_next` | `w(10)` | Subsequent tap change delay (s) |
+
+#### Usage Example
+
+```
+DCTL  ltc2  LTC2_TR1  'TR1-HV-MV'  'BUS_MV'  1  0.85  1.15  33  0.01  1.025  30.0  10.0 ;
+```
+
+---
+
+### `dctl_ltcinv` — Inverse-Time Load Tap Changer
+
+#### Description
+
+An **inverse-time** tap changer in which the delay before a tap change is proportional to the integral of the voltage deviation rather than a fixed timer. Large voltage errors trigger faster operation; small but persistent deviations trigger slower operation.
+
+This implements behaviour analogous to inverse-time overcurrent relays, applied to voltage control.
+
+#### Logic Description
+
+The controller integrates the signed voltage deviation over time:
+
+$$
+\Sigma = \int_{t_0}^{t} (V_{set} - V) \, dt'
+$$
+
+A tap change fires when the integrated error exceeds a threshold derived from the maximum delay and acceleration parameter:
+
+$$
+\text{if } |\Sigma| \ge \frac{\tau_{max} \cdot \delta V}{\text{accel}}: \quad \text{tap change}, \quad \Sigma \leftarrow 0
+$$
+
+where $\tau_{max}$ is the maximum delay and `accel` is the acceleration factor (smaller value = faster response).
+
+**State variable** `w(13)`: same coding as `dctl_ltc`.
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `branch_name` | `w(1)` | Transformer branch |
+| `bus_name` | `w(2)` | Monitored bus |
+| `direction` | `w(3)` | Sign convention |
+| `ratio_min` | `w(4)` | Minimum ratio (pu) |
+| `ratio_max` | `w(5)` | Maximum ratio (pu) |
+| `nb_positions` | `w(6)` | Number of tap positions |
+| `half_deadband` | `w(7)` | Voltage half-deadband (pu) |
+| `Vset` | `w(8)` | Voltage setpoint (pu) |
+| `delay_max` | `w(9)` | Maximum delay before tap change (s) |
+| `accel` | `w(10)` | Acceleration factor (s) — smaller = faster |
+
+#### Usage Example
+
+```
+DCTL  ltcinv  LTCINV_TR1  'TR1-HV-MV'  'BUS_MV'  1  0.85  1.15  33  0.01  1.025  60.0  0.1 ;
+```
+
+---
+
+### `dctl_oltc2` — On-Load Tap Changer Type 2
+
+#### Description
+
+An advanced on-load tap changer with **R/X line drop compensation**, end-stop flags, and support for both Hydro-Quebec (`LIEGE`) and PSS/E (`PSSE`) data formats. It includes separate flags to prevent tap movement when the transformer is at its mechanical end-stop, and applies voltage correction based on the current flowing through the transformer using the compensation resistances `R_comp` and `X_comp`.
+
+The **Ratio2-factor** enables a secondary correction factor for the transformer ratio independent of the main tap position.
+
+#### Logic Description
+
+Compensated voltage seen by the controller:
+
+$$
+V_{comp} = V_{meas} - R_{comp} \, I_{re} - X_{comp} \, I_{im}
+$$
+
+where $I_{re}, I_{im}$ are the real and imaginary components of the transformer current. The deadband check and timer logic then operate on $V_{comp}$.
+
+End-stop flags `w(15)` and `w(16)` prevent further tap changes when the ratio is already at its limit and the requested change would move it beyond.
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `branch_name` | `w(1)` | Transformer branch |
+| `bus_name` | `w(2)` | Controlled bus |
+| `direction` | `w(3)` | Sign convention |
+| `ratio_min` | `w(4)` | Minimum ratio (pu) |
+| `ratio_max` | `w(5)` | Maximum ratio (pu) |
+| `nb_positions` | `w(6)` | Number of tap positions |
+| `half_deadband` | `w(7)` | Voltage half-deadband (pu) |
+| `Vset` | `w(8)` | Voltage setpoint (pu) |
+| `delay_first` | `w(9)` | First tap change delay (s) |
+| `delay_next` | `w(10)` | Subsequent tap change delay (s) |
+| `R_comp` | `w(17)` | Line drop compensation resistance (pu) |
+| `X_comp` | `w(18)` | Line drop compensation reactance (pu) |
+| `ratio2_factor` | `w(20)` | Secondary ratio correction factor (pu) |
+
+14 fields required (includes from-bus, to-bus, circuit ID for PSS/E format).
+
+#### Usage Example
+
+```
+DCTL  oltc2  OLTC_TR2  'FROM_BUS'  'TO_BUS'  '1'  1  0.88  1.12  25  0.0075
+             1.02  45.0  15.0  0.0  0.0 ;
+```
+
+---
+
+## Protection
+
+### `dctl_uvprot` — Under-Voltage Protection Relay
+
+#### Description
+
+Trips a **generator or injector** when the voltage at a monitored bus falls below a threshold for a sustained time delay. This models definite-time under-voltage protection relays.
+
+#### Logic Description
+
+The relay monitors voltage $V_{meas}$ at a specified bus:
+
+$$
+\text{if } V_{meas} < V_{\min}: \quad \text{start timer}
+$$
+$$
+\text{if timer} \ge T_{delay}: \quad \text{trip generator}, \quad \text{state} \leftarrow -1 \text{ (latched)}
+$$
+
+Once tripped (`w(8) = -1`), the controller is permanently latched and takes no further action.
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `bus_name` | `w(1)` | Monitored bus name |
+| `gen_name` | `w(2)` | Generator/injector to trip |
+| `Vmin` | `w(3)` | Under-voltage pickup threshold (pu) |
+| `T_delay` | `w(4)` | Time delay before tripping (s) |
+
+Internal variables: `w(5)` = measured voltage, `w(6)` = start time of violation, `w(7)` = simulation time, `w(8)` = controller state.
+
+#### Usage Example
+
+```
+DCTL  uvprot  UV_GEN1  'BUS_HV'  'GEN1'  0.85  0.5 ;
+```
+
+---
+
+### `dctl_uvls` — Under-Voltage Load Shedding
+
+#### Description
+
+Sheds load in **multiple steps** in response to sustained voltage depression. The controller integrates the area between the measured voltage and a threshold (energy integral criterion) and triggers load shedding when the area exceeds a limit $C$. This prevents unnecessary shedding for short transient dips.
+
+After each shedding step, the controller resets the integral and waits a minimum delay before the next step.
+
+#### Logic Description
+
+Area integral (trapezoidal):
+
+$$
+A(t) = \int_{t_{start}}^{t} \max(V_{th} - V_{meas}, 0) \, dt'
+$$
+
+Shedding condition:
+
+$$
+\text{if } A \ge C \text{ and } (t - t_{last}) \ge T_{\min}: \quad \text{shed load step}
+$$
+
+Amount shed per step (bounded):
+
+$$
+\Delta P_{shed} = \text{clip}\left(K \cdot A, \; P_{\min,step}, \; P_{\max,step}\right)
+$$
+
+Controller terminates when total shedding reaches the fraction `frac_load` of initial load or when `max_steps` is exhausted.
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `bus_name` | `w(1)` | Monitored bus |
+| `load_name` | `w(2)` | Controlled load (injector) |
+| `V_th` | `w(3)` | Voltage threshold (pu) |
+| `C` | `w(4)` | Maximum area $\int(V_{th}-V) \, dt$ before shedding (pu·s) |
+| `T_min` | `w(5)` | Minimum delay between steps (s) |
+| `T_max` | `w(6)` | Maximum delay between steps (s) |
+| `frac_load` | `w(7)` | Maximum fraction of load that may be shed |
+| `K` | `w(8)` | Gain: area → shed amount |
+| `P_min_step` | `w(9)` | Minimum load shedding per step (MW) |
+| `P_max_step` | `w(10)` | Maximum load shedding per step (MW) |
+| `max_steps` | `w(11)` | Maximum number of shedding steps |
+
+Internal variables: `w(12)`–`w(18)` (previous voltage, timers, area accumulator, step counter, total shed).
+
+#### Usage Example
+
+```
+DCTL  uvls  UVLS1  'BUS_MV'  'LOAD1'  0.90  0.5  5.0  20.0  0.3  2.0  5.0  50.0  5 ;
+```
+
+---
+
+### `dctl_FRT` — Fault Ride-Through Controller
+
+#### Description
+
+Implements a **piecewise-linear voltage–time FRT envelope** for an inverter-based generator (IBG). It monitors the bus voltage of the controlled injector and trips the unit if the voltage stays below the FRT envelope longer than allowed by the characteristic.
+
+The FRT envelope is defined by four (voltage, time) breakpoints: $(V_1, t_1), (V_2, t_2), (V_3, t_3), (V_4)$. If the voltage is above the envelope at all times, no action is taken. If it falls below the envelope for more than the corresponding time limit, the unit is tripped.
+
+#### Logic Description
+
+The FRT curve defines the minimum voltage $V(t)$ that must be sustained:
+
+| Segment | Condition |
+|---------|-----------|
+| $V \ge V_1$ | Always ride-through |
+| $V_2 \le V < V_1$ | Must recover within $t_1$ s |
+| $V_3 \le V < V_2$ | Must recover within $t_2$ s |
+| $V_4 \le V < V_3$ | Must recover within $t_3$ s |
+| $V < V_4$ | Immediate trip |
+
+Two internal timers (`w(8)`, `w(9)`) track time spent in violation zones.
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `inj_name` | `w(10)` | Controlled injector |
+| `Val1` | `w(1)` | Voltage threshold 1 (pu) — upper FRT boundary |
+| `t1` | `w(2)` | Time limit for zone 1 (s) |
+| `Val2` | `w(3)` | Voltage threshold 2 (pu) |
+| `t2` | `w(4)` | Time limit for zone 2 (s) |
+| `Val3` | `w(5)` | Voltage threshold 3 (pu) |
+| `t3` | `w(6)` | Time limit for zone 3 (s) |
+| `Val4` | `w(7)` | Voltage threshold 4 (pu) — below this: trip immediately |
+
+8 fields required. Field 1 is the injector name, fields 2–8 map to `Val1, t1, Val2, t2, Val3, t3, Val4`.
+
+#### Usage Example
+
+```
+DCTL  FRT  FRT_WTG1  'WT1'  0.90  0.15  0.70  0.5  0.20  1.0  0.05 ;
+```
+
+---
+
+### `dctl_injprot` — Injector Protection
+
+#### Description
+
+A **generic injector protection** relay that monitors any observable variable of an injector (e.g., current magnitude, active power, reactive power) and trips the injector if the variable goes outside prescribed bounds for a sustained time.
+
+The controller identifies the variable to monitor by name from the injector's observable list, making it flexible and applicable to any injector model.
+
+#### Logic Description
+
+$$
+\text{if } x_{obs} < L_{lower} \text{ or } x_{obs} > L_{upper}: \quad \text{start timer}
+$$
+$$
+\text{if timer} \ge T_{trip}: \quad \text{trip injector}, \quad \text{state} \leftarrow -1
+$$
+
+The controller latches once tripped and cannot reset. State variable `w(7)`:
+- `1` = active (monitoring)
+- `0` = idle (within bounds)
+- `−1` = already tripped
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `inj_name` | `w(1)` | Monitored/controlled injector name |
+| `var_name` | `w(2)` | Observable variable name (from injector's observable list) |
+| `lower_bound` | `w(3)` | Lower bound for the variable |
+| `upper_bound` | `w(4)` | Upper bound for the variable |
+| `T_trip` | `w(5)` | Time out-of-bounds before tripping (s) |
+
+5 fields required.
+
+#### Usage Example
+
+```
+DCTL  injprot  PROT_WTG1  'WT1'  'I'  0.0  1.2  0.1 ;
+```
+
+---
+
+### `dctl_losprot` — Loss-of-Synchronism Protection
+
+#### Description
+
+Trips a **synchronous generator** when its rotor speed exceeds a maximum threshold for a sustained time, detecting loss of synchronism (pole slipping). The controller monitors the machine's per-unit rotor speed $\omega$ and triggers disconnection when $\omega > \omega_{max}$ for longer than the specified time delay.
+
+#### Logic Description
+
+$$
+\text{if } \omega > \omega_{max}: \quad \text{start timer}
+$$
+$$
+\text{if timer} \ge T_{delay}: \quad \text{trip generator}, \quad \text{state} \leftarrow -1
+$$
+
+The timer resets if the speed returns within bounds. The controller latches permanently after tripping.
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `gen_name` | `w(1)` | Controlled synchronous generator name |
+| `omega_max` | `w(2)` | Maximum rotor speed threshold (pu) |
+| `T_delay` | `w(3)` | Time delay before tripping (s) |
+
+3 fields required. Internal variables: `w(4)` = measured speed, `w(5)` = violation start time, `w(6)` = current time, `w(7)` = state.
+
+#### Usage Example
+
+```
+DCTL  losprot  LOS_GEN2  'GEN2'  1.05  0.2 ;
+```
+
+---
+
+### `DCTL_line_prot` — Line Overcurrent Protection
+
+#### Description
+
+Monitors the **apparent power flow on a set of lines** and trips them if they exceed their thermal rating (with a configurable oversize factor). It is designed to protect multiple lines simultaneously and disconnects any line whose flow exceeds `oversize_factor × S_max`.
+
+The controller uses RAMSES' internal `smax_bra` array (maximum apparent power ratings from the network data) and reads real-time power flows via `pqbra`.
+
+#### Logic Description
+
+For each monitored branch $k$:
+
+$$
+\text{if } |S_k| > \text{oversize\_factor} \times S_{max,k}: \quad \text{disconnect branch } k
+$$
+
+The action is immediate (no time delay); the oversize factor allows temporary overloads.
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `oversize_factor` | `w(1)` | Allowed overload factor (e.g., 1.05 = 5% overload permitted) |
+| `nb_lines` | `w(2)` | Number of protected lines |
+| `line_1`, ... | `w(3-)` | Names of protected branches (space-separated) |
+
+#### Usage Example
+
+```
+DCTL  dctl_line_prot  LINEPROT1  1.05  2  'L1-L2'  'L3-L4' ;
+```
+
+---
+
+## System Controls
+
+### `dctl_mais` — Emergency Control (MAIS)
+
+#### Description
+
+The **MAIS** (Manœuvres Automatiques d'Inductances Shunt / Manœuvres Automatiques d'Ilotage et de Sauvegarde) controller is an Hydro-Québec emergency control scheme that automatically connects or disconnects **shunt reactors/capacitors** in response to voltage excursions. It monitors a single bus voltage and fires up to seven discrete shunt switching actions based on:
+
+1. Two **under-voltage** thresholds (absolute level)
+2. Three **voltage drop** thresholds (rate / sudden depression)
+3. Two **over-voltage** thresholds
+
+Each action connects or disconnects a susceptance $\Delta B$ after a corresponding time delay.
+
+#### Logic Description
+
+**Under-voltage triggers** (absolute level):
+
+$$
+\text{if } V < SO_1 \text{ for } TC_1 \text{ s}: \quad B \leftarrow B + PXL_1
+$$
+$$
+\text{if } V < SO_2 \text{ for } TC_2 \text{ s}: \quad B \leftarrow B + PXL_2
+$$
+
+**Voltage drop triggers** (based on $V_{initial} - V_{current}$):
+
+$$
+\text{if } V_0 - V > SH_k \text{ for } TC_{k+2} \text{ s}: \quad B \leftarrow B + PXL_{k+2}, \quad k = 1,2,3
+$$
+
+**Over-voltage triggers** (capacitor disconnection):
+
+$$
+\text{if } V > SU_1 \text{ for } TC_6 \text{ s}: \quad B \leftarrow B + PXL_6 \text{ (negative = disconnect capacitor)}
+$$
+$$
+\text{if } V > SU_2 \text{ for } TC_7 \text{ s}: \quad B \leftarrow B + PXL_7
+$$
+
+The cumulated susceptance change is bounded by `LMLN` (maximum increase) and `LMLP` (maximum decrease) representing the available shunts.
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `bus_name` | `w(1)` | Monitored bus |
+| `SO1` | `w(2)` | First under-voltage threshold (pu) |
+| `TC1` | `w(3)` | Corresponding delay (s) |
+| `PXL1` | `w(4)` | Susceptance switched for SO1 action (pu) |
+| `SO2` | `w(5)` | Second under-voltage threshold (pu) |
+| `TC2` | `w(6)` | Corresponding delay (s) |
+| `PXL2` | `w(7)` | Susceptance for SO2 action (pu) |
+| `SH1` | `w(8)` | First voltage drop threshold (pu) |
+| `TC3` | `w(9)` | Corresponding delay (s) |
+| `PXL3` | `w(10)` | Susceptance for SH1 action (pu) |
+| `SH2` | `w(11)` | Second voltage drop threshold (pu) |
+| `TC4` | `w(12)` | Corresponding delay (s) |
+| `PXL4` | `w(13)` | Susceptance for SH2 action (pu) |
+| `SH3` | `w(14)` | Third voltage drop threshold (pu) |
+| `TC5` | `w(15)` | Corresponding delay (s) |
+| `PXL5` | `w(16)` | Susceptance for SH3 action (pu) |
+| `SU1` | `w(17)` | First over-voltage threshold (pu) |
+| `TC6` | `w(18)` | Corresponding delay (s) |
+| `PXL6` | `w(19)` | Susceptance for SU1 action (pu) |
+| `SU2` | `w(20)` | Second over-voltage threshold (pu) |
+| `TC7` | `w(21)` | Corresponding delay (s) |
+| `PXL7` | `w(22)` | Susceptance for SU2 action (pu) |
+| `LMLN` | `w(23)` | Maximum susceptance increase (pu) |
+| `LMLP` | `w(24)` | Maximum susceptance decrease (pu) |
+
+24 fields required. Internal variables: 7 timers (`w(25)`–`w(31)`), cumulated $\Delta B$ (`w(32)`), initial voltage (`w(33)`), shunt number (`w(34)`).
+
+#### Usage Example
+
+```
+DCTL  mais  MAIS1  'BUS_735'
+      0.90  0.5  0.05
+      0.85  1.0  0.10
+      0.05  0.3  0.05
+      0.08  0.5  0.08
+      0.10  1.0  0.10
+      1.05  0.3  -0.05
+      1.10  0.5  -0.10
+      0.20  0.20 ;
+```
+
+---
+
+### `dctl_pst` — Phase-Shifting Transformer Control
+
+#### Description
+
+Controls the phase angle (and thus the **active power flow**) of a phase-shifting transformer (PST) to regulate power flow on a monitored branch. It is structurally identical to `dctl_ltc` but acts on the PST angle rather than on voltage: the deadband is in MW (or pu power), and the controller moves the tap to keep active power within a band around the setpoint.
+
+#### Logic Description
+
+Let $P_{meas}$ be the active power flow on the monitored branch and $P_{set}$ the setpoint (initialised at $t=0$):
+
+$$
+\text{if } |P_{meas} - P_{set}| > \delta P: \quad \text{start timer}
+$$
+$$
+\text{if timer} \ge \tau_{delay}: \quad \text{advance/retard PST angle by } \Delta\phi
+$$
+
+The direction parameter defines whether increasing the tap increases or decreases power flow.
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `pst_branch` | `w(1)` | PST branch name (must be type `trfo`) |
+| `mon_branch` | `w(2)` | Monitored branch for power flow |
+| `direction` | `w(3)` | Sign convention for power vs. angle |
+| `ratio_min` | `w(4)` | Minimum PST ratio (pu) |
+| `ratio_max` | `w(5)` | Maximum PST ratio (pu) |
+| `nb_positions` | `w(6)` | Number of positions |
+| `half_deadband` | `w(7)` | Power half-deadband (pu) |
+| `delay_first` | `w(8)` | First change delay (s) |
+| `delay_next` | `w(9)` | Subsequent change delay (s) |
+
+9 fields required. Internal variables: `w(10)` = power setpoint, `w(11)` = time of last change, `w(12)` = active delay, `w(13)` = state.
+
+#### Usage Example
+
+```
+DCTL  pst  PST_L1  'PST-TR1'  'LINE-MON'  1  -0.5  0.5  21  0.02  30.0  10.0 ;
+```
+
+---
+
+### `dctl_rt` — Real-Time Simulation Control
+
+#### Description
+
+Forces the RAMSES simulation to track **wall-clock time** at a configurable ratio, enabling hardware-in-the-loop (HIL) or real-time simulation testing. A ratio of 1.0 means the simulation runs in exact real time; a ratio of 2.0 allows the simulation to run up to twice as fast as real time (useful for digital twin applications).
+
+An optional over-run tolerance parameter `allowed_overrun` specifies how far the simulation may lag behind real time before an error is triggered.
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `ratio` | `w(1)` | Ratio to real time (1.0 = real time, >1 = faster) |
+| `allowed_overrun` | `w(2)` | Allowed over-run before error (s), optional |
+
+1 or 2 fields. Only one `DCTL RT` controller may be active per simulation.
+
+Observable: `elapsed` (wall-clock elapsed time in seconds).
+
+#### Usage Example
+
+```
+DCTL  rt  RT_CTL  1.0  0.01 ;
+```
+
+---
+
+### `dctl_hvdc_lim` — HVDC LCC Limiter/Controller
+
+#### Description
+
+A discrete controller that **supervises and adjusts an LCC-HVDC link** (`twop_HVDC_LCC`) by:
+- Moving rectifier and inverter transformer tap changers to maintain firing and extinction angles within desired ranges
+- Triggering reduced-current or blocked operation when AC voltages are too low for normal commutation
+- Setting the `alphamin`, `gammamin`, and `Idred` parameters of the HVDC model
+
+It interacts directly with the HVDC two-port model's internal parameters.
+
+#### Logic Description
+
+**Rectifier tap changer**: if $\alpha$ is outside $[\alpha_{min,des}, \alpha_{max,des}]$ for longer than `delay_rect`, move rectifier transformer tap.
+
+**Inverter tap changer**: if $\gamma$ is outside $[\gamma_{min,des}, \gamma_{max,des}]$ for longer than `delay_inv`, move inverter transformer tap.
+
+**Reduced-current control**: when $V_{dc}$ falls below $V_{min,des}$ or $V_{max,des}$ the controller switches the inverter to reduced-current mode (`inv_ctl = -1`) and sets $I_{red}$.
+
+**Blocked operation**: if conditions are unrecoverable (very low AC voltage), the HVDC is blocked (`rec_ctl = 3`, `inv_ctl = 3`).
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `hvdc_name` | `w(1)` | Target HVDC two-port device name |
+| `nr_min` | `w(2)` | Minimum rectifier transformer ratio |
+| `nr_max` | `w(3)` | Maximum rectifier transformer ratio |
+| `nr_step` | `w(4)` | Rectifier tap step size |
+| `ni_min` | `w(5)` | Minimum inverter transformer ratio |
+| `ni_max` | `w(6)` | Maximum inverter transformer ratio |
+| `ni_step` | `w(7)` | Inverter tap step size |
+| `alpha_min_des` | `w(8)` | Desired minimum firing angle (degrees) |
+| `alpha_max_des` | `w(9)` | Desired maximum firing angle (degrees) |
+| `gamma_min_des` | `w(10)` | Desired minimum extinction angle (degrees) |
+| `gamma_max_des` | `w(11)` | Desired maximum extinction angle (degrees) |
+| `V_min_des` | `w(12)` | Minimum desired DC voltage (kV) |
+| `V_max_des` | `w(13)` | Maximum desired DC voltage (kV) |
+| `delay_rect` | `w(14)` | Delay between rectifier tap changes (s) |
+| `delay_inv` | `w(15)` | Delay between inverter tap changes (s) |
+| `alphamin` | `w(16)` | Minimum firing angle limit (degrees) |
+| `Idred` | `w(17)` | Reduced DC current (kA) |
+| `gammamin` | `w(18)` | Minimum extinction angle (degrees) |
+
+18 fields required. Internal variables: `w(19)`–`w(22)` (operation modes and tap-change timers).
+
+#### Usage Example
+
+```
+DCTL  hvdc_lim  HVDCLIM1  'HVDClink'
+      0.85  1.15  0.00625
+      0.85  1.15  0.00625
+      15.0  18.0  15.0  18.0
+      400.0  600.0
+      10.0  10.0
+      5.0  0.0  15.0 ;
+```
+
+---
+
+## Monitoring
+
+### `dctl_sim_minmaxspeed` — Speed Monitoring (Min/Max)
+
+#### Description
+
+A **simulation monitoring** controller that checks whether any synchronous machine speed violates upper or lower bounds. If a violation persists beyond a deadtime, the controller logs a warning or stops the simulation, depending on the `stop_sim` flag. It is used to automatically terminate simulations that have become numerically unstable or that have reached an unacceptable operating state.
+
+#### Logic Description
+
+At each evaluation, the controller scans all synchronous machines and checks:
+
+$$
+\text{if } \omega > \omega_{max} \text{ or } \omega < \omega_{min}: \quad \text{record violation time}
+$$
+$$
+\text{if violation duration} > T_{deadtime}: \quad \text{warn or stop simulation}
+$$
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `omega_max` | `w(1)` | Upper speed limit (pu) |
+| `omega_min` | `w(2)` | Lower speed limit (pu) |
+| `deadtime` | `w(3)` | Deadtime before action (s) |
+| `stop_sim` | `w(4)` | 1 = stop simulation on violation, 0 = warn only |
+
+4 fields required. Internal: `w(5)` = last violation time.
+
+Parameter names exported: `SPEEDMIN`, `SPEEDMAX`, `DEADTIME`.
+
+#### Usage Example
+
+```
+DCTL  sim_minmaxspeed  SPEEDMON  1.2  0.5  0.5  1 ;
+```
+
+---
+
+### `dctl_sim_minmaxvolt` — Voltage Monitoring (Min/Max)
+
+#### Description
+
+Analogous to `dctl_sim_minmaxspeed` but for **bus voltages**. The controller scans all buses and checks whether any voltage violates the specified bounds. If the violation persists for longer than the deadtime, a warning is logged or the simulation is terminated.
+
+#### Logic Description
+
+$$
+\text{if } V > V_{max} \text{ or } V < V_{min}: \quad \text{record violation time}
+$$
+$$
+\text{if violation duration} > T_{deadtime}: \quad \text{warn or stop simulation}
+$$
+
+#### Parameters
+
+| Field | Working variable | Description |
+|-------|-----------------|-------------|
+| `V_max` | `w(1)` | Upper voltage limit (pu) |
+| `V_min` | `w(2)` | Lower voltage limit (pu) |
+| `deadtime` | `w(3)` | Deadtime before action (s) |
+| `stop_sim` | `w(4)` | 1 = stop on violation, 0 = warn only |
+
+4 fields required. Internal: `w(5)` = last violation time.
+
+Parameter names exported: `VMIN`, `VMAX`, `DEADTIME`.
+
+#### Usage Example
+
+```
+DCTL  sim_minmaxvolt  VOLTMON  1.15  0.80  1.0  0 ;
+```
+
+---
+
+### `dctl_voltage_variability` — Voltage Variability Monitor
+
+#### Description
+
+Computes a **running Exponential Moving Average (EMA)** of voltage variability (variance) across a list of monitored buses. It is used to assess power quality metrics such as voltage flicker or ramping caused by variable renewable energy sources.
+
+The EMA uses two decay constants ($\lambda_1$, $\lambda_2$) derived from the averaging time window, enabling a computationally efficient recursive estimation:
+
+$$
+\text{EMA}(t) = \lambda_1 \cdot \text{EMA}(t-1) + (1 - \lambda_1) \cdot V(t) + (\lambda_1 - \lambda_2)(V(t) - V(t-1))
+$$
+
+The controller accumulates per-bus variances and a system-wide sum.
+
+#### Parameters
+
+| Field | Description |
+|-------|-------------|
+| `aver_time_window` | Averaging time window (s) for EMA computation |
+| `nb_list` | Number of buses to monitor (bus names follow in subsequent RAMSES data records) |
+
+2 fields required. Only one `VOLT_VAR` controller may exist per simulation. Parameters are stored in module-level variables (`volt_var_mod`) rather than `w(*)`.
+
+#### Usage Example
+
+```
+DCTL  dctl_voltage_variability  VVAR  60.0  5 ;
+```

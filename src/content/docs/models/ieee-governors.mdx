@@ -1,0 +1,469 @@
+---
+title: IEEE Governor Models
+description: IEEE-standard turbine-governor models available in RAMSES
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+This page documents the IEEE-standard turbine-governor models available in RAMSES, all using the `tor_` prefix. These models implement standardised transfer-function blocks for diesel, gas-turbine, steam-turbine, hydraulic, and simplified ENTSO-E governors.
+
+---
+
+## tor_DEGOV1
+
+### Scientific Description
+
+The `tor_DEGOV1` model represents the **diesel engine governor** as defined in the IEEE Committee Report on governors. It consists of three main stages:
+
+**1. Speed governor (electrical control / lead–lag)**
+
+The speed error is formed from the measured speed deviation and a reference signal derived from either mechanical power ($P$) or mechanical torque ($T_m$), selected by the switch $SWM$:
+
+$$
+V_{60} = (1 - SWM) \cdot T_m + SWM \cdot P
+$$
+
+$$
+REF = V_{60} \cdot R
+$$
+
+The governor speed error drives a second-order lead–lag controller (transfer function approximating a two-pole, two-zero system) with time constants $T_1$, $T_2$, $T_3$:
+
+$$
+G_{gov}(s) \approx \frac{1 + s T_3}{(1 + s T_1)(1 + s T_2)}
+$$
+
+**2. Actuator (fuel injection system)**
+
+The governor output passes through a lead–lag block with gain $K$ and time constants $T_4$, $T_6$:
+
+$$
+G_{act}(s) = K \cdot \frac{1 + s T_4}{1 + s T_6}
+$$
+
+followed by a first-order lag $T_5$, and an integrator with limits $[T_{MIN},\, T_{MAX}]$.
+
+**3. Engine dead time and torque output**
+
+The actuator output is subject to engine dead time $T_D$, approximated by a second-order Padé:
+
+$$
+e^{-sT_D} \approx \frac{1 - 0.5 s T_D + 0.0833 s^2 T_D^2}{1 + 0.5 s T_D + 0.0833 s^2 T_D^2}
+$$
+
+The final mechanical torque is computed as:
+
+$$
+T_m = \frac{1}{1 + s T_E} \cdot V_{engine}
+$$
+
+$$
+P_m = T_m \cdot \omega
+$$
+
+The droop characteristic is:
+
+$$
+\Delta \omega + R \cdot (V_{60} - REF) = 0 \implies \text{error} = \Delta\omega + R \cdot V_{act}
+$$
+
+### Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `SWM` | Input switch: 0 = mechanical torque ($T_m$), 1 = electrical power ($P$) |
+| `T1` | Governor time constant — lead numerator (s) |
+| `T2` | Governor time constant — lag denominator (s) |
+| `T3` | Governor time constant — second-order denominator (s) |
+| `K` | Actuator gain |
+| `T4` | Actuator lead time constant (s) |
+| `T5` | First-order actuator lag (s) |
+| `T6` | Actuator lag time constant (s) |
+| `TMIN` | Minimum fuel/torque limit (pu) |
+| `TMAX` | Maximum fuel/torque limit (pu) |
+| `TD` | Engine dead time (s) |
+| `R` | Speed droop (pu/pu) |
+| `TE` | Engine time constant (s) |
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+tor tor_DEGOV1 GEN1
+  0     ! SWM: use torque input
+  0.02  ! T1 (s)
+  0.02  ! T2 (s)
+  0.20  ! T3 (s)
+  1.0   ! K
+  0.25  ! T4 (s)
+  0.009 ! T5 (s)
+  0.038 ! T6 (s)
+  0.0   ! TMIN (pu)
+  1.05  ! TMAX (pu)
+  0.01  ! TD (s)
+  0.05  ! R (droop)
+  0.05  ! TE (s)
+;
+```
+</TabItem>
+<TabItem label="Notes">
+- Set `SWM = 0` to use mechanical torque as the reference input, `SWM = 1` for electrical power.
+- `TMIN` and `TMAX` are per-unit limits on the integrator output (fuel demand / valve position).
+- `R` is the permanent droop; typical values are 0.04–0.05 pu/pu.
+- The Padé approximation of the dead time $T_D$ is a second-order filter.
+</TabItem>
+</Tabs>
+
+---
+
+## tor_ENTSOE_simp
+
+### Scientific Description
+
+The `tor_ENTSOE_simp` model is a simplified **ENTSO-E speed governor** suitable for primary frequency response studies. It is derived from the ENTSO-E recommendations for equivalent turbine-governor representation.
+
+The governor equation forms a speed error with permanent droop $R$:
+
+$$
+R \cdot \dot{p}_1 - C + (\omega - 1) = 0, \quad C = T_m \cdot R
+$$
+
+This error drives a first-order lag (representing the valve or steam chest) with limits $[V_{MIN},\, V_{MAX}]$:
+
+$$
+\frac{d p_2}{dt} = \frac{1}{T_1}(p_1 - p_2), \quad p_2 \in [V_{MIN},\, V_{MAX}]
+$$
+
+The turbine mechanical power is modelled by a lead–lag transfer function with time constants $T_2$ (zero) and $T_3$ (pole):
+
+$$
+P_m(s) = \frac{1 + s T_2}{1 + s T_3} \cdot p_2(s)
+$$
+
+The final mechanical torque output accounting for shaft speed is:
+
+$$
+T_m \cdot \omega = P_m
+$$
+
+### Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `R` | Permanent speed droop (pu/pu) |
+| `T1` | Governor/valve time constant (s) |
+| `VMIN` | Minimum valve position / lower output limit (pu) |
+| `VMAX` | Maximum valve position / upper output limit (pu) |
+| `T2` | Turbine lead time constant — zero (s) |
+| `T3` | Turbine lag time constant — pole (s) |
+
+**Internal parameter:** `C = Tm · R` (initialised from the load-flow mechanical torque)
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+tor tor_ENTSOE_simp GEN1
+  0.05  ! R: droop (pu/pu)
+  0.50  ! T1: valve time constant (s)
+  0.0   ! VMIN (pu)
+  1.1   ! VMAX (pu)
+  0.0   ! T2: turbine lead (s)
+  10.0  ! T3: turbine lag (s)
+;
+```
+</TabItem>
+<TabItem label="Notes">
+- Typical primary-frequency response studies use $R = 0.04$–$0.05$.
+- Setting $T_2 = 0$ simplifies the turbine to a pure first-order lag $1/(1+sT_3)$.
+- This model is commonly used as a simplified equivalent for aggregated generation.
+</TabItem>
+</Tabs>
+
+---
+
+## tor_GAST
+
+### Scientific Description
+
+The `tor_GAST` model represents a **gas turbine** unit, following the IEEE Committee Report (1973) and the NEPLAN/PowerWorld convention. It captures the speed governor, compressor discharge lag, and fuel/combustion dynamics.
+
+**Speed governor with droop and load reference:**
+
+$$
+\text{error} = R \cdot (V_{act} - LR) + (\omega - 1) = 0
+$$
+
+where $LR = T_m$ (load reference, initialised from mechanical torque) and $R$ is the droop.
+
+The speed error drives a value position through a limiter $[V_{MIN},\, V_{MAX}]$ and a first-order lag $T_1$:
+
+$$
+\frac{d p_2}{dt} = \frac{1}{T_1}(p_1 - p_2)
+$$
+
+The compressor discharge is modelled by lag $T_2$:
+
+$$
+\frac{d p_3}{dt} = \frac{1}{T_2}(p_2 - p_3)
+$$
+
+The mechanical power (including speed-dependent damping $D_{TURB}$) is:
+
+$$
+P_m = p_3 + D_{TURB} \cdot (\omega - 1)
+$$
+
+The exhaust temperature is tracked by a lag $T_3$:
+
+$$
+\frac{d p_4}{dt} = \frac{1}{T_3}(p_3 - p_4)
+$$
+
+A temperature limit is applied via:
+
+$$
+p_5 = A_T + K_T \cdot (A_T - p_4)
+$$
+
+A minimum gate blocks the valve position: $p_1 = \min(p_{gov},\, p_5)$.
+
+The torque-power conversion:
+
+$$
+T_m \cdot \omega = P_m
+$$
+
+### Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `R` | Permanent speed droop (pu/pu) |
+| `T1` | Governor/valve time constant (s) |
+| `T2` | Compressor discharge time constant (s) |
+| `T3` | Radiation shield / exhaust temperature lag (s) |
+| `AT` | Ambient temperature load limit (pu) |
+| `KT` | Temperature control loop gain |
+| `VMAX` | Maximum valve position (pu) |
+| `VMIN` | Minimum valve position (pu) |
+| `DTURB` | Turbine damping factor (pu torque / pu speed) |
+
+**Internal parameter:** `LR = Tm` (load reference, set at initialisation)
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+tor tor_GAST GEN1
+  0.05  ! R: droop (pu/pu)
+  0.40  ! T1: governor lag (s)
+  0.10  ! T2: compressor discharge (s)
+  3.00  ! T3: exhaust temperature lag (s)
+  1.00  ! AT: ambient temperature limit (pu)
+  2.50  ! KT: temperature gain
+  1.05  ! VMAX (pu)
+  0.0   ! VMIN (pu)
+  0.0   ! DTURB: damping factor
+;
+```
+</TabItem>
+<TabItem label="Notes">
+- Based on the IEEE Committee Report on "Dynamic Models for Steam and Hydro Turbines in Power System Studies" (1973), later adapted for gas turbines.
+- `AT` and `KT` define the exhaust-temperature protection characteristic.
+- `DTURB = 0` disables speed-dependent damping.
+</TabItem>
+</Tabs>
+
+---
+
+## tor_TGOV1D
+
+### Scientific Description
+
+The `tor_TGOV1D` model represents a **simple steam turbine governor**, based on the IEEE TGOV1 structure with an added damping term. It is one of the most widely used simple governor models in power-system stability studies.
+
+**Speed governor with permanent droop:**
+
+The speed error (with droop $R$) drives a first-order lag $T_1$ with output limits $[V_{MIN},\, V_{MAX}]$:
+
+$$
+R \cdot p_1 - C + (\omega - 1) = 0, \quad C = T_m \cdot R
+$$
+
+$$
+\frac{d p_2}{dt} = \frac{1}{T_1}(p_1 - p_2), \quad p_2 \in [V_{MIN},\, V_{MAX}]
+$$
+
+**Turbine with reheater and damping:**
+
+The valve position passes through a lead–lag block representing the steam chest and reheater:
+
+$$
+P_m(s) = \frac{1 + s T_2}{1 + s T_3} \cdot p_2(s)
+$$
+
+The total mechanical power includes a speed-dependent damping term $D_t$:
+
+$$
+P_m = p_{turbine} + D_t \cdot (\omega - 1)
+$$
+
+Hence the mechanical torque:
+
+$$
+T_m = \frac{P_m}{\omega}
+$$
+
+### Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `R` | Permanent speed droop (pu/pu) |
+| `T1` | Steam chest / valve actuator time constant (s) |
+| `VMAX` | Maximum valve position (pu) |
+| `VMIN` | Minimum valve position (pu) |
+| `T2` | Lead time constant — reheater zero (s) |
+| `T3` | Lag time constant — reheater pole (s) |
+| `Dt` | Turbine damping coefficient (pu torque / pu speed deviation) |
+
+**Internal parameter:** `C = Tm · R` (initialised from load-flow mechanical torque)
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+tor tor_TGOV1D GEN1
+  0.05  ! R: droop (pu/pu)
+  0.50  ! T1: valve time constant (s)
+  1.05  ! VMAX (pu)
+  0.0   ! VMIN (pu)
+  2.10  ! T2: lead (s)
+  7.00  ! T3: lag (s)
+  0.0   ! Dt: turbine damping
+;
+```
+</TabItem>
+<TabItem label="Notes">
+- This is essentially the IEEE TGOV1 model with an additional damping term $D_t$.
+- Setting $T_2 = 0$ gives a pure first-order turbine $1/(1+sT_3)$.
+- $D_t > 0$ adds a stabilising speed-dependent power correction (useful for islanded operation).
+</TabItem>
+</Tabs>
+
+---
+
+## tor_hygov
+
+### Scientific Description
+
+The `tor_hygov` model represents a **hydraulic turbine and governor** following a simplified penstock/water-column formulation, consistent with the IEEE representation for hydro governors (IEEE Std 1110).
+
+**Governor with droop and PI controller:**
+
+The speed error (with permanent droop $R$ and transient droop $r$) enters a lag $T_f$ to produce the error signal $e$:
+
+$$
+\text{input} = 1 - \omega - R \cdot (c - P_0)
+$$
+
+$$
+\frac{d e}{dt} = \frac{1}{T_f}\left(\text{input} - e\right)
+$$
+
+The rate of change of gate demand is computed via the transient droop:
+
+$$
+\dot{x}_2 = \frac{e}{r \cdot T_r}
+$$
+
+This is rate-limited to $[-V_{ELM},\, +V_{ELM}]$, then integrated with gate limits $[G_{min},\, G_{max}]$:
+
+$$
+\frac{d x_4}{dt} = x_3, \quad x_4 \in [G_{min},\, G_{max}]
+$$
+
+The PI controller output (desired gate) is:
+
+$$
+x_5 = x_4 + \frac{e}{r}, \quad c = \text{clip}(x_5,\, G_{min},\, G_{max})
+$$
+
+The actual gate position follows through the servo:
+
+$$
+\frac{d g}{dt} = \frac{1}{T_g}(c - g)
+$$
+
+**Penstock / water column:**
+
+The head deviation $dH$ is determined by the non-linear water flow equation and water-starting time $T_W$:
+
+$$
+1 - \left(\frac{Q}{g}\right)^2 = dH
+$$
+
+$$
+T_W \cdot \frac{dQ}{dt} = dH
+$$
+
+**Turbine mechanical torque:**
+
+$$
+T_m \cdot \omega = A_t \cdot (1 - dH)(Q - Q_{nl}) - D_{turb} \cdot (1 - \omega) \cdot g
+$$
+
+$$
+P_m = T_m \cdot \omega
+$$
+
+### Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `R` | Permanent droop (pu/pu) |
+| `r` | Transient droop (pu/pu) |
+| `Tr` | Transient droop reset time (s) |
+| `Tf` | Filter time constant for speed error (s) |
+| `Tg` | Gate servo time constant (s) |
+| `VELM` | Gate velocity limit (pu/s) |
+| `Gmax` | Maximum gate opening (pu) |
+| `Gmin` | Minimum gate opening (pu) |
+| `Tw` | Water starting time (s) |
+| `At` | Turbine gain (pu power / pu flow) |
+| `Dturb` | Turbine damping factor |
+| `Qnl` | No-load water flow (pu) |
+
+**Internal parameter:** `Po = (P / At) + Qnl` (initial gate setpoint from load-flow)
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+tor tor_hygov GEN1
+  0.05  ! R: permanent droop
+  0.30  ! r: transient droop
+  5.00  ! Tr: transient droop reset time (s)
+  0.05  ! Tf: filter time constant (s)
+  0.20  ! Tg: gate servo time constant (s)
+  0.20  ! VELM: gate velocity limit (pu/s)
+  1.00  ! Gmax (pu)
+  0.0   ! Gmin (pu)
+  1.50  ! Tw: water starting time (s)
+  1.10  ! At: turbine gain
+  0.50  ! Dturb: damping factor
+  0.05  ! Qnl: no-load flow (pu)
+;
+```
+</TabItem>
+<TabItem label="Notes">
+- `Tw` (water starting time) is the dominant parameter controlling frequency response; typical values are 0.5–2 s.
+- `r > R` is required for stable regulation; set $r \approx 2$–$5 \times R$.
+- `Tr` is the reset time for transient droop; values of 5–30 s are typical.
+- Non-linear head-flow equation makes this model suitable for large transients.
+</TabItem>
+</Tabs>

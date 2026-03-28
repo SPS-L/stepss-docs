@@ -1,0 +1,654 @@
+---
+title: Custom Governor Models
+description: Custom turbine-governor models in RAMSES
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+This page documents the custom turbine-governor (`tor_`) models in RAMSES. These models are implemented in Fortran using the legacy multi-subroutine API and cover a wide range of prime-mover types: thermal (steam), gas turbine, hydraulic, nuclear, and simplified equivalents.
+
+---
+
+## tor_constant
+
+### Scientific Description
+
+The `tor_constant` model provides a **constant mechanical torque** source. The mechanical torque is fixed at its initialisation value and does not respond to speed deviations or load changes:
+
+$$
+T_m(t) = T_{m0} \quad \forall t
+$$
+
+The single algebraic state satisfies:
+
+$$
+f(1) = x(1) - T_{m0} = 0
+$$
+
+The observable output is mechanical power:
+
+$$
+P_m = T_m \cdot \omega
+$$
+
+**Implementation details:**
+- `nbxvar = 1`, `nbzvar = 0`, `nbdata = 0`
+- One additional parameter: `prm(1) = Tm0` (set at initialisation from load-flow)
+- Observable: `Pm = x(1) * omega`
+
+### Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| *(none)* | No user-supplied parameters. $T_{m0}$ is taken from the load-flow initialisation. |
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+tor tor_constant GEN1
+;
+```
+</TabItem>
+<TabItem label="Notes">
+- Useful for machines operating at fixed setpoint, for testing generator models in isolation, or as a placeholder.
+- The mechanical power observable $P_m = T_m \cdot \omega$ will vary slightly with speed changes.
+</TabItem>
+</Tabs>
+
+---
+
+## tor_1storder
+
+### Scientific Description
+
+The `tor_1storder` model is a **first-order speed governor** with droop and a two-mass (HP/LP) turbine representation. It captures the primary frequency response through a proportional-droop speed controller with a first-order lag.
+
+**Speed controller with droop $R$:**
+
+The mechanical torque setpoint is:
+
+$$
+T_{set} = T_{m0} - \frac{\omega - 1}{R}
+$$
+
+The HP torque tracks $T_{set}$ through a first-order lag with time constant $T_2$:
+
+$$
+\frac{d x_1}{dt} = \frac{1}{T_2}\left(T_{set} - x_1\right)
+$$
+
+The LP (shaft) torque is a weighted combination:
+
+$$
+x_2 = (1 - F_{HP}) \cdot x_1 + F_{HP} \cdot T_{set}
+$$
+
+where $F_{HP}$ is the fraction of power generated in the HP stage.
+
+From the Fortran equations:
+
+```fortran
+f(1) = (-x(1) + (prm(4) - (omega-1.d0)/prm(3))) / prm(2)
+f(2) = (1.d0-prm(1))*x(1) + prm(1)*(prm(4)-(omega-1.d0)/prm(3)) - x(2)
+```
+
+i.e.:
+- `prm(1) = FHP` (HP fraction), `prm(2) = T2` (time constant), `prm(3) = R` (droop)
+- `prm(4) = Tm0` (setpoint, set at init)
+
+**Implementation details:**
+- `nbxvar = 2`, `nbzvar = 0`, `nbdata = 3`
+- State 1 = HP torque `x(1)`, State 2 = LP torque `x(2)`
+- Observables: `HP torque`, `LP torque`
+
+### Parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `FHP` | Fraction of torque produced by the HP turbine stage (0–1) |
+| `T2` | Governor/HP turbine time constant (s) |
+| `R` | Speed droop (pu/pu) |
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+tor tor_1storder GEN1
+  0.30   ! FHP: HP fraction
+  0.50   ! T2: time constant (s)
+  0.05   ! R: droop (pu/pu)
+;
+```
+</TabItem>
+<TabItem label="Notes">
+- `FHP = 0` makes the model a pure first-order lag on the total torque.
+- `FHP = 1` bypasses the HP lag entirely; the torque instantly tracks the droop setpoint.
+- Typical primary-frequency response studies use `R = 0.04`–`0.05`.
+</TabItem>
+</Tabs>
+
+---
+
+## tor_thermal_generic1
+
+### Scientific Description
+
+The `tor_thermal_generic1` model is a **generic multi-stage steam turbine governor**, suitable for both single-shaft and cross-compound units. It includes a speed controller with rate-limiting, a three-section steam chest/reheater, and separate HP, MP, and LP turbine stages.
+
+**Speed governor:**
+
+A speed measurement with time constant $T_{mes}$ feeds a droop-based error:
+
+$$
+e_{gov} = P_0 - P_{meas} \cdot \sigma + (1 - \omega)
+$$
+
+where $\sigma$ is the droop coefficient.
+
+The gate/valve demand is computed by an integrator with rate limits $[zdot_{min},\, zdot_{max}]$ and position limits $[z_{min},\, z_{max}]$, filtered through a servo time constant $T_{sm}$.
+
+**Turbine power stages:**
+
+The steam chest dynamics drive three stages with power fractions $F_{hp}$, $F_{mp}$, $(1-F_{hp}-F_{mp})$:
+
+$$
+\frac{d T_{mHP}}{dt} = \frac{1}{T_{hp}}(F_{hp} \cdot z - T_{mHP})
+$$
+
+$$
+\frac{d T_{mMP}}{dt} = \frac{1}{T_r}(F_{mp} \cdot T_{mHP}/F_{hp} - T_{mMP})
+$$
+
+$$
+\frac{d T_{mLP}}{dt} = \frac{1}{T_{lp}}((1-F_{hp}-F_{mp}) \cdot T_{mMP}/F_{mp} - T_{mLP})
+$$
+
+Total mechanical power:
+
+$$
+P_m = T_{mHP} + T_{mMP} + T_{mLP}
+$$
+
+**Parameters from Fortran `associate` block:**
+
+| Parameter | Index | Description |
+|-----------|-------|-------------|
+| `sigma` | 1 | Speed droop (pu/pu) |
+| `Tmes` | 2 | Speed measurement time constant (s) |
+| `Tsm` | 3 | Servo/gate time constant (s) |
+| `zdotmin` | 4 | Minimum gate rate (pu/s) — also additional parameter |
+| `zdotmax` | 5 | Maximum gate rate (pu/s) |
+| `zmin` | 6 | Minimum gate opening (pu) |
+| `zmax` | 7 | Maximum gate opening (pu) |
+| `Thp` | 8 | HP turbine time constant (s) |
+| `Fhp` | 9 | HP power fraction |
+| `Tr` | 10 | Reheater / MP time constant (s) |
+| `Fmp` | 11 | MP power fraction |
+| `Tlp` | 12 | LP turbine time constant (s) |
+
+**Implementation details:**
+- `nbxvar = 10`, `nbzvar = 2`, `nbdata = 12`, `nbaddpar = 2`
+- Additional: `prm(13) = P0` (initial power), `prm(14) = ivo` (initial valve opening)
+- Observables: `z`, `PmHP`, `PmMP`, `PmLP`, `Pm`
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+tor tor_thermal_generic1 GEN1
+  0.05   ! sigma: droop (pu/pu)
+  0.02   ! Tmes: speed filter (s)
+  0.20   ! Tsm: servo time constant (s)
+  -0.10  ! zdotmin: max closing rate (pu/s)
+  0.10   ! zdotmax: max opening rate (pu/s)
+  0.0    ! zmin: gate lower limit (pu)
+  1.05   ! zmax: gate upper limit (pu)
+  0.30   ! Thp: HP lag (s)
+  0.30   ! Fhp: HP fraction
+  7.0    ! Tr: reheater (s)
+  0.40   ! Fmp: MP fraction
+  0.50   ! Tlp: LP lag (s)
+;
+```
+</TabItem>
+<TabItem label="Notes">
+- The LP fraction is `1 - Fhp - Fmp`; ensure `Fhp + Fmp ≤ 1`.
+- Set `Tmes = 0` to bypass the speed measurement filter (instantaneous speed sensing).
+- Rate limits `zdotmin`/`zdotmax` are critical for AGC studies.
+</TabItem>
+</Tabs>
+
+---
+
+## tor_hydro_generic1
+
+### Scientific Description
+
+The `tor_hydro_generic1` model is a **generic hydraulic turbine governor** with a penstock (water column) and PI controller. It implements the standard hydraulic governor structure following IEEE Std 1110 conventions.
+
+**PI speed governor:**
+
+The speed error with droop $\sigma$:
+
+$$
+e = (P_0 - P_{meas}) \cdot \sigma + (1 - \omega)
+$$
+
+A PI controller with gains $K_P$ and $K_I$ drives the gate demand:
+
+$$
+\dot{x}_{I} = K_I \cdot e
+$$
+
+$$
+z_{demand} = K_P \cdot e + x_I
+$$
+
+The gate is rate-limited by $LIM_{\dot{z}}$ and position-limited by $[0, 1]$, with a servo time constant $T_{sm}$.
+
+**Water column (penstock):**
+
+The flow $Q$ and head $H$ are related by the water-starting time $T_W$:
+
+$$
+T_W \cdot \frac{dQ}{dt} = H - 1
+$$
+
+The head is:
+
+$$
+H = \left(\frac{Q_{v} + T_m (1 - Q_v)}{z}\right)^2
+$$
+
+where $Q_v$ is the no-load flow fraction.
+
+**Turbine mechanical torque:**
+
+$$
+T_m = \sqrt{H} \cdot (Q - Q_v \cdot \sqrt{H})
+$$
+
+$$
+P_m = T_m \cdot \omega
+$$
+
+**Parameters from Fortran `associate` block:**
+
+| Parameter | Index | Description |
+|-----------|-------|-------------|
+| `SIGMA` | 1 | Speed droop (pu/pu) |
+| `Tmes` | 2 | Speed measurement time constant (s) |
+| `Qv` | 3 | No-load water flow fraction (pu) |
+| `KP` | 4 | PI proportional gain |
+| `KI` | 5 | PI integral gain |
+| `TSM` | 6 | Gate servo time constant (s) |
+| `LIMZDOT` | 7 | Gate velocity limit (pu/s) |
+| `TW` | 8 | Water starting time (s) |
+
+**Implementation details:**
+- `nbxvar = 6`, `nbzvar = 2`, `nbdata = 8`, `nbaddpar = 1`
+- Additional: `prm(9) = P0` (initial electrical power)
+- Observables: `z`, `Q`, `H`, `Pm`
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+tor tor_hydro_generic1 GEN1
+  0.04   ! SIGMA: droop (pu/pu)
+  0.02   ! Tmes: speed filter (s)
+  0.05   ! Qv: no-load flow fraction
+  2.0    ! KP: proportional gain
+  0.5    ! KI: integral gain
+  0.20   ! TSM: servo time constant (s)
+  0.15   ! LIMZDOT: gate velocity limit (pu/s)
+  1.50   ! TW: water starting time (s)
+;
+```
+</TabItem>
+<TabItem label="Notes">
+- `TW` (water-starting time) is the most influential parameter; typical values are 0.5–3 s.
+- Increase `KP` / `KI` carefully: large values can cause governor instability with high `TW`.
+- `Qv = 0` assumes no no-load losses.
+</TabItem>
+</Tabs>
+
+---
+
+## tor_gasturbm
+
+### Scientific Description
+
+The `tor_gasturbm` model is a **gas turbine** governor following a multi-stage combustion model. It captures the compressor, fuel system, combustion chamber delay, and turbine torque characteristic. The name suffix `m` indicates a modified version.
+
+**Speed governor:**
+
+The governor error drives a PI controller producing a fuel demand signal. The speed governor uses:
+
+$$
+e_{gov} = (\omega_{ref} - \omega) / TDSP - STAT \cdot P_{elec}
+$$
+
+with saturation limits $[MIN,\, MAX]$.
+
+**Fuel system and combustion:**
+
+The fuel valve position `g1` is driven through:
+- A speed governor with gain $ZZ$ and lead–lag time constants determined by $XX$, $YY$
+- A fuel flow path through first-order lag $TVALVE$
+- Combustion chamber lag $TGAZ$
+
+**Turbine output:**
+
+The turbine mechanical power follows:
+
+$$
+P_m = BF2 \cdot g_{comb} + AF2
+$$
+
+where $g_{comb}$ is the combustion output through lag $TCD$.
+
+Additional thermodynamic correction terms involve $TF$ (flame lag) and $ECR$ (exhaust correction ratio).
+
+**Parameters from Fortran source (prm array):**
+
+| Index | Name | Description |
+|-------|------|-------------|
+| 1 | `TDSP` | Speed droop time constant (s) |
+| 2 | `STAT` | Steady-state gain |
+| 3 | `ZZ` | Governor proportional gain |
+| 4 | `XX` | Lead numerator factor |
+| 5 | `YY` | Lag denominator factor |
+| 6 | `SACC` | Acceleration constant |
+| 7 | `MIN` | Minimum fuel valve position (pu) |
+| 8 | `MAX` | Maximum fuel valve position (pu) |
+| 9 | `TVALVE` | Fuel valve time constant (s) |
+| 10 | `TGAZ` | Combustion chamber time constant (s) |
+| 11 | `TF` | Flame lag time constant (s) |
+| 12 | `ECR` | Exhaust correction ratio |
+| 13 | `TCD` | Compressor discharge time constant (s) |
+| 14 | `BF2` | Turbine power output slope |
+| 15 | `AF2` | Turbine power output intercept (pu) |
+
+**Implementation details:**
+- `nbxvar = 10`, `nbzvar = 4`, `nbdata = 15`, `nbaddpar = 1`
+- Additional: `prm(16) = SETPOINT` (initialised from load-flow power)
+- Observables: `g2`, `x4`, `g1`
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+tor tor_gasturbm GEN1
+  0.05   ! TDSP: droop lag (s)
+  1.0    ! STAT: steady-state gain
+  25.0   ! ZZ: proportional gain
+  0.50   ! XX: lead factor
+  1.0    ! YY: lag factor
+  1.0    ! SACC
+  0.0    ! MIN: min fuel (pu)
+  1.0    ! MAX: max fuel (pu)
+  0.05   ! TVALVE: fuel valve (s)
+  0.40   ! TGAZ: combustion lag (s)
+  0.01   ! TF: flame lag (s)
+  0.0    ! ECR
+  0.20   ! TCD: compressor discharge (s)
+  1.0    ! BF2: output slope
+  0.0    ! AF2: output intercept
+;
+```
+</TabItem>
+</Tabs>
+
+---
+
+## tor_govclasm
+
+### Scientific Description
+
+The `tor_govclasm` model is a **classical thermal governor** with a composite control law including deadband, droop, integral control, and combustion dynamics. The name stands for "governor classical model".
+
+**Speed governor with deadband and droop:**
+
+The speed error passes through a deadband $[DBON, DEADB]$ before entering a proportional–integral controller. The integral path has saturation at $MAXINT$ and gain $ALPHA$. The reset time $TRES$ determines the integration rate.
+
+**Valve and combustion dynamics:**
+
+The valve demand passes through:
+1. A governor with static gain $V0$ and fuel-flow limit $VFN$
+2. A first-order lag $TFV$ (valve actuator)
+3. A rate limiter $[PVARMIN,\, PVARMAX]$ (with gain $GPVAR$) representing fuel response
+4. A combustion/steam chest lag $KCR$, $TCR$ producing fuel flow
+5. Lower bound: $MINFUEL$
+6. Transport delay $TDELAY$ (approximated)
+7. Turbine output through lag $TCH$ with limits $[PMIN,\, PMAX]$
+
+**Parameters from Fortran source (prm array):**
+
+| Index | Name | Description |
+|-------|------|-------------|
+| 1 | `STAT` | Governor static characteristic selector |
+| 2 | `DEADB` | Deadband half-width (pu) |
+| 3 | `DBON` | Deadband onset (pu) |
+| 4 | `TSM` | Speed measurement / filter time constant (s) |
+| 5 | `V0` | Governor voltage reference (pu) |
+| 6 | `VFN` | Fuel-flow nominal (pu) |
+| 7 | `TFV` | Valve actuator time constant (s) |
+| 8 | `VFR` | Fuel flow rate limit (pu/s) |
+| 9 | `MAXINT` | Maximum integral output (pu) |
+| 10 | `ALPHA` | Integral controller gain |
+| 11 | `TRES` | Integral reset time (s) |
+| 12 | `GOMP` | Governor proportional gain |
+| 13 | `PVARMAX` | Maximum power variation rate (pu) |
+| 14 | `PVARMIN` | Minimum power variation rate (pu) |
+| 15 | `GPVAR` | Power variation gain |
+| 16 | `KCR` | Combustion gain |
+| 17 | `TCR` | Combustion time constant (s) |
+| 18 | `MINFUEL` | Minimum fuel flow (pu) |
+| 19 | `TDELAY` | Combustion transport delay (s) |
+| 20 | `PMAX` | Maximum turbine output (pu) |
+| 21 | `TCH` | Steam chest / turbine lag (s) |
+| 22 | `PMIN` | Minimum turbine output (pu) |
+
+**Implementation details:**
+- `nbxvar = 6`, `nbzvar = 10`, `nbdata = 22`, `nbaddpar = 1`
+- Additional: `prm(23) = P0` (initialised from load-flow power)
+- Observables: `x2`, `b3`, `b4`
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+tor tor_govclasm GEN1
+  1.0    ! STAT
+  0.003  ! DEADB (pu)
+  0.001  ! DBON (pu)
+  0.10   ! TSM (s)
+  1.0    ! V0 (pu)
+  1.0    ! VFN (pu)
+  0.30   ! TFV (s)
+  0.5    ! VFR (pu/s)
+  1.0    ! MAXINT (pu)
+  1.0    ! ALPHA
+  5.0    ! TRES (s)
+  25.0   ! GOMP
+  0.10   ! PVARMAX (pu)
+  -0.10  ! PVARMIN (pu)
+  0.05   ! GPVAR
+  1.0    ! KCR
+  0.20   ! TCR (s)
+  0.05   ! MINFUEL (pu)
+  0.30   ! TDELAY (s)
+  1.05   ! PMAX (pu)
+  0.30   ! TCH (s)
+  0.05   ! PMIN (pu)
+;
+```
+</TabItem>
+</Tabs>
+
+---
+
+## tor_govhydr
+
+### Scientific Description
+
+The `tor_govhydr` model is a **simplified hydraulic governor** with PI control and a non-linear penstock. It differs from `tor_hydro_generic1` in its simplified turbine characteristic and simpler water-column formulation.
+
+**PI governor:**
+
+$$
+\dot{x}_2 = K_I \cdot e, \quad x_2 \in [0, 1]
+$$
+
+$$
+z_{demand} = K_P \cdot e + x_2
+$$
+
+where the speed error $e = P_0/\omega - T_m - \omega \cdot STAT + \ldots$ accounts for the droop and steady-state bias.
+
+**Penstock (two-lag water column):**
+
+$$
+T_{CE1} \cdot \frac{dx_3}{dt} = P - x_3(1 + T_{CE2}/T_{CE1})
+$$
+
+The turbine mechanical power is computed via an empirical quadratic:
+
+$$
+P_m = 1.35 \cdot z - 0.7 z^2
+$$
+
+derived from the non-linear head-flow curve approximated at initialisation.
+
+**Parameters from Fortran source:**
+
+| Index | Name | Description |
+|-------|------|-------------|
+| 1 | `STAT` | Steady-state gain selector |
+| 2 | `KP` | Proportional gain |
+| 3 | `KI` | Integral gain |
+| 4 | `TC` | Governor/servo time constant (s) |
+| 5 | `V0` | Reference voltage (pu) |
+| 6 | `VF` | Flow gain |
+| 7 | `TCE2` | Second penstock time constant (s) |
+| 8 | `TCE1` | First penstock time constant (s) |
+
+**Implementation details:**
+- `nbxvar = 4`, `nbzvar = 4`, `nbdata = 8`, `nbaddpar = 1`
+- Additional: `prm(9) = P0` (initialised from load-flow power)
+- No observables defined (`nbobs = 0`)
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+tor tor_govhydr GEN1
+  1.0    ! STAT
+  2.0    ! KP: proportional gain
+  0.5    ! KI: integral gain
+  0.10   ! TC: servo (s)
+  1.0    ! V0: reference
+  1.0    ! VF: flow gain
+  1.0    ! TCE2 (s)
+  5.0    ! TCE1 (s)
+;
+```
+</TabItem>
+<TabItem label="Notes">
+- `TCE1` corresponds roughly to the water-starting time $T_W$.
+- `TCE2/TCE1` sets the ratio of the two penstock lags.
+</TabItem>
+</Tabs>
+
+---
+
+## tor_govnuc
+
+### Scientific Description
+
+The `tor_govnuc` model is a **nuclear plant governor** with deadband, droop, integral control, and a non-linear turbine characteristic via `GOMP` (the gain of the output multiplier). It is structurally similar to `tor_govclasm` but tailored for the slower, tightly-regulated dynamics of nuclear steam supply systems.
+
+**Speed governor:**
+
+The speed error passes through a deadband $[DBON, DEADB]$:
+
+$$
+e = \text{deadband}(\omega_{ref} - \omega) - STAT \cdot (P - P_0)
+$$
+
+The error enters an integrator with rate limits $[GRADMIN, GRADMAX]$ (pu/s) filtered through a ramp time $TGRAD$. The integrator output $x_I$ passes through a servo $TSM$.
+
+**Turbine characteristic with GOMP:**
+
+The turbine output is non-linearly mapped through a gain $GOMP$:
+
+$$
+P_m = \min\!\left(\frac{x_I}{GOMP},\, 1\right) \cdot f(x_I)
+$$
+
+where the limiter prevents over-power and $f$ is a piecewise-linear characteristic.
+
+The fuel valve dynamics use time constants $TFV$ (valve), $V0$ (reference), and $VFR$ (flow rate), then go through lag $TRES$ (reset) and $GOMP$ to produce the final torque.
+
+**Parameters from Fortran source:**
+
+| Index | Name | Description |
+|-------|------|-------------|
+| 1 | `STAT` | Governor static characteristic selector |
+| 2 | `DEADB` | Deadband half-width (pu) |
+| 3 | `DBON` | Deadband onset (pu) |
+| 4 | `GRADMAX` | Maximum load gradient (pu/s) |
+| 5 | `GRADMIN` | Minimum load gradient / unloading rate (pu/s) |
+| 6 | `TGRAD` | Ramp filter time constant (s) |
+| 7 | `TSM` | Servo time constant (s) |
+| 8 | `V0` | Governor reference (pu) |
+| 9 | `VFN` | Nominal valve position (pu) |
+| 10 | `TFV` | Valve actuator time constant (s) |
+| 11 | `VFR` | Valve rate limit (pu/s) |
+| 12 | `ALPHA` | Integral gain |
+| 13 | `TRES` | Reset time constant (s) |
+| 14 | `GOMP` | Output power gain |
+
+**Implementation details:**
+- `nbxvar = 4`, `nbzvar = 8`, `nbdata = 14`, `nbaddpar = 1`
+- Additional: `prm(15) = P0` (initialised from load-flow power)
+- Observable: `TM`
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+tor tor_govnuc GEN1
+  1.0    ! STAT
+  0.005  ! DEADB (pu)
+  0.002  ! DBON (pu)
+  0.02   ! GRADMAX: max load rate (pu/s)
+  -0.02  ! GRADMIN: max unload rate (pu/s)
+  10.0   ! TGRAD: ramp filter (s)
+  5.0    ! TSM: servo (s)
+  1.0    ! V0 (pu)
+  1.0    ! VFN (pu)
+  0.50   ! TFV: valve actuator (s)
+  0.10   ! VFR: valve rate (pu/s)
+  1.0    ! ALPHA: integral gain
+  20.0   ! TRES: reset time (s)
+  1.0    ! GOMP: output gain
+;
+```
+</TabItem>
+<TabItem label="Notes">
+- Nuclear plants typically have slow load-following characteristics: `GRADMAX` is typically 0.005–0.02 pu/s.
+- The `DEADB` is important to prevent hunting around the setpoint.
+- `GOMP` scales the turbine output; set to 1.0 for standard normalisation.
+</TabItem>
+</Tabs>

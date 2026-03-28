@@ -1,0 +1,649 @@
+---
+title: Two-Port Models
+description: HVDC and FACTS two-port device models in RAMSES
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Two-port models in RAMSES connect **two AC (or AC/DC) buses** and inject currents at both ends simultaneously. Each model receives the voltage and current phasors at bus 1 ($v_{x1}, v_{y1}, i_{x1}, i_{y1}$) and bus 2 ($v_{x2}, v_{y2}, i_{x2}, i_{y2}$) and computes the algebraic or differential equations governing the device.
+
+The RAMSES data keyword is `TWOPOR`:
+
+```
+TWOPOR  name  bus1  bus2  'model_name'  param1  param2  ... ;
+```
+
+---
+
+## HVDC Models
+
+### `twop_HVDC_LCC` — Line-Commutated Converter HVDC
+
+#### Description
+
+Models a **point-to-point Line-Commutated Converter (LCC) HVDC link** consisting of a rectifier station (bus 1) and an inverter station (bus 2). LCC-HVDC uses thyristor valves that require an external AC voltage for commutation. The rectifier controls DC current (or power), while the inverter controls DC voltage (or extinction angle). Reactive power is always consumed at both stations and must be supplied locally.
+
+The model includes:
+- Configurable rectifier control modes: constant current, constant power, minimum firing angle ($\alpha_{\min}$), or blocked
+- Configurable inverter control modes: constant voltage, constant extinction angle ($\gamma$), minimum $\gamma$, reduced current, or blocked
+- Transformer tap changers on both sides (handled via `dctl_hvdc_lim`)
+- Reactive power compensation shunts on both sides
+
+#### Scientific Description
+
+**Rectifier DC voltage** (bridge equation):
+
+$$
+V_{dr} = B_r \left( \frac{1.35 \, E_r \, V_1}{n_r} \cos\alpha - (0.9549 X_{cr} + 2 R_{cr}) I_d \right)
+$$
+
+where $B_r$ is the number of rectifier bridges, $E_r$ is the open-circuit secondary voltage, $n_r$ is the transformer ratio, $V_1$ is the AC voltage magnitude, and $I_d$ is the DC current.
+
+**Rectifier overlap angle** (commutation equation):
+
+$$
+\cos(\alpha + \mu_r) = \cos\alpha - \frac{\sqrt{2} \, X_{cr} \, n_r \, I_d}{V_1 \, E_r}
+$$
+
+**Inverter DC voltage**:
+
+$$
+V_{di} = B_i \left( \frac{1.35 \, E_i \, V_2}{n_i} \cos\gamma - (0.9549 X_{ci} + 2 R_{ci}) I_d \right)
+$$
+
+**Inverter overlap angle**:
+
+$$
+\cos(\gamma + \mu_i) = \cos\gamma - \frac{\sqrt{2} \, X_{ci} \, n_i \, I_d}{V_2 \, E_i}
+$$
+
+**DC link voltage balance** (series resistance $R_L$):
+
+$$
+V_{dr} - V_{di} = R_L \, I_d
+$$
+
+**Reactive power consumption** at the rectifier:
+
+$$
+Q_1 = P_1 \cdot \frac{2\mu_r + \sin 2\alpha - \sin 2(\mu_r + \alpha)}{\cos 2\alpha - \cos 2(\mu_r + \alpha)}
+$$
+
+**Active power injections** (in per unit):
+
+$$
+P_1 = -\frac{p \, V_{dr} \, I_d}{S_{\text{base1}}}, \qquad P_2 = \frac{p \, V_{di} \, I_d}{S_{\text{base2}}}
+$$
+
+where $p$ is the number of poles (monopolar or bipolar).
+
+**Rectifier control equation** (mode-dependent):
+
+| `rec_ctl` | Control mode | Constraint |
+|-----------|-------------|------------|
+| `1` | Constant current | $I_{ord} - I_d = 0$ |
+| `2` | Constant power | $P_{set}/V_{dr} - I_d = 0$ |
+| `-1` | Minimum $\alpha$ | $\alpha_{\min} - \alpha = 0$ |
+| `3` | Blocked | $I_d = 0$ |
+
+**Inverter control equation** (mode-dependent):
+
+| `inv_ctl` | Control mode | Constraint |
+|-----------|-------------|------------|
+| `1` | Constant voltage | $V_{di} + R_{comp} I_d - V_{set} = 0$ |
+| `2` | Constant $\gamma$ | $\gamma_0 - \gamma = 0$ |
+| `-2` | Minimum $\gamma$ | $\gamma_{\min} - \gamma = 0$ |
+| `-1` | Reduced current | $I_{red} - I_d = 0$ |
+| `3` | Blocked | $\gamma = \pi/2$ |
+
+The current order $I_{ord}$ is obtained from the desired current $I_{des}$ through a first-order filter with time constant $T_p$.
+
+#### Parameters Table
+
+| Parameter | Description | Unit |
+|-----------|-------------|------|
+| `p` | Number of poles (1 = monopolar, 2 = bipolar) | — |
+| `rec_ctl` | Rectifier control mode (1=current, 2=power, −1=αmin, 3=blocked) | — |
+| `inv_ctl` | Inverter control mode (1=voltage, 2=γ, −2=γmin, −1=reduced Id, 3=blocked) | — |
+| `Br` | Number of bridges in series at rectifier | — |
+| `Bi` | Number of bridges in series at inverter | — |
+| `Er` | Rectifier open-circuit secondary voltage (at 1 pu AC) | kV |
+| `Ei` | Inverter open-circuit secondary voltage (at 1 pu AC) | kV |
+| `Rcr` | Rectifier commutating resistance per bridge | Ω |
+| `Xcr` | Rectifier commutating reactance per bridge | Ω |
+| `Rci` | Inverter commutating resistance per bridge | Ω |
+| `Xci` | Inverter commutating reactance per bridge | Ω |
+| `RL` | DC line series resistance | Ω |
+| `Rcomp` | Compounding resistance for voltage control | Ω |
+| `Tp` | Time constant for power/current order filter | s |
+| `Idset` | Initial (and setpoint) DC current | kA |
+| `nr` | Initial rectifier transformer ratio | pu/pu |
+| `ni` | Initial inverter transformer ratio | pu/pu |
+
+#### Control Structure
+
+```
+Pset or Idset ──► [Power/Current → Ides] ──► [1st-order filter Tp] ──► Iord
+                                                                              │
+                                                                         rectifier
+                                                                         firing angle α
+                                                                              │
+                                                              Vdr ────────────┘
+                                                               │
+                                                              ─── RL ─── Vdi
+                                                                          │
+                                                               inverter: voltage/γ control
+```
+
+The rectifier minimises $\alpha$ (advances firing) to maintain the current order. The inverter maintains DC voltage via the compounding characteristic $V_{set} = V_{di} + R_{comp} I_d$.
+
+#### Usage Example
+
+```
+TWOPOR  HVDClink  BUS_RECT  BUS_INV  'HVDC_LCC'
+        2          ! p: bipolar
+        1          ! rec_ctl: current control
+        1          ! inv_ctl: voltage control
+        2          ! Br
+        2          ! Bi
+        200.0      ! Er (kV)
+        200.0      ! Ei (kV)
+        0.5        ! Rcr (ohm)
+        10.0       ! Xcr (ohm)
+        0.5        ! Rci (ohm)
+        10.0       ! Xci (ohm)
+        5.0        ! RL (ohm)
+        20.0       ! Rcomp (ohm)
+        0.01       ! Tp (s)
+        1.5        ! Idset (kA)
+        1.0        ! nr
+        1.0        ! ni
+        ;
+```
+
+---
+
+### `twop_HVDC_VSC` — Voltage Source Converter HVDC
+
+#### Description
+
+Models a **point-to-point VSC-HVDC link** in which bus 1 is the AC-side connection and bus 2 is the DC side (DC voltage appears as $v_{x2}$). The converter uses IGBT-based switches that are self-commutating, enabling independent control of active and reactive power on the AC side and DC voltage on the DC side.
+
+The model implements:
+- Phase reactor dynamics ($R, L$)
+- Phase-Locked Loop (PLL) for grid synchronisation
+- Inner current control loops ($d$- and $q$-axis PI controllers)
+- Outer loop for active power (P or $V_{dc}$) and reactive power/AC voltage control
+- Low-voltage reactive current injection (grid-code FRT support via piecewise-linear characteristic)
+- DC capacitor dynamics
+
+#### Scientific Description
+
+**PLL dynamics** (tracks $v_q = 0$):
+
+$$
+\Delta\omega_{pll} = (\omega_{pll} - \omega_{ref}) \cdot 2\pi f_0
+$$
+$$
+\dot{\theta}_{pll} = \Delta\omega_{pll}, \qquad \omega_{pll} = K_{pw} \, v_q + K_{iw} \int v_q \, dt
+$$
+
+**Park transformation** (bus-1 reference frame):
+
+$$
+i_d = i_x \cos\theta_{pll} + i_y \sin\theta_{pll}, \quad i_q = -i_x \sin\theta_{pll} + i_y \cos\theta_{pll}
+$$
+
+**Phase reactor dynamics** (in $x$-$y$ frame):
+
+$$
+L \frac{d i_x}{dt} = -R \, i_x + \omega_{ref} L \, i_y + v_{md}\cos\theta_{pll} - v_{mq}\sin\theta_{pll} - v_{x1}
+$$
+$$
+L \frac{d i_y}{dt} = -R \, i_y - \omega_{ref} L \, i_x + v_{mq}\cos\theta_{pll} + v_{md}\sin\theta_{pll} - v_{y1}
+$$
+
+**Inner current controller** ($d$-axis, decoupling):
+
+$$
+v_{md} = v_d - \omega_{pll} L \, i_q + K_p(i_{d,ref} - i_d) + K_i \int(i_{d,ref} - i_d)\,dt
+$$
+$$
+v_{mq} = v_q + \omega_{pll} L \, i_d + K_p(i_{q,ref} - i_q) + K_i \int(i_{q,ref} - i_q)\,dt
+$$
+
+**Outer active power / DC voltage loop** (combined P-V droop):
+
+$$
+N_1 = \alpha_1 \left(\frac{P_{ref} - P}{S_{base}}\right) + \beta_1 (V_{dc,ref} - V_{dc})
+$$
+
+The integrator state $N_{1a}$ feeds through gain $K_{pd}$ to produce $i_{d,ref,unlim}$, which is then limited to $[I_{d,\min}, I_{d,\max}]$.
+
+**Outer reactive power / AC voltage loop**:
+
+$$
+N_2 = \alpha_2 \left(\frac{Q_{ref} - Q}{S_{base}}\right) + \beta_2 (V_{ac,ref} - V)
+$$
+
+The integrator state $N_{2a}$ feeds through gain $K_{pq}$ to produce $i_{q,ref1}$.
+
+**Low-voltage reactive injection** (piecewise-linear):
+
+$$
+i_{q,ref2} = \begin{cases}
+-1 & V < V_{s2} \\
+\frac{V - V_{s2}}{V_{s1} - V_{s2}} \cdot (-1) & V_{s2} \le V < V_{s1} \\
+0 & V \ge V_{s1}
+\end{cases}
+$$
+
+**DC capacitor dynamics** (electrostatic inertia $H_{dc}$):
+
+$$
+2 H_{dc} \frac{d V_{dc}}{dt} = i_{m,dc}
+$$
+
+**AC–DC power balance** (lossless converter):
+
+$$
+i_d \, v_{md} + i_q \, v_{mq} + V_{dc} \, i_{dc} \cdot \frac{P_{nom}}{S_{nom}} = 0
+$$
+
+**Current magnitude limit**:
+
+$$
+I_{d,\max} = \frac{P_{nom}}{S_{nom}}, \quad I_{q,\max} = \sqrt{1 - i_{d,ref}^2}
+$$
+
+#### Parameters Table
+
+| Parameter | Description | Unit |
+|-----------|-------------|------|
+| `R` | Phase reactor resistance | pu |
+| `L` | Phase reactor inductance | pu |
+| `Hdc` | DC capacitor electrostatic inertia | s |
+| `Snom` | Nominal apparent power | MVA |
+| `Pnom` | Nominal active power (DC side rating) | MW |
+| `Kp` | Inner current controller proportional gain | — |
+| `Ki` | Inner current controller integral gain | — |
+| `Kpd` | Outer $d$-axis loop proportional gain | — |
+| `Kid` | Outer $d$-axis loop integral gain | — |
+| `Kpq` | Outer $q$-axis loop proportional gain | — |
+| `Kiq` | Outer $q$-axis loop integral gain | — |
+| `Kpw` | PLL proportional gain | — |
+| `Kiw` | PLL integral gain | — |
+| `alpha1` | P–V outer loop: active power coefficient | — |
+| `beta1` | P–V outer loop: DC voltage coefficient | — |
+| `alpha2` | Q–$V_{ac}$ outer loop: reactive power coefficient | — |
+| `beta2` | Q–$V_{ac}$ outer loop: AC voltage coefficient | — |
+| `Vs1` | AC voltage threshold for reactive support activation | pu |
+| `Vs2` | AC voltage for full reactive support | pu |
+
+Internal (auto-initialised) parameters: `Pref`, `Vdcref`, `Qref`, `Vacref`, `switch`.
+
+#### Control Structure
+
+```
+Pref, Vdcref ─► [P-V droop: α1·ΔP + β1·ΔVdc] ─► [Integr. 1/Kid] ─► idref_unlim
+                                                                              │
+                                                                         [Limiter Idmin/Idmax]
+                                                                              │ idref
+                                                     [Inner current PI] ◄────┘
+                  vd, ω·L·iq ──────────────────────────────────────────► vmd
+                  vq, ω·L·id ──────────────────────────────────────────► vmq
+
+Qref, Vacref ─► [Q-Vac droop: α2·ΔQ + β2·ΔVac] ─► [Integr. 1/Kiq] ─► iqref1_unlim
+                                                                              │
+FRT boost ────► iqref2 ────────────────────────────────────────────────► iqref = iqref1 + iqref2
+                                                                              │
+                                                     [Inner current PI] ◄────┘
+```
+
+#### Usage Example
+
+```
+TWOPOR  VSC1  AC_BUS  DC_BUS  'HVDC_VSC'
+        0.003   ! R (pu)
+        0.15    ! L (pu)
+        3.5     ! Hdc (s)
+        1000.0  ! Snom (MVA)
+        900.0   ! Pnom (MW)
+        1.0     ! Kp
+        50.0    ! Ki
+        0.0     ! Kpd
+        10.0    ! Kid
+        0.0     ! Kpq
+        20.0    ! Kiq
+        2.0     ! Kpw
+        40.0    ! Kiw
+        1.0     ! alpha1
+        0.0     ! beta1
+        1.0     ! alpha2
+        0.0     ! beta2
+        0.9     ! Vs1
+        0.5     ! Vs2
+        ;
+```
+
+---
+
+### `twop_HVDC_VSC_SC` — VSC-HVDC with Self-Commutation (Grid-Forming)
+
+#### Description
+
+An enhanced VSC-HVDC model with **self-commutation capability and synchronous machine emulation**. Unlike the standard `twop_HVDC_VSC`, this variant includes a frequency droop loop (via `Kwi`, the virtual synchronous machine inertia gain) in the outer active power control, enabling the converter to participate in primary frequency regulation as if it were a synchronous machine. It is suited for modelling converters operating as **grid-forming** or **frequency-supporting** devices.
+
+Key differences from `twop_HVDC_VSC`:
+- Outer active power loop uses **frequency droop**: $N_1 = (1-\omega_1) K_{wi} + (P_0 + \Delta P - P)(S_{base}/S_{nom})$
+- The integrator output is accumulated (not driven to zero), producing a continuous $i_{d,ref}$
+- External power correction signal $\Delta P$ allows participation in hub-level coordination
+
+#### Scientific Description
+
+**Outer active power control with frequency droop**:
+
+$$
+N_1 = (1 - \omega_1) K_{wi} + \frac{(P_0 + \Delta P - P) \, S_{base}}{S_{nom}}
+$$
+
+$$
+\dot{N}_{1a} = \frac{N_1}{K_{ip}}, \quad i_{d,ref,unlim} = N_{1a} + K_{pp} \, N_1
+$$
+
+where $K_{wi}$ introduces inertia-like damping: when grid frequency deviates from 1 pu, the converter adjusts its active current reference to oppose the deviation.
+
+**Outer reactive power control** (droop on Q and AC voltage):
+
+$$
+N_2 = (Q_0 - Q) \cdot \frac{S_{nom}}{...} + N_{1a}
+$$
+
+The inner current loop equations, PLL, phase reactor, and DC capacitor dynamics are identical to `twop_HVDC_VSC`.
+
+**Current limits** (priority to active current):
+
+$$
+I_{q,\max} = \sqrt{\max(1 - i_{d,ref}^2, 0)}
+$$
+
+#### Parameters Table
+
+| Parameter | Description | Unit |
+|-----------|-------------|------|
+| `R` | Phase reactor resistance | pu |
+| `L` | Phase reactor inductance | pu |
+| `Hdc` | DC capacitor electrostatic inertia | s |
+| `Snom` | Nominal apparent power | MVA |
+| `Pnom` | Nominal active power | MW |
+| `Kp` | Inner current controller proportional gain | — |
+| `Ki` | Inner current controller integral gain | — |
+| `Kpp` | Outer active power loop proportional gain | — |
+| `Kip` | Outer active power loop integral gain | — |
+| `Kwi` | Frequency droop / virtual inertia gain | — |
+| `Kpq` | Outer reactive power loop proportional gain | — |
+| `Kiq` | Outer reactive power loop integral gain | — |
+| `Kpw` | PLL proportional gain | — |
+| `Kiw` | PLL integral gain | — |
+| `Vs1` | AC voltage threshold for reactive support | pu |
+| `Vs2` | AC voltage for full reactive support | pu |
+
+Internal (auto-initialised): `DeltaP`, `P0`, `Q0`, `Vac`, `switch`.
+
+#### Control Structure
+
+```
+ω1 ─────────────► Kwi·(1-ω1) ─►┐
+P0, ΔP ─► ΔP/Snom ──────────────┼─► N1 ─► [Int. 1/Kip] ─► N1a ─► idref_unlim
+                                 │               │                      │
+                                 └───────────────┘         Kpp·N1 ─────┘
+                                                                    [Lim] ─► idref ─► [Inner PI] ─► vmd
+```
+
+#### Usage Example
+
+```
+TWOPOR  VSC_SC1  AC_BUS  DC_BUS  'HVDC_VSC_SC'
+        0.003   ! R (pu)
+        0.15    ! L (pu)
+        3.5     ! Hdc (s)
+        1000.0  ! Snom (MVA)
+        900.0   ! Pnom (MW)
+        1.0     ! Kp
+        50.0    ! Ki
+        2.0     ! Kpp (outer P loop P gain)
+        5.0     ! Kip (outer P loop I gain)
+        10.0    ! Kwi (frequency droop gain)
+        0.0     ! Kpq
+        20.0    ! Kiq
+        2.0     ! Kpw
+        40.0    ! Kiw
+        0.9     ! Vs1
+        0.5     ! Vs2
+        ;
+```
+
+---
+
+### `twop_DCL_WCL` — DC Link with Wind Converter Link (Offshore Wind HVDC)
+
+#### Description
+
+A comprehensive model of an **offshore wind HVDC connection** consisting of:
+
+- **Converter 1 (offshore, bus 1)**: Grid-forming VSC station connected to an offshore AC network (wind farm collector bus). It controls AC voltage and frequency at the offshore bus (island operation) and exports active power via the DC link.
+- **DC cable**: A lumped-parameter $\pi$-model with series resistance $R_{dc}$ and shunt capacitances at each end (represented as DC capacitors with inertia constants $H_{dc,1}$ and $H_{dc,2}$).
+- **Converter 2 (onshore, bus 2)**: Grid-following VSC station connected to the main AC grid. It controls DC voltage (ensuring power balance) and reactive power/AC voltage support.
+
+The model fully captures:
+- PLL dynamics at both converters
+- Inner $d$-$q$ current control loops at both converters
+- Offshore power/speed droop outer loop
+- Onshore DC voltage control with Q/$V_{ac}$ support
+- DC cable current dynamics
+- Current limiters at both ends
+
+#### Scientific Description
+
+**Converter 1 — Offshore (Grid-forming, active power + frequency droop)**
+
+Outer active power loop with speed droop:
+
+$$
+\text{PB}_1 = (1 - \omega_1) K_{wi,1} + \frac{(P_{0,1} + \Delta P - P_1) \, S_{base}}{S_{nom,1}}
+$$
+
+$$
+i_{d,ref,1} = \frac{\int \text{PB}_1 \, dt}{K_{ip,1}} + K_{pp,1} \, \text{PB}_1
+$$
+
+Outer reactive power loop with QV droop (slope $\beta_V$):
+
+$$
+\text{QB}_1 = V_1 - V_{0,1} + \beta_V (Q_1 - Q_{0,1}) \frac{S_{base}}{S_{nom,1}}
+$$
+
+$$
+i_{q,ref,1} = \frac{\int \text{QB}_1 \, dt}{K_{iq,1}} + K_{pq,1} \, \text{QB}_1
+$$
+
+**Converter 2 — Onshore (Grid-following, DC voltage control)**
+
+Outer DC voltage loop:
+
+$$
+\Delta V = V_{dc,ref} - v_{dc,2}
+$$
+
+$$
+i_{d,ref,2} = \frac{\int \Delta V \, dt}{K_{id,2}} + K_{pd,2} \, \Delta V
+$$
+
+Outer Q/$V_{ac}$ control with combined droop:
+
+$$
+\text{QB}_2 = \alpha_{2,2}(Q_{ref,2} - Q_2)/S_{base} + \beta_{2,2}(V_{0,2} - V_2)
+$$
+
+$$
+i_{q,ref,2} = \frac{\int \text{QB}_2 \, dt}{K_{iq,2}} + K_{pq,2} \, \text{QB}_2
+$$
+
+**Phase reactor dynamics** (both converters, in $x$-$y$ frame):
+
+$$
+-\frac{R_k}{L_k} i_{x,k} + \omega_{ref} i_{y,k} + \frac{1}{L_k}(v_{md,k}\cos\theta_k - v_{mq,k}\sin\theta_k - v_{x,k}) = 0
+$$
+
+$$
+-\frac{R_k}{L_k} i_{y,k} - \omega_{ref} i_{x,k} + \frac{1}{L_k}(v_{mq,k}\cos\theta_k + v_{md,k}\sin\theta_k - v_{y,k}) = 0
+$$
+
+**DC link** (Ohmic drop + shunt capacitors):
+
+$$
+v_{dc,1} - R_{dc} \, i_{dc} - v_{dc,2} = 0
+$$
+
+$$
+2 H_{dc,1} \frac{d v_{dc,1}}{dt} = i_{dc,1} - i_{m,dc,1} - i_{dc}
+$$
+
+$$
+2 H_{dc,2} \frac{d v_{dc,2}}{dt} = i_{dc} - i_{m,dc,2} - G \, v_{dc,2} - i_{dc,2}
+$$
+
+where $G$ is the shunt conductance computed at initialisation to balance active power at the onshore DC terminal.
+
+**AC–DC power balance** (both converters, lossless):
+
+$$
+i_{d,k} v_{md,k} + i_{q,k} v_{mq,k} \pm v_{dc,k} \, i_{dc,k} \frac{P_{nom}}{S_{nom,k}} = 0
+$$
+
+**PLL** (both stations):
+
+$$
+\dot{\theta}_{pll,k} = \Delta\omega_{pll,k} = (\omega_{pll,k} - \omega_{ref}) 2\pi f_0
+$$
+$$
+\omega_{pll,k} = K_{pw,k} \, v_{q,k} + K_{iw,k} \int v_{q,k} \, dt
+$$
+
+**Current limits** (both converters):
+
+$$
+I_{q,\max,k} = \sqrt{\max(1 - i_{d,k}^2, 0)}, \quad I_{d,\max,k} = \frac{P_{nom}}{S_{nom,k}}
+$$
+
+#### Parameters Table
+
+<Tabs>
+<TabItem label="Offshore Converter (1)">
+
+| Parameter | Description | Unit |
+|-----------|-------------|------|
+| `R_1` | Phase reactor resistance | pu |
+| `L_1` | Phase reactor inductance | pu |
+| `Hdc_1` | DC capacitor electrostatic inertia | s |
+| `Snom_1` | Nominal apparent power | MVA |
+| `Kpp_1` | Outer active power loop proportional gain | — |
+| `Kip_1` | Outer active power loop integral gain | — |
+| `Kwi_1` | Speed/frequency droop gain | — |
+| `Kpq_1` | Outer reactive power loop proportional gain | — |
+| `Kiq_1` | Outer reactive power loop integral gain | — |
+| `Kpw_1` | PLL proportional gain | — |
+| `Kiw_1` | PLL integral gain | — |
+| `betaV_1` | QV droop slope ($\Delta V / \Delta Q$) | pu/pu |
+
+</TabItem>
+<TabItem label="Onshore Converter (2)">
+
+| Parameter | Description | Unit |
+|-----------|-------------|------|
+| `R_2` | Phase reactor resistance | pu |
+| `L_2` | Phase reactor inductance | pu |
+| `Hdc_2` | DC capacitor electrostatic inertia | s |
+| `Snom_2` | Nominal apparent power | MVA |
+| `Kpd_2` | Outer $d$-axis (DC voltage) loop proportional gain | — |
+| `Kid_2` | Outer $d$-axis (DC voltage) loop integral gain | — |
+| `Kpq_2` | Outer $q$-axis (Q/Vac) loop proportional gain | — |
+| `Kiq_2` | Outer $q$-axis (Q/Vac) loop integral gain | — |
+| `Kpw_2` | PLL proportional gain | — |
+| `Kiw_2` | PLL integral gain | — |
+| `alpha2_2` | Q–$V_{ac}$ droop: reactive power coefficient | — |
+| `beta2_2` | Q–$V_{ac}$ droop: AC voltage coefficient | — |
+
+</TabItem>
+<TabItem label="DC Link">
+
+| Parameter | Description | Unit |
+|-----------|-------------|------|
+| `Pnom` | Nominal active power (DC link rating) | MW |
+| `R_dc` | DC line series resistance | pu |
+| `Vdc0` | Initial offshore DC voltage | pu |
+
+</TabItem>
+</Tabs>
+
+#### Control Structure
+
+```
+Wind farm ─► Bus 1 (offshore AC)
+                  │
+          ┌───────┴────────┐
+          │  Converter 1   │  PLL → id/iq transform
+          │  Grid-forming  │
+          │  P/ω droop     │  idref ← P0+ΔP droop + Kwi·Δω
+          │  QV droop      │  iqref ← βV·ΔQ
+          └───────┬────────┘
+                  │ idc1, vdc1
+          ┌───────┴──────────────────────────┐
+          │   DC CABLE: Rdc, Hdc1, Hdc2      │
+          └───────┬──────────────────────────┘
+                  │ idc2, vdc2
+          ┌───────┴────────┐
+          │  Converter 2   │  PLL → id/iq transform
+          │  Grid-following│
+          │  Vdc control   │  idref ← Kpd·ΔVdc + Kpd·∫ΔVdc
+          │  Q/Vac droop   │  iqref ← α2·ΔQ + β2·ΔVac
+          └───────┬────────┘
+                  │
+          Bus 2 (onshore AC grid)
+```
+
+The offshore converter establishes the AC voltage and frequency for the wind farm. The onshore converter maintains DC voltage. An optional hub coordinator can inject a power correction $\Delta P$ to the offshore converter via the parameter `DeltaP`.
+
+#### Usage Example
+
+```
+TWOPOR  WF_HVDC  OFFSHORE_BUS  ONSHORE_BUS  'DCL_WCL'
+        0.003    ! R_1 (pu)
+        0.15     ! L_1 (pu)
+        3.5      ! Hdc_1 (s)
+        900.0    ! Snom_1 (MVA)
+        2.0      ! Kpp_1
+        5.0      ! Kip_1
+        10.0     ! Kwi_1
+        0.0      ! Kpq_1
+        20.0     ! Kiq_1
+        2.0      ! Kpw_1
+        40.0     ! Kiw_1
+        0.05     ! betaV_1
+        0.003    ! R_2 (pu)
+        0.15     ! L_2 (pu)
+        3.5      ! Hdc_2 (s)
+        900.0    ! Snom_2 (MVA)
+        0.0      ! Kpd_2
+        10.0     ! Kid_2
+        0.0      ! Kpq_2
+        20.0     ! Kiq_2
+        2.0      ! Kpw_2
+        40.0     ! Kiw_2
+        1.0      ! alpha2_2
+        0.0      ! beta2_2
+        800.0    ! Pnom (MW)
+        0.05     ! R_dc (pu)
+        1.0      ! Vdc0 (pu)
+        ;
+```
