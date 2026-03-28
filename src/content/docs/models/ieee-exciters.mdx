@@ -1017,31 +1017,4 @@ A stator current limiter (SCL) with analogous structure acts on $I_{st} = \sqrt{
 
 ---
 
-## CODEGEN Block Reference
-
-The CODEGEN DSL primitives used in these models:
-
-| Block | Description | Signature |
-|---|---|---|
-| `tf1p` | First-order filter $K/(1+sT)$ | `in → out, K, T` |
-| `tf1p1z` | Lead-lag $(K(1+sT_z))/(1+sT_p)$ | `in → out, K, Tz, Tp` |
-| `tf1plim` | Lead-lag with output limits | `in → out, K, T, min, max` |
-| `tf1pvlim` | First-order with variable limits | `in → out, lo_var, hi_var, K, T` |
-| `tf2p2z` | Second-order filter | `in → out, b0, b1, b2, a1, a2` |
-| `tfder1p` | Derivative $sK/T/(1+s/T)$ | `in → out, K/T, T` |
-| `inlim` | Limited integrator | `in → out, T, lo, hi` |
-| `invlim` | Integrator with variable limits | `in → lo_var, hi_var, out, T` |
-| `pictl` | PI controller (no limit) | `in → out, Ki, Kp` |
-| `pictllim` | PI controller with limits | `in → out, Ki, Kp, lo, hi` |
-| `lim` | Algebraic clamp | `in → out, lo, hi` |
-| `limvb` | Variable-limit clamp | `in, lo_var, hi_var → out` |
-| `algeq` | Algebraic equation (residual = 0) | `expr` |
-| `max1v1c` | HV gate (max of signal and constant) | `in → out, const` |
-| `max2v` | HV gate (max of two signals) | `in1, in2 → out` |
-| `min1v1c` | LV gate (min of signal and constant) | `in → out, const` |
-| `min2v` | LV gate (min of two signals) | `in1, in2 → out` |
-| `timer3` / `timer11` | Piece-wise thermal timer | `in → out, (I1,T1), ..., (In,Tn)` |
-| `hyst` | Hysteresis latch | `in → out, ...thresholds...` |
-| `db` | Deadband with gain | `in → out, lo, g_lo, hi, g_hi` |
-| `switch3` | Three-position switch | `lo, mid, hi, selector → out` |
-| `pwlin6` | Piece-wise linear (6-point) indicator | `in → out, x1,y1,...,x6,y6` |
+For full documentation of the CODEGEN DSL primitives used in these models (`tf1p`, `tf1p1z`, `tf1plim`, `inlim`, `pictl`, etc.), see the [CODEGEN Blocks Library](/stepss-docs/developer/codegen-library/).
