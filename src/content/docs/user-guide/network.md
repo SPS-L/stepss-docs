@@ -55,6 +55,14 @@ LINE NAME BUS1 BUS2 R X WC2 SNOM BR ;
 
 Line orientation is arbitrary: BUS1 and BUS2 may be swapped.
 
+:::note
+To connect a line through a single end, add a bus at the open end and set BR to a nonzero value.
+:::
+
+:::note
+All lines are memorized, even those out of service. An out-of-service line has zero power flow but can be put into service during dynamic simulation.
+:::
+
 ## Switches
 
 A switch is a connection **without impedance** between two buses, treated internally as a very short line with $R = 0$, $\omega C/2 = 0$, and $X$ set to a very small value.
@@ -122,6 +130,10 @@ TRANSFO NAME FROMBUS TOBUS R X B1 B2 N PHI SNOM BR ;
 The orientation is **not arbitrary**: FROMBUS and TOBUS cannot be swapped.
 :::
 
+:::note
+To connect a transformer through a single end, add a bus at the open end and set BR to a nonzero value.
+:::
+
 ### Data Format — Simplified Model (TRFO)
 
 ```
@@ -129,6 +141,24 @@ TRFO NAME FROMBUS TOBUS CONBUS R X B N SNOM NFIRST NLAST NBPOS TOLV VDES BR ;
 ```
 
 This simplified model has $B_2 = 0$ and $\phi = 0$, and includes data for PFC to adjust the transformer ratio. It cannot be used for phase-shifting transformers. See [PFC Data](/stepss-docs/user-guide/pfc/) for details on ratio adjustment.
+
+| Field | Description | Unit |
+|-------|-------------|------|
+| `NAME` | Transformer name (max 20 characters) | — |
+| `FROMBUS` | "From" bus name (max 8 characters) | — |
+| `TOBUS` | "To" bus name (max 8 characters) | — |
+| `CONBUS` | Bus used by PFC for ratio adjustment (max 8 characters; a dummy name must be provided even if not used by RAMSES) | — |
+| `R` | Series resistance | % |
+| `X` | Leakage reactance | % |
+| `B` | Shunt susceptance (from side; $B_2 = 0$) | % |
+| `N` | Transformer ratio magnitude | % |
+| `SNOM` | Nominal apparent power (must not be zero) | MVA |
+| `NFIRST` | Initial (first) tap ratio value, used by PFC for ratio adjustment | % |
+| `NLAST` | Final (last) tap ratio value, used by PFC for ratio adjustment | % |
+| `NBPOS` | Number of tap positions, used by PFC for ratio adjustment | — |
+| `TOLV` | Voltage tolerance for tap adjustment, used by PFC | pu |
+| `VDES` | Desired controlled bus voltage, used by PFC | pu |
+| `BR` | Breaker status (0 = open/out of service, other = closed/in service) | — |
 
 ## Non-Reciprocal Two-Ports
 
@@ -146,19 +176,47 @@ with $G_{ij} \ne G_{ji}$ and $B_{ij} \ne B_{ji}$.
 ### Data Format
 
 ```
-NRTP NAME BUS1 BUS2 GSI BSI GIJ BIJ GJI BJI GSJ BSJ SNOM BR ;
+NRTP NAME FROMBUS TOBUS GIJ BIJ GJI BJI GSI BSI GSJ BSJ BR ;
 ```
+
+| Field | Description |
+|-------|-------------|
+| `NAME` | Name of the two-port (max 20 characters) |
+| `FROMBUS` | Name of bus $i$ (max 8 characters) |
+| `TOBUS` | Name of bus $j$ (max 8 characters) |
+| `GIJ` | Conductance from $i$ to $j$ (pu on nominal bus voltages and system base power) |
+| `BIJ` | Susceptance from $i$ to $j$ (pu) |
+| `GJI` | Conductance from $j$ to $i$ (pu) |
+| `BJI` | Susceptance from $j$ to $i$ (pu) |
+| `GSI` | Shunt conductance at bus $i$ (pu) |
+| `BSI` | Shunt susceptance at bus $i$ (pu) |
+| `GSJ` | Shunt conductance at bus $j$ (pu) |
+| `BSJ` | Shunt susceptance at bus $j$ (pu) |
+| `BR` | Breaker status (1 = closed/in service, 0 = open/out of service) |
+
+:::note
+Parameters are in per unit on nominal bus voltages and system base power (default 100 MVA).
+:::
+
+:::note
+A non-reciprocal two-port can connect buses with different nominal voltages.
+:::
 
 ## Shunts
 
 ### Data Format
 
 ```
-SHUNT NAME BUS BSHUNT ;
+SHUNT NAME BUS_NAME QNOM BR ;
 ```
 
 | Field | Description | Unit |
 |-------|-------------|------|
 | `NAME` | Shunt name (max 20 characters) | — |
-| `BUS` | Bus name | — |
-| `BSHUNT` | Nominal reactive power (positive for capacitor) | Mvar |
+| `BUS_NAME` | Name of the bus to which the shunt is connected (max 8 characters) | — |
+| `QNOM` | Nominal reactive power produced by the shunt at the nominal bus voltage (positive = capacitor, negative = reactor) | Mvar |
+| `BR` | Breaker status (1 = in service, 0 = out of service) | — |
+
+:::caution
+The SHUNT record is used by RAMSES. For PFC, shunt data is specified in the extended BUS record (see [PFC Data](/stepss-docs/user-guide/pfc/)).
+:::

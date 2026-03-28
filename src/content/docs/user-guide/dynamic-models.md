@@ -21,15 +21,20 @@ TOR TOR_TYPE parameters_passed_to_TOR ;
 | `FP`, `FQ` | Fractions of bus injection (active, reactive) | — |
 | `P`, `Q` | Initial powers (used if fractions are zero) | pu |
 | `Snom` | Nominal apparent power | MVA |
-| `Pnom` | Nominal active power | MW |
+| `Pnom` | Nominal active power of the turbine | MW |
 | `H` | Inertia constant | s |
 | `D` | Damping coefficient | pu |
+| `ibratio` | Ratio of subtransient current to nominal current (used for machine sizing) | — |
+| `XT/RL` | Keyword: `XT` if the next value is the step-up transformer reactance; `RL` if it is the line resistance | — |
+| `Xl` | Leakage reactance | pu |
 | `Xd`, `X'd`, `X"d` | d-axis reactances (synchronous, transient, subtransient) | pu |
 | `Xq`, `X'q`, `X"q` | q-axis reactances | pu |
+| `m`, `n` | Saturation exponents for the magnetic saturation characteristic. Use `*` to set to default values. | — |
+| `Ra` | Armature resistance | pu |
 | `T'do`, `T"do` | d-axis time constants (open-circuit transient, subtransient) | s |
 | `T'qo`, `T"qo` | q-axis time constants | s |
-| `Ra` | Armature resistance | pu |
-| `Xl` | Leakage reactance | pu |
+
+The FP, FQ, P, Q fields are power participation fractions and initial power values used during initialization. See [Reference Frames & Initialization](/stepss-docs/user-guide/reference-frames/) for detailed explanation.
 
 ### Available Exciter Models
 
@@ -72,6 +77,14 @@ INJEC THEVEQ INJEC_NAME BUS_NAME FP FQ P Q MVA ;
 
 A Thévenin equivalent imposes a constant-frequency voltage source and forces the synchronous reference frame.
 
+| Parameter | Description | Unit |
+|-----------|-------------|------|
+| `FP`, `FQ` | Fractions of bus injection (active, reactive) | — |
+| `P`, `Q` | Initial powers (used if fractions are zero) | pu |
+| `MVA` | Apparent power base used for per-unit values of the Thévenin equivalent | MVA |
+
+The FP, FQ, P, Q fields are power participation fractions and initial power values used during initialization. See [Reference Frames & Initialization](/stepss-docs/user-guide/reference-frames/) for detailed explanation.
+
 ## Impedance Loads
 
 ```
@@ -79,6 +92,13 @@ IMPLOAD loadname BUS_NAME FP FQ P Q ;
 ```
 
 Constant-impedance loads maintain the power factor at the initial voltage.
+
+| Parameter | Description | Unit |
+|-----------|-------------|------|
+| `FP`, `FQ` | Fractions of bus injection (active, reactive) | — |
+| `P`, `Q` | Initial powers (used if fractions are zero) | pu |
+
+The FP, FQ, P, Q fields are power participation fractions and initial power values used during initialization. See [Reference Frames & Initialization](/stepss-docs/user-guide/reference-frames/) for detailed explanation.
 
 ## Two-Port Components
 
