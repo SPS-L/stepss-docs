@@ -1051,10 +1051,12 @@ None.
 
 #### Equations
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 \dot{x}_i &= K_i \, x_k \\
 0 &= K_p \, x_k + x_i - x_j
-\end{aligned}$$
+\end{aligned}
+$$
 
 #### Initialization
 
@@ -1092,7 +1094,8 @@ $$0 = \begin{cases}
 \dot{x}_i = K_i x_k & \text{if } z = 0 \\
 x_i - x_i^{min} & \text{if } z = -1 \\
 x_i - x_i^{max} & \text{if } z = 1
-\end{cases}$$
+\end{cases}
+$$
 
 $$0 = K_p x_k + x_i - x_j$$
 
@@ -1149,17 +1152,21 @@ $z_1 \in \{-1, 0, 1\}$ and $z_2 \in \{-1, 0, 1\}$
 
 #### Equations
 
-$$\begin{cases}
+$$
+\begin{cases}
 0 = K_p x_k - x_p & \text{if } z_1 = 0 \\
 0 = x_p - x_p^{min} & \text{if } z_1 = -1 \\
 0 = x_p - x_p^{max} & \text{if } z_1 = 1
-\end{cases}$$
+\end{cases}
+$$
 
-$$\begin{cases}
+$$
+\begin{cases}
 \dot{x}_i = K_i x_k & \text{if } z_2 = 0 \\
 0 = x_i - x_i^{min} & \text{if } z_2 = -1 \\
 0 = x_i - x_i^{max} & \text{if } z_2 = 1
-\end{cases}$$
+\end{cases}
+$$
 
 $$0 = x_p + x_i - x_j$$
 
@@ -1244,7 +1251,8 @@ $$\text{if } z = 0: \quad
 0 = K_p x_k + x_1 - x_j \\
 \dot{x}_1 = K_i \, x_k \\
 0 = x_2 - x_1
-\end{cases}$$
+\end{cases}
+$$
 
 $$\text{if } z = 2: \quad
 \begin{cases}
@@ -1258,7 +1266,8 @@ $$\text{if } z = 2: \quad
 0 = x_j^{max} - x_j \\
 \dot{x}_1 = 0 \\
 \dot{x}_2 = K_i \, x_k
-\end{cases}$$
+\end{cases}
+$$
 
 $$\text{if } z = -2: \quad
 \begin{cases}
@@ -1272,7 +1281,8 @@ $$\text{if } z = -2: \quad
 0 = x_j^{min} - x_j \\
 \dot{x}_1 = 0 \\
 \dot{x}_2 = K_i \, x_k
-\end{cases}$$
+\end{cases}
+$$
 
 #### Discrete Transitions
 
@@ -1367,11 +1377,13 @@ $z \in \{-1, 0, 1\}$
 
 #### Equations
 
-$$\begin{cases}
+$$
+\begin{cases}
 T \, \dot{x}_j = G \, x_i - x_j & \text{if } z = 0 \\
 0 = x_j - x_{max} & \text{if } z = 1 \\
 0 = x_j - x_{min} & \text{if } z = -1
-\end{cases}$$
+\end{cases}
+$$
 
 #### Discrete Transitions
 
@@ -1427,11 +1439,13 @@ $z \in \{-1, 0, 1\}$
 
 #### Equations
 
-$$\begin{cases}
+$$
+\begin{cases}
 T \, \dot{x}_j = G \, x_i - x_j & \text{if } z = 0 \\
 0 = x_j - x_{max} & \text{if } z = 1 \\
 0 = x_j - x_{min} & \text{if } z = -1
-\end{cases}$$
+\end{cases}
+$$
 
 #### Discrete Transitions
 
@@ -1487,17 +1501,21 @@ $z_1 \in \{-1, 0, 1\}$ (rate limiter) and $z_2 \in \{-1, 0, 1\}$ (output limiter
 
 #### Equations
 
-$$\begin{cases}
+$$
+\begin{cases}
 0 = x_1 - G \, x_i + x_j & \text{if } z_1 = 0 \\
 0 = x_1 - T \, \dot{x}_{max} & \text{if } z_1 = 1 \\
 0 = x_1 - T \, \dot{x}_{min} & \text{if } z_1 = -1
-\end{cases}$$
+\end{cases}
+$$
 
-$$\begin{cases}
+$$
+\begin{cases}
 T \, \dot{x}_j = x_1 & \text{if } z_2 = 0 \\
 0 = x_j - x_{max} & \text{if } z_2 = 1 \\
 0 = x_j - x_{min} & \text{if } z_2 = -1
-\end{cases}$$
+\end{cases}
+$$
 
 $\dot{x}_{max}$ (resp. $\dot{x}_{min}$) is the maximum (resp. minimum) rate of change of $x_j$ with time.
 
@@ -1567,10 +1585,12 @@ None.
 
 #### Equations
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 T \, \dot{x}_1 &= x_j \\
 0 &= G \, x_i - x_1 - x_j
-\end{aligned}$$
+\end{aligned}
+$$
 
 #### Initialization
 
@@ -1609,10 +1629,12 @@ None.
 
 #### Equations
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 \dot{x}_1 &= G \, x_i - x_j \\
 0 &= T_p \, x_j - G \, T_z \, x_i - x_1
-\end{aligned}$$
+\end{aligned}
+$$
 
 #### Initialization
 
@@ -1657,11 +1679,13 @@ None.
 
 State-space controllable canonical form:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 \dot{x}_1 &= x_2 \\
 d_2 \, \dot{x}_2 &= -x_1 - d_1 x_2 + d_2 x_i \\
 0 &= G(d_2 - n_2) x_1 + G(n_1 d_2 - d_1 n_2) x_2 + G n_2 d_2 x_i - d_2^2 x_j
-\end{aligned}$$
+\end{aligned}
+$$
 
 #### Initialization
 
@@ -1802,7 +1826,8 @@ $z \in \{1, 2\}$
 $$0 = \begin{cases}
 x_l - x_i & \text{if } z = 1 \\
 x_l - x_j & \text{if } z = 2
-\end{cases}$$
+\end{cases}
+$$
 
 #### Discrete Transitions
 
@@ -1855,13 +1880,16 @@ $z \in \{-1, 0, 1\}$
 $$0 = \begin{cases}
 x_j & \text{if } z \in \{-1, 0\} \\
 x_j - 1 & \text{if } z = 1
-\end{cases}$$
+\end{cases}
+$$
 
-$$\begin{cases}
+$$
+\begin{cases}
 0 = x_1 & \text{if } z = -1 \\
 \dot{x}_1 = 1 & \text{if } z = 0 \\
 \dot{x}_1 = 0 & \text{if } z = 1
-\end{cases}$$
+\end{cases}
+$$
 
 #### Discrete Transitions
 
@@ -1918,13 +1946,16 @@ $z \in \{-1, 0, 1\}$
 $$0 = \begin{cases}
 x_j & \text{if } z \in \{-1, 0\} \\
 x_j - 1 & \text{if } z = 1
-\end{cases}$$
+\end{cases}
+$$
 
-$$\begin{cases}
+$$
+\begin{cases}
 0 = x_1 & \text{if } z = -1 \\
 \dot{x}_1 = 1 & \text{if } z = 0 \\
 \dot{x}_1 = 0 & \text{if } z = 1
-\end{cases}$$
+\end{cases}
+$$
 
 #### Discrete Transitions
 
@@ -1980,7 +2011,8 @@ $z \in \{1, 2\}$ represents the automaton state.
 $$0 = \begin{cases}
 x_k - v_1 & \text{if } z = 1 \\
 x_k - v_2 & \text{if } z = 2
-\end{cases}$$
+\end{cases}
+$$
 
 #### Discrete Transitions
 
@@ -2128,11 +2160,13 @@ loop:
 
 **Computation:**
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 V_{comp} &= \left| K_v \bar{V} + (R_c + j X_c) \bar{I} \right| \\
 &= \left| K_v V + (R_c + j X_c)\!\left(\frac{P}{V} - j\frac{Q}{V}\right) \right| \\
 &= \frac{1}{V} \sqrt{\left(K_v V^2 + R_c P + X_c Q\right)^2 + \left(X_c P - R_c Q\right)^2}
-\end{aligned}$$
+\end{aligned}
+$$
 
 ---
 
@@ -2152,10 +2186,12 @@ $$satur = m \, ve^n$$
 
 where:
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 n &= \frac{\log_{10}(se1/se2)}{\log_{10}(ve1/ve2)} \\[4pt]
 m &= \frac{se1}{ve1^n}
-\end{aligned}$$
+\end{aligned}
+$$
 
 **Exception.** Returns $satur = 0$ if any of the following conditions holds:
 
