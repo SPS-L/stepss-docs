@@ -5,10 +5,86 @@ description: Run your first STEPSS simulation
 
 import { Tabs, TabItem, Steps } from '@astrojs/starlight/components';
 
-This guide walks through running a basic power system simulation using either the STEPSS GUI or PyRAMSES.
+STEPSS provides three ways to run simulations:
+
+| Interface | Dynamic Simulator (RAMSES) | Static Simulator (PFC) |
+|-----------|:-------------------------:|:----------------------:|
+| **Command Line** | `ramses.exe -t cmd.txt` | `pfc.exe -t cmd.txt` |
+| **GUI (Java)** | Via STEPSS GUI | Via STEPSS GUI |
+| **Python** | Via PyRAMSES | — |
+
+---
+
+## Dynamic Simulation (RAMSES)
 
 <Tabs>
-<TabItem label="GUI">
+<TabItem label="Command Line">
+
+### RAMSES Command-Line Interface
+
+The RAMSES executable accepts the following arguments:
+
+```bash
+ramses.exe [-t command_file] [-v]
+```
+
+| Flag | Description |
+|------|-------------|
+| `-t command_file` | Read inputs from a command file (non-interactive mode) |
+| `-v` | Print version information and exit |
+
+**Interactive mode** (no `-t` flag): RAMSES prompts for each input sequentially:
+
+```
+Dump settings, comments and initialization data in file [press enter to skip] :
+Disturbance file name [compulsory] :
+Dump system trajectory in file [press enter to skip] :
+Observable file name [compulsory] :
+Dump continuous simulation trace in file [press enter to skip] :
+Dump discrete simulation trace in file [press enter to skip] :
+```
+
+**Non-interactive mode** (`-t` flag): The command file provides the same inputs as lines, in order:
+
+<Steps>
+
+1. **Prepare data files**: Network data, dynamic data, solver settings, LFRESV (power flow solution)
+
+2. **Create a command file** (`cmd.txt`):
+   ```
+   data.dat volt_rat.dat settings.dat
+   
+   disturbance.dst
+   result.rtrj
+   obs.obs
+   cont.trace
+   disc.trace
+   ```
+
+   The command file contains, in order:
+   - **Data files** (one or more, space- or newline-separated) — read until a blank line
+   - **Initialization dump file** (blank line to skip)
+   - **Disturbance file** (required)
+   - **Trajectory file** (blank line to skip)
+   - **Observables file** (required if trajectory file is given)
+   - **Continuous trace file** (blank line to skip)
+   - **Discrete trace file** (blank line to skip)
+
+3. **Run the simulation**:
+   ```bash
+   ramses.exe -tcmd.txt
+   ```
+
+4. **Process results**: Use PyRAMSES extractor, MATLAB, or other tools to read the trajectory file
+
+</Steps>
+
+:::note
+Lines starting with `#` in the command file are treated as comments and skipped.
+:::
+
+</TabItem>
+<TabItem label="GUI (Java)">
 
 <Steps>
 
@@ -20,6 +96,8 @@ This guide walks through running a basic power system simulation using either th
 6. **Analyze Results**: Use the built-in plotting tools to visualize voltage, frequency, and power traces
 
 </Steps>
+
+The GUI coordinates PFC and RAMSES through lock files (`.lock_RAMSES`, `.kill_RAMSES`) for graceful process management.
 
 For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/stepss/).
 
@@ -33,96 +111,144 @@ For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/s
    pip install pyramses
    ```
 
-2. **Create a command file** (`cmd.txt`):
-   ```
-   data.dat
-   
-   init.trace
-   dst.dst
-   result.rtrj
-   obs.obs
-   cont.trace
-   disc.trace
-   ```
-
-3. **Run a simulation**:
+2. **Run a simulation**:
    ```python
    import pyramses
-   
-   # Initialize simulator
+
+   # Configure the case
+   case = pyramses.cfg()
+   case.addData("data.dat")
+   case.addData("volt_rat.dat")
+   case.addData("settings.dat")
+   case.addObs("obs.obs")
+   case.addDst("disturbance.dst")
+
+   # Run
    ram = pyramses.sim()
-   
-   # Load test case from command file
-   case = pyramses.cfg("cmd.txt")
-   
-   # Run full simulation
-   ram.execSim(case)
+   ram.execSim(case, 150.0)
    ```
 
-4. **Extract and plot results**:
+3. **Extract and plot results**:
    ```python
-   # Extract trajectory data
    ext = pyramses.extractor(case.getTrj())
-   
+
    # Plot bus voltage magnitude
    ext.getBus('1041').mag.plot()
-   
+
    # Plot synchronous machine speed
    ext.getSync('g1').speed.plot()
    ```
 
 </Steps>
 
-</TabItem>
-<TabItem label="CLI">
-
-<Steps>
-
-1. **Prepare data files**: Create network data, dynamic data, disturbance, and solver settings files
-
-2. **Run simulation via RAMSES executable**:
-   ```bash
-   dynsim.exe cmd.txt
-   ```
-
-3. **Process results** using MATLAB, Python, or other tools
-
-</Steps>
+See the [PyRAMSES API Reference](/stepss-docs/pyramses/api-reference/) for the complete interface.
 
 </TabItem>
 </Tabs>
 
-## Command File Structure
+---
 
-The command file (`cmd.txt`) lists the input files for a simulation, separated by blank lines:
+## Static Simulation (PFC)
 
+<Tabs>
+<TabItem label="Command Line">
+
+### PFC Command-Line Interface
+
+The PFC executable accepts the following arguments:
+
+```bash
+pfc.exe [-t command_file] [-o output_file] [-c trigger_file] [-v verbosity]
 ```
-datafile1.dat        # Network + dynamic data files
-datafile2.dat        # (one or more)
 
-init.trace           # Initialization output (optional)
-disturbance.dst      # Disturbance scenario
-result.rtrj          # Trajectory output (optional)
-obs.obs              # Observables definition (required if trajectory given)
-cont.trace           # Continuous trace output (optional)
-disc.trace           # Discrete trace output (optional)
-```
+| Flag | Description |
+|------|-------------|
+| `-t command_file` | Read inputs from a command file (non-interactive mode) |
+| `-o output_file` | Redirect output to a file instead of the console |
+| `-c trigger_file` | Cycle mode — wait for trigger file to start/proceed |
+| `-v N` | Verbosity level (0 = silent, 1 = normal) |
 
-Records can be distributed across an arbitrary number of data files, read sequentially. The order of records and files does not matter.
+**Interactive mode** (no `-t` flag): PFC prompts for data files, then presents a command menu.
+
+**Non-interactive mode** (`-t` flag): The command file provides data file names (one per line, blank line to end), followed by menu commands.
+
+<Steps>
+
+1. **Prepare data files**: Network data, PFC-specific data (generators, loads, SVC, LTC-V, PSHIFT-P)
+
+2. **Create a command file** (`pfc_cmd.txt`):
+   ```
+   network.dat
+   pfc_data.dat
+
+   VT
+   volt_rat.dat
+   E
+   ```
+
+3. **Run the power flow**:
+   ```bash
+   pfc.exe -tpfc_cmd.txt -ooutput.txt
+   ```
+
+</Steps>
+
+### PFC Menu Commands
+
+After loading data and solving, PFC presents these commands:
+
+| Command | Description |
+|---------|-------------|
+| `P` | Take new control parameters from file |
+| `D` | Display output values |
+| `1` | Display outputs on 1-line diagram (SVG) |
+| `M` | Modify system (change loads, generators, topology) |
+| `RI` | Reset system to initial configuration |
+| `CA` | Perform contingency analysis |
+| `CL` | Check operating limits (voltage bounds, branch overloads) |
+| `O` | Change output file |
+| `DF` | Update all records and dump them to a file |
+| `VT` | Generate a file with voltages and adjustable transformer ratios (LFRESV format) |
+| `S` | Save operating point and Y matrix to MATLAB file |
+| `E` | Exit |
+
+The `VT` command produces the LFRESV file needed to initialize RAMSES.
+
+</TabItem>
+<TabItem label="GUI (Java)">
+
+<Steps>
+
+1. **Launch STEPSS** by double-clicking `stepss.jar`
+2. **Load data files**: Use File → Open to load network and PFC data files
+3. **Run Power Flow**: Click the PFC button to compute the power flow
+4. **Inspect results**: View bus voltages, branch flows, generator outputs, and reactive power limits
+5. **Export LFRESV**: Save the power flow solution for use with RAMSES
+
+</Steps>
+
+For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/stepss/).
+
+</TabItem>
+</Tabs>
+
+---
 
 ## Typical Workflow
 
 1. **Define the network**: Specify buses, lines, transformers, and shunts
 2. **Set up power flow data**: Define generators, loads, and the slack bus
-3. **Add dynamic models**: Specify synchronous machines, excitation systems, speed governors, loads, and controllers
-4. **Configure solver**: Set integration method, time steps, and tolerances
-5. **Define disturbances**: Specify faults, line trips, parameter changes, etc.
-6. **Run simulation**: Execute PFC for initialization, then RAMSES for dynamics
-7. **Analyze results**: Extract and visualize trajectories of voltages, frequencies, and powers
+3. **Run PFC**: Compute the initial operating point and export LFRESV
+4. **Add dynamic models**: Specify synchronous machines, excitation systems, speed governors, loads, and controllers
+5. **Configure solver**: Set integration method, time steps, and tolerances
+6. **Define disturbances**: Specify faults, line trips, parameter changes, etc.
+7. **Run RAMSES**: Execute the dynamic simulation
+8. **Analyze results**: Extract and visualize trajectories of voltages, frequencies, and powers
 
 ## Next Steps
 
 - [File Formats](/stepss-docs/user-guide/file-formats/) — Learn about data file syntax
 - [Network Modeling](/stepss-docs/user-guide/network/) — Define your power system network
+- [Power Flow (PFC)](/stepss-docs/user-guide/pfc/) — PFC data and control parameters
 - [Dynamic Models](/stepss-docs/user-guide/dynamic-models/) — Add generators, loads, and controllers
 - [PyRAMSES API](/stepss-docs/pyramses/api-reference/) — Full Python API documentation

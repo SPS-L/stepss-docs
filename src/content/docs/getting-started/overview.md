@@ -84,11 +84,24 @@ Four types of user-defined models are supported:
 
 The user model is **compiled, not interpreted** — resulting in efficient number-crunching code. While the solver code is proprietary, the models are designed to be freely shared, making STEPSS an **open-source simulation software** for the modeling part.
 
+## Simulation Interfaces
+
+STEPSS modules can be run through three interfaces:
+
+| Interface | RAMSES (Dynamic) | PFC (Static) | CODEGEN |
+|-----------|:----------------:|:------------:|:-------:|
+| **Command Line** | `ramses.exe -t cmd.txt` | `pfc.exe -t cmd.txt` | Via STEPSS GUI |
+| **GUI (Java)** | Full support | Full support | Full support |
+| **Python (PyRAMSES)** | Full support | — | — |
+
+See the [Quick Start](/stepss-docs/getting-started/quickstart/) for details on each interface.
+
 ## Platform Support
 
 | Feature | Details |
 |---------|---------|
 | **STEPSS GUI** | Windows 64-bit, Java 20 |
 | **PyRAMSES** | Windows and Linux, Python 3.x |
+| **Command-line executables** | Windows 64-bit (ramses.exe, pfc.exe) |
 | **CODEGEN compilation** | Visual Studio 2022 + Intel oneAPI Fortran |
 | **Free version limits** | 1000 buses max, 2 OpenMP cores |
