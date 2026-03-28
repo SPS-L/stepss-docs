@@ -1,0 +1,177 @@
+---
+title: Nordic Test System
+description: A 74-bus, 20-generator benchmark for voltage stability and long-term dynamics studies in RAMSES
+---
+
+import { Tabs, TabItem, LinkCard, CardGrid } from '@astrojs/starlight/components';
+
+The Nordic test system is a well-established benchmark for voltage stability and long-term dynamics studies, originally defined in the [IEEE PES Technical Report on Test Systems for Voltage Stability Analysis and Security Assessment](https://resourcecenter.ieee.org/publications/technical-reports/PESTR19). It represents a realistic multi-area transmission network and is used extensively in research and education.
+
+<LinkCard
+  title="Nordic_JhubStart Repository"
+  description="Ready-to-run PyRAMSES simulation files with Jupyter notebook tutorial"
+  href="https://github.com/SPS-L/Nordic_JhubStart"
+/>
+
+---
+
+## System Overview
+
+| Property | Value |
+|---|---|
+| Nominal frequency | 50 Hz |
+| Buses | 74 |
+| Synchronous generators | 20 (g1–g20) |
+| Transformers | 20 |
+| Transmission lines | 52 |
+| Voltage levels | 15 kV, 20 kV, 130 kV, 220 kV, 400 kV |
+| Total generation capacity | ~10,000 MW |
+
+The system is divided into several areas interconnected through a meshed 400 kV transmission network. Lower voltage levels (130 kV, 220 kV) serve sub-transmission, while 15 kV and 20 kV buses connect generators and distribution loads.
+
+---
+
+## Dynamic Models
+
+Each generator is modeled as a detailed synchronous machine (`SYNC_MACH`) with:
+
+- **Machine model**: Subtransient model with d- and q-axis dynamics (round-rotor or salient-pole depending on unit type)
+- **Excitation system**: `EXC GENERIC1` — a generic AVR with field current limiter, OEL, and optional PSS (SPEEDIN type)
+- **Governor/turbine**:
+  - Hydro units (g1–g5, g8–g12, g19–g20): `TOR HYDRO_GENERIC1` — hydraulic turbine with governor
+  - Thermal units (g6–g7, g13–g18): `TOR CONSTANT` — constant mechanical torque
+
+Loads are represented using the `INJEC vfd_load` model (variable-frequency-dependent exponential recovery load) with voltage-dependent active and reactive power characteristics.
+
+Under-load tap changers are modeled with `DCTL LTC2` discrete controllers on all distribution transformers.
+
+---
+
+## Operating Points
+
+The repository provides two operating points:
+
+| File | Description |
+|---|---|
+| `dyn_A.dat` / `volt_rat_A.dat` | Operating Point A — base case, moderately stressed |
+| `dyn_B.dat` / `volt_rat_B.dat` | Operating Point B — heavily stressed, closer to voltage collapse |
+
+Operating Point B is the primary case for voltage stability studies; it features higher load levels in the central area and reduced reactive power reserves.
+
+---
+
+## Repository Contents
+
+| File | Description |
+|---|---|
+| `Execute.ipynb` | Jupyter notebook with step-by-step simulation tutorial |
+| `dyn_A.dat` / `dyn_B.dat` | Dynamic data files (generators, controllers, network, loads) |
+| `volt_rat_A.dat` / `volt_rat_B.dat` | Power flow solutions (bus voltages and angles) |
+| `settings1.dat` | Solver configuration (time step, tolerances, threading) |
+| `obs.dat` | Observation file — monitors all buses, branches, machines, injectors |
+| `nothing.dst` | Empty disturbance file (undisturbed simulation) |
+| `trip_gen.dst` | Generator trip disturbance scenario |
+| `short_trip_branch.dst` | Short-circuit followed by branch trip |
+| `variants.pdf` | Documentation of system variants and operating points |
+
+---
+
+## Disturbance Scenarios
+
+### Generator Trip (`trip_gen.dst`)
+
+Trips generator g2 at $t = 1$ s and observes the system response. Additional shunt compensation is switched at $t = 11$ s and $t = 21$ s:
+
+```
+0.000 CONTINUE SOLVER BD 0.010 0.001 0.0 ALL
+1.000 BREAKER SYNC_MACH g2 0
+5.000 CONTINUE SOLVER BD 0.010 0.001 0.0 ALL
+120.000 STOP
+11.000 CHGPRM SHUNT SH1042 QNOM 80
+21.000 CHGPRM SHUNT SH1042 QNOM 80
+```
+
+### Short-Circuit with Branch Trip (`short_trip_branch.dst`)
+
+Applies a three-phase fault on bus 4032 at $t = 1$ s, cleared after 100 ms by tripping the faulted branch:
+
+```
+0.000 CONTINUE SOLVER BD 0.020 0.001 0. ABL
+1.000 FAULT BUS 4032 0. 0.8
+1.100 CLEAR BUS 4032
+1.100 BREAKER BRANCH 4032-4044 0 0
+5.000 CONTINUE SOLVER BD 0.020 0.001 0. ABL
+240.000 STOP
+```
+
+---
+
+## Quick Start
+
+### Prerequisites
+
+- Python 3 with [PyRAMSES](/stepss-docs/pyramses/installation/) installed
+- JupyterLab (recommended) or any Python environment
+
+### Installation
+
+```bash
+pip install pyramses matplotlib numpy
+```
+
+### Running a Simulation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/SPS-L/Nordic_JhubStart.git
+   cd Nordic_JhubStart
+   ```
+
+2. Open `Execute.ipynb` in Jupyter and run cells sequentially, or use the following Python script:
+
+<Tabs>
+<TabItem label="Python Script">
+```python
+import pyramses
+
+case = pyramses.cfg()
+case.addData("dyn_B.dat")
+case.addData("volt_rat_B.dat")
+case.addData("settings1.dat")
+case.addObs("obs.dat")
+case.addDst("trip_gen.dst")
+
+ram = pyramses.sim()
+ram.execSim(case, 150.0)
+
+# Extract and plot results
+ext = pyramses.extractor(case.getTrj())
+```
+</TabItem>
+<TabItem label="Jupyter Notebook">
+Open `Execute.ipynb` directly — it contains a complete guided tutorial with inline plots for:
+- Bus voltage evolution
+- Generator frequency deviations
+- Governor valve output and mechanical power
+- Active and reactive power output
+</TabItem>
+</Tabs>
+
+---
+
+## What to Observe
+
+After a generator trip on Operating Point B, the simulation demonstrates:
+
+- **Frequency transient**: immediate frequency drop followed by primary governor response from hydro units
+- **Voltage dynamics**: progressive voltage decline in the central area as load restoration (tap changers, thermostatic loads) increases demand beyond available reactive reserves
+- **Long-term voltage instability**: if the system lacks sufficient reactive support, voltages collapse over tens of seconds — a classic long-term voltage stability phenomenon
+
+---
+
+## References
+
+- T. Van Cutsem, M. Classes, "Description, modelling and simulation results of a test system for voltage stability analysis," IEEE PES Technical Report PES-TR19, 2013. Available from the [IEEE Resource Center](https://resourcecenter.ieee.org/publications/technical-reports/PESTR19)
+- [RAMSES project page](https://sps-lab.org/project/pyramses/) at the Sustainable Power Systems Lab
+- [STEPSS project page](https://sps-lab.org/project/stepss/) at the Sustainable Power Systems Lab

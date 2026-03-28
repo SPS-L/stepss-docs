@@ -1,0 +1,2159 @@
+---
+title: CODEGEN Blocks Library
+description: Complete reference for all modeling blocks available in the CODEGEN DSL
+---
+
+CODEGEN provides a library of reusable modeling blocks for constructing user-defined dynamic models. Each block is specified by a keyword (prefixed with `&`), followed by input/output state names and parameters. Parameters can be literal values, named data enclosed in braces `{T}`, or arithmetic expressions.
+
+:::note[Syntax Conventions]
+- Block keywords are prefixed with `&` (e.g., `& tf1p`)
+- State names (inputs/outputs) are plain identifiers — do **not** enclose them in brackets
+- Parameters (data values) are enclosed in braces: `{T}`, `{Kp}`, `{1/{omegac}}`
+- Square brackets `[v]`, `[p]`, `[q]`, `[if]`, `[vf]` denote **system variables** provided by the simulator (bus voltage, active power, reactive power, field current, field voltage)
+:::
+
+---
+
+## Block Reference
+
+### Algebraic & Mathematical
+
+| Block | Description |
+|-------|-------------|
+| [`abs`](#abs) | Absolute value of input |
+| [`algeq`](#algeq) | Algebraic equation |
+| [`max1v1c`](#max1v1c) | Maximum of a state and a constant |
+| [`max2v`](#max2v) | Maximum of two states |
+| [`min1v1c`](#min1v1c) | Minimum of a state and a constant |
+| [`min2v`](#min2v) | Minimum of two states |
+| [`nint`](#nint) | Nearest integer |
+| [`pwlin`](#pwlin) | Piecewise linear function |
+
+### Transfer Functions
+
+| Block | Description |
+|-------|-------------|
+| [`tf1p`](#tf1p) | First-order: $G/(1 + sT)$ |
+| [`tf1plim`](#tf1plim) | First-order with non-windup output limits |
+| [`tf1pvlim`](#tf1pvlim) | First-order with variable non-windup limits |
+| [`tf1p2lim`](#tf1p2lim) | First-order with rate limits and output limits |
+| [`tf1p1z`](#tf1p1z) | One zero, one pole: $G(1 + sT_z)/(1 + sT_p)$ |
+| [`tf2p2z`](#tf2p2z) | Two zeros, two poles |
+| [`tfder1p`](#tfder1p) | Derivative (washout): $sT/(1 + sT)$ |
+
+### Integrators
+
+| Block | Description |
+|-------|-------------|
+| [`int`](#int) | Integrator with time constant |
+| [`inlim`](#inlim) | Integrator with non-windup limits |
+| [`invlim`](#invlim) | Integrator with variable non-windup limits |
+
+### Controllers
+
+| Block | Description |
+|-------|-------------|
+| [`pictl`](#pictl) | Proportional-Integral controller |
+| [`pictllim`](#pictllim) | PI with non-windup limit on integral |
+| [`pictl2lim`](#pictl2lim) | PI with limits on integral and total output |
+| [`pictlieee`](#pictlieee) | PI with non-windup limit (IEEE formulation) |
+
+### Limiters & Switching
+
+| Block | Description |
+|-------|-------------|
+| [`lim`](#lim) | Limiter with constant bounds |
+| [`limvb`](#limvb) | Limiter with variable bounds |
+| [`db`](#db) | Deadband |
+| [`hyst`](#hyst) | Hysteresis |
+| [`switch`](#switch) | Select one of $n$ inputs |
+| [`swsign`](#swsign) | Switch based on sign of input |
+
+### Frequency Estimation
+
+| Block | Description |
+|-------|-------------|
+| [`f_inj`](#f_inj) | Frequency at bus of injector |
+| [`f_twop_bus1`](#f_twop_bus1) | Frequency at first bus of two-port |
+| [`f_twop_bus2`](#f_twop_bus2) | Frequency at second bus of two-port |
+
+### Automata & Timers
+
+| Block | Description |
+|-------|-------------|
+| [`fsa`](#fsa) | Finite State Automaton |
+| [`tsa`](#tsa) | Two-state automaton |
+| [`timer`](#timer) | Timer with piecewise-linear delay |
+| [`timersc`](#timersc) | Timer with staircase delay |
+
+---
+
+## Block Details
+
+## Algebraic & Mathematical
+
+---
+
+### abs
+
+*Absolute value of input.*
+
+**Syntax**
+
+```
+& abs
+x_i
+x_j
+```
+
+`x_i` is the input state; `x_j` is the output state (the absolute value of `x_i`).
+
+**Internal states:** none
+
+**Discrete variable:** $z \in \{-1, 1\}$
+
+**Equations**
+
+$$
+0 =
+\begin{cases}
+x_j - x_i & \text{if } z = 1 \\
+x_j + x_i & \text{if } z = -1
+\end{cases}
+$$
+
+**Discrete transitions**
+
+```
+if z = 1:
+    if x_i < 0:
+        z ← -1
+else:  # z = -1
+    if x_i > 0:
+        z ← 1
+```
+
+**Initialization**
+
+```
+if x_i > 0:
+    z ← 1
+else:
+    z ← 0
+```
+
+**Notes**
+
+The model has a discontinuous derivative at $x_i = 0$. It is implemented internally with a small hysteresis; see the **hyst** block with $x_I = \epsilon$, $y_{IB} = -\epsilon$, $y_{IA} = \epsilon$, $x_D = -\epsilon$, $y_{DB} = -\epsilon$, $y_{DA} = \epsilon$, where $\epsilon$ is the absolute accuracy used to solve the algebraic equations in RAMSES.
+
+---
+
+### algeq
+
+*Algebraic equation.*
+
+**Syntax**
+
+```
+& algeq
+math expression
+```
+
+**Internal states:** none
+
+**Discrete variables:** none
+
+**Description**
+
+This block forces an algebraic constraint (or equation) involving one or several states:
+
+$$f(x_1, x_2, \ldots, x_n) = 0$$
+
+where $n$ is the number of states ($n \ge 1$).
+
+**Notes**
+
+This block does not have distinct "inputs" and "outputs". Those roles emerge from the rest of the model that incorporates the algebraic constraint.
+
+---
+
+### max1v1c
+
+*Maximum between a state and a constant.*
+
+**Syntax**
+
+```
+& max1v1c
+x_i
+x_j
+{C}
+```
+
+`x_i` is the input state, `x_j` is the output ($\max(x_i, C)$), and `C` is a constant (data name, parameter name, or math expression).
+
+**Internal states:** none
+
+**Discrete variable:** $z \in \{1, 2\}$
+
+**Equations**
+
+$$
+0 =
+\begin{cases}
+x_j - C   & \text{if } z = 1 \\
+x_j - x_i & \text{if } z = 2
+\end{cases}
+$$
+
+When $z = 1$ the output is clamped to $C$; when $z = 2$ the output tracks $x_i$.
+
+**Discrete transitions**
+
+```
+if z = 1:
+    if x_i > C:
+        z ← 2
+else:  # z = 2
+    if x_i <= C:
+        z ← 1
+```
+
+**Initialization**
+
+```
+if x_i < C:
+    z ← 1
+else:
+    z ← 2
+```
+
+---
+
+### max2v
+
+*Maximum between two states.*
+
+**Syntax**
+
+```
+& max2v
+x_i
+x_j
+x_k
+```
+
+`x_i` and `x_j` are the two input states; `x_k` is the output ($\max(x_i, x_j)$).
+
+**Internal states:** none
+
+**Discrete variable:** $z \in \{1, 2\}$
+
+**Equations**
+
+$$
+0 =
+\begin{cases}
+x_i - x_k & \text{if } z = 1 \\
+x_j - x_k & \text{if } z = 2
+\end{cases}
+$$
+
+When $z = 1$ the output follows $x_i$; when $z = 2$ the output follows $x_j$.
+
+**Discrete transitions**
+
+```
+if z = 1:
+    if x_i < x_j:
+        z ← 2
+else:  # z = 2
+    if x_j <= x_i:
+        z ← 1
+```
+
+**Initialization**
+
+```
+if x_i > x_j:
+    z ← 1
+else:
+    z ← 2
+```
+
+---
+
+### min1v1c
+
+*Minimum between a state and a constant.*
+
+**Syntax**
+
+```
+& min1v1c
+x_i
+x_j
+{C}
+```
+
+`x_i` is the input state, `x_j` is the output ($\min(x_i, C)$), and `C` is a constant (data name, parameter name, or math expression).
+
+**Internal states:** none
+
+**Discrete variable:** $z \in \{1, 2\}$
+
+**Equations**
+
+$$
+0 =
+\begin{cases}
+x_j - x_i & \text{if } z = 1 \\
+x_j - C   & \text{if } z = 2
+\end{cases}
+$$
+
+When $z = 1$ the output tracks $x_i$; when $z = 2$ the output is clamped to $C$.
+
+**Discrete transitions**
+
+```
+if z = 1:
+    if x_i > C:
+        z ← 2
+else:  # z = 2
+    if x_i <= C:
+        z ← 1
+```
+
+**Initialization**
+
+```
+if x_i < C:
+    z ← 1
+else:
+    z ← 2
+```
+
+---
+
+### min2v
+
+*Minimum between two states.*
+
+**Syntax**
+
+```
+& min2v
+x_i
+x_j
+x_k
+```
+
+`x_i` and `x_j` are the two input states; `x_k` is the output ($\min(x_i, x_j)$).
+
+**Internal states:** none
+
+**Discrete variable:** $z \in \{1, 2\}$
+
+**Equations**
+
+$$
+0 =
+\begin{cases}
+x_i - x_k & \text{if } z = 1 \\
+x_j - x_k & \text{if } z = 2
+\end{cases}
+$$
+
+When $z = 1$ the output follows $x_i$; when $z = 2$ the output follows $x_j$.
+
+**Discrete transitions**
+
+```
+if z = 1:
+    if x_i > x_j:
+        z ← 2
+else:  # z = 2
+    if x_j >= x_i:
+        z ← 1
+```
+
+**Initialization**
+
+```
+if x_i < x_j:
+    z ← 1
+else:
+    z ← 2
+```
+
+---
+
+### nint
+
+*Integer nearest to the input shifted by a constant $c$.*
+
+**Syntax**
+
+```
+& nint
+x_i
+x_j
+{c}
+```
+
+`x_i` is the input state, `x_j` is the output (nearest integer), and `c` is a shift constant (data name, parameter name, or math expression).
+
+**Internal states:** none
+
+**Discrete variable:** $z \in \mathcal{I}$ (the integers)
+
+**Equations**
+
+$$0 = x_j - z$$
+
+**Discrete transitions**
+
+```
+if nint(x_i + c) ≠ z:
+    z ← nint(x_i + c)
+```
+
+where $\text{nint}(\cdot)$ returns the nearest integer.
+
+**Initialization**
+
+$$z \leftarrow \text{nint}(x_i + c)$$
+
+**Notes — particular cases**
+
+- With $c = 0$: the output is the integer nearest to $x_i$.
+- With $c = -0.5$: the output is the *floor* of $x_i$ (largest integer $\le x_i$).
+- With $c = 0.5$: the output is the *ceiling* of $x_i$ (smallest integer $\ge x_i$).
+
+---
+
+## Limiters & Switching
+
+---
+
+### lim
+
+*Limiter with constant bounds.*
+
+**Syntax**
+
+```
+& lim
+x_i
+x_j
+{x_min}
+{x_max}
+```
+
+`x_i` is the input, `x_j` is the (limited) output. `x_min` and `x_max` are constant bounds (data names, parameter names, or math expressions).
+
+**Internal states:** none
+
+**Discrete variable:** $z \in \{-1, 0, 1\}$
+
+**Equations**
+
+$$
+0 =
+\begin{cases}
+x_j - x_i     & \text{if } z = 0 \\
+x_j - x_{max} & \text{if } z = 1 \\
+x_j - x_{min} & \text{if } z = -1
+\end{cases}
+$$
+
+**Discrete transitions**
+
+```
+if z = 0:
+    if x_i > x_max:
+        z ← 1
+    else if x_i < x_min:
+        z ← -1
+else if z = 1:
+    if x_i < x_max:
+        z ← 0
+else:  # z = -1
+    if x_i > x_min:
+        z ← 0
+```
+
+**Initialization**
+
+```
+if x_j > x_max:
+    z ← 1
+else if x_j < x_min:
+    z ← -1
+else:
+    z ← 0
+```
+
+---
+
+### limvb
+
+*Limiter with variable bounds.*
+
+**Syntax**
+
+```
+& limvb
+x_i
+x_min
+x_max
+x_j
+```
+
+`x_i` is the input; `x_min` and `x_max` are variable (state) lower and upper bounds; `x_j` is the (limited) output.
+
+**Internal states:** none
+
+**Discrete variable:** $z \in \{-1, 0, 1\}$
+
+**Equations**
+
+$$
+0 =
+\begin{cases}
+x_j - x_i     & \text{if } z = 0 \\
+x_j - x_{max} & \text{if } z = 1 \\
+x_j - x_{min} & \text{if } z = -1
+\end{cases}
+$$
+
+**Discrete transitions**
+
+```
+if z = 0:
+    if x_i > x_max:
+        z ← 1
+    else if x_i < x_min:
+        z ← -1
+else if z = 1:
+    if x_i < x_max:
+        z ← 0
+else:  # z = -1
+    if x_i > x_min:
+        z ← 0
+```
+
+**Initialization**
+
+```
+if x_i > x_max:
+    z ← 1
+else if x_i < x_min:
+    z ← -1
+else:
+    z ← 0
+```
+
+**Notes**
+
+Unlike **lim**, the bounds $x_{min}$ and $x_{max}$ are model states (variables) rather than fixed parameters, allowing dynamic limit variation during simulation.
+
+---
+
+### db
+
+*Deadband.*
+
+**Syntax**
+
+```
+& db
+x_i
+x_j
+{delta_1}
+{s_1}
+{a_1}
+{delta_2}
+{s_2}
+{a_2}
+```
+
+`x_i` is the input, `x_j` is the output. Parameters $\delta_1$, $s_1$, $a_1$, $\delta_2$, $s_2$, $a_2$ are data names, parameter names, or math expressions.
+
+**Internal states:** none
+
+**Discrete variable:** $z \in \{0, 1, -1\}$
+
+**Equations**
+
+$$
+0 =
+\begin{cases}
+x_j                              & \text{if } z = 0 \\
+x_j - s_2 - a_2(x_i - \delta_2) & \text{if } z = 1 \\
+x_j - s_1 - a_1(x_i - \delta_1) & \text{if } z = -1
+\end{cases}
+$$
+
+**Discrete transitions**
+
+```
+if z ∈ {0, 1}:
+    if x_i < delta_1:
+        z ← -1
+else if z ∈ {-1, 0}:
+    if x_i > delta_2:
+        z ← 1
+else if z ∈ {-1, 1}:
+    if delta_1 < x_i < delta_2:
+        z ← 0
+```
+
+**Initialization**
+
+```
+if x_i > delta_2:
+    z ← 1
+else if x_i < delta_1:
+    z ← -1
+else:
+    z ← 0
+```
+
+**Notes**
+
+- The data must satisfy $\delta_1 < \delta_2$, $a_1 \ge 0$, and $a_2 \ge 0$.
+- A common special case is $s_1 = s_2 = 0$ and $a_1 = a_2 = 1$, although all values are permitted.
+- The **pwlin4**, **pwlin5**, or **pwlin6** blocks can be used as alternatives.
+
+---
+
+### hyst
+
+*Hysteresis.*
+
+**Syntax**
+
+```
+& hyst
+x_i
+x_j
+{x_I}
+{y_IB}
+{y_IA}
+{x_D}
+{y_DB}
+{y_DA}
+{z0}
+```
+
+`x_i` is the input, `x_j` is the output. The parameters $x_I$, $y_{IB}$, $y_{IA}$, $x_D$, $y_{DB}$, $y_{DA}$ define the hysteresis shape. `z0` specifies the initial discrete state when the input starts in the indeterminate region.
+
+**Internal states:** none
+
+**Discrete variable:** $z \in \{-1, 1\}$
+
+**Equations**
+
+$$
+0 =
+\begin{cases}
+\displaystyle x_j - y_{IA} - \frac{y_{IA} - y_{DB}}{x_I - x_D}(x_i - x_I) & \text{if } z = 1 \\[8pt]
+\displaystyle x_j - y_{DA} - \frac{y_{IB} - y_{DA}}{x_I - x_D}(x_i - x_D) & \text{if } z = -1
+\end{cases}
+$$
+
+**Discrete transitions**
+
+```
+if z = -1:
+    if x_i > x_I:
+        z ← 1
+else:  # z = 1
+    if x_i < x_D:
+        z ← -1
+```
+
+**Initialization**
+
+```
+if x_i > x_I:
+    z ← 1
+else if x_i < x_D:
+    z ← -1
+else:
+    if z0 >= 0:
+        z ← 1
+    else:
+        z ← 0
+```
+
+**Notes**
+
+At $t = 0$, if $x_D < x_i(0) < x_I$ the initial operating branch is indeterminate — the system could operate on either the $(y_{IA}, y_{DB})$ line ($z = 1$) or the $(y_{DA}, y_{IB})$ line ($z = -1$). The user must therefore supply `z0` to resolve the ambiguity.
+
+If $x_i(0) < x_D$ then $z$ is initialised to $-1$; if $x_i(0) > x_I$ then $z$ is initialised to $1$, and `z0` is ignored in both cases.
+
+The data must satisfy $x_D < x_I$. The degenerate case $x_D = x_I$ is not allowed by this block but can be handled with the **pwlin4** block.
+
+---
+
+## Frequency Estimation
+
+---
+
+### f_inj
+
+*Computes $f$, an estimate of the frequency (in per unit) at a given bus, from the evolution of the rectangular components $v_x$ and $v_y$ of the bus voltage. A measurement time constant $T$ is involved. Can be used in the model of an injector only.*
+
+**Syntax**
+
+```
+& f_inj
+f
+{T}
+```
+
+`f` is the name of the estimated frequency variable; `T` is the measurement time constant (data name, parameter name, or math expression). The voltage components $v_x$ and $v_y$ are automatically inherited and must not be declared.
+
+**Internal states:** $v_{xm}$ and $v_{ym}$ (measured/filtered voltage components)
+
+**Discrete variables:** none
+
+**Equations**
+
+$$
+\begin{aligned}
+\dot{v}_{xm} &= \frac{v_x - v_{xm}}{T} \\[6pt]
+\dot{v}_{ym} &= \frac{v_y - v_{ym}}{T} \\[6pt]
+0 &= \omega_{ref,pu} + \frac{(v_y - v_{ym})\,v_{xm} - (v_x - v_{xm})\,v_{ym}}{2\pi f_N T \left(v_{xm}^2 + v_{ym}^2\right)} - f
+\end{aligned}
+$$
+
+**Initialization**
+
+$$v_{xm} = v_x \qquad v_{ym} = v_y$$
+
+**Explanation**
+
+The voltage components $v_x$ and $v_y$ are the projections of the bus voltage phasor onto the reference axes rotating at angular speed $\omega_{ref}$ (rad/s). The instantaneous angular frequency is:
+
+$$\omega = \omega_{ref} + \frac{d\phi}{dt}, \qquad \phi = \arctan\frac{v_y}{v_x}$$
+
+The per-unit frequency is therefore:
+
+$$f = \frac{\omega}{2\pi f_N} = \omega_{ref,pu} + \frac{1}{2\pi f_N}\frac{d}{dt}\!\left(\arctan\frac{v_y}{v_x}\right) = \omega_{ref,pu} + \frac{1}{2\pi f_N}\frac{\dot{v}_y v_x - \dot{v}_x v_y}{v_x^2 + v_y^2}$$
+
+where $f_N$ is the nominal frequency (known from the system data). To filter transients, $v_x$ and $v_y$ are passed through first-order filters with time constant $T$, yielding the measured values $v_{xm}$ and $v_{ym}$. Substituting the filter derivatives into the frequency expression yields the third equation above.
+
+**Notes**
+
+- A recommended value for $T$ is in the range $0.05$–$0.10$ s.
+- $T = 0$ is not allowed. If $T$ is too small, the solver may encounter a singularity and the simulation may fail.
+
+---
+
+### f_twop_bus1
+
+*Similar to f\_inj. Computes $f$, an estimate of the frequency (in per unit) at the **first bus** of a given two-port. Can be used in the model of a two-port only.*
+
+**Syntax**
+
+```
+& f_twop_bus1
+f
+{T}
+```
+
+`f` is the name of the estimated frequency variable; `T` is the measurement time constant (data name, parameter name, or math expression).
+
+**Internal states:** $v_{xm}$ and $v_{ym}$ (filtered voltage components at bus 1)
+
+**Discrete variables:** none
+
+**Equations, initialization, and notes:** identical to **f\_inj** — refer to that block for the full mathematical description. The only difference is that this block uses the voltage at the first bus of a two-port rather than an injector bus.
+
+---
+
+### f_twop_bus2
+
+*Similar to f\_inj. Computes $f$, an estimate of the frequency (in per unit) at the **second bus** of a given two-port. Can be used in the model of a two-port only.*
+
+**Syntax**
+
+```
+& f_twop_bus2
+f
+{T}
+```
+
+`f` is the name of the estimated frequency variable; `T` is the measurement time constant (data name, parameter name, or math expression).
+
+**Internal states:** $v_{xm}$ and $v_{ym}$ (filtered voltage components at bus 2)
+
+**Discrete variables:** none
+
+**Equations, initialization, and notes:** identical to **f\_inj** — refer to that block for the full mathematical description. The only difference is that this block uses the voltage at the second bus of a two-port rather than an injector bus.
+
+---
+
+## Automata & Timers
+
+---
+
+### fsa
+
+*Finite State Automaton.*
+
+This block forces a set of $n$ algebraic equations. There are $s$ possible sets, each corresponding to a value of the discrete state $z$. Transitions between sets occur when Boolean expressions evaluate to true.
+
+**Syntax**
+
+The block is specified via an inline example. For $s = 3$ states and $n = 2$ algebraic constraints per state:
+
+```
+& fsa
+initial_state
+# 1
+algebraic constraint No. 1
+algebraic constraint No. 2
+-> 2
+boolean expression C1
+# 2
+algebraic constraint No. 3
+algebraic constraint No. 4
+-> 1
+boolean expression C2
+-> 3
+boolean expression C3
+-> 3
+boolean expression C4
+# 3
+algebraic constraint No. 5
+algebraic constraint No. 6
+-> 1
+boolean expression C5
+##
+```
+
+**Internal states:** none
+
+**Discrete variable:** $z$ — the index of the currently active state
+
+**Syntax rules**
+
+| Token | Meaning |
+|-------|---------|
+| `# N` | Begins the section for state $N$. States must be numbered consecutively from 1 to $s$ in increasing order. |
+| `##`  | Marks the end of the state list. |
+| `-> N` | Declares a transition to state $N$. The following line is the Boolean expression that triggers the transition. |
+| Second line | Integer specifying the initial state of the automaton. |
+
+**Notes**
+
+- The number $n$ of algebraic constraints must be identical across all states.
+- Multiple transitions from the same state to the same target state are permitted (e.g., two separate conditions C3 and C4 both targeting state 3 in the example). Alternatively a single transition with the combined condition `C3 or C4` may be used.
+- Transitions and algebraic constraints may involve any model states and parameters.
+
+---
+
+## Integrators
+
+---
+
+### int
+
+*Integrator with (positive) time constant $T$.*
+
+**Syntax**
+
+```
+& int
+x_i
+x_j
+{T}
+```
+
+`x_i` is the input, `x_j` is the integrated output, and `T` is the (positive) time constant (data name, parameter name, or math expression).
+
+**Internal states:** none
+
+**Discrete variables:** none
+
+**Equation**
+
+$$T\,\dot{x}_j = x_i$$
+
+**Notes**
+
+$T = 0$ is not allowed. If $T$ is too small, the solver may encounter a singularity and the simulation may fail.
+
+---
+
+### inlim
+
+*Integrator with (positive) time constant $T$ and non-windup limits on output.*
+
+**Syntax**
+
+```
+& inlim
+x_i
+x_j
+{T}
+{x_min}
+{x_max}
+```
+
+`x_i` is the input, `x_j` is the limited integrated output. `T` is the time constant; `x_min` and `x_max` are constant output limits (data names, parameter names, or math expressions).
+
+**Internal states:** none
+
+**Discrete variable:** $z \in \{0, 1, -1\}$
+
+**Equations**
+
+$$
+\begin{aligned}
+T\,\dot{x}_j &= x_i                     && \text{if } z = 0 \\
+0 &= x_j - x_{min}                      && \text{if } z = -1 \\
+0 &= x_j - x_{max}                      && \text{if } z = 1
+\end{aligned}
+$$
+
+**Discrete transitions**
+
+```
+if z = 0:
+    if x_j > x_max:
+        z ← 1
+    else if x_j < x_min:
+        z ← -1
+else if z = 1:
+    if x_i < 0:
+        z ← 0
+else:  # z = -1
+    if x_i > 0:
+        z ← 0
+```
+
+**Initialization**
+
+```
+if x_j > x_max:
+    z ← 1
+else if x_j < x_min:
+    z ← -1
+else:
+    z ← 0
+```
+
+**Notes**
+
+The limits are *non-windup*: when the output reaches a limit, integration stops and the limit is enforced as an algebraic constraint. Integration resumes (in the direction away from the limit) once the input drives the output back into the feasible range.
+
+$T = 0$ is not allowed. If $T$ is too small, the solver may encounter a singularity and the simulation may fail.
+
+---
+
+### invlim
+
+*Integrator with (positive) time constant $T$ and non-windup limits on output. The lower and upper limits are variables.*
+
+**Syntax**
+
+```
+& invlim
+x_i
+x_min
+x_max
+x_j
+{T}
+```
+
+`x_i` is the input; `x_min` and `x_max` are variable (state) lower and upper limits; `x_j` is the limited integrated output; `T` is the time constant (data name, parameter name, or math expression).
+
+**Internal states:** none
+
+**Discrete variable:** $z \in \{0, 1, -1\}$
+
+**Equations**
+
+$$
+\begin{aligned}
+T\,\dot{x}_j &= x_i                     && \text{if } z = 0 \\
+0 &= x_j - x_{min}                      && \text{if } z = -1 \\
+0 &= x_j - x_{max}                      && \text{if } z = 1
+\end{aligned}
+$$
+
+**Discrete transitions**
+
+```
+if z = 0:
+    if x_j > x_max:
+        z ← 1
+    else if x_j < x_min:
+        z ← -1
+else if z = 1:
+    if x_i < 0:
+        z ← 0
+else:  # z = -1
+    if x_i > 0:
+        z ← 0
+```
+
+**Initialization**
+
+```
+if x_j > x_max:
+    z ← 1
+else if x_j < x_min:
+    z ← -1
+else:
+    z ← 0
+```
+
+**Notes**
+
+Unlike **inlim**, the bounds $x_{min}$ and $x_{max}$ are model states (variables) that can change during simulation, enabling dynamic limit adjustment.
+
+The non-windup behaviour is identical to **inlim**: integration halts when a limit is reached and resumes once the input drives the output away from that limit.
+
+$T = 0$ is not allowed. If $T$ is too small, the solver may encounter a singularity and the simulation may fail.
+## Controllers
+
+### `pictl`
+
+**Proportional-Integral (PI) controller.**
+
+#### Syntax
+
+```
+& pictl
+name of variable x_k
+name of variable x_j
+data name, parameter name or math expression for K_i
+data name, parameter name or math expression for K_p
+```
+
+#### Internal States
+
+$x_i$
+
+#### Discrete Variables
+
+None.
+
+#### Equations
+
+$$\begin{aligned}
+\dot{x}_i &= K_i \, x_k \\
+0 &= K_p \, x_k + x_i - x_j
+\end{aligned}$$
+
+#### Initialization
+
+$$x_i = x_j$$
+
+---
+
+### `pictllim`
+
+**Proportional-Integral (PI) controller with non-windup limit on the integral term.**
+
+#### Syntax
+
+```
+& pictllim
+name of variable x_k
+name of variable x_j
+data name, parameter name or math expression for K_i
+data name, parameter name or math expression for K_p
+data name, parameter name or math expression for x_i^min
+data name, parameter name or math expression for x_i^max
+```
+
+#### Internal States
+
+$x_i$
+
+#### Discrete Variables
+
+$z \in \{-1, 0, 1\}$
+
+#### Equations
+
+$$0 = \begin{cases}
+\dot{x}_i = K_i x_k & \text{if } z = 0 \\
+x_i - x_i^{min} & \text{if } z = -1 \\
+x_i - x_i^{max} & \text{if } z = 1
+\end{cases}$$
+
+$$0 = K_p x_k + x_i - x_j$$
+
+#### Discrete Transitions
+
+```
+if z = 0:
+  if x_i > x_i^max:  z ← 1
+  else if x_i < x_i^min:  z ← -1
+else if z = 1:
+  if K_i * x_k < 0:  z ← 0
+else if z = -1:
+  if K_i * x_k > 0:  z ← 0
+```
+
+#### Initialization
+
+```
+if K_i * x_k > 0:
+  z ← 1;  x_i ← x_i^max
+else if K_i * x_k < 0:
+  z ← -1;  x_i ← x_i^min
+else:
+  z ← 0;  x_i ← x_j
+```
+
+---
+
+### `pictl2lim`
+
+**Proportional-Integral (PI) controller with non-windup limit on the integral term and limit on the proportional term.**
+
+#### Syntax
+
+```
+& pictl2lim
+name of variable x_k
+name of variable x_j
+data name, parameter name or math expression for K_i
+data name, parameter name or math expression for K_p
+data name, parameter name or math expression for x_i^min
+data name, parameter name or math expression for x_i^max
+data name, parameter name or math expression for x_p^min
+data name, parameter name or math expression for x_p^max
+```
+
+#### Internal States
+
+$x_i$ and $x_p$
+
+#### Discrete Variables
+
+$z_1 \in \{-1, 0, 1\}$ and $z_2 \in \{-1, 0, 1\}$
+
+#### Equations
+
+$$\begin{cases}
+0 = K_p x_k - x_p & \text{if } z_1 = 0 \\
+0 = x_p - x_p^{min} & \text{if } z_1 = -1 \\
+0 = x_p - x_p^{max} & \text{if } z_1 = 1
+\end{cases}$$
+
+$$\begin{cases}
+\dot{x}_i = K_i x_k & \text{if } z_2 = 0 \\
+0 = x_i - x_i^{min} & \text{if } z_2 = -1 \\
+0 = x_i - x_i^{max} & \text{if } z_2 = 1
+\end{cases}$$
+
+$$0 = x_p + x_i - x_j$$
+
+#### Discrete Transitions
+
+```
+# Proportional limiter (z_1):
+if z_1 = 0:
+  if x_p > x_p^max:  z_1 ← 1
+  else if x_p < x_p^min:  z_1 ← -1
+else if z_1 = 1:
+  if K_p * x_k < x_p^max:  z_1 ← 0
+else if z_1 = -1:
+  if K_p * x_k > x_p^min:  z_1 ← 0
+
+# Integral limiter (z_2):
+if z_2 = 0:
+  if x_i > x_i^max:  z_2 ← 1
+  else if x_i < x_i^min:  z_2 ← -1
+else if z_2 = 1:
+  if K_i * x_k < 0:  z_2 ← 0
+else if z_2 = -1:
+  if K_i * x_k > 0:  z_2 ← 0
+```
+
+#### Initialization
+
+Initialization of $x_p$:
+
+$$x_p = \min\!\left(x_p^{max},\, \max(x_p^{min},\, K_p x_k)\right)$$
+
+Initialization of $x_i$ and discrete variables:
+
+```
+if K_p * x_k > x_p^max:  z_1 ← 1
+else if K_p * x_k < x_p^min:  z_1 ← -1
+else:  z_1 ← 0
+
+if K_i * x_k > 0:
+  z_2 ← 1;  x_i ← x_i^max
+else if K_i * x_k < 0:
+  z_2 ← -1;  x_i ← x_i^min
+else:
+  z_2 ← 0;  x_i ← x_j - x_p
+```
+
+---
+
+### `pictlieee`
+
+**Proportional-Integral (PI) controller with non-windup limit on the integral term, compliant with IEEE standards.**
+
+This PI controller implements the non-windup integrator specified in:
+- IEEE Std 421.5-1992, IEEE Std 421.5-2005, and IEEE Std 421.5-2016 (excitation system models for power system stability studies).
+
+The IEEE standard specifies that the integrator state $x_1$ is frozen as soon as $x_j$ reaches its lower or upper limit. To avoid limit cycles when the integrator is released, a second "open-loop" integrator tracks what $x_1$ would be if unconstrained. The lower integrator is re-activated only when $K_p x_k + x_2$ re-enters $[x_j^{min},\, x_j^{max}]$.
+
+#### Syntax
+
+```
+& pictlieee
+name of variable x_k
+name of variable x_j
+data name, parameter name or math expression for K_i
+data name, parameter name or math expression for K_p
+data name, parameter name or math expression for x_j^min
+data name, parameter name or math expression for x_j^max
+```
+
+#### Internal States
+
+$x_1$ and $x_2$
+
+#### Discrete Variables
+
+$z \in \{-2, -1, 0, 1, 2\}$
+
+#### Equations
+
+$$\text{if } z = 0: \quad
+\begin{cases}
+0 = K_p x_k + x_1 - x_j \\
+\dot{x}_1 = K_i \, x_k \\
+0 = x_2 - x_1
+\end{cases}$$
+
+$$\text{if } z = 2: \quad
+\begin{cases}
+0 = x_j^{max} - x_j \\
+\dot{x}_1 = 0 \\
+0 = x_2 - x_1
+\end{cases}
+\qquad
+\text{if } z = 1: \quad
+\begin{cases}
+0 = x_j^{max} - x_j \\
+\dot{x}_1 = 0 \\
+\dot{x}_2 = K_i \, x_k
+\end{cases}$$
+
+$$\text{if } z = -2: \quad
+\begin{cases}
+0 = x_j^{min} - x_j \\
+\dot{x}_1 = 0 \\
+0 = x_2 - x_1
+\end{cases}
+\qquad
+\text{if } z = -1: \quad
+\begin{cases}
+0 = x_j^{min} - x_j \\
+\dot{x}_1 = 0 \\
+\dot{x}_2 = K_i \, x_k
+\end{cases}$$
+
+#### Discrete Transitions
+
+The tests marked (*) use $x_2$ (the open-loop integrator) to decide when the active integrator $x_1$ can be released.
+
+```
+if z = 0:
+  if x_j > x_j^max:  z ← 2
+  else if x_j < x_j^min:  z ← -2
+else if z = 2:
+  if K_p*x_k + x_1 < x_j^max:  z ← 1
+else if z = 1:
+  if K_p*x_k + x_1 > x_j^max:  z ← 2
+  else if K_p*x_k + x_2 < x_j^max:  z ← 0   (*)
+else if z = -2:
+  if K_p*x_k + x_1 > x_j^min:  z ← -1
+else if z = -1:
+  if K_p*x_k + x_1 < x_j^min:  z ← -2
+  else if K_p*x_k + x_2 > x_j^min:  z ← 0   (*)
+```
+
+#### Initialization
+
+```
+if x_j >= x_j^max:
+  z ← 2;  x_1 ← x_j^max - K_p*x_k;  x_2 ← x_1
+else if x_j <= x_j^min:
+  z ← -2;  x_1 ← x_j^min - K_p*x_k;  x_2 ← x_1
+else:
+  z ← 0;  x_1 ← x_j;  x_2 ← x_1
+```
+
+---
+
+## Transfer Functions
+
+### `tf1p`
+
+**Transfer function between input and output: one time constant.**
+
+#### Syntax
+
+```
+& tf1p
+name of variable x_i
+name of variable x_j
+data name, parameter name or math expression for G
+data name, parameter name or math expression for T
+```
+
+#### Internal States
+
+None.
+
+#### Discrete Variables
+
+None.
+
+#### Equations
+
+$$T \, \dot{x}_j = -x_j + G \, x_i$$
+
+#### Notes
+
+The time constant $T$ can be zero, in which case the block behaves as a simple gain $x_j = G \, x_i$.
+
+---
+
+### `tf1plim`
+
+**Transfer function between input and output: one time constant with non-windup limits on output.**
+
+#### Syntax
+
+```
+& tf1plim
+name of variable x_i
+name of variable x_j
+data name, parameter name or math expression for G
+data name, parameter name or math expression for T
+data name, parameter name or math expression for x_min
+data name, parameter name or math expression for x_max
+```
+
+#### Internal States
+
+None.
+
+#### Discrete Variables
+
+$z \in \{-1, 0, 1\}$
+
+#### Equations
+
+$$\begin{cases}
+T \, \dot{x}_j = G \, x_i - x_j & \text{if } z = 0 \\
+0 = x_j - x_{max} & \text{if } z = 1 \\
+0 = x_j - x_{min} & \text{if } z = -1
+\end{cases}$$
+
+#### Discrete Transitions
+
+```
+if z = 0:
+  if x_j > x_max:  z ← 1
+  else if x_j < x_min:  z ← -1
+else if z = 1:
+  if G*x_i - x_j < 0:  z ← 0
+else if z = -1:
+  if G*x_i - x_j > 0:  z ← 0
+```
+
+#### Initialization
+
+```
+if x_j >= x_max:  z ← 1
+else if x_j <= x_min:  z ← -1
+else:  z ← 0
+```
+
+#### Notes
+
+The time constant $T$ can be zero. In this case the block behaves as a gain ($x_j = G x_i$) but the limits $x_{min}$ and $x_{max}$ remain in effect.
+
+---
+
+### `tf1pvlim`
+
+**Transfer function between input and output: one time constant with non-windup limits on output. The limits are variables.**
+
+This block is identical in behaviour to `tf1plim` except that $x_{min}$ and $x_{max}$ are **variable states** rather than fixed data parameters.
+
+#### Syntax
+
+```
+& tf1pvlim
+name of variable x_i
+name of variable x_j
+name of variable x_min
+name of variable x_max
+data name, parameter name or math expression for G
+data name, parameter name or math expression for T
+```
+
+#### Internal States
+
+None.
+
+#### Discrete Variables
+
+$z \in \{-1, 0, 1\}$
+
+#### Equations
+
+$$\begin{cases}
+T \, \dot{x}_j = G \, x_i - x_j & \text{if } z = 0 \\
+0 = x_j - x_{max} & \text{if } z = 1 \\
+0 = x_j - x_{min} & \text{if } z = -1
+\end{cases}$$
+
+#### Discrete Transitions
+
+```
+if z = 0:
+  if x_j > x_max:  z ← 1
+  else if x_j < x_min:  z ← -1
+else if z = 1:
+  if G*x_i - x_j < 0:  z ← 0
+else if z = -1:
+  if G*x_i - x_j > 0:  z ← 0
+```
+
+#### Initialization
+
+```
+if x_j >= x_max:  z ← 1
+else if x_j <= x_min:  z ← -1
+else:  z ← 0
+```
+
+#### Notes
+
+The time constant $T$ can be zero. In this case the block behaves as a gain ($x_j = G x_i$) but the variable limits remain in effect.
+
+---
+
+### `tf1p2lim`
+
+**Transfer function between input and output: one time constant, with limits on rate of change of output and non-windup limits on output.**
+
+#### Syntax
+
+```
+& tf1p2lim
+name of variable x_i
+name of variable x_j
+data name, parameter name or math expression for G
+data name, parameter name or math expression for T
+data name, parameter name or math expression for x_min
+data name, parameter name or math expression for x_max
+data name, parameter name or math expression for dx_min/dt
+data name, parameter name or math expression for dx_max/dt
+```
+
+#### Internal States
+
+$x_1$, initialized at $\min\!\left[\max\!\left(0,\, T \, \dot{x}_{min}\right),\, T \, \dot{x}_{max}\right]$
+
+#### Discrete Variables
+
+$z_1 \in \{-1, 0, 1\}$ (rate limiter) and $z_2 \in \{-1, 0, 1\}$ (output limiter)
+
+#### Equations
+
+$$\begin{cases}
+0 = x_1 - G \, x_i + x_j & \text{if } z_1 = 0 \\
+0 = x_1 - T \, \dot{x}_{max} & \text{if } z_1 = 1 \\
+0 = x_1 - T \, \dot{x}_{min} & \text{if } z_1 = -1
+\end{cases}$$
+
+$$\begin{cases}
+T \, \dot{x}_j = x_1 & \text{if } z_2 = 0 \\
+0 = x_j - x_{max} & \text{if } z_2 = 1 \\
+0 = x_j - x_{min} & \text{if } z_2 = -1
+\end{cases}$$
+
+$\dot{x}_{max}$ (resp. $\dot{x}_{min}$) is the maximum (resp. minimum) rate of change of $x_j$ with time.
+
+#### Discrete Transitions
+
+```
+# Rate limiter (z_1):
+if z_1 = 0:
+  if x_1 > T*dx_max:  z_1 ← 1
+  else if x_1 < T*dx_min:  z_1 ← -1
+else if z_1 = 1:
+  if G*x_i - x_j < T*dx_max:  z_1 ← 0
+else if z_1 = -1:
+  if G*x_i - x_j > T*dx_min:  z_1 ← 0
+
+# Output limiter (z_2):
+if z_2 = 0:
+  if x_j > x_max:  z_2 ← 1
+  else if x_j < x_min:  z_2 ← -1
+else if z_2 = 1:
+  if x_1 < 0:  z_2 ← 0
+else if z_2 = -1:
+  if x_1 > 0:  z_2 ← 0
+```
+
+#### Initialization
+
+```
+if G*x_i - x_j > T*dx_max:  z_1 ← 1
+else if G*x_i - x_j < T*dx_min:  z_1 ← -1
+else:  z_1 ← 0
+
+if x_j > x_max:  z_2 ← 1
+else if x_j < x_min:  z_2 ← -1
+else:  z_2 ← 0
+```
+
+#### Notes
+
+The time constant $T$ can be zero. In this case $x_1 = 0$ throughout the simulation, the block behaves as a gain $x_j = G x_i$, and both limiters are ignored ($x_{max} \to \infty$, $x_{min} \to -\infty$, $T\dot{x}_{max} \to \infty$, $T\dot{x}_{min} \to -\infty$).
+
+---
+
+### `tfder1p`
+
+**Transfer function: derivative with one time constant.**
+
+The transfer function is $\displaystyle x_j = \frac{G s}{1 + sT} x_i$.
+
+#### Syntax
+
+```
+& tfder1p
+name of variable x_i
+name of variable x_j
+data name, parameter name or math expression for G
+data name, parameter name or math expression for T
+```
+
+#### Internal States
+
+$x_1$
+
+#### Discrete Variables
+
+None.
+
+#### Equations
+
+$$\begin{aligned}
+T \, \dot{x}_1 &= x_j \\
+0 &= G \, x_i - x_1 - x_j
+\end{aligned}$$
+
+#### Initialization
+
+$$x_1 = G \, x_i$$
+
+#### Notes
+
+The model allows $T = 0$. In this case $x_j = 0$ as expected; the second equation is formally retained but becomes redundant.
+
+---
+
+### `tf1p1z`
+
+**Transfer function between input and output: one zero and one pole.**
+
+The transfer function is $\displaystyle x_j = G \frac{1 + s T_z}{1 + s T_p} x_i$.
+
+#### Syntax
+
+```
+& tf1p1z
+name of variable x_i
+name of variable x_j
+data name, parameter name or math expression for G
+data name, parameter name or math expression for T_z
+data name, parameter name or math expression for T_p
+```
+
+#### Internal States
+
+$x_1$
+
+#### Discrete Variables
+
+None.
+
+#### Equations
+
+$$\begin{aligned}
+\dot{x}_1 &= G \, x_i - x_j \\
+0 &= T_p \, x_j - G \, T_z \, x_i - x_1
+\end{aligned}$$
+
+#### Initialization
+
+$$x_1 = G \, (T_p - T_z) \, x_i$$
+
+#### Notes
+
+- $T_z = 0$ is allowed: the block reduces to $T_p \dot{x}_j = -x_j + G x_i$ (i.e., `tf1p`).
+- $T_p = 0$ is formally allowed but produces a pure differentiator $G(1 + sT_z)$; undesired transients may occur at discontinuities of $x_i$ or $\dot{x}_i$.
+- $T_p = T_z = T$: $x_1$ is initialized to zero and remains zero, giving $x_j = G x_i$.
+
+---
+
+### `tf2p2z`
+
+**Transfer function between input and output: two real zeros and two real poles.**
+
+The transfer function is $\displaystyle x_j = G \frac{(1 + n_1 s)(1 + n_2 s)}{(1 + d_1 s)(1 + d_2 s)} x_i$.
+
+#### Syntax
+
+```
+& tf2p2z
+name of variable x_i
+name of variable x_j
+data name, parameter name or math expression for G
+data name, parameter name or math expression for n_1
+data name, parameter name or math expression for n_2
+data name, parameter name or math expression for d_1
+data name, parameter name or math expression for d_2
+```
+
+#### Internal States
+
+$x_1$ and $x_2$
+
+#### Discrete Variables
+
+None.
+
+#### Equations
+
+State-space controllable canonical form:
+
+$$\begin{aligned}
+\dot{x}_1 &= x_2 \\
+d_2 \, \dot{x}_2 &= -x_1 - d_1 x_2 + d_2 x_i \\
+0 &= G(d_2 - n_2) x_1 + G(n_1 d_2 - d_1 n_2) x_2 + G n_2 d_2 x_i - d_2^2 x_j
+\end{aligned}$$
+
+#### Initialization
+
+$$x_2 = 0, \qquad x_1 = d_2 \, x_i$$
+
+#### Notes
+
+**Exception.** If $d_2 < 0.005$, both $d_2$ and $n_2$ are set to zero and the transfer function reduces to:
+
+$$G \frac{1 + n_1 s}{1 + d_1 s}$$
+
+as in the `tf1p1z` block. If additionally $d_1 < 0.005$, both $d_1$ and $n_1$ are set to zero and the block becomes a simple gain $x_j = G x_i$.
+
+---
+
+## Switching
+
+### `pwlin`
+
+**Piece-wise linear function of input, defined by $n$ points. Separate blocks exist for $n = 3, 4, 5$ and $6$.**
+
+#### Syntax
+
+```
+& pwlin3
+name of variable x_i
+name of variable x_j
+data/parameter/expression for v_x(1)
+data/parameter/expression for v_y(1)
+data/parameter/expression for v_x(2)
+data/parameter/expression for v_y(2)
+data/parameter/expression for v_x(3)
+data/parameter/expression for v_y(3)
+```
+
+For `pwlin4`, `pwlin5`, and `pwlin6`, append additional $(v_x(k), v_y(k))$ pairs up to $k = 4$, $5$, or $6$ respectively.
+
+#### Internal States
+
+None.
+
+#### Discrete Variables
+
+$z \in \{1, \ldots, n-1\}$
+
+#### Equations
+
+$$0 = v_y(z) + \frac{v_y(z+1) - v_y(z)}{v_x(z+1) - v_x(z)} \left( x_i - v_x(z) \right) - x_j$$
+
+#### Discrete Transitions
+
+```
+if x_i < v_x(1):
+  z ← 1
+else if x_i >= v_x(n):
+  z ← n-1
+else:
+  for k = 1 to n-1:
+    if v_x(k) <= x_i < v_x(k+1):
+      z ← k
+```
+
+#### Initialization
+
+Same logic as discrete transitions.
+
+#### Notes
+
+- The $v_x$ values must be strictly increasing at the endpoints: $v_x(1) < v_x(2)$ and $v_x(n-1) < v_x(n)$; intermediate values may be equal: $v_x(1) < v_x(2) \le \cdots \le v_x(n-1) < v_x(n)$.
+- For $x_i < v_x(1)$ or $x_i > v_x(n)$, $x_j$ is obtained by linear extrapolation from the first or last two points respectively.
+
+---
+
+### `switch`
+
+**Set the output state to one among $n$ input states, based on the value of a controlling state. Separate blocks exist for $n = 2, 3, 4$ and $5$.**
+
+#### Syntax
+
+```
+& switch2
+name of variable x_i(1)
+name of variable x_i(2)
+name of variable x_k        (selector)
+name of variable x_j        (output)
+```
+
+For `switch3`–`switch5`, prepend additional input variables $x_i(3)$ through $x_i(n)$ before $x_k$.
+
+#### Internal States
+
+None.
+
+#### Discrete Variables
+
+$z \in \{1, 2, \ldots, n\}$
+
+#### Equations
+
+$$0 = x_j - x_i(z)$$
+
+#### Discrete Transitions
+
+$$z \leftarrow \max\!\left(1,\, \min\!\left(n,\, \text{nint}(x_k)\right)\right)$$
+
+where $\text{nint}$ returns the nearest integer.
+
+#### Initialization
+
+Same as discrete transitions.
+
+---
+
+### `swsign`
+
+**Switch between two input states, based on the sign of a third input state.**
+
+#### Syntax
+
+```
+& swsign
+name of variable x_i   (selected when x_k >= 0)
+name of variable x_j   (selected when x_k < 0)
+name of variable x_k   (sign selector)
+name of variable x_l   (output)
+```
+
+#### Internal States
+
+None.
+
+#### Discrete Variables
+
+$z \in \{1, 2\}$
+
+#### Equations
+
+$$0 = \begin{cases}
+x_l - x_i & \text{if } z = 1 \\
+x_l - x_j & \text{if } z = 2
+\end{cases}$$
+
+#### Discrete Transitions
+
+```
+if z = 1:
+  if x_k < 0:  z ← 2
+else if z = 2:
+  if x_k >= 0:  z ← 1
+```
+
+#### Initialization
+
+```
+if x_k < 0:  z ← 2
+else:  z ← 1
+```
+
+---
+
+## Automata & Timers
+
+### `timer`
+
+**Timer with varying delay. The delay is a piecewise linear function of the monitored variable. Separate blocks exist for $n = 1, 2, 3, 4$ and $5$ characteristic points.**
+
+If $x_i$ is smaller than a threshold $v_1$, the output $x_j$ is zero. Otherwise, $x_j$ changes from zero to one at time $t^\star + \tau(x_i)$, where $t^\star$ is the time at which $x_i$ first exceeded $v_1$ and $\tau(x_i)$ is a piecewise linear function of $x_i$ defined by the $(v_k, T_k)$ pairs.
+
+#### Syntax
+
+```
+& timer1
+name of variable x_i
+name of variable x_j
+data/parameter/expression for v_1
+data/parameter/expression for T_1
+```
+
+For `timer2`–`timer5`, append additional $(v_k, T_k)$ pairs up to the required $n$.
+
+#### Internal States
+
+$x_1$ (elapsed time counter)
+
+#### Discrete Variables
+
+$z \in \{-1, 0, 1\}$
+
+#### Equations
+
+$$0 = \begin{cases}
+x_j & \text{if } z \in \{-1, 0\} \\
+x_j - 1 & \text{if } z = 1
+\end{cases}$$
+
+$$\begin{cases}
+0 = x_1 & \text{if } z = -1 \\
+\dot{x}_1 = 1 & \text{if } z = 0 \\
+\dot{x}_1 = 0 & \text{if } z = 1
+\end{cases}$$
+
+#### Discrete Transitions
+
+```
+if z = -1:
+  if x_i >= v_1:  z ← 0
+else (z = 0 or 1):
+  if x_i < v_1:  z ← -1
+
+if z = 0:
+  if x_1 >= τ(x_i):  z ← 1
+```
+
+#### Initialization
+
+$$x_1 \leftarrow 0, \qquad z \leftarrow -1$$
+
+#### Notes
+
+- The $v_i$ values must be non-decreasing: $v_1 \le v_2 \le \cdots \le v_n$.
+- Typical use: approximating an inverse-time characteristic with $T_1 \ge T_2 \ge \cdots \ge T_n$.
+- If $x_i > v_1$ at $t = 0$, $x_j$ will trip to one after $\tau(x_i)$ unless $x_i$ drops below $v_1$ first.
+
+---
+
+### `timersc`
+
+**Timer with varying delay. The delay is a staircase function of the monitored variable. Separate blocks exist for $n = 1, 2, 3, 4, 5$ and $6$ characteristic points.**
+
+Identical behaviour to `timer` except that the delay function $\tau(x_i)$ is a staircase (step) function instead of a piecewise linear interpolation.
+
+#### Syntax
+
+```
+& timersc1
+name of variable x_i
+name of variable x_j
+data/parameter/expression for v_1
+data/parameter/expression for T_1
+```
+
+For `timersc2`–`timersc6`, append additional $(v_k, T_k)$ pairs up to the required $n$.
+
+#### Internal States
+
+$x_1$ (elapsed time counter)
+
+#### Discrete Variables
+
+$z \in \{-1, 0, 1\}$
+
+#### Equations
+
+$$0 = \begin{cases}
+x_j & \text{if } z \in \{-1, 0\} \\
+x_j - 1 & \text{if } z = 1
+\end{cases}$$
+
+$$\begin{cases}
+0 = x_1 & \text{if } z = -1 \\
+\dot{x}_1 = 1 & \text{if } z = 0 \\
+\dot{x}_1 = 0 & \text{if } z = 1
+\end{cases}$$
+
+#### Discrete Transitions
+
+```
+if z = -1:
+  if x_i >= v_1:  z ← 0
+else (z = 0 or 1):
+  if x_i < v_1:  z ← -1
+
+if z = 0:
+  if x_1 >= τ(x_i):  z ← 1
+```
+
+#### Initialization
+
+$$x_1 \leftarrow 0, \qquad z \leftarrow -1$$
+
+#### Notes
+
+- The $v_i$ values must be non-decreasing: $v_1 \le v_2 \le \cdots \le v_n$.
+- The staircase characteristic is typically used to approximate an inverse-time protection curve.
+- If $x_i > v_1$ at $t = 0$, $x_j$ trips to one after $\tau(x_i)$ unless $x_i$ drops below $v_1$ first.
+
+---
+
+### `tsa`
+
+**Two-state automaton with transitions based on signs of two inputs.**
+
+The output state $x_k$ can take two values: $v_1$ or $v_2$. When $x_k = v_1$, a positive $x_1$ triggers the transition to $v_2$; when $x_k = v_2$, a positive $x_2$ triggers the return to $v_1$.
+
+#### Syntax
+
+```
+& 2sa
+name of variable x_1   (trigger for transition to v_2)
+name of variable x_2   (trigger for transition to v_1)
+name of variable x_k   (output)
+data/parameter/expression for v_1
+data/parameter/expression for v_2
+```
+
+#### Internal States
+
+None.
+
+#### Discrete Variables
+
+$z \in \{1, 2\}$ represents the automaton state.
+
+#### Equations
+
+$$0 = \begin{cases}
+x_k - v_1 & \text{if } z = 1 \\
+x_k - v_2 & \text{if } z = 2
+\end{cases}$$
+
+#### Discrete Transitions
+
+```
+if z = 1 and x_1 > 0:  z ← 2
+else if z = 2 and x_2 > 0:  z ← 1
+```
+
+#### Initialization
+
+$$z \leftarrow 1 \quad (x_k = v_1 \text{ is assumed initially})$$
+
+---
+
+## Functions Reference
+
+The following functions can be used in any mathematical expression within CODEGEN model definitions.
+
+### `equal`
+
+**Signature:** `double precision function equal(var1, var2)`
+
+**Arguments:** `double precision :: var1, var2`
+
+**Description:** Returns `1.0` if `var1` differs from `var2` by less than $10^{-6}$, and `0.0` otherwise.
+
+**Notes:** General-purpose; available in all model types.
+
+---
+
+### `equalstr`
+
+**Signature:** `double precision function equalstr(var1, var2)`
+
+**Arguments:** `character :: var1, var2`
+
+**Description:** Returns `1.0` if the non-blank portions of `var1` and `var2` are identical strings, and `0.0` otherwise.
+
+**Notes:** General-purpose; available in all model types.
+
+---
+
+### `ppower`
+
+**Signature:** `double precision ppower([vx], [vy], [ix], [iy])`
+
+**Description:** Returns the active power injected into the network.
+
+**Model type:** `inj` only.
+
+**Computation:**
+
+$$P = v_x \, i_x + v_y \, i_y$$
+
+---
+
+### `qpower`
+
+**Signature:** `double precision qpower([vx], [vy], [ix], [iy])`
+
+**Description:** Returns the reactive power injected into the network.
+
+**Model type:** `inj` only.
+
+**Computation:**
+
+$$Q = v_y \, i_x - v_x \, i_y$$
+
+---
+
+### `vrectif`
+
+**Signature:** `double precision function vrectif([if], [vin], {kc})`
+
+**Arguments:** `double precision :: kc`
+
+**Description:** Models the voltage drop in a rectifier. Returns the output voltage $vrectif$ as a function of output current $if$ and input voltage $vin$. Used in IEEE standard excitation models with $vrectif = f_{ex} \, E_{FD}$.
+
+**Model type:** `exc` only.
+
+**Computation:**
+
+```
+in = kc * if / max(vin, 1e-3)
+
+if in <= 0:
+  vrectif = vin
+else if in <= 0.433:
+  vrectif = vin - 0.577 * kc * if
+else if in <= 0.75:
+  vrectif = sqrt(0.75 * vin^2 - (kc * if)^2)
+else if in <= 1.00:
+  vrectif = 1.732 * (vin - kc * if)
+else:
+  vrectif = 0
+```
+
+---
+
+### `vinrectif`
+
+**Signature:** `double precision function vinrectif([if], [vrectif], {kc})`
+
+**Arguments:** `double precision :: kc`
+
+**Description:** Inverse of `vrectif`. Given the field current $if$ and rectifier output voltage $vrectif$, returns the rectifier input voltage $vinrectif$. Intended for use at initialization. The computation is iterative because the operating segment of the piecewise characteristic is not known a priori. Does not work when $vrectif = 0$ (indeterminate input).
+
+**Model type:** `exc` only.
+
+**Computation:**
+
+```
+nbtries = 1
+vinest = vrectif + 0.577 * kc * if
+
+loop:
+  in = kc * if / max(vinest, 1e-3)
+
+  if in <= 0:
+    vinrectif = vrectif
+  else if in <= 0.433:
+    vinrectif = vrectif + 0.577 * kc * if
+  else if in <= 0.75:
+    vinrectif = sqrt(vrectif^2 + (kc * if)^2) / 0.75
+  else:
+    vinrectif = (vrectif / 1.732) + kc * if
+
+  if vinrectif == vinest or nbtries > 5:
+    exit loop
+  nbtries = nbtries + 1
+  vinest = vinrectif
+```
+
+---
+
+### `vcomp`
+
+**Signature:** `double precision function vcomp([v], [p], [q], {Kv}, {Rc}, {Xc})`
+
+**Arguments:** `double precision :: Kv, Rc, Xc`
+
+**Description:** Returns the magnitude of a combination of terminal voltage and current of a synchronous machine. Appears in IEEE standard excitation models.
+
+**Model type:** `exc` only.
+
+**Computation:**
+
+$$\begin{aligned}
+V_{comp} &= \left| K_v \bar{V} + (R_c + j X_c) \bar{I} \right| \\
+&= \left| K_v V + (R_c + j X_c)\!\left(\frac{P}{V} - j\frac{Q}{V}\right) \right| \\
+&= \frac{1}{V} \sqrt{\left(K_v V^2 + R_c P + X_c Q\right)^2 + \left(X_c P - R_c Q\right)^2}
+\end{aligned}$$
+
+---
+
+### `satur`
+
+**Signature:** `double precision function satur([ve], {ve1}, {se1}, {ve2}, {se2})`
+
+**Arguments:** `double precision :: ve1, se1, ve2, se2`
+
+**Description:** Returns the increment of field current needed to obtain a given output voltage, accounting for magnetic saturation. Appears in IEEE excitation system models.
+
+**Model type:** `exc` only.
+
+**Computation:**
+
+$$satur = m \, ve^n$$
+
+where:
+
+$$\begin{aligned}
+n &= \frac{\log_{10}(se1/se2)}{\log_{10}(ve1/ve2)} \\[4pt]
+m &= \frac{se1}{ve1^n}
+\end{aligned}$$
+
+**Exception.** Returns $satur = 0$ if any of the following conditions holds:
+
+$$ve \le 0 \quad \text{or} \quad ve1 \le 0 \quad \text{or} \quad ve2 \le 0 \quad \text{or} \quad ve1 = ve2 \quad \text{or} \quad se1 = 0 \quad \text{or} \quad se2 = 0$$
