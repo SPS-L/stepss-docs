@@ -100,8 +100,8 @@ See the [Quick Start](/stepss-docs/getting-started/quickstart/) for details on e
 
 | Feature | Details |
 |---------|---------|
-| **STEPSS GUI** | Windows 64-bit, Java 20 |
+| **STEPSS GUI** | Windows and Linux, Java 20 |
 | **PyRAMSES** | Windows and Linux, Python 3.x |
-| **Command-line executables** | Windows 64-bit (ramses.exe, pfc.exe) |
+| **Command-line executables** | Windows and Linux (ramses, pfc) |
 | **CODEGEN compilation** | Visual Studio 2022 + Intel oneAPI Fortran |
 | **Free version limits** | 1000 buses max, 2 OpenMP cores |
