@@ -103,6 +103,13 @@ export default defineConfig({
 					],
 				},
 				{
+					label: 'Test Systems',
+					items: [
+						{ label: 'Nordic Test System', slug: 'test-systems/nordic' },
+						{ label: '5-Bus Test System', slug: 'test-systems/5bus' },
+					],
+				},
+				{
 					label: 'Resources',
 					items: [
 						{ label: 'References', slug: 'resources/references' },
