@@ -5,7 +5,7 @@
    height="100"
    version="1.1"
    id="svg26"
-   sodipodi:docname="logo3_dark.svg"
+   sodipodi:docname="logo_dark.svg"
    inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -22,8 +22,8 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
      inkscape:zoom="3.1190476"
-     inkscape:cx="197.17557"
-     inkscape:cy="50.175573"
+     inkscape:cx="197.33588"
+     inkscape:cy="50.496184"
      inkscape:window-width="3006"
      inkscape:window-height="1659"
      inkscape:window-x="0"
@@ -87,9 +87,9 @@
      x="112"
      y="55"
      class="tm"
-     id="text20">STEP<tspan
-   fill="#4da6ff"
-   id="tspan18">SS</tspan></text>
+     id="text20">STE<tspan
+   style="fill:#4da6ff;fill-opacity:1"
+   id="tspan1318">PSS</tspan></text>
   <text
      x="112"
      y="70"

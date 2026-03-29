@@ -5,7 +5,7 @@
    height="100"
    version="1.1"
    id="svg24"
-   sodipodi:docname="logo3_light.svg"
+   sodipodi:docname="logo_light.svg"
    inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -22,10 +22,10 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="false"
      inkscape:zoom="3.1190476"
-     inkscape:cx="203.74809"
-     inkscape:cy="38.633588"
-     inkscape:window-width="1920"
-     inkscape:window-height="1043"
+     inkscape:cx="195.89313"
+     inkscape:cy="38.954199"
+     inkscape:window-width="3006"
+     inkscape:window-height="1659"
      inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -81,11 +81,15 @@
   <!-- Wordmark: STEP dark, SS blue -->
   <text
      x="113"
-     y="55.000053"
+     y="55.062977"
      class="tm"
-     id="text18">STEP<tspan
-   fill="#1a6fc4"
-   id="tspan16">SS</tspan></text>
+     id="text18">STE</text>
+  <text
+     x="168.80493"
+     y="55.062977"
+     class="tm"
+     id="text18-3"
+     style="font-weight:700;font-size:27px;font-family:'DejaVu Sans', Arial, sans-serif;fill:#1a6fc4;fill-opacity:1">PSS</text>
   <text
      x="113"
      y="70.000053"
