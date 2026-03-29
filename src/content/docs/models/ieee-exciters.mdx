@@ -26,7 +26,6 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
 |---|---|---|---|---|
 | `AC1A` | AC type 1 | — | — | IEEE 421.5 Type AC1A |
 | `AC1A_MAXEX2` | AC type 1 | — | MAXEX2 field current limiter | IEEE 421.5 Type AC1A |
-| `AC1A_OELHQ` | AC type 1 | — | OELHQ PID OEL | IEEE 421.5 Type AC1A |
 | `AC1A_RETRO` | AC type 1 (retrofit) | PSS4B (internal) | — | — |
 | `AC1A_RETRO_PSS4B` | AC type 1 (retrofit) | PSS4B | — | — |
 | `AC4A` | AC type 4 | — | — | IEEE 421.5 Type AC4A |
@@ -36,11 +35,6 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
 | `DC3A` | DC type 3 | — | — | IEEE 421.5 Type DC3A |
 | `ENTSOE_simp` | ENTSO-E simplified | IEEEST (internal) | — | ENTSO-E |
 | `ENTSOE_lim` | ENTSO-E simplified | IEEEST (internal) | Integral OEL | ENTSO-E |
-| `EXHQSC` | ST type (HQ) | — | Field current db | — |
-| `EXHQSC_MAXEX2` | ST type (HQ) | — | MAXEX2 + field db | — |
-| `EXHQSC_PSS4B` | ST type (HQ) | PSS4B | Field current db | — |
-| `EXHQSC_PSS4B_MAXEX2` | ST type (HQ) | PSS4B | MAXEX2 | — |
-| `EXHQSC_PSS4B_OELHQ` | ST type (HQ) | PSS4B | OELHQ PID OEL | — |
 | `EXPIC1` | AC/ST (PIC type) | — | — | — |
 | `EXPIC1_PSS2B` | AC/ST (PIC type) | PSS2B | — | — |
 | `EXPIC1_PSS2B_MAXEX2` | AC/ST (PIC type) | PSS2B | MAXEX2 | — |
@@ -53,13 +47,9 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
 | `ST1A_IEEEST_MAXEX2` | ST type 1 | IEEEST | MAXEX2 | IEEE 421.5 Type ST1A |
 | `ST1A_PSS2B` | ST type 1 | PSS2B | — | IEEE 421.5 Type ST1A |
 | `ST1A_PSS2B_MAXEX2` | ST type 1 | PSS2B | MAXEX2 | IEEE 421.5 Type ST1A |
-| `ST1A_PSS2B_OELHQ` | ST type 1 | PSS2B | OELHQ PID OEL | IEEE 421.5 Type ST1A |
 | `ST1A_PSS3B` | ST type 1 | PSS3B | — | IEEE 421.5 Type ST1A |
-| `ST1A_PSS3B_OELHQ` | ST type 1 | PSS3B | OELHQ PID OEL | IEEE 421.5 Type ST1A |
 | `ST1A_PSS4B` | ST type 1 | PSS4B | — | IEEE 421.5 Type ST1A |
 | `ST1A_PSS4B_MAXEX2` | ST type 1 | PSS4B | MAXEX2 | IEEE 421.5 Type ST1A |
-| `ST1A_PSS4B_OELHQ` | ST type 1 | PSS4B | OELHQ PID OEL | IEEE 421.5 Type ST1A |
-| `ST1A_OELHQ` | ST type 1 | — | OELHQ PID OEL | IEEE 421.5 Type ST1A |
 | `ST1A_lim` | ST type 1 | — | Integral OEL + SCL | IEEE 421.5 Type ST1A |
 | `ST2A` | ST type 2 | — | — | IEEE 421.5 Type ST2A (via EXPIC1) |
 
@@ -144,7 +134,6 @@ where $S_E(V_E)$ is the saturation function interpolated from the two-point satu
 |---|---|
 | `AC1A` | Base model — IEEE Type AC1A |
 | `AC1A_MAXEX2` | Adds MAXEX2 field current limiter; VOEL moves to reference summation point (LV gate removed) |
-| `AC1A_OELHQ` | Adds Hydro-Québec PID over-excitation limiter (11-point timer) |
 | `AC1A_RETRO` | Retrofit variant with internal PSS4B; uses first-order AVR without separate exciter block |
 | `AC1A_RETRO_PSS4B` | Retrofit variant with external PSS4B speed input |
 
@@ -447,13 +436,9 @@ $$V_F(s) = E_{fd} \cdot \frac{sK_F/T_F}{1 + sT_F}$$
 | `ST1A_IEEEST_MAXEX2` | Adds IEEEST PSS + MAXEX2 field current limiter |
 | `ST1A_PSS2B` | Adds PSS2B dual-input stabilizer |
 | `ST1A_PSS2B_MAXEX2` | Adds PSS2B + MAXEX2 |
-| `ST1A_PSS2B_OELHQ` | Adds PSS2B + Hydro-Québec PID OEL |
 | `ST1A_PSS3B` | Adds PSS3B two-channel second-order filter stabilizer |
-| `ST1A_PSS3B_OELHQ` | Adds PSS3B + OELHQ |
 | `ST1A_PSS4B` | Adds PSS4B three-band stabilizer |
 | `ST1A_PSS4B_MAXEX2` | Adds PSS4B + MAXEX2 |
-| `ST1A_PSS4B_OELHQ` | Adds PSS4B + OELHQ |
-| `ST1A_OELHQ` | Adds OELHQ PID OEL without PSS |
 | `ST1A_lim` | Integral OEL + stator current limiter (SCL), simplified structure without Kv/Rc/Xc |
 
 #### Usage Example
@@ -626,74 +611,6 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
               TOR CONSTANT ;
 ```
 
----
-
-### EXPIC1 / EXHQSC
-
-:::note[Proprietary Model]
-The EXHQSC family is a proprietary model developed by Hydro-Québec. It is included for compatibility with existing simulation cases. New studies should prefer standard IEEE models such as ST1A.
-:::
-
-The EXHQSC is a Hydro-Québec static exciter model based on the ST1A topology but extended with an internal field current deadband controller (`db` block). This controller measures the filtered field current $I_{ff}$ through a first-order filter with time constant $T_I$, compares it against asymmetric limits $[I_{FMIN}, I_{FMAX}]$, and feeds back a corrective signal $V_{lr}$ through a first-order lag, contributing to the amplifier output before the variable-limit clamp.
-
-#### Mathematical Description
-
-The main AVR path follows ST1A topology with two cascaded first-order blocks (instead of lead-lag):
-
-$$V_2(s) = \Delta V \cdot \frac{K_A}{1 + sT_A}$$
-
-$$V_4(s) = V_2 \cdot \frac{1 + sT_{A1}}{1 + sT_{A2}}$$
-
-The field current limiter deadband:
-
-$$I_{ff}(s) = I_{fd} \cdot \frac{1}{1 + sT_I}$$
-
-$$I_{fdb} = db(I_{ff}; I_{FMIN}, K_{MIN}, I_{FMAX}, K_{MAX})$$
-
-$$V_{lr}(s) = I_{fdb} \cdot \frac{1}{1 + sT_A}$$
-
-$$E_{fd} = \text{limvb}(V_4 + K_A \cdot V_{lr}; V_{vmin}, V_{vmax})$$
-
-where $V_{vmin} = V_t \cdot V_{RMIN} - K_C I_{fd}$ and $V_{vmax} = V_t \cdot V_{RMAX} - K_C I_{fd}$.
-
-#### Parameters
-
-| Parameter | Description | Unit/Type |
-|---|---|---|
-| `Kv` | Voltage compensation gain | pu |
-| `Rc` | Line drop resistance | pu |
-| `Xc` | Line drop reactance | pu |
-| `UEL` | UEL connection flag | integer |
-| `VUEL` | UEL signal | pu |
-| `TR` | Measurement time constant | s |
-| `VMIN` | Input error lower limit | pu |
-| `VMAX` | Input error upper limit | pu |
-| `TA1` | Second filter numerator | s |
-| `TA2` | Second filter denominator | s |
-| `KA` | Regulator gain | pu |
-| `TA` | Regulator time constant | s |
-| `VRMIN` | Output lower limit factor | pu |
-| `VRMAX` | Output upper limit factor | pu |
-| `KC` | Field current derating factor | pu |
-| `KF` | Derivative feedback gain | pu |
-| `TF` | Derivative feedback time constant | s |
-| `TI` | Field current filter time constant | s |
-| `IFMIN` | Lower deadband threshold | pu |
-| `IFMAX` | Upper deadband threshold | pu |
-| `KMIN` | Lower deadband gain | pu |
-| `KMAX` | Upper deadband gain | pu |
-
-#### Variants
-
-| Model | Description |
-|---|---|
-| `EXHQSC` | Base Hydro-Québec static exciter with field current deadband |
-| `EXHQSC_MAXEX2` | Adds MAXEX2 field current limiter |
-| `EXHQSC_PSS4B` | Adds PSS4B three-band stabilizer |
-| `EXHQSC_PSS4B_MAXEX2` | Adds PSS4B + MAXEX2 |
-| `EXHQSC_PSS4B_OELHQ` | Adds PSS4B + OELHQ PID OEL |
-
----
 
 ## ENTSO-E Models
 
@@ -923,49 +840,9 @@ $$V_{PSS} = \text{clamp}(stab_3, -V_{LIM}, V_{LIM})$$
 
 Over-Excitation Limiters (OEL) prevent sustained field current overloads that would thermally damage the field winding. They generate a signal $V_{OEL}$ that reduces the AVR output when field current exceeds thermal limits.
 
-### OELHQ — Hydro-Québec PID OEL
-
-:::note[Proprietary Model]
-The OELHQ is a proprietary over-excitation limiter developed by Hydro-Québec. It is included for compatibility with existing simulation cases.
-:::
-
-The OELHQ OEL is a sophisticated limiter developed by Hydro-Québec. It uses a piece-wise linear timer (11 operating points) to model the thermal capability curve, combined with a hysteresis latch and a full PID controller.
-
-**Timer phase:** The measured field current $I_{fd,mes}$ (filtered with time constant $T_m$) drives a `timer11` block with 11 $(I_{fd}, T_{limit})$ pairs defining the permitted over-current duration. When the accumulated timer exceeds 1.0, the `hyst` block locks the reference to $I_{FDPL}$ for the remainder of the simulation.
-
-**PID phase:** Once the timer triggers, the error signal drives a PID controller:
-
-$$e_{IFD} = I_{fd,ref} - I_{fd,mes}$$
-
-$$V_{OEL,der}(s) = e_{IFD} \cdot \frac{sK_{Doel}/T_{Doel}}{1 + sT_{Doel}}$$
-
-$$V_{OEL,PI}(s) = K_{Poel} \cdot e_{IFD} + \frac{K_{Ioel}}{s} \cdot e_{IFD}, \quad 0 \le V_{OEL,PI} \le V_{OELMAX}$$
-
-$$V_{OEL} = \text{clamp}(V_{OEL,der} + V_{OEL,PI},\, V_{OELMIN},\, V_{OELMAX})$$
-
-$V_{OEL}$ is applied at the AVR LV gate (`min2v`) or at the reference summation point, reducing the effective reference voltage.
-
-**OELHQ Parameters:**
-
-| Parameter | Description |
-|---|---|
-| `Tm` | Field current measurement filter time constant |
-| `IFDTH` | Hysteresis upper threshold (= $I_{FDDES}$ at steady state) |
-| `IFDPL` | Hysteresis lower threshold (permanent limit, e.g. 1.0 pu) |
-| `KIoel` | OEL integral gain |
-| `KPoel` | OEL proportional gain |
-| `KDoel` | OEL derivative gain |
-| `TDoel` | OEL derivative filter time constant |
-| `VOELMAX` | Maximum OEL output (= 0 pu in LV gate convention) |
-| `VOELMIN` | Minimum OEL output (negative, e.g. −0.95 pu) |
-| `IFD1`–`IFD11` | Thermal curve current points |
-| `TIFD1`–`TIFD11` | Thermal curve time limit points |
-
----
-
 ### MAXEX2 — Field Current Limiter with Timer and Hysteresis
 
-The MAXEX2 is a field current limiter derived from IEEE work, using a simplified three-point piece-wise linear timer instead of the full thermal curve of OELHQ. It is designed for the EXST1/ST1A topology where the OEL output is injected at the reference summation point (not the LV gate).
+The MAXEX2 is a field current limiter derived from IEEE work, using a simplified three-point piece-wise linear timer It is designed for the EXST1/ST1A topology where the OEL output is injected at the reference summation point (not the LV gate).
 
 **Timer phase:** The measured current $I_{fd,mes}$ (selected as either field current or $E_{fd}$ via parameter `IC`) drives a `timer3` block with three $(I_{fd}, T)$ operating points. The `hyst` block latches when timer ≥ 1.
 

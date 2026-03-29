@@ -173,7 +173,7 @@ DCTL  ltcinv  LTCINV_TR1  TR1-HV-MV  BUS_MV  1  0.85  1.15  33  0.01  1.025  60.
 
 #### Description
 
-An advanced on-load tap changer with **R/X line drop compensation**, end-stop flags, and support for both Hydro-Quebec (`LIEGE`) and PSS/E (`PSSE`) data formats. It includes separate flags to prevent tap movement when the transformer is at its mechanical end-stop, and applies voltage correction based on the current flowing through the transformer using the compensation resistances `R_comp` and `X_comp`.
+An advanced on-load tap changer with **R/X line drop compensation**, end-stop flags. It includes separate flags to prevent tap movement when the transformer is at its mechanical end-stop, and applies voltage correction based on the current flowing through the transformer using the compensation resistances `R_comp` and `X_comp`.
 
 The **Ratio2-factor** enables a secondary correction factor for the transformer ratio independent of the main tap position.
 
@@ -469,97 +469,6 @@ DCTL  dctl_line_prot  LINEPROT1  1.05  2  L1-L2  L3-L4 ;
 ```
 
 ---
-
-## System Controls
-
-### `dctl_mais` — Emergency Control (MAIS)
-
-:::note[Proprietary Model]
-The MAIS controller is a proprietary Hydro-Québec emergency control scheme. It is included for compatibility with existing simulation cases.
-:::
-
-#### Description
-
-The **MAIS** (Manœuvres Automatiques d'Inductances Shunt / Manœuvres Automatiques d'Ilotage et de Sauvegarde) controller is an Hydro-Québec emergency control scheme that automatically connects or disconnects **shunt reactors/capacitors** in response to voltage excursions. It monitors a single bus voltage and fires up to seven discrete shunt switching actions based on:
-
-1. Two **under-voltage** thresholds (absolute level)
-2. Three **voltage drop** thresholds (rate / sudden depression)
-3. Two **over-voltage** thresholds
-
-Each action connects or disconnects a susceptance $\Delta B$ after a corresponding time delay.
-
-#### Logic Description
-
-**Under-voltage triggers** (absolute level):
-
-$$
-\text{if } V < SO_1 \text{ for } TC_1 \text{ s}: \quad B \leftarrow B + PXL_1
-$$
-$$
-\text{if } V < SO_2 \text{ for } TC_2 \text{ s}: \quad B \leftarrow B + PXL_2
-$$
-
-**Voltage drop triggers** (based on $V_{initial} - V_{current}$):
-
-$$
-\text{if } V_0 - V > SH_k \text{ for } TC_{k+2} \text{ s}: \quad B \leftarrow B + PXL_{k+2}, \quad k = 1,2,3
-$$
-
-**Over-voltage triggers** (capacitor disconnection):
-
-$$
-\text{if } V > SU_1 \text{ for } TC_6 \text{ s}: \quad B \leftarrow B + PXL_6 \text{ (negative = disconnect capacitor)}
-$$
-$$
-\text{if } V > SU_2 \text{ for } TC_7 \text{ s}: \quad B \leftarrow B + PXL_7
-$$
-
-The cumulated susceptance change is bounded by `LMLN` (maximum increase) and `LMLP` (maximum decrease) representing the available shunts.
-
-#### Parameters
-
-| Field | Working variable | Description |
-|-------|-----------------|-------------|
-| `bus_name` | `w(1)` | Monitored bus |
-| `SO1` | `w(2)` | First under-voltage threshold (pu) |
-| `TC1` | `w(3)` | Corresponding delay (s) |
-| `PXL1` | `w(4)` | Susceptance switched for SO1 action (pu) |
-| `SO2` | `w(5)` | Second under-voltage threshold (pu) |
-| `TC2` | `w(6)` | Corresponding delay (s) |
-| `PXL2` | `w(7)` | Susceptance for SO2 action (pu) |
-| `SH1` | `w(8)` | First voltage drop threshold (pu) |
-| `TC3` | `w(9)` | Corresponding delay (s) |
-| `PXL3` | `w(10)` | Susceptance for SH1 action (pu) |
-| `SH2` | `w(11)` | Second voltage drop threshold (pu) |
-| `TC4` | `w(12)` | Corresponding delay (s) |
-| `PXL4` | `w(13)` | Susceptance for SH2 action (pu) |
-| `SH3` | `w(14)` | Third voltage drop threshold (pu) |
-| `TC5` | `w(15)` | Corresponding delay (s) |
-| `PXL5` | `w(16)` | Susceptance for SH3 action (pu) |
-| `SU1` | `w(17)` | First over-voltage threshold (pu) |
-| `TC6` | `w(18)` | Corresponding delay (s) |
-| `PXL6` | `w(19)` | Susceptance for SU1 action (pu) |
-| `SU2` | `w(20)` | Second over-voltage threshold (pu) |
-| `TC7` | `w(21)` | Corresponding delay (s) |
-| `PXL7` | `w(22)` | Susceptance for SU2 action (pu) |
-| `LMLN` | `w(23)` | Maximum susceptance increase (pu) |
-| `LMLP` | `w(24)` | Maximum susceptance decrease (pu) |
-
-24 fields required. Internal variables: 7 timers (`w(25)`–`w(31)`), cumulated $\Delta B$ (`w(32)`), initial voltage (`w(33)`), shunt number (`w(34)`).
-
-#### Usage Example
-
-```
-DCTL  mais  MAIS1  BUS_735
-      0.90  0.5  0.05
-      0.85  1.0  0.10
-      0.05  0.3  0.05
-      0.08  0.5  0.08
-      0.10  1.0  0.10
-      1.05  0.3  -0.05
-      1.10  0.5  -0.10
-      0.20  0.20 ;
-```
 
 ---
 
