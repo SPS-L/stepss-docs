@@ -630,6 +630,10 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 
 ### EXPIC1 / EXHQSC
 
+:::note[Proprietary Model]
+The EXHQSC family is a proprietary model developed by Hydro-Québec. It is included for compatibility with existing simulation cases. New studies should prefer standard IEEE models such as ST1A.
+:::
+
 The EXHQSC is a Hydro-Québec static exciter model based on the ST1A topology but extended with an internal field current deadband controller (`db` block). This controller measures the filtered field current $I_{ff}$ through a first-order filter with time constant $T_I$, compares it against asymmetric limits $[I_{FMIN}, I_{FMAX}]$, and feeds back a corrective signal $V_{lr}$ through a first-order lag, contributing to the amplifier output before the variable-limit clamp.
 
 #### Mathematical Description
@@ -920,6 +924,10 @@ $$V_{PSS} = \text{clamp}(stab_3, -V_{LIM}, V_{LIM})$$
 Over-Excitation Limiters (OEL) prevent sustained field current overloads that would thermally damage the field winding. They generate a signal $V_{OEL}$ that reduces the AVR output when field current exceeds thermal limits.
 
 ### OELHQ — Hydro-Québec PID OEL
+
+:::note[Proprietary Model]
+The OELHQ is a proprietary over-excitation limiter developed by Hydro-Québec. It is included for compatibility with existing simulation cases.
+:::
 
 The OELHQ OEL is a sophisticated limiter developed by Hydro-Québec. It uses a piece-wise linear timer (11 operating points) to model the thermal capability curve, combined with a hysteresis latch and a full PID controller.
 

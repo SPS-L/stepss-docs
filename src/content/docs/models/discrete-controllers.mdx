@@ -474,6 +474,10 @@ DCTL  dctl_line_prot  LINEPROT1  1.05  2  L1-L2  L3-L4 ;
 
 ### `dctl_mais` — Emergency Control (MAIS)
 
+:::note[Proprietary Model]
+The MAIS controller is a proprietary Hydro-Québec emergency control scheme. It is included for compatibility with existing simulation cases.
+:::
+
 #### Description
 
 The **MAIS** (Manœuvres Automatiques d'Inductances Shunt / Manœuvres Automatiques d'Ilotage et de Sauvegarde) controller is an Hydro-Québec emergency control scheme that automatically connects or disconnects **shunt reactors/capacitors** in response to voltage excursions. It monitors a single bus voltage and fires up to seven discrete shunt switching actions based on:

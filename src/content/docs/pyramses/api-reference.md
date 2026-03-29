@@ -475,7 +475,9 @@ Disturbances can be added dynamically while the simulation is paused, enabling i
 
 #### `addDisturb(time, description)`
 
-Schedule a disturbance to occur at a given simulation time. The syntax for `description` follows the RAMSES disturbance file format.
+Schedule a disturbance to occur at a given simulation time.
+
+The disturbance description string follows the same syntax as the disturbance file format. See [Disturbances](/user-guide/disturbances/) for the complete reference.
 
 ```python
 ram.execSim(case, 80.0)

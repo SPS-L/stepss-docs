@@ -16,35 +16,21 @@ EXC EXC_TYPE parameters_passed_to_EXC
 TOR TOR_TYPE parameters_passed_to_TOR ;
 ```
 
-| Parameter | Description | Unit |
-|-----------|-------------|------|
-| `FP`, `FQ` | Fractions of bus injection (active, reactive) | — |
-| `P`, `Q` | Initial powers (used if fractions are zero) | pu |
-| `Snom` | Nominal apparent power | MVA |
-| `Pnom` | Nominal active power of the turbine | MW |
-| `H` | Inertia constant | s |
-| `D` | Damping coefficient | pu |
-| `ibratio` | Ratio of subtransient current to nominal current (used for machine sizing) | — |
-| `XT/RL` | Keyword: `XT` if the next value is the step-up transformer reactance; `RL` if it is the line resistance | — |
-| `Xl` | Leakage reactance | pu |
-| `Xd`, `X'd`, `X"d` | d-axis reactances (synchronous, transient, subtransient) | pu |
-| `Xq`, `X'q`, `X"q` | q-axis reactances | pu |
-| `m`, `n` | Saturation exponents for the magnetic saturation characteristic. Use `*` to set to default values. | — |
-| `Ra` | Armature resistance | pu |
-| `T'do`, `T"do` | d-axis time constants (open-circuit transient, subtransient) | s |
-| `T'qo`, `T"qo` | q-axis time constants | s |
-
-The FP, FQ, P, Q fields are power participation fractions and initial power values used during initialization. See [Reference Frames & Initialization](/user-guide/reference-frames/) for detailed explanation.
+For the complete mathematical model, per unit system, and detailed parameter descriptions, see the [Synchronous Machine Model](/models/synchronous-machine/) page.
 
 ### Available Exciter Models
 
 The following exciter types are available in the current version:
 
-`1storder`, `constant`, `kundur`, `generic1`, `generic2`, `GENERIC3`, `GENERIC4`, `ST1A`, `ST1A_lim`, `ST1A_OELHQ`, `ST1A_PSS2B`, `ST1A_PSS3B`, `ST1A_PSS4B`, `ST1A_IEEEST`, `ST2A`, `AC1A`, `AC1A_RETRO`, `AC4A`, `AC8B`, `DC3A`, `IEEET5`, `EXPIC1`, `EXHQSC`, `ENTSOE_simp`, and many more with combinations of PSS and OEL models.
+`1storder`, `constant`, `kundur`, `generic1`, `generic2`, `ST1A`, `ST1A_lim`, `ST1A_PSS2B`, `ST1A_PSS3B`, `ST1A_PSS4B`, `ST1A_IEEEST`, `ST2A`, `AC1A`, `AC1A_RETRO`, `AC4A`, `AC8B`, `DC3A`, `IEEET5`, `EXPIC1`, `ENTSOE_simp`, and many more with combinations of PSS and OEL models.
+
+For detailed documentation of each model, see the [Model Reference](/models/ieee-exciters/) section.
 
 ### Available Torque Controller Models
 
-`1storder`, `constant`, `DEGOV1`, `hydro_generic1`, `thermal_generic1`, `HQRVC`, `HQRVM`, `HQRVN`, `HQRVW`, `hq_generic`, `hq_generic1`, `ENTSOE_simp`, `ENTSOE_simp_consensus`
+`1storder`, `constant`, `DEGOV1`, `hydro_generic1`, `thermal_generic1`, `ENTSOE_simp`
+
+For detailed documentation of each model, see the [Model Reference](/models/ieee-exciters/) section.
 
 ## Injectors
 
@@ -66,7 +52,7 @@ INJEC INJ_TYPE NAME BUS_NAME FP FQ P Q parameters_passed_to_INJ ;
 | `WT3WithChanges`, `WT4WithChanges` | Wind turbine models |
 | `BESSWithChanges` | Battery energy storage system |
 | `vfd_load` | Variable frequency drive load |
-| `svc_hq_generic1` | SVC model |
+| `svc` | SVC model |
 | `theveq` | Thévenin equivalent (infinite bus) |
 
 ## Thévenin Equivalent (Infinite Bus)
@@ -108,15 +94,12 @@ Two-port components connect two buses:
 
 | Model | Description |
 |-------|-------------|
-| `HQSVC` | SVC model (Hydro-Quebec type) |
 | `HVDC_LCC` | Line-commutated converter HVDC |
 | `HVDC_VSC` | Voltage source converter HVDC |
 | `HVDC_VSC_SC` | VSC-HVDC with short-circuit contribution |
-| `DC_BHPM`, `DC_CHAAUT` | DC link models |
-| `CSVGN5` | SVC variant |
-| `CHENIER` | HVDC link (Chenier) |
 | `DCL_WCL` | DC link model |
-| `vsc_hq` | VSC model (Hydro-Quebec type) |
+
+For detailed documentation of each model, see the [Model Reference](/models/ieee-exciters/) section.
 
 ## Discrete Controllers
 
@@ -134,7 +117,7 @@ DCTL CTRL_TYPE CTLNAME parameters ;
 | `uvprot` | Under-voltage protection |
 | `pst` | Phase-shifting transformer controller |
 | `rt` | Real-time synchronizer |
-| `mais`, `HQmais` | Multi-area islanding schemes |
+| `mais` | Multi-area islanding scheme |
 | `FRT` | Fault ride-through |
 | `sim_minmaxvolt` | Voltage stopping criteria |
 | `sim_minmaxspeed` | Speed stopping criteria |

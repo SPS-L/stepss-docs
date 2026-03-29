@@ -1142,6 +1142,10 @@ INJEC  BESSWithChanges  BESS1  BUS_ST  1.  1.  0.  0.
 
 ### `inj_svc_hq_generic1` — SVC (Hydro-Québec Generic)
 
+:::note[Proprietary Model]
+This model is based on a proprietary Hydro-Québec SVC structure. It is included for compatibility with existing simulation cases.
+:::
+
 #### Description
 
 A Static VAr Compensator model based on the Hydro-Québec generic SVC structure. It consists of two lead-lag blocks (representing the measurement chain and voltage regulator), a PI voltage controller, and a susceptance limiter. An optional PSS (power system stabiliser) output can add a damping signal to the voltage reference. The model represents the reactive power exchange of the SVC as a variable susceptance $B_{\mathrm{svc}}$.
