@@ -99,3 +99,8 @@ M_4                    4                       -0.017     -0.022
 ```
 
 Here, `M_3` and `M_4` are negligible (rounding artifacts), while `M_2` suggests a missing load specification at bus 2.
+
+## Next Steps
+
+- [Dynamic Models](/stepss-docs/user-guide/dynamic-models/) — Define SYNC_MACH, INJEC, and TWOP records
+- [Disturbances](/stepss-docs/user-guide/disturbances/) — Define simulation events

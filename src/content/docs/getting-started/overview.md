@@ -105,3 +105,8 @@ See the [Quick Start](/stepss-docs/getting-started/quickstart/) for details on e
 | **Command-line executables** | Windows and Linux (ramses, pfc) |
 | **CODEGEN compilation** | Visual Studio 2022 + Intel oneAPI Fortran |
 | **Free version limits** | 1000 buses max, 2 OpenMP cores |
+
+## Next Steps
+
+- [Installation](/stepss-docs/getting-started/installation/) — Set up STEPSS on your system
+- [Quick Start](/stepss-docs/getting-started/quickstart/) — Run your first simulation

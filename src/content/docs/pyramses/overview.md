@@ -31,8 +31,8 @@ PyRAMSES supports both Windows and Linux operating systems. Pre-compiled RAMSES 
 
 ## Further Reading
 
-- [API Reference](/pyramses/api-reference/) — Detailed documentation for `cfg`, `sim`, and `extractor`
-- [Examples](/pyramses/examples/) — Practical simulation examples and notebooks
+- [API Reference](/stepss-docs/pyramses/api-reference/) — Detailed documentation for `cfg`, `sim`, and `extractor`
+- [Examples](/stepss-docs/pyramses/examples/) — Practical simulation examples and notebooks
 
 ## Repository
 

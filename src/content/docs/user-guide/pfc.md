@@ -228,3 +228,8 @@ The following table summarises which records are used by PFC and RAMSES respecti
 | LFRESV | Input: initial values; Output: solution | Input: initial values for RAMSES |
 | LTC-V | Used | Ignored |
 | PSHIFT-P | Used | Ignored |
+
+## Next Steps
+
+- [Reference Frames & Initialization](/stepss-docs/user-guide/reference-frames/) — Understand how RAMSES initializes from the PFC solution
+- [Dynamic Models](/stepss-docs/user-guide/dynamic-models/) — Define synchronous machines, injectors, and controllers

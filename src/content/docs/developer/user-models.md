@@ -406,3 +406,9 @@ After writing a model file, CODEGEN translates it into Fortran 2003 code. The wo
 For compilation details, see [URAMSES](/stepss-docs/developer/uramses/).
 
 See the [CODEGEN Blocks Library](/stepss-docs/developer/codegen-library/) for the available modelling blocks.
+
+## Next Steps
+
+- [CODEGEN Blocks Library](/stepss-docs/developer/codegen-library/) — Reference for all modeling blocks
+- [CODEGEN Model Examples](/stepss-docs/developer/codegen-examples/) — Complete model files for each type
+- [URAMSES](/stepss-docs/developer/uramses/) — Compile and link custom models with RAMSES

@@ -813,3 +813,8 @@ pyramses.curplot([
     ext.getSync('g3').S,
 ])
 ```
+
+## Next Steps
+
+- [Examples](/stepss-docs/pyramses/examples/) — Practical simulation examples and workflows
+- [Test Systems](/stepss-docs/test-systems/nordic/) — Ready-to-run benchmark systems

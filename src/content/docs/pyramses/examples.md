@@ -103,7 +103,7 @@ ram.addDisturb(100.0, 'BREAKER SYNC_MACH g7 0')
 ram.contSim(ram.getInfTime())
 ```
 
-For full disturbance syntax, see the [disturbances reference](/pyramses/disturbances).
+For full disturbance syntax, see the [Disturbances reference](/stepss-docs/user-guide/disturbances/).
 
 ## Plotting Results
 

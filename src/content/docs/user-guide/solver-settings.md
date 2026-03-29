@@ -203,3 +203,8 @@ $OMP DYN 50 ;
 $SKIP_CONV T ;
 $FULL_UPDATE F ;
 ```
+
+## Next Steps
+
+- [PyRAMSES API](/stepss-docs/pyramses/api-reference/) — Run simulations programmatically from Python
+- [Test Systems](/stepss-docs/test-systems/nordic/) — Try the Nordic or 5-bus benchmark systems

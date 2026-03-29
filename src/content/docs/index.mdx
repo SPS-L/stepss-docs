@@ -11,12 +11,12 @@ hero:
       link: /stepss-docs/getting-started/overview/
       icon: right-arrow
       variant: primary
-    - text: PyRAMSES API
-      link: /stepss-docs/pyramses/api-reference/
+    - text: Browse Examples
+      link: /stepss-docs/pyramses/examples/
       icon: right-arrow
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 ## Core Modules
 
@@ -31,7 +31,7 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     Translates user-defined models into Fortran 2003 code for compilation and linking with RAMSES.
   </Card>
   <Card title="PyRAMSES — Python Interface" icon="seti:python">
-    Modern Python API for scripting simulations, extracting results, and integrating with the scientific Python ecosystem.
+    Python API for scripting simulations, extracting results, and integrating with the scientific Python ecosystem.
   </Card>
 </CardGrid>
 
@@ -44,10 +44,10 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
   <Card title="Quick Start" icon="open-book">
     [Run your first simulation →](/stepss-docs/getting-started/quickstart/)
   </Card>
-  <Card title="User-Defined Models" icon="setting">
-    [Create custom models with CODEGEN →](/stepss-docs/developer/user-models/)
+  <Card title="Model Reference" icon="list-format">
+    [Browse available models →](/stepss-docs/models/ieee-exciters/)
   </Card>
-  <Card title="URAMSES" icon="puzzle">
-    [Compile and link Fortran models →](/stepss-docs/developer/uramses/)
+  <Card title="Test Systems" icon="star">
+    [Nordic and 5-bus benchmarks →](/stepss-docs/test-systems/nordic/)
   </Card>
 </CardGrid>

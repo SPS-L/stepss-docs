@@ -80,3 +80,8 @@ A typical organization:
 - One file for simulation control parameters
 
 These files can be listed in any order in the command file.
+
+## Next Steps
+
+- [Network Modeling](/stepss-docs/user-guide/network/) — Define buses, lines, transformers, and shunts
+- [Power Flow (PFC)](/stepss-docs/user-guide/pfc/) — Set up and run power flow computations

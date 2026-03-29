@@ -220,3 +220,8 @@ SHUNT NAME BUS_NAME QNOM BR ;
 :::caution
 The SHUNT record is used by RAMSES. For PFC, shunt data is specified in the extended BUS record (see [PFC Data](/stepss-docs/user-guide/pfc/)).
 :::
+
+## Next Steps
+
+- [Power Flow (PFC)](/stepss-docs/user-guide/pfc/) — Configure generators, loads, and compute the initial operating point
+- [Dynamic Models](/stepss-docs/user-guide/dynamic-models/) — Add synchronous machines and controllers

@@ -159,3 +159,9 @@ DCTL SIM_MINMAXVOLT CTRL_Name VMAX(pu) VMIN(pu) DEADTIME(s) Stop_Simulation(T/F)
 ```
 DCTL SIM_MINMAXSPEED CTRL_Name MAX_SPEED(pu) MIN_SPEED(pu) DEADTIME(s) Stop_Simulation(T/F) ;
 ```
+
+## Next Steps
+
+- [Disturbances](/stepss-docs/user-guide/disturbances/) — Define faults, trips, and parameter changes
+- [Solver Settings](/stepss-docs/user-guide/solver-settings/) — Configure the numerical solver
+- [Model Reference](/stepss-docs/models/ieee-exciters/) — Browse available exciter, governor, and injector models
