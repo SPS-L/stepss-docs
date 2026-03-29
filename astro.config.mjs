@@ -17,7 +17,8 @@ export default defineConfig({
 			title: 'STEPSS',
 			description: 'Static and Transient Electric Power Systems Simulation — Documentation',
 			logo: {
-				src: './src/assets/logo.png',
+				light: './src/assets/logo-light.png',
+				dark: './src/assets/logo-dark.png',
 				replacesTitle: false,
 			},
 			social: [
