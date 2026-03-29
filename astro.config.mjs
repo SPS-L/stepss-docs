@@ -22,7 +22,7 @@ export default defineConfig({
 				replacesTitle: false,
 			},
 			social: [
-				{ icon: 'github', label: 'GitHub', href: 'https://github.com/SPS-L/STEPSS-GUI' },
+				{ icon: 'github', label: 'GitHub', href: 'https://github.com/SPS-L/stepss-docs' },
 			],
 			editLink: {
 				baseUrl: 'https://github.com/SPS-L/stepss-docs/edit/main/',
