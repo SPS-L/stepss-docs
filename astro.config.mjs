@@ -51,17 +51,28 @@ export default defineConfig({
 				{
 					label: 'Simulation Guide',
 					items: [
-						// Network definition & initial conditions
-						{ label: 'File Formats',                       slug: 'user-guide/file-formats' },
-						{ label: 'Network Modeling',                   slug: 'user-guide/network' },
-						{ label: 'Power Flow (PFC)',                   slug: 'user-guide/pfc' },
-						{ label: 'Reference Frames & Initialization',  slug: 'user-guide/reference-frames' },
-						// Dynamic simulation
-						{ label: 'Dynamic Models',                     slug: 'user-guide/dynamic-models' },
-						{ label: 'Disturbances',                       slug: 'user-guide/disturbances' },
-						{ label: 'Solver Settings',                    slug: 'user-guide/solver-settings' },
-						// Analysis
-						{ label: 'Eigenanalysis',                      slug: 'user-guide/eigenanalysis' },
+						{
+							label: 'Data Formats',
+							items: [
+								{ label: 'File Formats',    slug: 'user-guide/file-formats' },
+								{ label: 'Network Modeling', slug: 'user-guide/network' },
+							],
+						},
+						{
+							label: 'Power Flow (PFC)',
+							items: [
+								{ label: 'Power Flow Data & Settings', slug: 'user-guide/pfc' },
+							],
+						},
+						{
+							label: 'Dynamic Simulation',
+							items: [
+								{ label: 'Reference Frames & Initialization', slug: 'user-guide/reference-frames' },
+								{ label: 'Dynamic Models',                    slug: 'user-guide/dynamic-models' },
+								{ label: 'Disturbances',                      slug: 'user-guide/disturbances' },
+								{ label: 'Solver Settings',                   slug: 'user-guide/solver-settings' },
+							],
+						},
 					],
 				},
 				{
@@ -98,10 +109,16 @@ export default defineConfig({
 				{
 					label: 'Extending STEPSS',
 					items: [
-						{ label: 'User-Defined Models',      slug: 'developer/user-models' },
-						{ label: 'CODEGEN Blocks Library',   slug: 'developer/codegen-library' },
-						{ label: 'CODEGEN Model Examples',   slug: 'developer/codegen-examples' },
-						{ label: 'URAMSES',                  slug: 'developer/uramses' },
+						{ label: 'User-Defined Models',    slug: 'developer/user-models' },
+						{ label: 'CODEGEN Blocks Library', slug: 'developer/codegen-library' },
+						{ label: 'CODEGEN Model Examples', slug: 'developer/codegen-examples' },
+						{ label: 'URAMSES',                slug: 'developer/uramses' },
+					],
+				},
+				{
+					label: 'Analysis',
+					items: [
+						{ label: 'Eigenanalysis', slug: 'user-guide/eigenanalysis' },
 					],
 				},
 				{
