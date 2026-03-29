@@ -255,7 +255,7 @@ Modelling blocks and their arguments are listed sequentially. Order does not mat
 
 **The `&` symbol must be followed by a space**, then the block name. Each block declaration may be followed by a comment starting with `!`.
 
-After the block name, list the states (inputs/outputs of the block) followed by the data, parameters, or expressions required by the block, in the order specified by the block's definition (see [CODEGEN Blocks Library](/stepss-docs/developer/codegen-library/)).
+After the block name, list the states (inputs/outputs of the block) followed by the data, parameters, or expressions required by the block, in the order specified by the block's definition (see [CODEGEN Blocks Library](/developer/codegen-library/)).
 
 The model section ends at the end of the file.
 
@@ -403,12 +403,12 @@ After writing a model file, CODEGEN translates it into Fortran 2003 code. The wo
 3. Compile with Intel Fortran compiler
 4. Link with RAMSES to create a custom executable or DLL
 
-For compilation details, see [URAMSES](/stepss-docs/developer/uramses/).
+For compilation details, see [URAMSES](/developer/uramses/).
 
-See the [CODEGEN Blocks Library](/stepss-docs/developer/codegen-library/) for the available modelling blocks.
+See the [CODEGEN Blocks Library](/developer/codegen-library/) for the available modelling blocks.
 
 ## Next Steps
 
-- [CODEGEN Blocks Library](/stepss-docs/developer/codegen-library/) — Reference for all modeling blocks
-- [CODEGEN Model Examples](/stepss-docs/developer/codegen-examples/) — Complete model files for each type
-- [URAMSES](/stepss-docs/developer/uramses/) — Compile and link custom models with RAMSES
+- [CODEGEN Blocks Library](/developer/codegen-library/) — Reference for all modeling blocks
+- [CODEGEN Model Examples](/developer/codegen-examples/) — Complete model files for each type
+- [URAMSES](/developer/uramses/) — Compile and link custom models with RAMSES

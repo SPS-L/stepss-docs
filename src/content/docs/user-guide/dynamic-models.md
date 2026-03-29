@@ -34,7 +34,7 @@ TOR TOR_TYPE parameters_passed_to_TOR ;
 | `T'do`, `T"do` | d-axis time constants (open-circuit transient, subtransient) | s |
 | `T'qo`, `T"qo` | q-axis time constants | s |
 
-The FP, FQ, P, Q fields are power participation fractions and initial power values used during initialization. See [Reference Frames & Initialization](/stepss-docs/user-guide/reference-frames/) for detailed explanation.
+The FP, FQ, P, Q fields are power participation fractions and initial power values used during initialization. See [Reference Frames & Initialization](/user-guide/reference-frames/) for detailed explanation.
 
 ### Available Exciter Models
 
@@ -83,7 +83,7 @@ A Thévenin equivalent imposes a constant-frequency voltage source and forces th
 | `P`, `Q` | Initial powers (used if fractions are zero) | pu |
 | `MVA` | Apparent power base used for per-unit values of the Thévenin equivalent | MVA |
 
-The FP, FQ, P, Q fields are power participation fractions and initial power values used during initialization. See [Reference Frames & Initialization](/stepss-docs/user-guide/reference-frames/) for detailed explanation.
+The FP, FQ, P, Q fields are power participation fractions and initial power values used during initialization. See [Reference Frames & Initialization](/user-guide/reference-frames/) for detailed explanation.
 
 ## Impedance Loads
 
@@ -98,7 +98,7 @@ Constant-impedance loads maintain the power factor at the initial voltage.
 | `FP`, `FQ` | Fractions of bus injection (active, reactive) | — |
 | `P`, `Q` | Initial powers (used if fractions are zero) | pu |
 
-The FP, FQ, P, Q fields are power participation fractions and initial power values used during initialization. See [Reference Frames & Initialization](/stepss-docs/user-guide/reference-frames/) for detailed explanation.
+The FP, FQ, P, Q fields are power participation fractions and initial power values used during initialization. See [Reference Frames & Initialization](/user-guide/reference-frames/) for detailed explanation.
 
 ## Two-Port Components
 
@@ -162,6 +162,6 @@ DCTL SIM_MINMAXSPEED CTRL_Name MAX_SPEED(pu) MIN_SPEED(pu) DEADTIME(s) Stop_Simu
 
 ## Next Steps
 
-- [Disturbances](/stepss-docs/user-guide/disturbances/) — Define faults, trips, and parameter changes
-- [Solver Settings](/stepss-docs/user-guide/solver-settings/) — Configure the numerical solver
-- [Model Reference](/stepss-docs/models/ieee-exciters/) — Browse available exciter, governor, and injector models
+- [Disturbances](/user-guide/disturbances/) — Define faults, trips, and parameter changes
+- [Solver Settings](/user-guide/solver-settings/) — Configure the numerical solver
+- [Model Reference](/models/ieee-exciters/) — Browse available exciter, governor, and injector models

@@ -103,7 +103,7 @@ ram.addDisturb(100.0, 'BREAKER SYNC_MACH g7 0')
 ram.contSim(ram.getInfTime())
 ```
 
-For full disturbance syntax, see the [Disturbances reference](/stepss-docs/user-guide/disturbances/).
+For full disturbance syntax, see the [Disturbances reference](/user-guide/disturbances/).
 
 ## Plotting Results
 
@@ -193,11 +193,11 @@ Set `$OMEGA_REF SYN ;` in the solver settings file when exporting Jacobians for 
 
 ## Test System Examples
 
-The following examples use the ready-to-run test systems. For system descriptions, data files, and disturbance scenarios, see the [Test Systems](/stepss-docs/test-systems/nordic/) section.
+The following examples use the ready-to-run test systems. For system descriptions, data files, and disturbance scenarios, see the [Test Systems](/test-systems/nordic/) section.
 
 ### Nordic Test System: Generator Trip
 
-Trips generator g7 at $t = 10$ s on the heavily-stressed Operating Point B and observes the voltage collapse dynamics over 150 seconds. See the [Nordic Test System](/stepss-docs/test-systems/nordic/) page for full system details and file descriptions.
+Trips generator g7 at $t = 10$ s on the heavily-stressed Operating Point B and observes the voltage collapse dynamics over 150 seconds. See the [Nordic Test System](/test-systems/nordic/) page for full system details and file descriptions.
 
 ```python
 import pyramses
@@ -228,7 +228,7 @@ ext.getBus('1041').mag.plot()  # voltage at central bus
 
 ### 5-Bus System: Exciter Parameter Change
 
-Applies a step change to the exciter voltage setpoint at $t = 1$ s and plots the generator response. See the [5-Bus Test System](/stepss-docs/test-systems/5bus/) page for details.
+Applies a step change to the exciter voltage setpoint at $t = 1$ s and plots the generator response. See the [5-Bus Test System](/test-systems/5bus/) page for details.
 
 ```python
 import pyramses

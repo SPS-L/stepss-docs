@@ -191,5 +191,5 @@ time(s) LFRESV 'name_of_filename'
 
 ## Next Steps
 
-- [Solver Settings](/stepss-docs/user-guide/solver-settings/) — Configure time steps, tolerances, and parallelism
-- [PyRAMSES Examples](/stepss-docs/pyramses/examples/) — See complete simulation workflows in Python
+- [Solver Settings](/user-guide/solver-settings/) — Configure time steps, tolerances, and parallelism
+- [PyRAMSES Examples](/pyramses/examples/) — See complete simulation workflows in Python

@@ -6,8 +6,8 @@ import rehypeKatex from 'rehype-katex';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://sps-l.github.io',
-	base: '/stepss-docs',
+	site: 'https://stepss.sps-lab.org',
+	base: '/',
 	markdown: {
 		remarkPlugins: [remarkMath],
 		rehypePlugins: [rehypeKatex],

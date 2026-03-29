@@ -25,7 +25,7 @@ BUS NAME VNOM ;
 Only one BUS record per bus is allowed. All buses must be declared before being referenced.
 
 :::note
-For power flow computations with PFC, an extended version of the BUS record with six fields is used (see [PFC Data](/stepss-docs/user-guide/pfc/)). When RAMSES encounters the extended format, only the first two fields are read.
+For power flow computations with PFC, an extended version of the BUS record with six fields is used (see [PFC Data](/user-guide/pfc/)). When RAMSES encounters the extended format, only the first two fields are read.
 :::
 
 ## Lines and Cables
@@ -140,7 +140,7 @@ To connect a transformer through a single end, add a bus at the open end and set
 TRFO NAME FROMBUS TOBUS CONBUS R X B N SNOM NFIRST NLAST NBPOS TOLV VDES BR ;
 ```
 
-This simplified model has $B_2 = 0$ and $\phi = 0$, and includes data for PFC to adjust the transformer ratio. It cannot be used for phase-shifting transformers. See [PFC Data](/stepss-docs/user-guide/pfc/) for details on ratio adjustment.
+This simplified model has $B_2 = 0$ and $\phi = 0$, and includes data for PFC to adjust the transformer ratio. It cannot be used for phase-shifting transformers. See [PFC Data](/user-guide/pfc/) for details on ratio adjustment.
 
 | Field | Description | Unit |
 |-------|-------------|------|
@@ -218,10 +218,10 @@ SHUNT NAME BUS_NAME QNOM BR ;
 | `BR` | Breaker status (1 = in service, 0 = out of service) | — |
 
 :::caution
-The SHUNT record is used by RAMSES. For PFC, shunt data is specified in the extended BUS record (see [PFC Data](/stepss-docs/user-guide/pfc/)).
+The SHUNT record is used by RAMSES. For PFC, shunt data is specified in the extended BUS record (see [PFC Data](/user-guide/pfc/)).
 :::
 
 ## Next Steps
 
-- [Power Flow (PFC)](/stepss-docs/user-guide/pfc/) — Configure generators, loads, and compute the initial operating point
-- [Dynamic Models](/stepss-docs/user-guide/dynamic-models/) — Add synchronous machines and controllers
+- [Power Flow (PFC)](/user-guide/pfc/) — Configure generators, loads, and compute the initial operating point
+- [Dynamic Models](/user-guide/dynamic-models/) — Add synchronous machines and controllers

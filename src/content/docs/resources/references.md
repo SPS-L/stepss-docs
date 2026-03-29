@@ -27,5 +27,5 @@ description: Academic publications and suggested reading
 
 ## External Resources
 
-- [PyRAMSES Documentation](/stepss-docs/pyramses/overview/) — API reference and examples
+- [PyRAMSES Documentation](/pyramses/overview/) — API reference and examples
 - [Sustainable Power Systems Lab](https://sps-lab.org/) — Research group homepage

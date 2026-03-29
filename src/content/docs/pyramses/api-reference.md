@@ -816,5 +816,5 @@ pyramses.curplot([
 
 ## Next Steps
 
-- [Examples](/stepss-docs/pyramses/examples/) — Practical simulation examples and workflows
-- [Test Systems](/stepss-docs/test-systems/nordic/) — Ready-to-run benchmark systems
+- [Examples](/pyramses/examples/) — Practical simulation examples and workflows
+- [Test Systems](/test-systems/nordic/) — Ready-to-run benchmark systems

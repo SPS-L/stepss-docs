@@ -94,7 +94,7 @@ STEPSS modules can be run through three interfaces:
 | **GUI (Java)** | Full support | Full support | Full support |
 | **Python (PyRAMSES)** | Full support | — | — |
 
-See the [Quick Start](/stepss-docs/getting-started/quickstart/) for details on each interface.
+See the [Quick Start](/getting-started/quickstart/) for details on each interface.
 
 ## Platform Support
 
@@ -108,5 +108,5 @@ See the [Quick Start](/stepss-docs/getting-started/quickstart/) for details on e
 
 ## Next Steps
 
-- [Installation](/stepss-docs/getting-started/installation/) — Set up STEPSS on your system
-- [Quick Start](/stepss-docs/getting-started/quickstart/) — Run your first simulation
+- [Installation](/getting-started/installation/) — Set up STEPSS on your system
+- [Quick Start](/getting-started/quickstart/) — Run your first simulation

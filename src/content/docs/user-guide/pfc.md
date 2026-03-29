@@ -3,7 +3,7 @@ title: Power Flow (PFC)
 description: Power flow computation data and settings
 ---
 
-PFC uses the following network records documented in [Network Modeling](/stepss-docs/user-guide/network/): BUS, LINE, SWITCH, TRANSFO, TRFO, NRTP.
+PFC uses the following network records documented in [Network Modeling](/user-guide/network/): BUS, LINE, SWITCH, TRANSFO, TRFO, NRTP.
 
 The additional records specific to power flow computations are documented below.
 
@@ -231,5 +231,5 @@ The following table summarises which records are used by PFC and RAMSES respecti
 
 ## Next Steps
 
-- [Reference Frames & Initialization](/stepss-docs/user-guide/reference-frames/) — Understand how RAMSES initializes from the PFC solution
-- [Dynamic Models](/stepss-docs/user-guide/dynamic-models/) — Define synchronous machines, injectors, and controllers
+- [Reference Frames & Initialization](/user-guide/reference-frames/) — Understand how RAMSES initializes from the PFC solution
+- [Dynamic Models](/user-guide/dynamic-models/) — Define synchronous machines, injectors, and controllers

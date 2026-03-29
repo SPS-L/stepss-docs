@@ -268,8 +268,8 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
 
 All reactances and resistances are in per unit on the machine base ($S_{nom}$, nominal voltage).
 
-The `EXC` and `TOR` sub-records specify the excitation system and turbine-governor models. See the [Model Reference](/stepss-docs/models/ieee-exciters/) for available models.
+The `EXC` and `TOR` sub-records specify the excitation system and turbine-governor models. See the [Model Reference](/models/ieee-exciters/) for available models.
 
 :::note
-The FP, FQ, P, Q fields control how the machine's initial operating point is determined from the power flow solution. See [Reference Frames & Initialization](/stepss-docs/user-guide/reference-frames/) for details.
+The FP, FQ, P, Q fields control how the machine's initial operating point is determined from the power flow solution. See [Reference Frames & Initialization](/user-guide/reference-frames/) for details.
 :::

@@ -77,7 +77,7 @@ $OMEGA_REF SYN/COI ;
 - `SYN` — Synchronous reference frame (suitable for short-term simulations)
 - `COI` — Center of inertia reference (suitable for long-term simulations)
 
-See [Reference Frames](/stepss-docs/user-guide/reference-frames/) for details.
+See [Reference Frames](/user-guide/reference-frames/) for details.
 
 ## Numerical Parameters
 
@@ -206,5 +206,5 @@ $FULL_UPDATE F ;
 
 ## Next Steps
 
-- [PyRAMSES API](/stepss-docs/pyramses/api-reference/) — Run simulations programmatically from Python
-- [Test Systems](/stepss-docs/test-systems/nordic/) — Try the Nordic or 5-bus benchmark systems
+- [PyRAMSES API](/pyramses/api-reference/) — Run simulations programmatically from Python
+- [Test Systems](/test-systems/nordic/) — Try the Nordic or 5-bus benchmark systems

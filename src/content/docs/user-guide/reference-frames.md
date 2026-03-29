@@ -41,7 +41,7 @@ When the system reaches equilibrium at frequency $f$, all phasor components tend
 
 ### Specifying the Reference Frame
 
-The reference is specified in [Solver Settings](/stepss-docs/user-guide/solver-settings/) via:
+The reference is specified in [Solver Settings](/user-guide/solver-settings/) via:
 ```
 $OMEGA_REF SYN ;    # Synchronous reference
 $OMEGA_REF COI ;    # Center of inertia reference
@@ -102,5 +102,5 @@ Here, `M_3` and `M_4` are negligible (rounding artifacts), while `M_2` suggests 
 
 ## Next Steps
 
-- [Dynamic Models](/stepss-docs/user-guide/dynamic-models/) — Define SYNC_MACH, INJEC, and TWOP records
-- [Disturbances](/stepss-docs/user-guide/disturbances/) — Define simulation events
+- [Dynamic Models](/user-guide/dynamic-models/) — Define SYNC_MACH, INJEC, and TWOP records
+- [Disturbances](/user-guide/disturbances/) — Define simulation events
