@@ -191,79 +191,68 @@ ssa('jac_val.dat', 'jac_eqs.dat', 'jac_var.dat', 'jac_struc.dat')
 Set `$OMEGA_REF SYN ;` in the solver settings file when exporting Jacobians for eigenanalysis.
 :::
 
-## Nordic Test System: Generator Trip
+## Test System Examples
 
-The following example is based on the [Nordic JHub starter notebook](https://github.com/SPS-L/Nordic_JhubStart). It simulates a generator trip at t = 10 s and plots the rotor speed of the tripped machine.
+The following examples use the ready-to-run test systems. For system descriptions, data files, and disturbance scenarios, see the [Test Systems](/stepss-docs/test-systems/nordic/) section.
 
-```python
-import pyramses
-import os
+### Nordic Test System: Generator Trip
 
-# --- Configure the test case ---
-case = pyramses.cfg()
-case.addData('dyn_B.dat')         # dynamic model data
-case.addData('volt_rat_B.dat')    # power-flow initialisation
-case.addData('settings1.dat')     # solver settings
-case.addDst('nothing.dst')        # no pre-defined disturbances
-case.addObs('obs.dat')            # observables to record
-case.addTrj('output.trj')         # trajectory output file
-
-# --- Remove stale output files from previous runs ---
-for f in os.listdir('.'):
-    if f.endswith('.trj') or f.endswith('.trace'):
-        os.remove(f)
-
-# --- Run simulation ---
-ram = pyramses.sim()
-ram.execSim(case, 0.0)                          # initialise, paused at t = 0
-ram.addDisturb(10.0, 'BREAKER SYNC_MACH g7 0')  # trip generator g7 at t = 10 s
-ram.contSim(150.0)                              # simulate to t = 150 s
-ram.endSim()
-
-# --- Extract and plot results ---
-ext = pyramses.extractor(case.getTrj())
-ext.getSync('g7').S.plot()    # rotor speed of generator g7
-```
-
-:::note
-The Nordic test system files (`dyn_B.dat`, `volt_rat_B.dat`, etc.) are available in the [Nordic_JhubStart](https://github.com/SPS-L/Nordic_JhubStart) repository.
-:::
-
-## 5-Bus System: Exciter Parameter Change
-
-The following example is based on the [5-bus test system Case 2 notebook](https://github.com/SPS-L/5_bus_test_system). It applies a step change to the exciter voltage setpoint at t = 1 s and plots the generator active power.
+Trips generator g7 at $t = 10$ s on the heavily-stressed Operating Point B and observes the voltage collapse dynamics over 150 seconds. See the [Nordic Test System](/stepss-docs/test-systems/nordic/) page for full system details and file descriptions.
 
 ```python
 import pyramses
 import os
 
-# --- Configure the test case ---
 case = pyramses.cfg()
-case.addData('dyn.dat')           # dynamic model data
-case.addData('lf1solv.dat')       # power-flow solution
-case.addData('solveroptions.dat') # solver settings
-case.addDst('nothing.dst')        # no pre-defined disturbances
-case.addObs('obs.dat')            # observables to record
-case.addTrj('output.trj')         # trajectory output file
+case.addData('dyn_B.dat')
+case.addData('volt_rat_B.dat')
+case.addData('settings1.dat')
+case.addDst('nothing.dst')
+case.addObs('obs.dat')
+case.addTrj('output.trj')
 
-# --- Remove stale output files from previous runs ---
 for f in os.listdir('.'):
     if f.endswith('.trj') or f.endswith('.trace'):
         os.remove(f)
 
-# --- Run simulation ---
 ram = pyramses.sim()
-ram.execSim(case, 0.0)                              # initialise, paused at t = 0
-ram.addDisturb(1.0, 'CHGPRM EXC G Vo 0.05 2')      # step +0.05 pu on Vo of exciter G at t = 1 s
-ram.contSim(60.0)                                   # simulate to t = 60 s
+ram.execSim(case, 0.0)
+ram.addDisturb(10.0, 'BREAKER SYNC_MACH g7 0')
+ram.contSim(150.0)
 ram.endSim()
 
-# --- Extract and plot results ---
 ext = pyramses.extractor(case.getTrj())
-ext.getSync('G').P.plot()     # active power of generator G
-ext.getSync('G').Q.plot()     # reactive power of generator G
+ext.getSync('g7').S.plot()    # rotor speed
+ext.getBus('1041').mag.plot()  # voltage at central bus
 ```
 
-:::note
-The 5-bus test system files are available in the [5_bus_test_system](https://github.com/SPS-L/5_bus_test_system) repository.
-:::
+### 5-Bus System: Exciter Parameter Change
+
+Applies a step change to the exciter voltage setpoint at $t = 1$ s and plots the generator response. See the [5-Bus Test System](/stepss-docs/test-systems/5bus/) page for details.
+
+```python
+import pyramses
+import os
+
+case = pyramses.cfg()
+case.addData('dyn.dat')
+case.addData('lf1solv.dat')
+case.addData('solveroptions.dat')
+case.addDst('nothing.dst')
+case.addObs('obs.dat')
+case.addTrj('output.trj')
+
+for f in os.listdir('.'):
+    if f.endswith('.trj') or f.endswith('.trace'):
+        os.remove(f)
+
+ram = pyramses.sim()
+ram.execSim(case, 0.0)
+ram.addDisturb(1.0, 'CHGPRM EXC G Vo 0.05 2')
+ram.contSim(60.0)
+ram.endSim()
+
+ext = pyramses.extractor(case.getTrj())
+ext.getSync('G').P.plot()
+ext.getSync('G').Q.plot()
+```

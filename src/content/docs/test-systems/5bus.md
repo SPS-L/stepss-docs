@@ -47,3 +47,7 @@ ext.getSync('G').Q.plot()     # reactive power
 ## Download
 
 The test system files are available in the [5_bus_test_system repository](https://github.com/SPS-L/5_bus_test_system).
+
+## See Also
+
+- [PyRAMSES Examples](/stepss-docs/pyramses/examples/#5-bus-system-exciter-parameter-change) — Complete Python simulation workflow with this test system
