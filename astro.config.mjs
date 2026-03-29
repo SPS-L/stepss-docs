@@ -43,77 +43,80 @@ export default defineConfig({
 				{
 					label: 'Getting Started',
 					items: [
-						{ label: 'Overview', slug: 'getting-started/overview' },
+						{ label: 'Overview',     slug: 'getting-started/overview' },
 						{ label: 'Installation', slug: 'getting-started/installation' },
-						{ label: 'Quick Start', slug: 'getting-started/quickstart' },
-						{ label: 'License', slug: 'getting-started/license' },
+						{ label: 'Quick Start',  slug: 'getting-started/quickstart' },
 					],
 				},
 				{
-					label: 'User Guide',
+					label: 'Simulation Guide',
 					items: [
-						{ label: 'File Formats', slug: 'user-guide/file-formats' },
-						{ label: 'Network Modeling', slug: 'user-guide/network' },
-						{ label: 'Power Flow (PFC)', slug: 'user-guide/pfc' },
-						{ label: 'Reference Frames & Initialization', slug: 'user-guide/reference-frames' },
-						{ label: 'Dynamic Models', slug: 'user-guide/dynamic-models' },
-						{ label: 'Disturbances', slug: 'user-guide/disturbances' },
-						{ label: 'Solver Settings', slug: 'user-guide/solver-settings' },
-						{ label: 'Eigenanalysis', slug: 'user-guide/eigenanalysis' },
+						// Network definition & initial conditions
+						{ label: 'File Formats',                       slug: 'user-guide/file-formats' },
+						{ label: 'Network Modeling',                   slug: 'user-guide/network' },
+						{ label: 'Power Flow (PFC)',                   slug: 'user-guide/pfc' },
+						{ label: 'Reference Frames & Initialization',  slug: 'user-guide/reference-frames' },
+						// Dynamic simulation
+						{ label: 'Dynamic Models',                     slug: 'user-guide/dynamic-models' },
+						{ label: 'Disturbances',                       slug: 'user-guide/disturbances' },
+						{ label: 'Solver Settings',                    slug: 'user-guide/solver-settings' },
+						// Analysis
+						{ label: 'Eigenanalysis',                      slug: 'user-guide/eigenanalysis' },
 					],
 				},
 				{
 					label: 'PyRAMSES',
 					items: [
-						{ label: 'Overview', slug: 'pyramses/overview' },
-						{ label: 'Installation', slug: 'pyramses/installation' },
+						{ label: 'Overview',      slug: 'pyramses/overview' },
+						{ label: 'Installation',  slug: 'pyramses/installation' },
 						{ label: 'API Reference', slug: 'pyramses/api-reference' },
-						{ label: 'Examples', slug: 'pyramses/examples' },
+						{ label: 'Examples',      slug: 'pyramses/examples' },
 					],
 				},
 				{
-					label: 'Model Library',
+					label: 'Model Reference',
 					items: [
 						{
-							label: 'IEEE Models',
+							label: 'Exciters',
 							items: [
-								{ label: 'Exciter Models', slug: 'models/ieee-exciters' },
-								{ label: 'Governor Models', slug: 'models/ieee-governors' },
+								{ label: 'IEEE Exciters',    slug: 'models/ieee-exciters' },
+								{ label: 'Custom Exciters',  slug: 'models/custom-exciters' },
 							],
 						},
 						{
-							label: 'Custom Models',
+							label: 'Governors',
 							items: [
-								{ label: 'Exciter Models', slug: 'models/custom-exciters' },
-								{ label: 'Governor Models', slug: 'models/custom-governors' },
-								{ label: 'Injector Models', slug: 'models/custom-injectors' },
-								{ label: 'Two-Port Models', slug: 'models/two-port-models' },
+								{ label: 'IEEE Governors',   slug: 'models/ieee-governors' },
+								{ label: 'Custom Governors', slug: 'models/custom-governors' },
 							],
 						},
+						{ label: 'Injectors',            slug: 'models/custom-injectors' },
+						{ label: 'Two-Port Models',      slug: 'models/two-port-models' },
 						{ label: 'Discrete Controllers', slug: 'models/discrete-controllers' },
 					],
 				},
 				{
-					label: 'Developer Guide',
+					label: 'Extending STEPSS',
 					items: [
-						{ label: 'User-Defined Models', slug: 'developer/user-models' },
-						{ label: 'CODEGEN Blocks Library', slug: 'developer/codegen-library' },
-						{ label: 'CODEGEN Model Examples', slug: 'developer/codegen-examples' },
-						{ label: 'URAMSES', slug: 'developer/uramses' },
+						{ label: 'User-Defined Models',      slug: 'developer/user-models' },
+						{ label: 'CODEGEN Blocks Library',   slug: 'developer/codegen-library' },
+						{ label: 'CODEGEN Model Examples',   slug: 'developer/codegen-examples' },
+						{ label: 'URAMSES',                  slug: 'developer/uramses' },
 					],
 				},
 				{
 					label: 'Test Systems',
 					items: [
 						{ label: 'Nordic Test System', slug: 'test-systems/nordic' },
-						{ label: '5-Bus Test System', slug: 'test-systems/5bus' },
+						{ label: '5-Bus Test System',  slug: 'test-systems/5bus' },
 					],
 				},
 				{
-					label: 'Resources',
+					label: 'Reference',
 					items: [
-						{ label: 'References', slug: 'resources/references' },
 						{ label: 'Repositories', slug: 'resources/repositories' },
+						{ label: 'References',   slug: 'resources/references' },
+						{ label: 'License',      slug: 'getting-started/license' },
 					],
 				},
 			],
