@@ -31,6 +31,27 @@ Refresh interval for runtime observable plots (requires Gnuplot):
 $GP_REFRESH_RATE time_interval(s) ;
 ```
 
+### Observable Buffer Size
+
+Internal memory reserved for storing observables during simulation:
+
+```
+$OBS_BUFFER_SIZE size(GB) ;
+```
+
+Default: 8 GB. Set this to less than half of your available RAM for large simulations.
+
+### Sparse Solver
+
+Selects the sparse linear solver used for Jacobian factorization:
+
+```
+$SPARSE_SOLVER name ;
+```
+
+- `KLU` — SuiteSparse KLU solver (default)
+- `ma41` — HSL MA41 solver
+
 ## System Parameters
 
 ### Base Power
