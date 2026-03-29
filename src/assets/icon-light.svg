@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="22mm"
+   height="22mm"
+   viewBox="0 0 21.999999 22"
+   version="1.1"
+   id="svg6940"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="logo3_light_S.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview6942"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="4.086974"
+     inkscape:cx="128.82392"
+     inkscape:cy="65.941207"
+     inkscape:window-width="1920"
+     inkscape:window-height="1043"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs6937" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-71.143834,-128.23298)">
+    <path
+       d="m 86.090651,131.9174 c 0,0 -8.731249,0 -8.731249,3.70417 0,3.70417 7.937499,3.70417 7.937499,6.87917 0,3.175 -9.260416,3.70416 -9.260416,3.70416"
+       fill="none"
+       stroke="#1e2d3d"
+       stroke-width="3.175"
+       stroke-linecap="round"
+       id="path6" />
+    <path
+       d="m 73.390652,139.8549 h 4.7625 c 0.264583,0 0.264583,-3.175 1.058333,-3.175 0.79375,0 0.79375,5.82084 1.852083,5.82084 1.058334,0 1.058334,-4.49792 2.116667,-4.49792 1.058333,0 1.058333,3.175 2.116666,3.175 1.058334,0 1.058334,-1.5875 1.852084,-1.5875 0.79375,0 0.79375,0.26458 2.116666,0.26458 h 2.116667"
+       class="wc"
+       id="path8"
+       style="fill:none;stroke:#1a6fc4;stroke-width:0.926042;stroke-linecap:round" />
+    <circle
+       cx="73.390656"
+       cy="139.85492"
+       r="0.79374999"
+       class="dt"
+       id="circle10"
+       style="fill:#1a6fc4;stroke-width:0.264583" />
+    <circle
+       cx="91.382324"
+       cy="139.85492"
+       r="0.79374999"
+       class="dt"
+       id="circle12"
+       style="fill:#1a6fc4;stroke-width:0.264583" />
+  </g>
+</svg>

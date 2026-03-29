@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="22mm"
+   height="22mm"
+   viewBox="0 0 22 22"
+   version="1.1"
+   id="svg10441"
+   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   sodipodi:docname="logo3_dark_S.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview10443"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="5.7798541"
+     inkscape:cx="78.202666"
+     inkscape:cy="11.85151"
+     inkscape:window-width="3006"
+     inkscape:window-height="1659"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs10438" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-111.73498,-142.41202)">
+    <rect
+       width="22.157724"
+       height="22.082354"
+       rx="0.42205191"
+       fill="#0a1520"
+       id="rect6"
+       x="111.73498"
+       y="142.41202"
+       style="stroke-width:0.265;stroke-dasharray:none" />
+    <path
+       d="m 126.55164,146.11618 c 0,0 -8.73125,0 -8.73125,3.70417 0,3.70416 7.9375,3.70416 7.9375,6.87916 0,3.175 -9.26041,3.70417 -9.26041,3.70417"
+       fill="none"
+       stroke="#c8d8ec"
+       stroke-width="3.175"
+       stroke-linecap="round"
+       id="path8" />
+    <path
+       d="m 113.85164,154.05368 h 4.7625 c 0.26459,0 0.26459,-3.175 1.05834,-3.175 0.79375,0 0.79375,5.82083 1.85208,5.82083 1.05833,0 1.05833,-4.49791 2.11667,-4.49791 1.05833,0 1.05833,3.175 2.11666,3.175 1.05834,0 1.05834,-1.5875 1.85209,-1.5875 0.79375,0 0.79375,0.26458 2.11666,0.26458 h 2.11667"
+       class="wc"
+       id="path10"
+       style="fill:none;stroke:#4da6ff;stroke-width:0.926042;stroke-linecap:round" />
+    <circle
+       cx="113.85165"
+       cy="154.0537"
+       r="0.79374999"
+       class="dt"
+       id="circle12"
+       style="fill:#4da6ff;stroke-width:0.264583" />
+    <circle
+       cx="131.84332"
+       cy="154.0537"
+       r="0.79374999"
+       class="dt"
+       id="circle14"
+       style="fill:#4da6ff;stroke-width:0.264583" />
+  </g>
+</svg>
