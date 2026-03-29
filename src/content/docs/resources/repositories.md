@@ -38,7 +38,7 @@ Python interface to the RAMSES simulator providing scripting access to simulatio
 
 - **Repository**: [github.com/SPS-L/stepss-PyRAMSES](https://github.com/SPS-L/stepss-PyRAMSES)
 - **Install**: `pip install pyramses`
-- **Documentation**: [pyramses.sps-lab.org](https://pyramses.sps-lab.org/)
+- **Documentation**: [PyRAMSES section](/stepss-docs/pyramses/overview/) on this site
 - **Includes**: Nordic test system example
 
 ### STEPSS-Userguide

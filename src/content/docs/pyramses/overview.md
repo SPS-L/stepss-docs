@@ -5,7 +5,7 @@ description: Python-based RApid Multithreaded Simulation of Electric power Syste
 
 **PyRAMSES** is a Python module that provides an interface to the RAMSES dynamic simulator. It covers the full simulation workflow: defining test cases, launching simulations, querying system states at runtime, and extracting and plotting results. The package embeds pre-compiled RAMSES binaries (dynamic libraries) for both Windows and Linux and exposes them through a clean Python API.
 
-For more information, visit the [PyRAMSES project page](https://sps-lab.org/project/pyramses/) and the [PyRAMSES documentation site](https://pyramses.sps-lab.org/).
+For more information, visit the [PyRAMSES project page](https://sps-lab.org/project/pyramses/).
 
 ## Package-Level Attributes
 
@@ -14,7 +14,7 @@ After importing the package, the following attributes are available:
 | Attribute | Description |
 |-----------|-------------|
 | `pyramses.__version__` | Current version string (e.g., `'0.0.65'`) |
-| `pyramses.__url__` | Documentation URL (`https://pyramses.sps-lab.org`) |
+| `pyramses.__url__` | Documentation URL |
 | `pyramses.__runTimeObs__` | `True` if Gnuplot was found in PATH at import time; runtime observables will be active |
 
 ## Main Classes
