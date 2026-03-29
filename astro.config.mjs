@@ -87,6 +87,7 @@ export default defineConfig({
 				{
 					label: 'Model Reference',
 					items: [
+						{ label: 'Synchronous Machine', slug: 'models/synchronous-machine' },
 						{
 							label: 'Exciters',
 							items: [
