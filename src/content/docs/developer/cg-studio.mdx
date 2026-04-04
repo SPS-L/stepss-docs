@@ -1,0 +1,352 @@
+---
+title: CODEGEN Studio
+description: Visual block diagram editor for building CODEGEN DSL models — creating, saving, loading, and exporting models
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+CODEGEN Studio is a browser-based visual editor for assembling [User-Defined Models](/developer/user-models/) using the [CODEGEN block library](/developer/codegen-library/). Instead of writing DSL files by hand, you drag blocks onto a canvas, connect them, fill in metadata, and export a valid `.txt` file ready for the `codegen` binary.
+
+## Getting Started
+
+### Installation
+
+```bash
+git clone https://github.com/SPS-L/stepss-cg-studio
+cd stepss-cg-studio
+pip install -r requirements.txt
+python server/app.py
+```
+
+Open `http://localhost:8765` in your browser.
+
+### Interface Overview
+
+The interface has three columns:
+
+| Area | Location | Purpose |
+|------|----------|---------|
+| **Block palette** | Left sidebar | Searchable catalogue of all CODEGEN blocks, grouped by category |
+| **Canvas** | Center | Drag-and-drop block diagram with connection wires |
+| **Metadata tabs** | Below canvas | Editable tables for `%data`, `%parameters`, `%states`, `%observables` |
+| **Block inspector** | Right panel (top) | Edit output signal names and block arguments for the selected block |
+| **DSL preview** | Right panel (bottom) | Live syntax-highlighted preview of the generated DSL code |
+| **Topbar** | Top | Model type/name selectors, file operations, and settings |
+
+---
+
+## Creating a Model
+
+### 1. Choose the Model Type and Name
+
+Use the **Type** dropdown in the topbar to select the model category:
+
+| Type | Description | Mandatory outputs | Colour theme |
+|------|-------------|-------------------|-------------|
+| **EXC** | Excitation controller | `vf` | Blue |
+| **TOR** | Torque controller | `tm` | Green |
+| **INJ** | Current injector | `ix`, `iy` | Orange |
+| **TWOP** | Two-port device | `ix1`, `iy1`, `ix2`, `iy2` | Purple |
+
+The UI accent colour changes to reflect the active model type. Type the model name (max 32 characters) in the **Name** field next to the dropdown.
+
+:::note[Model type determines available inputs]
+Each model type exposes a different set of RAMSES input variables. For instance, an EXC model can reference `[v]`, `[p]`, `[q]`, `[omega]`, `[if]`, and `[vf]`, while a TOR model only has `[p]`, `[omega]`, and `[tm]`. See [User-Defined Models](/developer/user-models/) for the complete list.
+:::
+
+### 2. Add Blocks to the Canvas
+
+The left palette lists all available blocks from the [CODEGEN Blocks Library](/developer/codegen-library/), organised by category (Transfer Functions, Limiters, Controllers, etc.).
+
+1. **Search** by typing in the search box at the top of the palette
+2. **Expand** a category by clicking its header
+3. **Drag** a block from the palette onto the canvas
+
+Each block appears as a node with input ports on the left and output ports on the right. A coloured dot indicates the block category.
+
+### 3. Connect Blocks
+
+Click and drag from an **output port** (right side) of one block to an **input port** (left side) of another. A wire appears showing the signal flow. The connection assigns a signal name that links the two blocks in the generated DSL.
+
+- Each input port accepts exactly one incoming wire
+- Each output port can fan out to multiple inputs
+- The status bar below the canvas toolbar shows the current block and wire count
+
+:::caution[Cycle detection]
+If your connections form a cycle, the status bar shows **"Cycle detected"** in red and DSL export is blocked. Feedback loops in control systems are valid in RAMSES, but the loop must be broken by declaring the fed-back signal as a `%state` with an explicit initial value. See [User-Defined Models — States](/developer/user-models/) for details.
+:::
+
+### 4. Edit Block Properties
+
+Click a block on the canvas to select it. The **Block Inspector** (right panel) shows:
+
+- **Output signal names** — one editable field per output port. The default auto-generated name (e.g., `tf11`, `int2`) can be renamed to any valid identifier. This is the state name that appears in the DSL.
+- **Arguments** — block-specific parameters such as gain `K`, time constant `T`, or limiter bounds. Values can be:
+  - A numeric literal: `1.0`
+  - A data reference: `{KA}` (refers to an entry in `%data`)
+  - A Fortran expression: `{1/{omegac}}`
+
+The `algeq` (algebraic equation) block has a special **Expression** field for the equation set to zero.
+
+### 5. Fill in the Metadata Tables
+
+The four tabs below the canvas correspond to the four metadata sections of a CODEGEN DSL file:
+
+<Tabs>
+<TabItem label="%data">
+**Purpose:** Declare named constants whose values are read from the RAMSES data record at runtime.
+
+| Column | Description | Example |
+|--------|-------------|---------|
+| Name | Identifier (max 20 chars) | `KA` |
+| Value | Optional default | `200.0` |
+| Comment | Annotation | `AVR gain` |
+
+In block arguments and expressions, reference data values with braces: `{KA}`.
+</TabItem>
+
+<TabItem label="%parameters">
+**Purpose:** Define derived quantities computed once at initialisation from data and initial state values.
+
+| Column | Description | Example |
+|--------|-------------|---------|
+| Name | Identifier | `Vo` |
+| Expr | Fortran expression | `[vf]/{KE}+[vf]/{KA}` |
+| Comment | Annotation | `initial voltage` |
+
+Use `[name]` to reference state/input variables and `{name}` to reference data constants. Multi-line expressions are supported with the `&` continuation marker.
+</TabItem>
+
+<TabItem label="%states">
+**Purpose:** Declare the internal state variables of the model and their initial-condition expressions.
+
+| Column | Description | Example |
+|--------|-------------|---------|
+| Name | State identifier | `avr1` |
+| Init | Initial value expression | `vf/{KE}` |
+| Comment | Annotation | `AVR integrator` |
+
+Every block output signal that represents a dynamic state should have a corresponding entry here. The mandatory output states for the selected model type (e.g., `vf` for EXC) must appear either as block outputs or in `%states`.
+</TabItem>
+
+<TabItem label="%observables">
+**Purpose:** List variables to be recorded during simulation. These are typically the states you want to monitor.
+
+| Column | Description | Example |
+|--------|-------------|---------|
+| Name | Observable name | `vf` |
+
+Observables do not need expressions — they refer to state names already defined elsewhere in the model.
+</TabItem>
+</Tabs>
+
+Click **"+ Add row"** to append a row. Click the **x** button on a row to remove it. All edits update the DSL preview in real time.
+
+### 6. Review the DSL Preview
+
+The bottom-right panel shows a **live syntax-highlighted preview** of the generated DSL code. It updates automatically (with a 600 ms debounce) after every change. The preview uses colour coding:
+
+| Colour | Meaning |
+|--------|---------|
+| Orange, bold | Section headers (`%data`, `%parameters`, etc.) |
+| Gray, italic | Comments (`! ...`) |
+| Blue | Numeric literals |
+| Purple | Data/parameter references (`{KA}`) |
+| Cyan | State/input references (`[omega]`) |
+
+Click the **copy button** in the preview header to copy the DSL text to your clipboard.
+
+---
+
+## Saving a Project
+
+Click **"Save Project"** in the topbar (or press **Ctrl+S** / **Cmd+S**).
+
+The browser downloads a `.json` file named `{model_name}.json` containing the complete project state:
+
+- Model type and name
+- All blocks with their positions, arguments, and output signal names
+- All wire connections
+- All metadata (data, parameters, states, observables)
+
+This is a **lossless format** — every aspect of your canvas layout and configuration is preserved. Use this format for work-in-progress models that you intend to continue editing.
+
+---
+
+## Loading a Project
+
+Click **"Load Project"** in the topbar and select a previously saved `.json` file.
+
+The editor restores the full project state:
+- Canvas blocks appear at their saved positions
+- All wires are reconnected
+- Metadata tables repopulate
+- The model type and name update in the topbar
+- The colour theme switches to match the model type
+
+A toast notification confirms: *"Project loaded: {model_name}"*.
+
+:::note[New vs. Load]
+Clicking **"New"** resets the editor to a blank state. A confirmation dialog ("Discard current model?") prevents accidental loss of work. If you want to keep your current model, save it first.
+:::
+
+---
+
+## Importing a DSL File
+
+Click **"Load DSL"** and select a `.txt` file written in the [CODEGEN DSL format](/developer/user-models/).
+
+The backend parser extracts all sections and blocks from the file, and the editor reconstructs the canvas:
+
+1. Each `& blockname` in `%models` becomes a node on the canvas
+2. Signal references are resolved into wire connections
+3. Metadata sections populate the corresponding tabs
+4. A **Sugiyama auto-layout** algorithm assigns node positions automatically:
+   - Blocks are arranged left-to-right by dependency order
+   - A three-pass crossing-reduction minimises wire overlaps
+   - Feedback loops are detected and handled gracefully
+
+This lets you visually inspect and edit any existing CODEGEN model, including the [example models](/developer/codegen-examples/).
+
+---
+
+## Exporting a DSL File
+
+Click **"Export DSL"** to download the generated `.txt` file.
+
+Before export, the editor validates that all **mandatory output states** for the selected model type are produced by at least one block on the canvas. If any are missing, a warning dialog lists them:
+
+> **Missing Mandatory Outputs**
+>
+> Missing mandatory outputs for **exc**: `vf`
+>
+> The codegen binary will reject this model.
+
+You can click **"Export Anyway"** to override the warning, or **"Cancel"** to go back and fix the model.
+
+The exported file follows the [strict DSL section order](/developer/user-models/): model type, model name, `%data`, `%parameters`, `%states`, `%observables`, `%models`. Blocks are emitted in topologically-sorted order (dependencies before dependents).
+
+:::note[Round-trip fidelity]
+You can import an exported DSL file back into the editor. Unknown block types (not in the catalogue) are preserved through `rawArgLines` and re-emitted verbatim, ensuring lossless round-trip even for custom or future blocks.
+:::
+
+---
+
+## Running CODEGEN
+
+Click **"Run Codegen"** (the accent-coloured button with the play icon) to compile the model into Fortran.
+
+The same mandatory-output validation runs first. If validation passes:
+
+1. The editor generates the DSL text
+2. The backend writes it to a temporary file and invokes the `codegen` binary
+3. On **success**, a modal displays the generated `.f90` source code with options to **"Download .f90"** or **"Close"**
+4. On **failure**, a modal shows the error output from the `codegen` binary
+
+The downloaded `.f90` file is named `{type}_{name}.f90` (e.g., `exc_ieee_st1a.f90`) and is ready to compile and link with RAMSES.
+
+:::caution[Codegen binary required]
+The `codegen` executable must be installed and its path configured. Click the **gear icon** in the topbar to open Settings, then set the **"Codegen binary path"** to the full path of your `codegen` executable (or just `codegen` if it is on your system `PATH`).
+:::
+
+---
+
+## File Formats Summary
+
+| Format | Extension | Use case | Lossless? |
+|--------|-----------|----------|-----------|
+| **Project** | `.json` | Save/resume editing | Yes — includes canvas positions, all metadata |
+| **DSL** | `.txt` | Input to `codegen` binary | Structure only — no canvas layout |
+| **Fortran** | `.f90` | Output from `codegen` | Export only — cannot be re-imported |
+
+---
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl+S` / `Cmd+S` | Save project |
+| `Ctrl+Z` / `Cmd+Z` | Undo |
+| `Ctrl+Y` / `Cmd+Shift+Z` | Redo |
+| `Delete` / `Backspace` | Delete selected block |
+| `Escape` | Close any open modal |
+
+Shortcuts are disabled while typing in text fields.
+
+---
+
+## Settings
+
+Click the **gear icon** in the topbar to configure:
+
+| Setting | Default | Description |
+|---------|---------|-------------|
+| **Codegen binary path** | `codegen` | Full path to the `codegen` executable |
+| **Server host** | `127.0.0.1` | Bind address (change to `0.0.0.0` for network access) |
+| **Server port** | `8765` | HTTP port |
+
+Changes to host and port require a server restart. The codegen path takes effect immediately.
+
+Settings are stored in `server/config.json` and can also be edited via the REST API at `/docs` (Swagger UI).
+
+---
+
+## Workflow Example: Building an AVR Model
+
+This walkthrough creates a simplified Automatic Voltage Regulator (AVR) as an EXC model.
+
+### Step 1 — Set up the model
+
+1. Select **EXC** from the Type dropdown
+2. Type `simple_avr` in the Name field
+
+### Step 2 — Add data constants
+
+Switch to the **%data** tab and add rows:
+
+| Name | Value | Comment |
+|------|-------|---------|
+| `KA` | | AVR gain |
+| `TA` | | AVR time constant |
+| `VREF` | | Reference voltage |
+
+### Step 3 — Place blocks
+
+Drag the following blocks from the palette onto the canvas:
+
+1. `algeq` — to compute the voltage error
+2. `tf1p` — a first-order transfer function for the AVR
+
+### Step 4 — Connect and configure
+
+1. Connect the `algeq` output to the `tf1p` input
+2. Select the `algeq` block and set its **Expression** to `{VREF}-[v]-avr1`
+3. Select the `tf1p` block and:
+   - Rename its output signal to `vf` (this is the mandatory EXC output)
+   - Set **K** to `{KA}` and **T** to `{TA}`
+
+### Step 5 — Define states
+
+Switch to the **%states** tab and add:
+
+| Name | Init | Comment |
+|------|------|---------|
+| `avr1` | `vf/{KA}` | AVR integrator state |
+
+### Step 6 — Add observables
+
+Switch to the **%observables** tab and add `vf`.
+
+### Step 7 — Export
+
+1. Click **"Export DSL"** — validation passes because `vf` is produced by the `tf1p` block
+2. The downloaded `simple_avr.txt` is ready for `codegen -tsimple_avr.txt`
+3. Or click **"Run Codegen"** to generate `exc_simple_avr.f90` directly
+
+---
+
+## See Also
+
+- [User-Defined Models](/developer/user-models/) — DSL file format and model framework
+- [CODEGEN Blocks Library](/developer/codegen-library/) — complete block reference
+- [CODEGEN Model Examples](/developer/codegen-examples/) — annotated model files for all four types
