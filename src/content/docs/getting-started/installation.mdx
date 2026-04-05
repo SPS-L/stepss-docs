@@ -93,6 +93,38 @@ Three packages need to be installed **in order**:
 
 </Steps>
 
+## Installing CODEGEN Studio
+
+<Aside type="tip">
+This step can be **skipped** if you do not plan to build user-defined models visually. You can also write DSL files by hand — see [User-Defined Models](/developer/user-models/).
+</Aside>
+
+[CODEGEN Studio](/developer/cg-studio/) is a browser-based visual editor for assembling CODEGEN models using drag-and-drop blocks.
+
+<Steps>
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/SPS-L/stepss-cg-studio
+   cd stepss-cg-studio
+   ```
+
+2. Install Python dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. Start the server:
+   ```bash
+   python server/app.py
+   ```
+
+4. Open `http://localhost:8765` in your browser
+
+</Steps>
+
+To compile models from within the editor, configure the **codegen binary path** in Settings (gear icon). See the [CODEGEN Studio guide](/developer/cg-studio/) for details.
+
 ## Installing PyRAMSES
 
 For the Python interface to RAMSES, see the [PyRAMSES Installation Guide](/pyramses/installation/).

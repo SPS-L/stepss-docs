@@ -84,6 +84,10 @@ Four types of user-defined models are supported:
 
 The user model is **compiled, not interpreted** — resulting in efficient number-crunching code. While the solver code is proprietary, the models are designed to be freely shared, making STEPSS an **open-source simulation software** for the modeling part.
 
+### CODEGEN Studio
+
+[CODEGEN Studio](/developer/cg-studio/) is a browser-based visual editor for building CODEGEN models. Instead of writing DSL files by hand, you drag blocks onto a canvas, connect them, and export a valid model file. It can also import existing DSL files for visual inspection and editing.
+
 ## Simulation Interfaces
 
 STEPSS modules can be run through three interfaces:

@@ -14,6 +14,7 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 | [STEPSS-Userguide](https://github.com/SPS-L/STEPSS-Userguide) | LaTeX user documentation and models reference | LaTeX | Public |
 | [stepss-URAMSES](https://github.com/SPS-L/stepss-URAMSES) | User-defined device models framework | Fortran | Public |
 | [RAMSES-Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis) | Small-signal / eigenvalue analysis tools | MATLAB | Public |
+| [stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) | Visual block diagram editor for CODEGEN models | Python/JS | Public |
 | stepss-ramses | Core RAMSES simulation engine | Fortran | Private |
 | stepss-PFC | Power-flow calculator (Newton-Raphson) | Fortran | Private |
 | stepss-dyngraph | Dynamic graph / topology module | Fortran | Private |
@@ -64,6 +65,16 @@ MATLAB-based tool for small-signal stability analysis using eigenvalues extracte
 - **Repository**: [github.com/SPS-L/RAMSES-Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis)
 - **Requirements**: MATLAB R2016a+, PyRAMSES
 - **Methods**: QZ, ARPACK, JDQR
+
+### stepss-cg-studio (CODEGEN Studio)
+
+Browser-based visual editor for building CODEGEN user-defined models with drag-and-drop blocks.
+
+- **Repository**: [github.com/SPS-L/stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio)
+- **Requirements**: Python 3.x
+- **Install**: `pip install -r requirements.txt`
+- **Run**: `python server/app.py` → open `http://localhost:8765`
+- **Documentation**: [CODEGEN Studio guide](/developer/cg-studio/) on this site
 
 ## Contributing
 
