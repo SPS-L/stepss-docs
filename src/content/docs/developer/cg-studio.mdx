@@ -162,7 +162,7 @@ Click the **copy button** in the preview header to copy the DSL text to your cli
 
 Click **"Save Project"** in the topbar (or press **Ctrl+S** / **Cmd+S**).
 
-The browser downloads a `.json` file named `{model_name}.json` containing the complete project state:
+The browser downloads a `.json` file named after your model (e.g., `simple_avr.json`) containing the complete project state:
 
 - Model type and name
 - All blocks with their positions, arguments, and output signal names
@@ -184,7 +184,7 @@ The editor restores the full project state:
 - The model type and name update in the topbar
 - The colour theme switches to match the model type
 
-A toast notification confirms: *"Project loaded: {model_name}"*.
+A toast notification confirms the load with the model name.
 
 :::note[New vs. Load]
 Clicking **"New"** resets the editor to a blank state. A confirmation dialog ("Discard current model?") prevents accidental loss of work. If you want to keep your current model, save it first.
@@ -243,7 +243,7 @@ The same mandatory-output validation runs first. If validation passes:
 3. On **success**, a modal displays the generated `.f90` source code with options to **"Download .f90"** or **"Close"**
 4. On **failure**, a modal shows the error output from the `codegen` binary
 
-The downloaded `.f90` file is named `{type}_{name}.f90` (e.g., `exc_ieee_st1a.f90`) and is ready to compile and link with RAMSES.
+The downloaded `.f90` file follows the naming convention `exc_simple_avr.f90` (type prefix + model name) and is ready to compile and link with RAMSES.
 
 :::caution[Codegen binary required]
 The `codegen` executable must be installed and its path configured. Click the **gear icon** in the topbar to open Settings, then set the **"Codegen binary path"** to the full path of your `codegen` executable (or just `codegen` if it is on your system `PATH`).
