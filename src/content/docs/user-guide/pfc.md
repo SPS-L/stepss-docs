@@ -86,6 +86,8 @@ PFC can handle only one connected network (island). If the graph is disconnected
 
 The SVC is modeled with a controllable susceptance $B$ at a controlled bus $i$, regulating the voltage at a monitored bus $j$:
 
+![SVC model](/images/SVC.svg)
+
 $$
 I_{Qi} = G(V_j^o - V_j) V_i \quad \text{(voltage control)}
 $$

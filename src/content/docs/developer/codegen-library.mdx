@@ -98,6 +98,8 @@ CODEGEN provides a library of reusable modeling blocks for constructing user-def
 
 *Absolute value of input.*
 
+![abs block diagram](/images/codegen/abs.svg)
+
 **Syntax**
 
 ```
@@ -181,6 +183,8 @@ This block does not have distinct "inputs" and "outputs". Those roles emerge fro
 
 *Maximum between a state and a constant.*
 
+![max1v1c block diagram](/images/codegen/max1v1c.svg)
+
 **Syntax**
 
 ```
@@ -233,6 +237,8 @@ else:
 ### max2v
 
 *Maximum between two states.*
+
+![max2v block diagram](/images/codegen/max2.svg)
 
 **Syntax**
 
@@ -287,6 +293,8 @@ else:
 
 *Minimum between a state and a constant.*
 
+![min1v1c block diagram](/images/codegen/min1v1c.svg)
+
 **Syntax**
 
 ```
@@ -339,6 +347,8 @@ else:
 ### min2v
 
 *Minimum between two states.*
+
+![min2v block diagram](/images/codegen/min2.svg)
 
 **Syntax**
 
@@ -393,6 +403,8 @@ else:
 
 *Integer nearest to the input shifted by a constant $c$.*
 
+![nint block diagram](/images/codegen/nint.svg)
+
 **Syntax**
 
 ```
@@ -440,6 +452,8 @@ $$z \leftarrow \text{nint}(x_i + c)$$
 ### lim
 
 *Limiter with constant bounds.*
+
+![lim block diagram](/images/codegen/lim.svg)
 
 **Syntax**
 
@@ -500,6 +514,8 @@ else:
 ### limvb
 
 *Limiter with variable bounds.*
+
+![limvb block diagram](/images/codegen/limvb.svg)
 
 **Syntax**
 
@@ -564,6 +580,8 @@ Unlike **lim**, the bounds $x_{min}$ and $x_{max}$ are model states (variables) 
 ### db
 
 *Deadband.*
+
+![db block diagram](/images/codegen/db.svg)
 
 **Syntax**
 
@@ -632,6 +650,8 @@ else:
 ### hyst
 
 *Hysteresis.*
+
+![hyst block diagram](/images/codegen/hyst.svg)
 
 **Syntax**
 
@@ -806,6 +826,8 @@ f
 
 *Finite State Automaton.*
 
+![fsa block diagram](/images/codegen/fsa.svg)
+
 This block forces a set of $n$ algebraic equations. There are $s$ possible sets, each corresponding to a value of the discrete state $z$. Transitions between sets occur when Boolean expressions evaluate to true.
 
 **Syntax**
@@ -866,6 +888,8 @@ boolean expression C5
 
 *Integrator with (positive) time constant $T$.*
 
+![int block diagram](/images/codegen/in.svg)
+
 **Syntax**
 
 ```
@@ -894,6 +918,8 @@ $T = 0$ is not allowed. If $T$ is too small, the solver may encounter a singular
 ### inlim
 
 *Integrator with (positive) time constant $T$ and non-windup limits on output.*
+
+![inlim block diagram](/images/codegen/inlim.svg)
 
 **Syntax**
 
@@ -960,6 +986,8 @@ $T = 0$ is not allowed. If $T$ is too small, the solver may encounter a singular
 ### invlim
 
 *Integrator with (positive) time constant $T$ and non-windup limits on output. The lower and upper limits are variables.*
+
+![invlim block diagram](/images/codegen/invlim.svg)
 
 **Syntax**
 
@@ -1031,6 +1059,8 @@ $T = 0$ is not allowed. If $T$ is too small, the solver may encounter a singular
 
 **Proportional-Integral (PI) controller.**
 
+![pictl block diagram](/images/codegen/pictl.svg)
+
 #### Syntax
 
 ```
@@ -1067,6 +1097,8 @@ $$x_i = x_j$$
 ### `pictllim`
 
 **Proportional-Integral (PI) controller with non-windup limit on the integral term.**
+
+![pictllim block diagram](/images/codegen/pictllim.svg)
 
 #### Syntax
 
@@ -1128,6 +1160,8 @@ else:
 ### `pictl2lim`
 
 **Proportional-Integral (PI) controller with non-windup limit on the integral term and limit on the proportional term.**
+
+![pictl2lim block diagram](/images/codegen/pictl2lim.svg)
 
 #### Syntax
 
@@ -1219,6 +1253,8 @@ else:
 ### `pictlieee`
 
 **Proportional-Integral (PI) controller with non-windup limit on the integral term, compliant with IEEE standards.**
+
+![pictlieee block diagram](/images/codegen/pictlieee.svg)
 
 This PI controller implements the non-windup integrator specified in:
 - IEEE Std 421.5-1992, IEEE Std 421.5-2005, and IEEE Std 421.5-2016 (excitation system models for power system stability studies).
@@ -1327,6 +1363,8 @@ else:
 
 **Transfer function between input and output: one time constant.**
 
+![tf1p block diagram](/images/codegen/tf1p.svg)
+
 #### Syntax
 
 ```
@@ -1358,6 +1396,8 @@ The time constant $T$ can be zero, in which case the block behaves as a simple g
 ### `tf1plim`
 
 **Transfer function between input and output: one time constant with non-windup limits on output.**
+
+![tf1plim block diagram](/images/codegen/tf1plim.svg)
 
 #### Syntax
 
@@ -1418,6 +1458,8 @@ The time constant $T$ can be zero. In this case the block behaves as a gain ($x_
 ### `tf1pvlim`
 
 **Transfer function between input and output: one time constant with non-windup limits on output. The limits are variables.**
+
+![tf1pvlim block diagram](/images/codegen/tf1pvlim.svg)
 
 This block is identical in behaviour to `tf1plim` except that $x_{min}$ and $x_{max}$ are **variable states** rather than fixed data parameters.
 
@@ -1480,6 +1522,8 @@ The time constant $T$ can be zero. In this case the block behaves as a gain ($x_
 ### `tf1p2lim`
 
 **Transfer function between input and output: one time constant, with limits on rate of change of output and non-windup limits on output.**
+
+![tf1p2lim block diagram](/images/codegen/tf1p2lim.svg)
 
 #### Syntax
 
@@ -1567,6 +1611,8 @@ The time constant $T$ can be zero. In this case $x_1 = 0$ throughout the simulat
 
 **Transfer function: derivative with one time constant.**
 
+![tfder1p block diagram](/images/codegen/tfder1p.svg)
+
 The transfer function is $\displaystyle x_j = \frac{G s}{1 + sT} x_i$.
 
 #### Syntax
@@ -1609,6 +1655,8 @@ The model allows $T = 0$. In this case $x_j = 0$ as expected; the second equatio
 ### `tf1p1z`
 
 **Transfer function between input and output: one zero and one pole.**
+
+![tf1p1z block diagram](/images/codegen/tf1p1z.svg)
 
 The transfer function is $\displaystyle x_j = G \frac{1 + s T_z}{1 + s T_p} x_i$.
 
@@ -1655,6 +1703,8 @@ $$x_1 = G \, (T_p - T_z) \, x_i$$
 ### `tf2p2z`
 
 **Transfer function between input and output: two real zeros and two real poles.**
+
+![tf2p2z block diagram](/images/codegen/tf2p2z.svg)
 
 The transfer function is $\displaystyle x_j = G \frac{(1 + n_1 s)(1 + n_2 s)}{(1 + d_1 s)(1 + d_2 s)} x_i$.
 
@@ -1710,6 +1760,8 @@ as in the `tf1p1z` block. If additionally $d_1 < 0.005$, both $d_1$ and $n_1$ ar
 ### `pwlin`
 
 **Piece-wise linear function of input, defined by $n$ points. Separate blocks exist for $n = 3, 4, 5$ and $6$.**
+
+![pwlin block diagram](/images/codegen/pwlin.svg)
 
 #### Syntax
 
@@ -1767,6 +1819,8 @@ Same logic as discrete transitions.
 
 **Set the output state to one among $n$ input states, based on the value of a controlling state. Separate blocks exist for $n = 2, 3, 4$ and $5$.**
 
+![switch block diagram](/images/codegen/switch.svg)
+
 #### Syntax
 
 ```
@@ -1806,6 +1860,8 @@ Same as discrete transitions.
 ### `swsign`
 
 **Switch between two input states, based on the sign of a third input state.**
+
+![swsign block diagram](/images/codegen/switchsign.svg)
 
 #### Syntax
 
@@ -1857,6 +1913,8 @@ else:  z ← 1
 ### `timer`
 
 **Timer with varying delay. The delay is a piecewise linear function of the monitored variable. Separate blocks exist for $n = 1, 2, 3, 4$ and $5$ characteristic points.**
+
+![timer block diagram](/images/codegen/timer.svg)
 
 If $x_i$ is smaller than a threshold $v_1$, the output $x_j$ is zero. Otherwise, $x_j$ changes from zero to one at time $t^\star + \tau(x_i)$, where $t^\star$ is the time at which $x_i$ first exceeded $v_1$ and $\tau(x_i)$ is a piecewise linear function of $x_i$ defined by the $(v_k, T_k)$ pairs.
 
@@ -1925,6 +1983,8 @@ $$x_1 \leftarrow 0, \qquad z \leftarrow -1$$
 
 **Timer with varying delay. The delay is a staircase function of the monitored variable. Separate blocks exist for $n = 1, 2, 3, 4, 5$ and $6$ characteristic points.**
 
+![timersc block diagram](/images/codegen/timersc.svg)
+
 Identical behaviour to `timer` except that the delay function $\tau(x_i)$ is a staircase (step) function instead of a piecewise linear interpolation.
 
 #### Syntax
@@ -1991,6 +2051,8 @@ $$x_1 \leftarrow 0, \qquad z \leftarrow -1$$
 ### `tsa`
 
 **Two-state automaton with transitions based on signs of two inputs.**
+
+![tsa block diagram](/images/codegen/tsa.svg)
 
 The output state $x_k$ can take two values: $v_1$ or $v_2$. When $x_k = v_1$, a positive $x_1$ triggers the transition to $v_2$; when $x_k = v_2$, a positive $x_2$ triggers the return to $v_1$.
 

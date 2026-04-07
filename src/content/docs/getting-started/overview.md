@@ -13,6 +13,8 @@ For more information, visit the [STEPSS project page](https://sps-lab.org/projec
 
 STEPSS includes three tightly integrated modules:
 
+![The three modules of STEPSS](/images/over-general.svg)
+
 | Module | Full Name | Description |
 |--------|-----------|-------------|
 | **PFC** | Power Flow Computation | Determines the initial operating point using the Newton-Raphson method in polar coordinates. Computes bus voltage magnitudes and phase angles, with optional transformer ratio adjustment. |
