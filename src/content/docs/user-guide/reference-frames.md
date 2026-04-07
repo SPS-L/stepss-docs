@@ -21,7 +21,7 @@ $$
 
 where $v_{xi} + j\,v_{yi}$ is the voltage phasor in rectangular coordinates on $(x,y)$ axes rotating at $\omega_N = 2\pi f_N$.
 
-![Phasor approximation and reference frames](/images/phasor.svg)
+<img src="/images/phasor.svg" alt="Phasor approximation and reference frames" style="width:60%" />
 
 ## Synchronous Reference Frame
 
@@ -65,7 +65,7 @@ For a network with $N$ buses, there are $2N$ equations involving $4N$ variables.
 
 The dynamic simulation is initialized as follows:
 
-![Initialization from power flow](/images/init-pflow.svg)
+<img src="/images/init-pflow.svg" alt="Initialization from power flow" style="width:60%" />
 
 1. **Start from initial bus voltages** (from the power flow solution)
 2. **Compute power flows** in network branches and shunts
