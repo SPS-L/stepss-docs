@@ -28,7 +28,7 @@ Where `model_name` is the controller type (e.g., `LTC2`, `uvls`, `FRT`), `ctl_na
 ## Tap Changers
 
 :::note[TRFO and DCTL LTC]
-The [TRFO record](/user-guide/network/#data-format--simplified-model-trfo) combines the transformer model with load tap changer data (tap range, positions, controlled bus, voltage setpoint), but this data is used **only by PFC** for ratio adjustment during power flow computation. To control a transformer's ratio during dynamic simulation with RAMSES, a DCTL LTC controller (below) must be associated with the transformer — whether it was defined with TRANSFO or TRFO.
+The [TRFO record](/user-guide/network/#data-format--combined-model-trfo) combines the transformer model with load tap changer data (tap range, positions, controlled bus, voltage setpoint), but this data is used **only by PFC** for ratio adjustment during power flow computation. To control a transformer's ratio during dynamic simulation with RAMSES, a DCTL LTC controller (below) must be associated with the transformer — whether it was defined with TRANSFO or TRFO.
 :::
 
 ### `dctl_ltc` — Load Tap Changer (Standard)

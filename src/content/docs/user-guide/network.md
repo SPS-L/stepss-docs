@@ -148,7 +148,7 @@ All transformers are memorized, even those out of service. An out-of-service tra
 To connect a transformer through a single end, add a bus at the open end and set BR to a nonzero value.
 :::
 
-### Data Format — Simplified Model (TRFO)
+### Data Format — Combined Model (TRFO)
 
 ```
 TRFO NAME FROMBUS TOBUS CONBUS R X B N SNOM NFIRST NLAST NBPOS TOLV VDES BR ;
