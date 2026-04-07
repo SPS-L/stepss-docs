@@ -146,7 +146,7 @@ $T_LOAD_REST time(s) ;
 
 Update network elements (admittances) with frequency:
 
-![Network frequency update model](/images/freq_upd_vminmax.svg)
+<img src="/images/freq_upd_vminmax.svg" alt="Network frequency update model" style="width:60%" />
 
 ```
 $NET_FREQ_UPD T/F ;

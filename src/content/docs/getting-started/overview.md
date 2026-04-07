@@ -13,7 +13,7 @@ For more information, visit the [STEPSS project page](https://sps-lab.org/projec
 
 STEPSS includes three tightly integrated modules:
 
-![The three modules of STEPSS](/images/over-general.svg)
+<img src="/images/over-general.svg" alt="The three modules of STEPSS" style="width:60%" />
 
 | Module | Full Name | Description |
 |--------|-----------|-------------|

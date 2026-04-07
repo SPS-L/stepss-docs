@@ -22,7 +22,7 @@ Every model has three categories of states:
 - **Internal states** ($\mathbf{x}_{ITL}$) — computed by the model
 - **Output states** ($\mathbf{x}_{OUT}$) — returned to the system
 
-![Input, internal, and output states](/images/states.svg)
+<img src="/images/states.svg" alt="Input, internal, and output states" style="width:60%" />
 
 ### Input and Output States by Category
 
@@ -79,7 +79,7 @@ During simulation, the input, internal, and output states are computed together 
 
 A simple excitation system with gain $G$ and time constant $T$:
 
-![Simple AVR block diagram](/images/simple_AVR.svg)
+<img src="/images/simple_AVR.svg" alt="Simple AVR block diagram" style="width:60%" />
 
 $$
 0 = V^o - V - dV
@@ -99,13 +99,13 @@ At initialization ($\dot{v}_f = 0$): $dV(0) = v_f(0)/G$, then $V^o = V(0) + dV(0
 
 Discrete variables $\mathbf{z}$ control which set of equations is active. Transitions occur when inequality constraints are violated (e.g., a state exceeds its limit).
 
-![Discrete transition identification and treatment](/images/disc_steps.svg)
+<img src="/images/disc_steps.svg" alt="Discrete transition identification and treatment" style="width:60%" />
 
 ### Example: AVR with Non-Windup Limits
 
 When the integrator output $v_f$ is limited between $v_f^{min}$ and $v_f^{max}$:
 
-![AVR with non-windup limits](/images/simple_AVR2.svg)
+<img src="/images/simple_AVR2.svg" alt="AVR with non-windup limits" style="width:60%" />
 
 - **Normal** ($z = 0$): $T\dot{v}_f = -v_f + G \cdot dV$
 - **Upper limit** ($z = 1$): $0 = v_f^{max} - v_f$
@@ -257,7 +257,7 @@ Starts with the keyword `%models`.
 
 Modelling blocks and their arguments are listed sequentially. Order does not matter.
 
-![Interconnected modelling blocks](/images/states-links.svg)
+<img src="/images/states-links.svg" alt="Interconnected modelling blocks" style="width:60%" />
 
 Each block is identified by:
 
