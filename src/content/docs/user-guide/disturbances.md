@@ -76,13 +76,14 @@ time(s) BREAKER INJ name_of_injector breaker(0/1)
 
 ## Three-Phase Short-Circuit (Impedance)
 
-Apply a three-phase fault with specified impedance to ground:
+Apply a three-phase fault with specified impedance to ground. This requires two commands — one to apply the fault and one to clear it.
 
 ```
 time(s) FAULT BUS name_of_bus rfault [xfault]
 time(s) CLEAR BUS name_of_bus
 ```
 
+The fault has an impedance of `rfault + j*xfault` to ground:
 - `rfault` and `xfault` are in Ω
 - If `xfault` is omitted, a fully resistive fault is assumed
 
@@ -94,7 +95,7 @@ time(s) CLEAR BUS name_of_bus
 
 ## Three-Phase Short-Circuit (Voltage)
 
-Apply a fault where the post-fault voltage is specified:
+Apply a fault where the post-fault voltage is specified. The fault has an unknown reactance to ground; based on the specified voltage, the reactance is computed internally and used for simulating the fault.
 
 ```
 time(s) VFAULT BUS name_of_bus Voltage_after_fault(pu)
@@ -127,7 +128,7 @@ time(s) CHGPRM BRANCH name_of_line MAGN/PHAN ±increment
 time(s) CHGPRM SHUNT name_of_shunt QNOM ±increment
 ```
 
-The increment is in MVAr.
+The increment is in MVAr and is per-unitized internally by RAMSES.
 
 ### Exciter Parameters
 
@@ -144,30 +145,42 @@ time(s) CHGPRM EXC name_of_equipment name_of_parameter ±increment [MVAr/%] dura
 10.000 CHGPRM EXC g1 V0 +10 % 10
 ```
 
+This means the parameter V0 of the exciter of synchronous machine g1 is ramped by +10% between 10 and 20 seconds.
+
 ### Torque Controller Parameters
 
 ```
 time(s) CHGPRM TOR name_of_equipment name_of_parameter ±increment [MW/%] duration(s)
 ```
 
-**Example** — ramp active power setpoint by +1 MW:
+**Units**: No unit = absolute, `MW` = per-unitized by $P_{nom}$ of the machine, `%` = percentage of original value.
+
+**Duration**: `0` = step change, `> 0` = ramp over given duration.
+
+**Example** — ramp active power setpoint by +1 MW over 10 seconds:
 ```
 10.000 CHGPRM TOR g1 P0 +1 MW 10
 ```
 
+This means the parameter P0 of the torque controller of synchronous machine g1 is ramped by +1 MW between 10 and 20 seconds.
+
 ### Injector / Two-Port / Discrete Controller Parameters
 
 ```
-time(s) CHGPRM INJ/TWOP/DCTL name ±increment [MW/MVAr/%/SETP] duration(s)
+time(s) CHGPRM INJ/TWOP/DCTL name_of_equipment name_of_parameter ±increment [MW/MVAr/%/SETP] duration(s)
 ```
 
-**Units**: `SETP` = the increment is the new setpoint value.
+**Units**: No unit = absolute, `MW` or `MVAr` = per-unitized using the system's $S_{base}$, `%` = percentage of original value, `SETP` = the increment is the new setpoint value.
+
+**Duration**: `0` = step change, `> 0` = ramp over given duration.
 
 **Example** — load increase of 50% active and 30% reactive over 60 seconds:
 ```
 10.000 CHGPRM INJ L_11 P0 +50 % 60
 10.000 CHGPRM INJ L_11 Q0 +30 % 60
 ```
+
+This means the parameter P0 (resp. Q0) of the injector L\_11 is ramped by +50% (resp. 30%) between 10 and 70 seconds. If L\_11 is a load model, this simulates a load increase.
 
 ## Export Jacobian Matrix
 

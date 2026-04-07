@@ -54,9 +54,11 @@ GENER NAME BUS P Q VIMP SNOM QMIN QMAX BR ;
 
 For PV buses, if reactive limits are exceeded, the bus switches to PQ type with the limit enforced. It switches back to PV if the voltage returns past the setpoint.
 
-A variant with additional fields `PMIN` and `PMAX` exists but these are currently ignored by STEPSS.
+A variant with additional fields `PMIN` and `PMAX` (minimum/maximum active power in MW) exists but these are currently ignored by STEPSS.
 
 Only one generator is allowed per bus.
+
+All generators are memorized, even those which are disconnected. A disconnected generator has zero power output but can be put into service during dynamic simulation.
 
 :::note
 A generator producing constant active and reactive powers can be modeled as a negative load using the BUS record (negative PLOAD/QLOAD) without a GENER record.
@@ -64,13 +66,21 @@ A generator producing constant active and reactive powers can be modeled as a ne
 
 ## Slack Bus
 
-A slack bus is **mandatory** for power flow. A PV-type generator must be connected to it.
+A slack bus is **mandatory** for power flow computations: not all buses can be of PV or PQ type, since this would require knowing the active power losses in the network before performing the calculation.
+
+A PV-type generator must be connected to the slack bus. Its voltage magnitude (from the GENER record) is imposed, and the voltage phase angle is set to zero.
 
 ```
 SLACK NAME ;
 ```
 
-PFC can handle only one connected network. If the graph is disconnected, only the sub-network containing the slack bus is treated.
+| Field | Description |
+|-------|-------------|
+| `NAME` | Bus name (max 8 characters) |
+
+There must be **exactly one** SLACK record in the data.
+
+PFC can handle only one connected network (island). If the graph is disconnected, only the sub-network containing the slack bus is treated; the rest is ignored with a warning.
 
 ## Static Var Compensators (SVC)
 
@@ -92,24 +102,34 @@ SVC NAME CON_BUS MON_BUS V0 Q0 SNOM BMAX BMIN G BR ;
 
 | Field | Description | Unit |
 |-------|-------------|------|
-| `NAME` | SVC name | — |
-| `CON_BUS` | Controlled bus | — |
-| `MON_BUS` | Monitored bus | — |
-| `V0` | Voltage setpoint (0 = constant power mode) | pu |
+| `NAME` | SVC name (max 20 characters) | — |
+| `CON_BUS` | Controlled bus where the susceptance $B$ is varied (max 8 characters) | — |
+| `MON_BUS` | Monitored bus whose voltage is regulated (max 8 characters) | — |
+| `V0` | Voltage setpoint $V_j^o$ (0 = constant power mode with $P=0$, $Q=Q0$, no limits tested) | pu |
 | `Q0` | Reactive power setpoint (ignored if V0 ≠ 0) | Mvar |
 | `SNOM` | Nominal reactive power | Mvar |
-| `BMAX` | Max nominal reactive power | Mvar |
-| `BMIN` | Min nominal reactive power | Mvar |
-| `G` | Gain | pu |
-| `BR` | Breaker status | — |
+| `BMAX` | Maximal nominal reactive power: reactive power produced under $V_i = 1$ pu when $B = B_{max}$ | Mvar |
+| `BMIN` | Minimal nominal reactive power: reactive power produced under $V_i = 1$ pu when $B = B_{min}$ | Mvar |
+| `G` | Gain, in pu on the ($V_B$, SNOM) base, where $V_B$ is the nominal voltage at the controlled bus | pu |
+| `BR` | Breaker status (0 = open, other = closed) | — |
 
-It is not allowed to connect both a generator and an SVC to the same bus.
+It is common for BMAX to be positive and BMIN negative, but other combinations are allowed.
 
-## Transformer Ratio Adjustment
+For SVCs with nonzero V0, the voltage control equation is solved initially. If the susceptance limits are exceeded, the corresponding limit is enforced and Newton iterations continue. The SVC reverts to voltage control when the limit is no longer binding.
 
-PFC can adjust transformer ratios to bring a controlled voltage inside a deadband $[V_{des} - \epsilon,\; V_{des} + \epsilon]$.
+Only one SVC is allowed per bus. It is not allowed to connect both a generator and an SVC to the same bus.
+
+All SVCs are memorized, even those which are disconnected. A disconnected SVC can be put into service during dynamic simulation.
+
+## Transformer Ratio Adjustment for Voltage Control
+
+PFC can adjust the ratio of a designated transformer to bring a controlled voltage inside a deadband $[V_{des} - \epsilon,\; V_{des} + \epsilon]$, where $V_{des}$ is the desired voltage and $\epsilon$ is the tolerance.
+
+The ratio is changed in **discrete steps** between a minimum and maximum value. During computation, the ratio is changed by one step at a time, after which Newton iterations run until convergence. The process repeats until the controlled voltage falls in the deadband. When multiple transformers are adjusted, some may reach their deadbands before others.
 
 ### Via TRFO Record
+
+The controlled bus is `CONBUS` in the TRFO record. This must be one of the two ending buses of the transformer. An empty or blank string **enclosed within quotes** indicates that the transformer ratio is not to be adjusted; in this case, dummy values must still be provided for the remaining fields.
 
 The ratio corresponding to tap position $p$ ($1 \le p \le \text{NBPOS}$):
 
@@ -117,17 +137,41 @@ $$
 n = \frac{\text{NFIRST}}{100} + \frac{p-1}{\text{NBPOS}-1} \cdot \frac{\text{NLAST} - \text{NFIRST}}{100}
 $$
 
-Relevant fields in the TRFO record: `CONBUS`, `NFIRST`, `NLAST`, `NBPOS`, `TOLV`, `VDES`.
+The initial ratio from the `N` field of the TRFO record is adjusted to the nearest tap position before starting the power flow computation.
+
+Relevant fields in the TRFO record:
+
+| Field | Description | Unit |
+|-------|-------------|------|
+| `NFIRST` | Ratio at first tap position (lower bound) | % |
+| `NLAST` | Ratio at last tap position (upper bound) | % |
+| `NBPOS` | Total number of tap positions (including first and last) | — |
+| `TOLV` | Voltage tolerance $\epsilon$ | pu |
+| `VDES` | Desired voltage $V_{des}$ | pu |
 
 ### Via LTC-V Record
+
+The second way to specify ratio adjustment is through a separate LTC-V record. This is more natural in association with a TRANSFO record.
 
 ```
 LTC-V NAME CON_BUS NFIRST NLAST NBPOS TOLV VDES ;
 ```
 
+| Field | Description | Unit |
+|-------|-------------|------|
+| `NAME` | Name of the controlled transformer (max 20 characters) | — |
+| `CON_BUS` | Controlled bus (max 8 characters) | — |
+| `NFIRST` | Ratio at first tap position (lower bound) | % |
+| `NLAST` | Ratio at last tap position (upper bound) | % |
+| `NBPOS` | Total number of tap positions (including first and last) | — |
+| `TOLV` | Voltage tolerance $\epsilon$ | pu |
+| `VDES` | Desired voltage $V_{des}$ | pu |
+
+A transformer can be controlled by a **single tap changer only**. The LTC-V record can also be associated with a TRFO record, provided that no adjustment is specified in the TRFO record itself.
+
 ## Phase-Shifting Transformer Adjustment (PSHIFT-P)
 
-For phase-shifting transformers, PFC can adjust the phase angle to bring the active power flow in a monitored branch inside a deadband $[P_{des} - \epsilon,\; P_{des} + \epsilon]$.
+PFC can adjust the phase angle of a transformer to bring the active power flow in a monitored branch inside a deadband $[P_{des} - \epsilon,\; P_{des} + \epsilon]$. The adjustment mechanism is similar to the in-phase ratio adjustment described above.
 
 ```
 PSHIFT-P CONTRFO MONBRANCH PHAFIRST PHALAST NBPOS SIGN PDES TOLP ;
@@ -135,14 +179,14 @@ PSHIFT-P CONTRFO MONBRANCH PHAFIRST PHALAST NBPOS SIGN PDES TOLP ;
 
 | Field | Description | Unit |
 |-------|-------------|------|
-| `CONTRFO` | Name of the controlled phase-shifting transformer (max 20 characters) | — |
-| `MONBRANCH` | Name of the monitored branch (max 20 characters) | — |
-| `PHAFIRST` | Phase angle at first tap position | degrees |
-| `PHALAST` | Phase angle at last tap position | degrees |
+| `CONTRFO` | Name of the transformer whose phase angle is adjusted (max 20 characters, defined in a TRFO or TRANSFO record). If the transformer does not exist, the record is ignored with a warning | — |
+| `MONBRANCH` | Name of the branch where active power $P$ is monitored (max 20 characters, defined in a LINE, TRFO, or TRANSFO record). $P$ is the active power leaving the first bus of the branch record | — |
+| `PHAFIRST` | Phase angle $\phi$ at first tap position (lower bound) | degrees |
+| `PHALAST` | Phase angle $\phi$ at last tap position (upper bound) | degrees |
 | `NBPOS` | Number of tap positions | — |
-| `SIGN` | +1 or -1 — determines direction of power flow increase with phase angle increase | — |
-| `PDES` | Desired active power on monitored branch | MW |
-| `TOLP` | Tolerance on active power | MW |
+| `SIGN` | Direction indicator: `1` means $\phi$ must increase to increase power flow; `-1` means decrease. Any other value causes the program to stop | — |
+| `PDES` | Desired active power flow | MW |
+| `TOLP` | Tolerance $\epsilon$ | MW |
 
 The phase angle $\phi$ at tap position $p$ ($1 \le p \le \text{NBPOS}$) is:
 
@@ -150,13 +194,13 @@ $$
 \phi = \text{PHAFIRST} + \frac{p-1}{\text{NBPOS}-1}(\text{PHALAST} - \text{PHAFIRST})
 $$
 
-:::note
-PFC performs a sensitivity analysis to determine whether the phase angle should be increased or decreased. If this analysis indicates a direction opposite to SIGN, a warning is issued and SIGN is ignored.
-:::
+The initial phase angle from the `PHI` field of the TRANSFO record is adjusted to the nearest tap position before starting the power flow computation.
 
-:::note
+PFC performs a sensitivity analysis to determine whether the phase angle should be increased or decreased. If this analysis indicates a direction opposite to SIGN, a warning is issued and SIGN is ignored. On output, PFC sets SIGN to the value from its sensitivity analysis.
+
+Only one PSHIFT-P record per transformer is allowed. The PSHIFT-P record is intended for use with a TRANSFO record, but can also be used with a TRFO record (in which case the angle is initialized to zero).
+
 A transformer cannot be controlled by both an LTC-V and a PSHIFT-P record.
-:::
 
 ## Bus Voltages: Initial Values and Results (LFRESV)
 

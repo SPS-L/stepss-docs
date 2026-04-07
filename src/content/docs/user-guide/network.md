@@ -53,7 +53,9 @@ LINE NAME BUS1 BUS2 R X WC2 SNOM BR ;
 | `SNOM` | Nominal apparent power (0 = infinite) | MVA |
 | `BR` | Breaker status (0 = open, other = closed) | — |
 
-Line orientation is arbitrary: BUS1 and BUS2 may be swapped.
+Line orientation is arbitrary: BUS1 and BUS2 may be swapped. Only one LINE record per line is allowed.
+
+Lines must not connect two buses with different nominal voltages.
 
 :::note
 To connect a line through a single end, add a bus at the open end and set BR to a nonzero value.
@@ -76,9 +78,15 @@ SWITCH NAME BUS1 BUS2 BR ;
 | Field | Description |
 |-------|-------------|
 | `NAME` | Switch name (max 20 characters) |
-| `BUS1` | First bus name |
-| `BUS2` | Second bus name |
+| `BUS1` | First bus name (max 8 characters) |
+| `BUS2` | Second bus name (max 8 characters) |
 | `BR` | Status (0 = open, other = closed) |
+
+Switch orientation is arbitrary: BUS1 and BUS2 may be swapped. Only one SWITCH record per switch is allowed.
+
+Switches must not connect two buses with different nominal voltages.
+
+All switches are memorized, even those which are open. An open switch has zero power flow but can be put into service during dynamic simulation.
 
 ## Transformers
 
@@ -126,8 +134,14 @@ TRANSFO NAME FROMBUS TOBUS R X B1 B2 N PHI SNOM BR ;
 | `SNOM` | Nominal apparent power (must not be zero) | MVA |
 | `BR` | Breaker status | — |
 
+Only one TRANSFO or TRFO record per transformer is allowed.
+
 :::caution
 The orientation is **not arbitrary**: FROMBUS and TOBUS cannot be swapped.
+:::
+
+:::note
+All transformers are memorized, even those out of service. An out-of-service transformer has zero power flow but can be put into service during dynamic simulation.
 :::
 
 :::note
@@ -194,15 +208,31 @@ NRTP NAME FROMBUS TOBUS GIJ BIJ GJI BJI GSI BSI GSJ BSJ BR ;
 | `BSJ` | Shunt susceptance at bus $j$ (pu) |
 | `BR` | Breaker status (1 = closed/in service, 0 = open/out of service) |
 
+The orientation is **not arbitrary**: FROMBUS and TOBUS cannot be swapped. Only one NRTP record per two-port is allowed.
+
 :::note
-Parameters are in per unit on nominal bus voltages and system base power (default 100 MVA).
+Parameters are in per unit on nominal bus voltages and system base power (default 100 MVA, changeable via `$SBASE`).
 :::
 
 :::note
-A non-reciprocal two-port can connect buses with different nominal voltages.
+A non-reciprocal two-port **can** connect buses with different nominal voltages (unlike lines and switches).
+:::
+
+:::note
+All non-reciprocal two-ports are memorized, even those out of service. An out-of-service two-port has zero power flow but can be put into service during dynamic simulation.
 :::
 
 ## Shunts
+
+### Modeling
+
+The shunt element is a purely reactive, constant shunt admittance. The reactive power $Q$ it produces varies with the square of the voltage:
+
+$$
+Q = B \cdot V^2
+$$
+
+where $B$ is the susceptance. The element is a capacitor ($B > 0$) or a reactor ($B < 0$).
 
 ### Data Format
 
@@ -216,6 +246,10 @@ SHUNT NAME BUS_NAME QNOM BR ;
 | `BUS_NAME` | Name of the bus to which the shunt is connected (max 8 characters) | — |
 | `QNOM` | Nominal reactive power produced by the shunt at the nominal bus voltage (positive = capacitor, negative = reactor) | Mvar |
 | `BR` | Breaker status (1 = in service, 0 = out of service) | — |
+
+Only one SHUNT record per named shunt is allowed. **Multiple shunts at the same bus** are allowed, each with its own name; in this case, the susceptances are added (taking signs into account).
+
+All shunts are memorized, even those which are disconnected. A disconnected shunt has zero power flow but can be put into service during dynamic simulation.
 
 :::caution
 The SHUNT record is used by RAMSES. For PFC, shunt data is specified in the extended BUS record (see [PFC Data](/user-guide/pfc/)).

@@ -123,6 +123,25 @@ DCTL CTRL_TYPE CTLNAME parameters ;
 | `sim_minmaxspeed` | Speed stopping criteria |
 | `voltage_variability` | Voltage variability monitor |
 
+### Load Tap Changer (LTC)
+
+```
+DCTL LTC CTLNAME TRFONAME BUS_NAME DIR NMIN NMAX NBPOS TOL DELAY1 DELAY2 ;
+```
+
+| Field | Description |
+|-------|-------------|
+| `CTLNAME` | Name of the controller |
+| `TRFONAME` | Name of the controlled transformer |
+| `BUS_NAME` | Name of the controlled bus |
+| `DIR` | Direction of tap change |
+| `NMIN` | Minimum tap ratio |
+| `NMAX` | Maximum tap ratio |
+| `NBPOS` | Number of tap positions |
+| `TOL` | Voltage tolerance |
+| `DELAY1` | First delay (initial action) |
+| `DELAY2` | Subsequent delay (between steps) |
+
 ### Real-Time Synchronizer
 
 ```

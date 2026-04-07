@@ -35,7 +35,7 @@ INJEC GFOL VSC1 A 1.0 1.0 0.0 0.0 0.005 0.15 1.00 1044.0 0.005 0.15 33.3
 
 ### Numeric Fields
 
-Numeric fields are written in free format, using floating-point notation:
+Numeric fields are written in free format, using floating-point notation. The exponent can be denoted by `E` or `D` (Fortran-style):
 
 ```
 30   30.   30.0   3E01   3.E01   3.0E01   3.E1   3.e1
