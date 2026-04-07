@@ -34,6 +34,8 @@ For power flow computations with PFC, an extended version of the BUS record with
 
 Lines and cables use the same **pi-equivalent** model with series resistance $R$, series reactance $X$, and half-shunt susceptance $\omega C/2$. Shunt conductances are neglected.
 
+![Pi-equivalent of lines and cables](/images/netw-line.svg)
+
 Under the phasor approximation, **series capacitors** can also be modeled with this pi-equivalent by setting $R = 0$, $C = 0$, and $X$ to a negative value.
 
 ### Data Format
@@ -97,6 +99,8 @@ Transformers are represented by a two-port model with:
 - Leakage reactance $X$
 - Magnetizing susceptances $B_1$ and $B_2$ (negative values)
 - Transformer ratio magnitude $n$ and phase angle $\phi$
+
+![Two-port model of transformers](/images/netw-transfo.svg)
 
 Iron losses are neglected (no shunt resistance). $R$, $X$, $B_1$, and $B_2$ are specified on the "from" side.
 
@@ -179,6 +183,8 @@ See [PFC Data](/user-guide/pfc/) for details on ratio adjustment.
 | `BR` | Breaker status (0 = open/out of service, other = closed/in service) | — |
 
 ## Non-Reciprocal Two-Ports
+
+![A two-port connecting buses i and j](/images/netw-twop.svg)
 
 A non-reciprocal two-port has a non-symmetric nodal admittance matrix:
 
