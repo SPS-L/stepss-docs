@@ -154,22 +154,26 @@ To connect a transformer through a single end, add a bus at the open end and set
 TRFO NAME FROMBUS TOBUS CONBUS R X B N SNOM NFIRST NLAST NBPOS TOLV VDES BR ;
 ```
 
-This simplified model has $B_2 = 0$ and $\phi = 0$, and includes data for PFC to adjust the transformer ratio. It cannot be used for phase-shifting transformers. See [PFC Data](/user-guide/pfc/) for details on ratio adjustment.
+This simplified model has $B_2 = 0$ and $\phi = 0$, and **combines the transformer model with load tap changer (LTC) data for PFC** in a single record. The LTC fields (`CONBUS`, `NFIRST`, `NLAST`, `NBPOS`, `TOLV`, `VDES`) provide PFC with the information needed to adjust the transformer ratio during power flow computation. These fields are not used by RAMSES during dynamic simulation. It cannot be used for phase-shifting transformers.
+
+To control the transformer ratio during dynamic simulation, associate a [DCTL LTC](/models/discrete-controllers/#dctl_ltc--load-tap-changer-standard) controller with the transformer.
+
+See [PFC Data](/user-guide/pfc/) for details on ratio adjustment.
 
 | Field | Description | Unit |
 |-------|-------------|------|
 | `NAME` | Transformer name (max 20 characters) | — |
 | `FROMBUS` | "From" bus name (max 8 characters) | — |
 | `TOBUS` | "To" bus name (max 8 characters) | — |
-| `CONBUS` | Bus used by PFC for ratio adjustment (max 8 characters; a dummy name must be provided even if not used by RAMSES) | — |
+| `CONBUS` | Controlled bus for PFC ratio adjustment (max 8 characters). Not used by RAMSES, but a dummy name must be provided | — |
 | `R` | Series resistance | % |
 | `X` | Leakage reactance | % |
 | `B` | Shunt susceptance (from side; $B_2 = 0$) | % |
 | `N` | Transformer ratio magnitude | % |
 | `SNOM` | Nominal apparent power (must not be zero) | MVA |
-| `NFIRST` | Initial (first) tap ratio value, used by PFC for ratio adjustment | % |
-| `NLAST` | Final (last) tap ratio value, used by PFC for ratio adjustment | % |
-| `NBPOS` | Number of tap positions, used by PFC for ratio adjustment | — |
+| `NFIRST` | Ratio at first tap position (lower bound), used by PFC for ratio adjustment | % |
+| `NLAST` | Ratio at last tap position (upper bound), used by PFC for ratio adjustment | % |
+| `NBPOS` | Number of tap positions (including first and last), used by PFC for ratio adjustment | — |
 | `TOLV` | Voltage tolerance for tap adjustment, used by PFC | pu |
 | `VDES` | Desired controlled bus voltage, used by PFC | pu |
 | `BR` | Breaker status (0 = open/out of service, other = closed/in service) | — |
