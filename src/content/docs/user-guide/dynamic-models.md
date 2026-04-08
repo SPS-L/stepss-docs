@@ -101,6 +101,16 @@ Two-port components connect two buses:
 
 For detailed documentation of each model, see the [Model Reference](/models/ieee-exciters/) section.
 
+### Data Format
+
+User-defined two-port models use a `TWOP` record:
+
+```
+TWOP MODEL_NAME TWOP_NAME BUS1 BUS2 IND FP1 FQ1 P1 Q1 FP2 FQ2 P2 Q2 DATA1 DATA2 ... ;
+```
+
+For details on each field, see [User-Defined Models — TWOP Record](/developer/user-models/#twop-record-user-defined-two-ports).
+
 ## Discrete Controllers
 
 ```
@@ -148,7 +158,7 @@ DCTL LTC CTLNAME TRFONAME BUS_NAME DIR NMIN NMAX NBPOS TOL DELAY1 DELAY2 ;
 DCTL RT CTLNAME ratio_to_rt ;
 ```
 
-Setting `ratio_to_rt = 1.0` slows the simulation to match real-time. Setting it to `2.0` means twice faster than real-time (if possible).
+Setting `ratio_to_rt = 1.0` synchronizes the simulation with real-time: the simulation is slowed down when it runs faster than real-time, but nothing is done when it is slower. Setting it to `2.0` means twice faster than real-time (if possible).
 
 ### Stopping Criteria
 
