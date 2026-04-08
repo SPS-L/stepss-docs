@@ -21,8 +21,10 @@ BUS NAME VNOM PLOAD QLOAD BSHUNT QSHUNT ;
 | `VNOM` | Nominal voltage | kV |
 | `PLOAD` | Total active power load (positive = consumed) | MW |
 | `QLOAD` | Total reactive power load (positive = consumed) | Mvar |
-| `BSHUNT` | Nominal reactive power of constant-susceptance shunt (positive = capacitor) | Mvar |
+| `BSHUNT` | Nominal reactive power of constant-susceptance shunt: the reactive power produced under the nominal voltage of the bus (positive = capacitor, negative = reactor) | Mvar |
 | `QSHUNT` | Reactive power of constant-power shunt (positive = capacitor) | Mvar |
+
+If no load is connected to the bus, set PLOAD and QLOAD to zero. If no shunt is connected, set BSHUNT and QSHUNT to zero.
 
 The total reactive power $Q$ produced by both shunt components:
 
@@ -52,9 +54,17 @@ GENER NAME BUS P Q VIMP SNOM QMIN QMAX BR ;
 | `QMAX` | Upper reactive power limit | Mvar |
 | `BR` | Breaker status (0 = open) | — |
 
-For PV buses, if reactive limits are exceeded, the bus switches to PQ type with the limit enforced. It switches back to PV if the voltage returns past the setpoint.
+For PV buses, if the upper reactive power limit QMAX is exceeded, the bus switches to PQ type with QMAX enforced, and Newton iterations continue. If subsequently the bus voltage rises above VIMP, the bus switches back to PV type. Similarly, if QMIN is exceeded, the bus switches to PQ type with QMIN enforced; it switches back to PV if the voltage subsequently drops below VIMP.
 
-A variant with additional fields `PMIN` and `PMAX` (minimum/maximum active power in MW) exists but these are currently ignored by STEPSS.
+QMIN and QMAX are used only if VIMP is nonzero (PV bus).
+
+A variant with additional fields exists:
+
+```
+GENER NAME BUS P Q VIMP SNOM QMIN QMAX PMIN PMAX BR ;
+```
+
+The `PMIN` and `PMAX` fields (minimum/maximum active power in MW) are currently ignored by STEPSS.
 
 Only one generator is allowed per bus.
 
@@ -83,6 +93,8 @@ There must be **exactly one** SLACK record in the data.
 PFC can handle only one connected network (island). If the graph is disconnected, only the sub-network containing the slack bus is treated; the rest is ignored with a warning.
 
 ## Static Var Compensators (SVC)
+
+Although reference is made to an SVC, the model can be used in general for any component controlling voltage with a droop. The SVC is assumed lossless: the active current injected at the controlled bus is zero.
 
 The SVC is modeled with a controllable susceptance $B$ at a controlled bus $i$, regulating the voltage at a monitored bus $j$:
 
@@ -117,7 +129,7 @@ SVC NAME CON_BUS MON_BUS V0 Q0 SNOM BMAX BMIN G BR ;
 
 It is common for BMAX to be positive and BMIN negative, but other combinations are allowed.
 
-For SVCs with nonzero V0, the voltage control equation is solved initially. If the susceptance limits are exceeded, the corresponding limit is enforced and Newton iterations continue. The SVC reverts to voltage control when the limit is no longer binding.
+For SVCs with nonzero V0, the voltage control equation is solved initially. If the susceptance upper limit BMAX is exceeded, the limit is enforced and Newton iterations continue. The SVC reverts to voltage control when $G(V_j^o - V_j) < B_{max}$. Similarly, if BMIN is exceeded, the lower limit is enforced; the SVC reverts when $G(V_j^o - V_j) > B_{min}$.
 
 Only one SVC is allowed per bus. It is not allowed to connect both a generator and an SVC to the same bus.
 
@@ -227,7 +239,7 @@ Default initialization: PQ buses start at 1 pu magnitude and 0 angle; PV buses s
 :::
 
 :::note
-The output LFRESV records from PFC can be fed back as input — this results in zero Newton iterations (round-trip property).
+The output LFRESV records from PFC can be fed back as input — this results in zero Newton iterations (round-trip property). This is an easy way to verify that system data come with their corresponding voltages.
 :::
 
 :::note
@@ -237,6 +249,11 @@ LFRESV is the output of PFC that initializes RAMSES dynamic simulation.
 ## PFC Computation Control Parameters
 
 PFC uses Newton–Raphson iterations to solve the power flow equations. Convergence is achieved when both the active and reactive power mismatches fall below specified thresholds, all transformer ratio and phase-shift controls are satisfied, and all generators and SVCs are within their reactive limits.
+
+Three convergence indices are used:
+- $\epsilon_P$: largest absolute mismatch of the active power equations
+- $\epsilon_Q$: largest absolute mismatch of the reactive power equations
+- $\epsilon_S$: largest apparent power mismatch, used to trigger limit checks (via `$MISQLIM`), Jacobian freezing (via `$MISBLOC`), and transformer adjustments (via `$MISADJ`)
 
 The following records control the computation. Each record starts with `$` and has a single numeric field.
 
@@ -252,7 +269,11 @@ The following records control the computation. Each record starts with `$` and h
 | `$DIVDET` | 0 | — | Set to 1 to activate divergence detection; 0 to skip |
 
 :::note
-Divergence is detected when $\varphi(k) > 1.1\,\varphi(k-1)$, where $\varphi$ is a norm of the power mismatches. The test is temporarily suspended following generator/SVC limit adjustments or transformer ratio/phase-shift adjustments.
+Divergence is detected when $\varphi(k) > 1.1\,\varphi(k-1)$, where:
+
+$$\varphi(k) = \sum_i \sqrt{(f_i - P_i^o)^2 + (g_i - Q_i^o)^2}$$
+
+Under normal convergence, $\varphi$ decreases at each iteration; an increase signals divergence. The test is temporarily suspended following limit adjustments or transformer ratio changes, as these cause increases in $\varphi$ unrelated to divergence.
 :::
 
 ## Record Sharing Between PFC and RAMSES
