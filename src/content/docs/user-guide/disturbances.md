@@ -3,7 +3,7 @@ title: Disturbances
 description: Specifying disturbances and actions in dynamic simulations
 ---
 
-Disturbances define the sequence of events during a dynamic simulation. All disturbance commands follow the format:
+Disturbances define the sequence of events during a dynamic simulation. Disturbances need to have a continuity. All disturbance commands follow the format:
 
 ```
 time(s) COMMAND parameters
@@ -95,7 +95,7 @@ The fault has an impedance of `rfault + j*xfault` to ground:
 
 ## Three-Phase Short-Circuit (Voltage)
 
-Apply a fault where the post-fault voltage is specified. The fault has an unknown reactance to ground; based on the specified voltage, the reactance is computed internally and used for simulating the fault.
+Apply a fault where the post-fault voltage is specified. The fault has an unknown reactance $jx_{fault}$ to ground; based on the specified voltage, $x_{fault}$ is computed internally and used for simulating the fault.
 
 ```
 time(s) VFAULT BUS name_of_bus Voltage_after_fault(pu)
