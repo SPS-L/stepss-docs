@@ -95,7 +95,7 @@ The fault has an impedance of `rfault + j*xfault` to ground:
 
 ## Three-Phase Short-Circuit (Voltage)
 
-Apply a fault where the post-fault voltage is specified. The fault has an unknown reactance $jx_{fault}$ to ground; based on the specified voltage, $x_{fault}$ is computed internally and used for simulating the fault.
+Apply a fault where the post-fault voltage is specified. Internally, RAMSES creates a temporary shunt admittance $B_{fault}$ at the faulted bus and iteratively adjusts it using a secant method until the bus voltage matches the target value to within $\pm 0.5\%$. The injected currents are $i_x = B_{fault}\, v_x$ and $i_y = -B_{fault}\, v_y$. Up to 10 correction steps are attempted; if convergence is not reached, the simulation halts with an error message.
 
 ```
 time(s) VFAULT BUS name_of_bus Voltage_after_fault(pu)
