@@ -3,6 +3,7 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import fortranFreeForm from '@shikijs/langs/fortran-free-form';
 
 // https://astro.build/config
 export default defineConfig({
@@ -15,6 +16,11 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'STEPSS',
+			expressiveCode: {
+				shiki: {
+					langs: [fortranFreeForm],
+				},
+			},
 			description: 'Static and Transient Electric Power Systems Simulation — Documentation',
 			logo: {
 				light: './src/assets/icon-light.svg',
