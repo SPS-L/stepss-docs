@@ -52,7 +52,7 @@ LINE NAME BUS1 BUS2 R X WC2 SNOM BR ;
 | `R` | Series resistance | Ω |
 | `X` | Series reactance | Ω |
 | `WC2` | Half shunt susceptance $\omega C/2$ | μS |
-| `SNOM` | Nominal apparent power (0 = infinite) | MVA |
+| `SNOM` | Nominal apparent power, used to display line loading or in user-defined models (0 = infinite) | MVA |
 | `BR` | Breaker status (0 = open, other = closed) | — |
 
 Line orientation is arbitrary: BUS1 and BUS2 may be swapped. Only one LINE record per line is allowed.
@@ -69,7 +69,7 @@ All lines are memorized, even those out of service. An out-of-service line has z
 
 ## Switches
 
-A switch is a connection **without impedance** between two buses, treated internally as a very short line with $R = 0$, $\omega C/2 = 0$, and $X$ set to a very small value.
+A switch is a connection **without impedance** between two buses, treated internally as a very short line with $R = 0$, $\omega C/2 = 0$, and $X$ set to a very small value. Thus it has no active power losses and negligible reactive power losses.
 
 ### Data Format
 
@@ -97,8 +97,8 @@ All switches are memorized, even those which are open. An open switch has zero p
 Transformers are represented by a two-port model with:
 - Series resistance $R$ (copper losses)
 - Leakage reactance $X$
-- Magnetizing susceptances $B_1$ and $B_2$ (negative values)
-- Transformer ratio magnitude $n$ and phase angle $\phi$
+- Magnetizing susceptances $B_1$ and $B_2$ (negative values). Usually one of them is zero.
+- Transformer ratio magnitude $n$ and phase angle $\phi$. A phase-shifting transformer is characterized by a nonzero value of $\phi$.
 
 <img src="/images/netw-transfo.svg" alt="Two-port model of transformers" style="width:60%" />
 
@@ -106,17 +106,31 @@ Iron losses are neglected (no shunt resistance). $R$, $X$, $B_1$, and $B_2$ are 
 
 ### Base Conversions
 
+#### Manufacturer Data Conversion
+
+The values of $R$, $X$, $B_1$, and $B_2$ relate to the following characteristics from manufacturer data:
+
+- $S_{nom}$: nominal apparent power
+- $V_{N1}$ (resp. $V_{N2}$): nominal voltage on the "from" (resp. "to") side
+- $R_{baseV_{N1}}$ (resp. $X_{baseV_{N1}}$): series resistance (resp. leakage reactance) in per unit on the $(S_{nom}, V_{N1})$ base
+- $B_{1\,baseV_{N1}}$ and $B_{2\,baseV_{N1}}$: shunt susceptances in per unit on the $(S_{nom}, V_{N1})$ base
+- $V_{o1}$ and $V_{o2}$: open-circuit voltages corresponding to the transformer ratio (very often $V_{o1} = V_{N1}$ and $V_{o2} = V_{N2}$)
+
+Let $V_{B1}$ and $V_{B2}$ be the nominal voltages of the "from" and "to" buses, as specified in their BUS records.
+
 Parameters are specified in **percent** on the $(S_{nom}, V_{B1})$ base:
 
 $$
-R = 100 \cdot R_{pu} \left(\frac{V_{N1}}{V_{B1}}\right)^2 \quad\quad X = 100 \cdot X_{pu} \left(\frac{V_{N1}}{V_{B1}}\right)^2
+R = 100 \cdot R_{baseV_{N1}} \left(\frac{V_{N1}}{V_{B1}}\right)^2 \quad\quad X = 100 \cdot X_{baseV_{N1}} \left(\frac{V_{N1}}{V_{B1}}\right)^2
+$$
+
+$$
+B_1 = 100 \cdot B_{1\,baseV_{N1}} \left(\frac{V_{B1}}{V_{N1}}\right)^2 \quad\quad B_2 = 100 \cdot B_{2\,baseV_{N1}} \left(\frac{V_{B1}}{V_{N1}}\right)^2
 $$
 
 $$
 n = 100 \cdot \frac{V_{o2} \cdot V_{B1}}{V_{o1} \cdot V_{B2}}
 $$
-
-where $V_{B1}$ and $V_{B2}$ are the nominal voltages of the "from" and "to" buses.
 
 ### Data Format — Full Model (TRANSFO)
 
@@ -197,6 +211,8 @@ $$
 
 with $G_{ij} \ne G_{ji}$ and $B_{ij} \ne B_{ji}$.
 
+Typically, non-reciprocal two-ports are produced when reducing a network that includes phase-shifting transformers, to obtain an equivalent.
+
 ### Data Format
 
 ```
@@ -219,6 +235,8 @@ NRTP NAME FROMBUS TOBUS GIJ BIJ GJI BJI GSI BSI GSJ BSJ BR ;
 | `BR` | Breaker status (1 = closed/in service, 0 = open/out of service) |
 
 The orientation is **not arbitrary**: FROMBUS and TOBUS cannot be swapped. Only one NRTP record per two-port is allowed.
+
+A non-reciprocal two-port is treated as a piece of equipment; hence, the presence of the BR field.
 
 :::note
 Parameters are in per unit on nominal bus voltages and system base power (default 100 MVA, changeable via `$SBASE`).
