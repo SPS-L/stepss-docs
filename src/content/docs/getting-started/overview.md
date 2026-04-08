@@ -15,6 +15,8 @@ STEPSS includes three tightly integrated modules:
 
 <img src="/images/over-general.svg" alt="The three modules of STEPSS" style="width:60%" />
 
+In the figure above, files shown in blue are provided by the user; those in black are produced internally.
+
 | Module | Full Name | Description |
 |--------|-----------|-------------|
 | **PFC** | Power Flow Computation | Determines the initial operating point using the Newton-Raphson method in polar coordinates. Computes bus voltage magnitudes and phase angles, with optional transformer ratio adjustment. |
@@ -23,7 +25,8 @@ STEPSS includes three tightly integrated modules:
 
 Each module can be used independently:
 
-- **PFC alone**: Run power flow computations to inspect system state or save solutions for RAMSES
+- **PFC alone**: Run a power flow computation to inspect the system state and/or save the solution for RAMSES
+- **PFC alone**: Run a sequence of power flow computations until obtaining the desired system state, then save the solution for RAMSES
 - **RAMSES alone**: With a pre-computed power flow solution, run multiple dynamic simulations from the same initial state
 - **CODEGEN alone**: Build and save models for future incorporation into a user-defined version of RAMSES
 
@@ -39,11 +42,15 @@ PFC can optionally adjust transformer ratios to:
 - Bring voltage magnitudes inside specified deadbands (in-phase transformers)
 - Bring active power flows inside specified deadbands (phase-shifting transformers)
 
+PFC produces an output file including:
+- The voltage magnitudes and phase angles at all buses of the network
+- The adjustable transformer data with updated values of their ratios
+
 ## RAMSES Module
 
 RAMSES simulates the dynamic response of power system models under the phasor (RMS) approximation. It takes as input:
 
-- Network data (shared with PFC)
+- Network data (shared with PFC, with a few exceptions detailed in this documentation)
 - Dynamic component data
 - Solver control parameters (tolerances, time steps, reference speed, etc.)
 - Sequence of disturbances and actions
@@ -60,13 +67,23 @@ All three methods are implicit, ensuring numerical robustness. BDF2 is an $L_1$-
 
 ### Solver Acceleration
 
+The solver was developed in response to the growing demand for simulations that last longer (e.g. long-term stability studies) or involve larger models (e.g. to account for the impact of active distribution networks).
+
 The solver achieves high computational efficiency through two techniques:
 
-**Parallel Processing**: The power system model is decomposed into the network, injectors, and two-ports. A Schur-complement approach for network equations ensures the exact same solution as a non-decomposed scheme. Tasks are distributed among threads using OpenMP shared-memory parallelism.
+**Parallel Processing**: The power system model is decomposed into the network, injectors, and two-ports. A Schur-complement approach for network equations ensures the exact same solution as a non-decomposed scheme. Tasks distributed among threads include:
+- Update and factorization of injector and two-port Jacobians
+- Computation of the mismatch vector of Newton method
+- Computation of injector contributions to the Schur-complement matrix
+- Solution of local linear systems
+
+The implementation is general: there is no hand-crafted optimization particular to the computer system, the power system, or the disturbance.
 
 **Localization**: After a disturbance, components exhibit different levels of dynamic activity. This is exploited at each time step to:
 - Skip Newton iterations on converged injectors/two-ports
 - Replace latent (inactive) injectors with sensitivity-based models
+
+A fast-to-compute metric is used to classify injectors, which seamlessly switch between categories according to their activity.
 
 ### Key References
 
