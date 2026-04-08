@@ -593,6 +593,8 @@ A Type 3 wind turbine model implementing the WECC composite structure with four 
 
 The doubly-fed induction generator (DFIG) topology allows decoupled control of active and reactive power via rotor-side converter injection.
 
+<img src="/images/models/inj_wt3.svg" alt="WT3 (DFIG) wind turbine model block diagram" style="width:60%" />
+
 #### Scientific Description
 
 The two-mass drivetrain model governs rotor dynamics:
@@ -646,6 +648,8 @@ INJEC  WT3WithChanges  WT3_1  BUS_WIND  1.  1.  0.  0.
 #### Description
 
 A Type 4 wind turbine with full-rated converter. Unlike Type 3, the generator is fully decoupled from the grid through a back-to-back converter. The model implements the same WECC framework as WT3 but without the doubly-fed rotor circuit: the mechanical sub-model is a single-mass (or two-mass) drive train, and all electrical power passes through the converter. Sub-models include REPC_A (plant controller), REEC_A (electrical controller), WTGT_A (drivetrain), and REGC_A (generator/converter).
+
+<img src="/images/models/inj_wt4.svg" alt="WT4 full-converter wind turbine model block diagram" style="width:60%" />
 
 #### Scientific Description
 
