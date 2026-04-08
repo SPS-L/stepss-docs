@@ -10,6 +10,8 @@ CODEGEN provides a library of reusable modeling blocks for constructing user-def
 - State names (inputs/outputs) are plain identifiers — do **not** enclose them in brackets
 - Parameters (data values) are enclosed in braces: `{T}`, `{Kp}`, `{1/{omegac}}`
 - Square brackets `[v]`, `[p]`, `[q]`, `[if]`, `[vf]` denote **system variables** provided by the simulator (bus voltage, active power, reactive power, field current, field voltage)
+
+For example, a time constant can be specified as: `2.` (a literal value), `{'{'}T{'}'}` (a data name), or `1/{'{'}omegac{'}'}` (a mathematical expression involving data).
 :::
 
 ---
@@ -756,6 +758,8 @@ $$
 $$v_{xm} = v_x \qquad v_{ym} = v_y$$
 
 **Explanation**
+
+<img src="/images/codegen/phasor.svg" alt="Bus voltage phasor projected onto reference axes" style="width:60%" />
 
 The voltage components $v_x$ and $v_y$ are the projections of the bus voltage phasor onto the reference axes rotating at angular speed $\omega_{ref}$ (rad/s). The instantaneous angular frequency is:
 
@@ -1975,6 +1979,7 @@ $$x_1 \leftarrow 0, \qquad z \leftarrow -1$$
 
 - The $v_i$ values must be non-decreasing: $v_1 \le v_2 \le \cdots \le v_n$.
 - Typical use: approximating an inverse-time characteristic with $T_1 \ge T_2 \ge \cdots \ge T_n$.
+- Non-decreasing $T$ values are also allowed (i.e., $T_1 \le T_2$ is permitted).
 - If $x_i > v_1$ at $t = 0$, $x_j$ will trip to one after $\tau(x_i)$ unless $x_i$ drops below $v_1$ first.
 
 ---
@@ -2044,6 +2049,7 @@ $$x_1 \leftarrow 0, \qquad z \leftarrow -1$$
 
 - The $v_i$ values must be non-decreasing: $v_1 \le v_2 \le \cdots \le v_n$.
 - The staircase characteristic is typically used to approximate an inverse-time protection curve.
+- Non-decreasing $T$ values are also allowed.
 - If $x_i > v_1$ at $t = 0$, $x_j$ trips to one after $\tau(x_i)$ unless $x_i$ drops below $v_1$ first.
 
 ---
