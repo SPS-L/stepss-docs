@@ -11,14 +11,37 @@ CODEGEN Studio is a browser-based visual editor for assembling [User-Defined Mod
 
 ### Installation
 
+Install from PyPI (requires Python ≥ 3.10):
+
+```bash
+pip install stepss-cg-studio
+cg-studio
+```
+
+This starts the local server and opens your browser to the editor at `http://localhost:8765`. The CODEGEN binary is bundled in the wheel for Windows and Linux — no separate download needed. On macOS, set a custom binary path via Settings.
+
+Equivalent module form:
+
+```bash
+python -m cg_studio
+```
+
+#### CLI options
+
+```bash
+cg-studio --port 9000       # use a different port
+cg-studio --host 0.0.0.0    # allow network access
+cg-studio --no-browser      # start server without opening browser
+```
+
+#### Install from source (development)
+
 ```bash
 git clone https://github.com/SPS-L/stepss-cg-studio
 cd stepss-cg-studio
-pip install -r requirements.txt
-python server/app.py
+pip install -e ".[dev]"
+cg-studio
 ```
-
-Open `http://localhost:8765` in your browser.
 
 ### Interface Overview
 
@@ -51,7 +74,16 @@ Use the **Type** dropdown in the topbar to select the model category:
 The UI accent colour changes to reflect the active model type. Type the model name (max 32 characters) in the **Name** field next to the dropdown.
 
 :::note[Model type determines available inputs]
-Each model type exposes a different set of RAMSES input variables. For instance, an EXC model can reference `[v]`, `[p]`, `[q]`, `[omega]`, `[if]`, and `[vf]`, while a TOR model only has `[p]`, `[omega]`, and `[tm]`. See [User-Defined Models](/developer/user-models/) for the complete list.
+Each model type exposes a different set of RAMSES input variables in the palette's **I/O (`modelType`)** category:
+
+| Type | Palette inputs | Mandatory outputs |
+|------|---------------|-------------------|
+| `exc` | `v`, `p`, `q`, `omega` | `vf` |
+| `tor` | `p`, `omega` | `tm` |
+| `inj` | `vx`, `vy`, `omega` | `ix`, `iy` |
+| `twop` | `vx1`, `vy1`, `vx2`, `vy2`, `omega1`, `omega2` | `ix1`, `iy1`, `ix2`, `iy2` |
+
+The `exc` type also reserves `if` as a RAMSES name (usable in DSL expressions such as `[if]`) but it is not a palette input. See [User-Defined Models](/developer/user-models/) for the complete list of reserved names.
 :::
 
 ### 2. Add Blocks to the Canvas
@@ -287,7 +319,12 @@ Click the **gear icon** in the topbar to configure:
 
 Changes to host and port require a server restart. The codegen path takes effect immediately.
 
-Settings are stored in `server/config.json` and can also be edited via the REST API at `/docs` (Swagger UI).
+Settings are stored in a platform-specific config file:
+
+- **Windows:** `%LOCALAPPDATA%\cg-studio\config.json`
+- **Linux/macOS:** `~/.config/cg-studio/config.json`
+
+They can also be edited via the REST API at `/docs` (Swagger UI).
 
 ---
 
