@@ -19,22 +19,22 @@ TWOP model_name twop_name bus_orig bus_extr S_or_A
 :::note[Usage in Dynamic Data Files]
 The record fields, in order, are:
 
-- `model_name` - two-port model type (e.g., `HVDC_LCC`, `DCL_WCL`, `HVDC_VSC_SC`). The `twop_` prefix is added automatically if omitted, so both `HVDC_LCC` and `twop_HVDC_LCC` are accepted.
-- `twop_name` - unique instance name.
-- `bus_orig`, `bus_extr` - origin and extremity bus names.
-- `S_or_A` - `S` (series-branch insertion) or `A` (shunt-style anchor) flag.
-- `FP_ORIG`/`FQ_ORIG`/`P_ORIG`/`Q_ORIG` - initial active/reactive power injection at the origin bus. Either the fraction (`FP_ORIG`/`FQ_ORIG`, of the load at that bus) or the absolute power (`P_ORIG`/`Q_ORIG`, in MW/Mvar) must be zero.
-- `FP_EXTR`/`FQ_EXTR`/`P_EXTR`/`Q_EXTR` - same pattern for the extremity bus.
+- `model_name` — two-port model type (e.g., `HVDC_LCC`, `DCL_WCL`, `HVDC_VSC_SC`). The `twop_` prefix is added automatically if omitted, so both `HVDC_LCC` and `twop_HVDC_LCC` are accepted.
+- `twop_name` — unique instance name.
+- `bus_orig`, `bus_extr` — origin and extremity bus names.
+- `S_or_A` — `S` (series-branch insertion) or `A` (shunt-style anchor) flag.
+- `FP_ORIG`/`FQ_ORIG`/`P_ORIG`/`Q_ORIG` — initial active/reactive power injection at the origin bus. Either the fraction (`FP_ORIG`/`FQ_ORIG`, of the load at that bus) or the absolute power (`P_ORIG`/`Q_ORIG`, in MW/Mvar) must be zero.
+- `FP_EXTR`/`FQ_EXTR`/`P_EXTR`/`Q_EXTR` — same pattern for the extremity bus.
 - Remaining fields are the model-specific parameter list.
 
-Three two-port models are available in every RAMSES distribution (both the standalone executable and the shared library used by PyRAMSES): `HVDC_LCC` / `twop_HVDC_LCC`, `DCL_WCL` / `twop_DCL_WCL`, and `HVDC_VSC_SC` / `twop_HVDC_VSC_SC`. Other two-port models documented below (`twop_HVDC_VSC`, the Hydro-Québec family `twop_CSVGN5`, `twop_CHENIER`, etc.) are not callable out of the box - they can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
+Three two-port models are available in every RAMSES distribution (both the standalone executable and the shared library used by PyRAMSES): `HVDC_LCC` / `twop_HVDC_LCC`, `DCL_WCL` / `twop_DCL_WCL`, and `HVDC_VSC_SC` / `twop_HVDC_VSC_SC`. Other two-port models documented below (`twop_HVDC_VSC`, the Hydro-Québec family `twop_CSVGN5`, `twop_CHENIER`, etc.) are not callable out of the box — they can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
 :::
 
 ---
 
 ## HVDC Models
 
-### `twop_HVDC_LCC` - Line-Commutated Converter HVDC
+### `twop_HVDC_LCC` — Line-Commutated Converter HVDC
 
 #### Description
 
@@ -119,11 +119,11 @@ The current order $I_{ord}$ is obtained from the desired current $I_{des}$ throu
 
 | Parameter | Description | Unit |
 |-----------|-------------|------|
-| `p` | Number of poles (1 = monopolar, 2 = bipolar) | - |
-| `rec_ctl` | Rectifier control mode (1=current, 2=power, −1=αmin, 3=blocked) | - |
-| `inv_ctl` | Inverter control mode (1=voltage, 2=γ, −2=γmin, −1=reduced Id, 3=blocked) | - |
-| `Br` | Number of bridges in series at rectifier | - |
-| `Bi` | Number of bridges in series at inverter | - |
+| `p` | Number of poles (1 = monopolar, 2 = bipolar) | — |
+| `rec_ctl` | Rectifier control mode (1=current, 2=power, −1=αmin, 3=blocked) | — |
+| `inv_ctl` | Inverter control mode (1=voltage, 2=γ, −2=γmin, −1=reduced Id, 3=blocked) | — |
+| `Br` | Number of bridges in series at rectifier | — |
+| `Bi` | Number of bridges in series at inverter | — |
 | `Er` | Rectifier open-circuit secondary voltage (at 1 pu AC) | kV |
 | `Ei` | Inverter open-circuit secondary voltage (at 1 pu AC) | kV |
 | `Rcr` | Rectifier commutating resistance per bridge | Ω |
@@ -182,7 +182,7 @@ TWOP  HVDC_LCC  HVDClink  BUS_RECT  BUS_INV  S
 
 ---
 
-### `twop_HVDC_VSC` - Voltage Source Converter HVDC
+### `twop_HVDC_VSC` — Voltage Source Converter HVDC
 
 :::caution
 `twop_HVDC_VSC` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)). For a built-in VSC-HVDC model, use `twop_HVDC_VSC_SC` instead.
@@ -288,18 +288,18 @@ $$
 | `Hdc` | DC capacitor electrostatic inertia | s |
 | `Snom` | Nominal apparent power | MVA |
 | `Pnom` | Nominal active power (DC side rating) | MW |
-| `Kp` | Inner current controller proportional gain | - |
-| `Ki` | Inner current controller integral gain | - |
-| `Kpd` | Outer $d$-axis loop proportional gain | - |
-| `Kid` | Outer $d$-axis loop integral gain | - |
-| `Kpq` | Outer $q$-axis loop proportional gain | - |
-| `Kiq` | Outer $q$-axis loop integral gain | - |
-| `Kpw` | PLL proportional gain | - |
-| `Kiw` | PLL integral gain | - |
-| `alpha1` | P–V outer loop: active power coefficient | - |
-| `beta1` | P–V outer loop: DC voltage coefficient | - |
-| `alpha2` | Q–$V_{ac}$ outer loop: reactive power coefficient | - |
-| `beta2` | Q–$V_{ac}$ outer loop: AC voltage coefficient | - |
+| `Kp` | Inner current controller proportional gain | — |
+| `Ki` | Inner current controller integral gain | — |
+| `Kpd` | Outer $d$-axis loop proportional gain | — |
+| `Kid` | Outer $d$-axis loop integral gain | — |
+| `Kpq` | Outer $q$-axis loop proportional gain | — |
+| `Kiq` | Outer $q$-axis loop integral gain | — |
+| `Kpw` | PLL proportional gain | — |
+| `Kiw` | PLL integral gain | — |
+| `alpha1` | P–V outer loop: active power coefficient | — |
+| `beta1` | P–V outer loop: DC voltage coefficient | — |
+| `alpha2` | Q–$V_{ac}$ outer loop: reactive power coefficient | — |
+| `beta2` | Q–$V_{ac}$ outer loop: AC voltage coefficient | — |
 | `Vs1` | AC voltage threshold for reactive support activation | pu |
 | `Vs2` | AC voltage for full reactive support | pu |
 
@@ -353,7 +353,7 @@ TWOP  HVDC_VSC  VSC1  AC_BUS  DC_BUS  S
 
 ---
 
-### `twop_HVDC_VSC_SC` - VSC-HVDC with Self-Commutation (Grid-Forming)
+### `twop_HVDC_VSC_SC` — VSC-HVDC with Self-Commutation (Grid-Forming)
 
 #### Description
 
@@ -401,15 +401,15 @@ $$
 | `Hdc` | DC capacitor electrostatic inertia | s |
 | `Snom` | Nominal apparent power | MVA |
 | `Pnom` | Nominal active power | MW |
-| `Kp` | Inner current controller proportional gain | - |
-| `Ki` | Inner current controller integral gain | - |
-| `Kpp` | Outer active power loop proportional gain | - |
-| `Kip` | Outer active power loop integral gain | - |
-| `Kwi` | Frequency droop / virtual inertia gain | - |
-| `Kpq` | Outer reactive power loop proportional gain | - |
-| `Kiq` | Outer reactive power loop integral gain | - |
-| `Kpw` | PLL proportional gain | - |
-| `Kiw` | PLL integral gain | - |
+| `Kp` | Inner current controller proportional gain | — |
+| `Ki` | Inner current controller integral gain | — |
+| `Kpp` | Outer active power loop proportional gain | — |
+| `Kip` | Outer active power loop integral gain | — |
+| `Kwi` | Frequency droop / virtual inertia gain | — |
+| `Kpq` | Outer reactive power loop proportional gain | — |
+| `Kiq` | Outer reactive power loop integral gain | — |
+| `Kpw` | PLL proportional gain | — |
+| `Kiw` | PLL integral gain | — |
 | `Vs1` | AC voltage threshold for reactive support | pu |
 | `Vs2` | AC voltage for full reactive support | pu |
 
@@ -452,7 +452,7 @@ TWOP  HVDC_VSC_SC  VSC_SC1  AC_BUS  DC_BUS  S
 
 ---
 
-### `twop_DCL_WCL` - DC Link with Wind Converter Link (Offshore Wind HVDC)
+### `twop_DCL_WCL` — DC Link with Wind Converter Link (Offshore Wind HVDC)
 
 #### Description
 
@@ -472,7 +472,7 @@ The model fully captures:
 
 #### Scientific Description
 
-**Converter 1 - Offshore (Grid-forming, active power + frequency droop)**
+**Converter 1 — Offshore (Grid-forming, active power + frequency droop)**
 
 Outer active power loop with speed droop:
 
@@ -494,7 +494,7 @@ $$
 i_{q,ref,1} = \frac{\int \text{QB}_1 \, dt}{K_{iq,1}} + K_{pq,1} \, \text{QB}_1
 $$
 
-**Converter 2 - Onshore (Grid-following, DC voltage control)**
+**Converter 2 — Onshore (Grid-following, DC voltage control)**
 
 Outer DC voltage loop:
 
@@ -574,13 +574,13 @@ $$
 | `L_1` | Phase reactor inductance | pu |
 | `Hdc_1` | DC capacitor electrostatic inertia | s |
 | `Snom_1` | Nominal apparent power | MVA |
-| `Kpp_1` | Outer active power loop proportional gain | - |
-| `Kip_1` | Outer active power loop integral gain | - |
-| `Kwi_1` | Speed/frequency droop gain | - |
-| `Kpq_1` | Outer reactive power loop proportional gain | - |
-| `Kiq_1` | Outer reactive power loop integral gain | - |
-| `Kpw_1` | PLL proportional gain | - |
-| `Kiw_1` | PLL integral gain | - |
+| `Kpp_1` | Outer active power loop proportional gain | — |
+| `Kip_1` | Outer active power loop integral gain | — |
+| `Kwi_1` | Speed/frequency droop gain | — |
+| `Kpq_1` | Outer reactive power loop proportional gain | — |
+| `Kiq_1` | Outer reactive power loop integral gain | — |
+| `Kpw_1` | PLL proportional gain | — |
+| `Kiw_1` | PLL integral gain | — |
 | `betaV_1` | QV droop slope ($\Delta V / \Delta Q$) | pu/pu |
 
 </TabItem>
@@ -592,14 +592,14 @@ $$
 | `L_2` | Phase reactor inductance | pu |
 | `Hdc_2` | DC capacitor electrostatic inertia | s |
 | `Snom_2` | Nominal apparent power | MVA |
-| `Kpd_2` | Outer $d$-axis (DC voltage) loop proportional gain | - |
-| `Kid_2` | Outer $d$-axis (DC voltage) loop integral gain | - |
-| `Kpq_2` | Outer $q$-axis (Q/Vac) loop proportional gain | - |
-| `Kiq_2` | Outer $q$-axis (Q/Vac) loop integral gain | - |
-| `Kpw_2` | PLL proportional gain | - |
-| `Kiw_2` | PLL integral gain | - |
-| `alpha2_2` | Q–$V_{ac}$ droop: reactive power coefficient | - |
-| `beta2_2` | Q–$V_{ac}$ droop: AC voltage coefficient | - |
+| `Kpd_2` | Outer $d$-axis (DC voltage) loop proportional gain | — |
+| `Kid_2` | Outer $d$-axis (DC voltage) loop integral gain | — |
+| `Kpq_2` | Outer $q$-axis (Q/Vac) loop proportional gain | — |
+| `Kiq_2` | Outer $q$-axis (Q/Vac) loop integral gain | — |
+| `Kpw_2` | PLL proportional gain | — |
+| `Kiw_2` | PLL integral gain | — |
+| `alpha2_2` | Q–$V_{ac}$ droop: reactive power coefficient | — |
+| `beta2_2` | Q–$V_{ac}$ droop: AC voltage coefficient | — |
 
 </TabItem>
 <TabItem label="DC Link">

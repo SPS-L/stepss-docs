@@ -20,9 +20,9 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
 Recognised exciter model names (case-sensitive):
 
 - **Uppercase short names** (no prefix): `CONSTANT`, `1ST_ORDER`, `GENERIC1`, `GENERIC2`.
-- **Prefixed names** - RAMSES adds the `exc_` prefix automatically, so you can write either form: `kundur`/`exc_kundur`, `ENTSOE_simp`, `ST1A`, `SEXS`, `SEXS_IEEEST`, `GENERIC3`/`exc_GENERIC3`, `GENERIC4`/`exc_GENERIC4`, `AC1A`, `AC4A`, `IEEET5`, `ST1A_IEEEST`, `ST1A_PSS4B`, `ST1A_PSS2B`, `EXPIC1_PSS2B`.
+- **Prefixed names** — RAMSES adds the `exc_` prefix automatically, so you can write either form: `kundur`/`exc_kundur`, `ENTSOE_simp`, `ST1A`, `SEXS`, `SEXS_IEEEST`, `GENERIC3`/`exc_GENERIC3`, `GENERIC4`/`exc_GENERIC4`, `AC1A`, `AC4A`, `IEEET5`, `ST1A_IEEEST`, `ST1A_PSS4B`, `ST1A_PSS2B`, `EXPIC1_PSS2B`.
 
-All of the above are built into every RAMSES distribution (the standalone executable and the shared library used by PyRAMSES). Additional IEEE variants that appear in the catalogue below but are not in this list (e.g. `AC1A_MAXEX2`, `AC8B`, `DC3A`, `EXHQSC*`, `ST1A_PSS3B`, `ST2A`, `SEXS_STAB3_lim`, etc.) are not callable out of the box - they can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
+All of the above are built into every RAMSES distribution (the standalone executable and the shared library used by PyRAMSES). Additional IEEE variants that appear in the catalogue below but are not in this list (e.g. `AC1A_MAXEX2`, `AC8B`, `DC3A`, `EXHQSC*`, `ST1A_PSS3B`, `ST2A`, `SEXS_STAB3_lim`, etc.) are not callable out of the box — they can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
 :::
 
 ---
@@ -142,7 +142,7 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
 
 ## exc_kundur (`kundur`)
 
-The data-file model name is `kundur` or `exc_kundur` - the `exc_` prefix is added automatically.
+The data-file model name is `kundur` or `exc_kundur` — the `exc_` prefix is added automatically.
 
 ### Scientific Description
 
@@ -405,7 +405,7 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
 
 ## exc_GENERIC3 (`GENERIC3`)
 
-The data-file model name is `exc_GENERIC3` (or `GENERIC3` - the `exc_` prefix is added automatically).
+The data-file model name is `exc_GENERIC3` (or `GENERIC3` — the `exc_` prefix is added automatically).
 
 ### Scientific Description
 
@@ -515,7 +515,7 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
 
 ## exc_GENERIC4 (`GENERIC4`)
 
-The data-file model name is `exc_GENERIC4` (or `GENERIC4` - the `exc_` prefix is added automatically).
+The data-file model name is `exc_GENERIC4` (or `GENERIC4` — the `exc_` prefix is added automatically).
 
 ### Scientific Description
 
@@ -579,6 +579,6 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
 <TabItem label="Notes">
 - `exc_GENERIC4` is the compiled-code equivalent of `exc_GENERIC3`. Use when simulation speed is a priority, as the Fortran subroutine is faster than the interpreted CODEGEN version.
 - Parameter order and meaning are identical to `exc_GENERIC3`.
-- The model name in the data file is `exc_GENERIC4` (or `GENERIC4` - the `exc_` prefix is added automatically).
+- The model name in the data file is `exc_GENERIC4` (or `GENERIC4` — the `exc_` prefix is added automatically).
 </TabItem>
 </Tabs>

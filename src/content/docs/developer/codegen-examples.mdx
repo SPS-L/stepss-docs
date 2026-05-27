@@ -1,6 +1,6 @@
 ---
 title: CODEGEN Model Examples
-description: Complete CODEGEN model files for each model type - exciter, governor, injector, and two-port
+description: Complete CODEGEN model files for each model type — exciter, governor, injector, and two-port
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
@@ -11,7 +11,7 @@ For the block reference, see the [CODEGEN Blocks Library](/developer/codegen-lib
 
 ---
 
-## Exciter Model - `exc_ST1A`
+## Exciter Model — `exc_ST1A`
 
 The IEEE ST1A is a bus-fed static excitation system. This model demonstrates the typical structure of an `exc`-type CODEGEN file: voltage compensation, AVR with lead-lag stages, field current limiting, UEL/OEL gating, and variable-limit output clamp.
 
@@ -191,31 +191,31 @@ All internal and output states with their initial values. The initialization exp
 
 States that can be recorded during simulation.
 
-### `%models` Section - Signal Flow
+### `%models` Section — Signal Flow
 
-1. `algeq` - OEL placeholder (set to large value, overridden by OEL model if present)
-2. `algeq` - line drop compensation: $V_{c1} = \text{vcomp}(V, P, Q, K_v, R_c, X_c)$
-3. `tf1p` - voltage measurement filter with time constant $T_R$
-4. `algeq` - AVR summation: $\Delta V = V_{REF} - V_c - V_{UEL} + V_F$
-5. `lim` - error limiter $[V_{IMIN}, V_{IMAX}]$
-6. `max1v1c` - HV gate for UEL (active when UEL=2)
-7. `tf1p1z` - first lead-lag: $(1 + sT_C)/(1 + sT_B)$
-8. `tf1p1z` - second lead-lag: $(1 + sT_{C1})/(1 + sT_{B1})$
-9. `tf1plim` - amplifier with gain $K_A$, time constant $T_A$, limits $[V_{AMIN}, V_{AMAX}]$
-10. `algeq` + `lim` - instantaneous field current limiter $V_{LR} = K_{LR}(I_f - I_{LR})$, lower-limited to 0
-11. `algeq` - subtract limiter signal from main path
-12. `max1v1c` - HV gate for UEL (active when UEL=3)
-13. `min2v` - LV gate for OEL
-14. `algeq` × 2 - compute variable limits: $V_{RMIN} \cdot V_t$ and $V_{RMAX} \cdot V_t - K_C I_f$
-15. `limvb` - bus-fed variable-limit output clamp → `vf`
-16. `tfder1p` - derivative feedback: $sK_F/T_F / (1 + sT_F)$
+1. `algeq` — OEL placeholder (set to large value, overridden by OEL model if present)
+2. `algeq` — line drop compensation: $V_{c1} = \text{vcomp}(V, P, Q, K_v, R_c, X_c)$
+3. `tf1p` — voltage measurement filter with time constant $T_R$
+4. `algeq` — AVR summation: $\Delta V = V_{REF} - V_c - V_{UEL} + V_F$
+5. `lim` — error limiter $[V_{IMIN}, V_{IMAX}]$
+6. `max1v1c` — HV gate for UEL (active when UEL=2)
+7. `tf1p1z` — first lead-lag: $(1 + sT_C)/(1 + sT_B)$
+8. `tf1p1z` — second lead-lag: $(1 + sT_{C1})/(1 + sT_{B1})$
+9. `tf1plim` — amplifier with gain $K_A$, time constant $T_A$, limits $[V_{AMIN}, V_{AMAX}]$
+10. `algeq` + `lim` — instantaneous field current limiter $V_{LR} = K_{LR}(I_f - I_{LR})$, lower-limited to 0
+11. `algeq` — subtract limiter signal from main path
+12. `max1v1c` — HV gate for UEL (active when UEL=3)
+13. `min2v` — LV gate for OEL
+14. `algeq` × 2 — compute variable limits: $V_{RMIN} \cdot V_t$ and $V_{RMAX} \cdot V_t - K_C I_f$
+15. `limvb` — bus-fed variable-limit output clamp → `vf`
+16. `tfder1p` — derivative feedback: $sK_F/T_F / (1 + sT_F)$
 
 </TabItem>
 </Tabs>
 
 ---
 
-## Governor Model - `tor_hygov`
+## Governor Model — `tor_hygov`
 
 A hydraulic turbine-governor model with speed droop, PI controller, rate limiter, gate servo, and non-linear turbine (head-flow-power). This demonstrates a `tor`-type model with both differential and algebraic equations.
 
@@ -363,7 +363,7 @@ hygov        ← model name (used as `TOR HYGOV` in the data file; dispatcher ca
 
 ---
 
-## Injector Model - `inj_vfd_load`
+## Injector Model — `inj_vfd_load`
 
 A voltage- and frequency-dependent load model with exponential characteristics and low-voltage protection (constant admittance below a threshold). This is the most widely used load model in RAMSES. It demonstrates an `inj`-type model with current injection equations.
 
@@ -484,13 +484,13 @@ vfd_load     ← model name (used as INJEC vfd_load in the data file)
 ### Model Logic
 
 **Frequency estimation:**
-1. `f_inj` - estimates bus frequency from voltage phasor derivatives
-2. `algeq` - selects bus frequency or COI frequency based on `foption`
+1. `f_inj` — estimates bus frequency from voltage phasor derivatives
+2. `algeq` — selects bus frequency or COI frequency based on `foption`
 
 **Voltage processing:**
-3. `algeq` - compute distribution bus voltage: $V_{real} = \sqrt{v_x^2 + v_y^2}/r$
-4. `tf1p` - small delay (3 ms) for numerical stability
-5. `pwlin4` - switch: $u = 1$ if $V > V_{min}$, $u = 0$ otherwise
+3. `algeq` — compute distribution bus voltage: $V_{real} = \sqrt{v_x^2 + v_y^2}/r$
+4. `tf1p` — small delay (3 ms) for numerical stability
+5. `pwlin4` — switch: $u = 1$ if $V > V_{min}$, $u = 0$ otherwise
 
 **Power computation:**
 6. Active power: $P = u \cdot P_0 (1 + D_p \Delta f) \frac{a_1 V^{\alpha_1} + a_2 V^{\alpha_2} + (1-a_1-a_2) V^{\alpha_3}}{\text{denom}_P} + (1-u) G_{eq} V^2$
@@ -510,7 +510,7 @@ vfd_load     ← model name (used as INJEC vfd_load in the data file)
 
 ---
 
-## Two-Port Model - `twop_HVDC_LCC`
+## Two-Port Model — `twop_HVDC_LCC`
 
 A Line-Commutated Converter (LCC) HVDC link model connecting two AC buses through a DC line. This demonstrates a `twop`-type model with complex AC/DC interaction, multiple control modes (current control, voltage control, gamma control), and non-linear commutation equations.
 
@@ -734,7 +734,7 @@ HVDC_LCC     ← model name (used as `TWOP HVDC_LCC ...` in data file)
 
 ### Key Design Patterns
 
-- **`equal()` function**: used to switch between control modes without discrete variables - acts as a continuous selector
+- **`equal()` function**: used to switch between control modes without discrete variables — acts as a continuous selector
 - **`sbase1`/`sbase2`**: system variables for per-unit conversion at each bus
 - **`Td` delay**: small artificial time constant on terminal voltages for numerical robustness
 - **Initialization**: complex parameter expressions compute initial angles, overlap, and compensation from the power flow solution

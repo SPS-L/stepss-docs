@@ -27,12 +27,12 @@ After importing the package, the following attributes are available:
 
 ## Platform Support
 
-PyRAMSES supports both Windows and Linux operating systems. Pre-compiled RAMSES binaries are bundled directly in the package - no separate simulator installation is required.
+PyRAMSES supports both Windows and Linux operating systems. Pre-compiled RAMSES binaries are bundled directly in the package — no separate simulator installation is required.
 
 ## Further Reading
 
-- [API Reference](/pyramses/api-reference/) - Detailed documentation for `cfg`, `sim`, and `extractor`
-- [Examples](/pyramses/examples/) - Practical simulation examples and notebooks
+- [API Reference](/pyramses/api-reference/) — Detailed documentation for `cfg`, `sim`, and `extractor`
+- [Examples](/pyramses/examples/) — Practical simulation examples and notebooks
 
 ## Repository
 

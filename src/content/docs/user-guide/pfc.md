@@ -17,7 +17,7 @@ BUS NAME VNOM PLOAD QLOAD BSHUNT QSHUNT ;
 
 | Field | Description | Unit |
 |-------|-------------|------|
-| `NAME` | Bus name (max 8 characters) | - |
+| `NAME` | Bus name (max 8 characters) | — |
 | `VNOM` | Nominal voltage | kV |
 | `PLOAD` | Total active power load (positive = consumed) | MW |
 | `QLOAD` | Total reactive power load (positive = consumed) | Mvar |
@@ -44,15 +44,15 @@ GENER NAME BUS P Q VIMP SNOM QMIN QMAX BR ;
 
 | Field | Description | Unit |
 |-------|-------------|------|
-| `NAME` | Generator name (max 20 characters) | - |
-| `BUS` | Connection bus name | - |
+| `NAME` | Generator name (max 20 characters) | — |
+| `BUS` | Connection bus name | — |
 | `P` | Active power produced | MW |
 | `Q` | Reactive power produced (ignored if VIMP ≠ 0) | Mvar |
 | `VIMP` | Imposed voltage (0 = PQ bus, nonzero = PV bus) | pu |
 | `SNOM` | Nominal apparent power | MVA |
 | `QMIN` | Lower reactive power limit | Mvar |
 | `QMAX` | Upper reactive power limit | Mvar |
-| `BR` | Breaker status (0 = open) | - |
+| `BR` | Breaker status (0 = open) | — |
 
 For PV buses, if the upper reactive power limit QMAX is exceeded, the bus switches to PQ type with QMAX enforced, and Newton iterations continue. If subsequently the bus voltage rises above VIMP, the bus switches back to PV type. Similarly, if QMIN is exceeded, the bus switches to PQ type with QMIN enforced; it switches back to PV if the voltage subsequently drops below VIMP.
 
@@ -116,16 +116,16 @@ SVC NAME CON_BUS MON_BUS V0 Q0 SNOM BMAX BMIN G BR ;
 
 | Field | Description | Unit |
 |-------|-------------|------|
-| `NAME` | SVC name (max 20 characters) | - |
-| `CON_BUS` | Controlled bus where the susceptance $B$ is varied (max 8 characters) | - |
-| `MON_BUS` | Monitored bus whose voltage is regulated (max 8 characters) | - |
+| `NAME` | SVC name (max 20 characters) | — |
+| `CON_BUS` | Controlled bus where the susceptance $B$ is varied (max 8 characters) | — |
+| `MON_BUS` | Monitored bus whose voltage is regulated (max 8 characters) | — |
 | `V0` | Voltage setpoint $V_j^o$ (0 = constant power mode with $P=0$, $Q=Q0$, no limits tested) | pu |
 | `Q0` | Reactive power setpoint (ignored if V0 ≠ 0) | Mvar |
 | `SNOM` | Nominal reactive power | Mvar |
 | `BMAX` | Maximal nominal reactive power: reactive power produced under $V_i = 1$ pu when $B = B_{max}$ | Mvar |
 | `BMIN` | Minimal nominal reactive power: reactive power produced under $V_i = 1$ pu when $B = B_{min}$ | Mvar |
 | `G` | Gain, in pu on the ($V_B$, SNOM) base, where $V_B$ is the nominal voltage at the controlled bus | pu |
-| `BR` | Breaker status (0 = open, other = closed) | - |
+| `BR` | Breaker status (0 = open, other = closed) | — |
 
 It is common for BMAX to be positive and BMIN negative, but other combinations are allowed.
 
@@ -159,7 +159,7 @@ Relevant fields in the TRFO record:
 |-------|-------------|------|
 | `NFIRST` | Ratio at first tap position (lower bound) | % |
 | `NLAST` | Ratio at last tap position (upper bound) | % |
-| `NBPOS` | Total number of tap positions (including first and last) | - |
+| `NBPOS` | Total number of tap positions (including first and last) | — |
 | `TOLV` | Voltage tolerance $\epsilon$ | pu |
 | `VDES` | Desired voltage $V_{des}$ | pu |
 
@@ -173,11 +173,11 @@ LTC-V NAME CON_BUS NFIRST NLAST NBPOS TOLV VDES ;
 
 | Field | Description | Unit |
 |-------|-------------|------|
-| `NAME` | Name of the controlled transformer (max 20 characters) | - |
-| `CON_BUS` | Controlled bus (max 8 characters) | - |
+| `NAME` | Name of the controlled transformer (max 20 characters) | — |
+| `CON_BUS` | Controlled bus (max 8 characters) | — |
 | `NFIRST` | Ratio at first tap position (lower bound) | % |
 | `NLAST` | Ratio at last tap position (upper bound) | % |
-| `NBPOS` | Total number of tap positions (including first and last) | - |
+| `NBPOS` | Total number of tap positions (including first and last) | — |
 | `TOLV` | Voltage tolerance $\epsilon$ | pu |
 | `VDES` | Desired voltage $V_{des}$ | pu |
 
@@ -193,12 +193,12 @@ PSHIFT-P CONTRFO MONBRANCH PHAFIRST PHALAST NBPOS SIGN PDES TOLP ;
 
 | Field | Description | Unit |
 |-------|-------------|------|
-| `CONTRFO` | Name of the transformer whose phase angle is adjusted (max 20 characters, defined in a TRFO or TRANSFO record). If the transformer does not exist, the record is ignored with a warning | - |
-| `MONBRANCH` | Name of the branch where active power $P$ is monitored (max 20 characters, defined in a LINE, TRFO, or TRANSFO record). $P$ is the active power leaving the first bus of the branch record | - |
+| `CONTRFO` | Name of the transformer whose phase angle is adjusted (max 20 characters, defined in a TRFO or TRANSFO record). If the transformer does not exist, the record is ignored with a warning | — |
+| `MONBRANCH` | Name of the branch where active power $P$ is monitored (max 20 characters, defined in a LINE, TRFO, or TRANSFO record). $P$ is the active power leaving the first bus of the branch record | — |
 | `PHAFIRST` | Phase angle $\phi$ at first tap position (lower bound) | degrees |
 | `PHALAST` | Phase angle $\phi$ at last tap position (upper bound) | degrees |
-| `NBPOS` | Number of tap positions | - |
-| `SIGN` | Direction indicator: `1` means $\phi$ must increase to increase power flow; `-1` means decrease. Any other value causes the program to stop | - |
+| `NBPOS` | Number of tap positions | — |
+| `SIGN` | Direction indicator: `1` means $\phi$ must increase to increase power flow; `-1` means decrease. Any other value causes the program to stop | — |
 | `PDES` | Desired active power flow | MW |
 | `TOLP` | Tolerance $\epsilon$ | MW |
 
@@ -226,7 +226,7 @@ LFRESV BUS MODV PHASV ;
 
 | Field | Description | Unit |
 |-------|-------------|------|
-| `BUS` | Bus name (max 8 characters) | - |
+| `BUS` | Bus name (max 8 characters) | — |
 | `MODV` | Voltage magnitude | pu |
 | `PHASV` | Voltage phase angle, referenced to slack bus | radians |
 
@@ -239,7 +239,7 @@ Default initialization: PQ buses start at 1 pu magnitude and 0 angle; PV buses s
 :::
 
 :::note
-The output LFRESV records from PFC can be fed back as input - this results in zero Newton iterations (round-trip property). This is an easy way to verify that system data come with their corresponding voltages.
+The output LFRESV records from PFC can be fed back as input — this results in zero Newton iterations (round-trip property). This is an easy way to verify that system data come with their corresponding voltages.
 :::
 
 :::note
@@ -262,11 +262,11 @@ The following records control the computation. Each record starts with `$` and h
 | `$SBASE` | 100 | MVA | System base power (on which pu values are expressed) |
 | `$TOLAC` | 0.1 | MW | Convergence tolerance on active power mismatch ($\epsilon_P$) |
 | `$TOLREAC` | 0.1 | Mvar | Convergence tolerance on reactive power mismatch ($\epsilon_Q$) |
-| `$NBITMA` | 20 | - | Maximum number of Newton iterations |
+| `$NBITMA` | 20 | — | Maximum number of Newton iterations |
 | `$MISQLIM` | 20 | MVA | Apparent power mismatch threshold below which generator/SVC reactive limits are checked and enforced (set to 0 to skip) |
 | `$MISBLOC` | 10 | MVA | Apparent power mismatch threshold below which the Jacobian is kept constant |
 | `$MISADJ` | 10 | MVA | Apparent power mismatch threshold below which transformer ratios and phase shifts are adjusted (set to 0 to skip) |
-| `$DIVDET` | 0 | - | Set to 1 to activate divergence detection; 0 to skip |
+| `$DIVDET` | 0 | — | Set to 1 to activate divergence detection; 0 to skip |
 
 :::note
 Divergence is detected when $\varphi(k) > 1.1\,\varphi(k-1)$, where:
@@ -298,5 +298,5 @@ The following table summarises which records are used by PFC and RAMSES respecti
 
 ## Next Steps
 
-- [Reference Frames & Initialization](/user-guide/reference-frames/) - Understand how RAMSES initializes from the PFC solution
-- [Dynamic Models](/user-guide/dynamic-models/) - Define synchronous machines, injectors, and controllers
+- [Reference Frames & Initialization](/user-guide/reference-frames/) — Understand how RAMSES initializes from the PFC solution
+- [Dynamic Models](/user-guide/dynamic-models/) — Define synchronous machines, injectors, and controllers

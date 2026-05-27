@@ -1,6 +1,6 @@
 ---
 title: CODEGEN Studio
-description: Visual block diagram editor for building CODEGEN DSL models - creating, saving, loading, and exporting models
+description: Visual block diagram editor for building CODEGEN DSL models — creating, saving, loading, and exporting models
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
@@ -18,7 +18,7 @@ pip install stepss-cg-studio
 cg-studio
 ```
 
-This starts the local server and opens your browser to the editor at `http://localhost:8765`. The CODEGEN binary is bundled in the wheel for Windows and Linux - no separate download needed. On macOS, set a custom binary path via Settings.
+This starts the local server and opens your browser to the editor at `http://localhost:8765`. The CODEGEN binary is bundled in the wheel for Windows and Linux — no separate download needed. On macOS, set a custom binary path via Settings.
 
 Equivalent module form:
 
@@ -105,15 +105,15 @@ Click and drag from an **output port** (right side) of one block to an **input p
 - The status bar below the canvas toolbar shows the current block and wire count
 
 :::caution[Cycle detection]
-If your connections form a cycle, the status bar shows **"Cycle detected"** in red and DSL export is blocked. Feedback loops in control systems are valid in RAMSES, but the loop must be broken by declaring the fed-back signal as a `%state` with an explicit initial value. See [User-Defined Models - States](/developer/user-models/) for details.
+If your connections form a cycle, the status bar shows **"Cycle detected"** in red and DSL export is blocked. Feedback loops in control systems are valid in RAMSES, but the loop must be broken by declaring the fed-back signal as a `%state` with an explicit initial value. See [User-Defined Models — States](/developer/user-models/) for details.
 :::
 
 ### 4. Edit Block Properties
 
 Click a block on the canvas to select it. The **Block Inspector** (right panel) shows:
 
-- **Output signal names** - one editable field per output port. The default auto-generated name (e.g., `tf11`, `int2`) can be renamed to any valid identifier. This is the state name that appears in the DSL.
-- **Arguments** - block-specific parameters such as gain `K`, time constant `T`, or limiter bounds. Values can be:
+- **Output signal names** — one editable field per output port. The default auto-generated name (e.g., `tf11`, `int2`) can be renamed to any valid identifier. This is the state name that appears in the DSL.
+- **Arguments** — block-specific parameters such as gain `K`, time constant `T`, or limiter bounds. Values can be:
   - A numeric literal: `1.0`
   - A data reference: `{KA}` (refers to an entry in `%data`)
   - A Fortran expression: `{1/{omegac}}`
@@ -168,7 +168,7 @@ Every block output signal that represents a dynamic state should have a correspo
 |--------|-------------|---------|
 | Name | Observable name | `vf` |
 
-Observables do not need expressions - they refer to state names already defined elsewhere in the model.
+Observables do not need expressions — they refer to state names already defined elsewhere in the model.
 </TabItem>
 </Tabs>
 
@@ -201,7 +201,7 @@ The browser downloads a `.json` file named after your model (e.g., `simple_avr.j
 - All wire connections
 - All metadata (data, parameters, states, observables)
 
-This is a **lossless format** - every aspect of your canvas layout and configuration is preserved. Use this format for work-in-progress models that you intend to continue editing.
+This is a **lossless format** — every aspect of your canvas layout and configuration is preserved. Use this format for work-in-progress models that you intend to continue editing.
 
 ---
 
@@ -287,9 +287,9 @@ The `codegen` executable must be installed and its path configured. Click the **
 
 | Format | Extension | Use case | Lossless? |
 |--------|-----------|----------|-----------|
-| **Project** | `.json` | Save/resume editing | Yes - includes canvas positions, all metadata |
-| **DSL** | `.txt` | Input to `codegen` binary | Structure only - no canvas layout |
-| **Fortran** | `.f90` | Output from `codegen` | Export only - cannot be re-imported |
+| **Project** | `.json` | Save/resume editing | Yes — includes canvas positions, all metadata |
+| **DSL** | `.txt` | Input to `codegen` binary | Structure only — no canvas layout |
+| **Fortran** | `.f90` | Output from `codegen` | Export only — cannot be re-imported |
 
 ---
 
@@ -332,12 +332,12 @@ They can also be edited via the REST API at `/docs` (Swagger UI).
 
 This walkthrough creates a simplified Automatic Voltage Regulator (AVR) as an EXC model.
 
-### Step 1 - Set up the model
+### Step 1 — Set up the model
 
 1. Select **EXC** from the Type dropdown
 2. Type `simple_avr` in the Name field
 
-### Step 2 - Add data constants
+### Step 2 — Add data constants
 
 Switch to the **%data** tab and add rows:
 
@@ -347,14 +347,14 @@ Switch to the **%data** tab and add rows:
 | `TA` | | AVR time constant |
 | `VREF` | | Reference voltage |
 
-### Step 3 - Place blocks
+### Step 3 — Place blocks
 
 Drag the following blocks from the palette onto the canvas:
 
-1. `algeq` - to compute the voltage error
-2. `tf1p` - a first-order transfer function for the AVR
+1. `algeq` — to compute the voltage error
+2. `tf1p` — a first-order transfer function for the AVR
 
-### Step 4 - Connect and configure
+### Step 4 — Connect and configure
 
 1. Connect the `algeq` output to the `tf1p` input
 2. Select the `algeq` block and set its **Expression** to `{VREF}-[v]-avr1`
@@ -362,7 +362,7 @@ Drag the following blocks from the palette onto the canvas:
    - Rename its output signal to `vf` (this is the mandatory EXC output)
    - Set **K** to `{KA}` and **T** to `{TA}`
 
-### Step 5 - Define states
+### Step 5 — Define states
 
 Switch to the **%states** tab and add:
 
@@ -370,13 +370,13 @@ Switch to the **%states** tab and add:
 |------|------|---------|
 | `avr1` | `vf/{KA}` | AVR integrator state |
 
-### Step 6 - Add observables
+### Step 6 — Add observables
 
 Switch to the **%observables** tab and add `vf`.
 
-### Step 7 - Export
+### Step 7 — Export
 
-1. Click **"Export DSL"** - validation passes because `vf` is produced by the `tf1p` block
+1. Click **"Export DSL"** — validation passes because `vf` is produced by the `tf1p` block
 2. The downloaded `simple_avr.txt` is ready for `codegen -tsimple_avr.txt`
 3. Or click **"Run Codegen"** to generate `exc_simple_avr.f90` directly
 
@@ -384,6 +384,6 @@ Switch to the **%observables** tab and add `vf`.
 
 ## See Also
 
-- [User-Defined Models](/developer/user-models/) - DSL file format and model framework
-- [CODEGEN Blocks Library](/developer/codegen-library/) - complete block reference
-- [CODEGEN Model Examples](/developer/codegen-examples/) - annotated model files for all four types
+- [User-Defined Models](/developer/user-models/) — DSL file format and model framework
+- [CODEGEN Blocks Library](/developer/codegen-library/) — complete block reference
+- [CODEGEN Model Examples](/developer/codegen-examples/) — annotated model files for all four types

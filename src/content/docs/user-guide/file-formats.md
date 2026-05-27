@@ -59,7 +59,7 @@ All of the above represent the same number.
 There are three ways to insert comments:
 
 1. **Exclamation mark** (`!`): A line whose first non-blank character is `!` is memorized and reproduced on output (up to 130 characters after the `!`)
-2. **Sharp** (`#`): A line whose first non-blank character is `#` is completely ignored - useful for field labels
+2. **Sharp** (`#`): A line whose first non-blank character is `#` is completely ignored — useful for field labels
 3. **After semicolon**: Anything after the `;` terminator is ignored
 
 ```
@@ -86,5 +86,5 @@ These files can be listed in any order in the command file. The second and third
 
 ## Next Steps
 
-- [Network Modeling](/user-guide/network/) - Define buses, lines, transformers, and shunts
-- [Power Flow (PFC)](/user-guide/pfc/) - Set up and run power flow computations
+- [Network Modeling](/user-guide/network/) — Define buses, lines, transformers, and shunts
+- [Power Flow (PFC)](/user-guide/pfc/) — Set up and run power flow computations

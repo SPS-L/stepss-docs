@@ -93,9 +93,9 @@ $$
 | Parameter | Description |
 |-----------|-------------|
 | `SWM` | Input switch: 0 = mechanical torque ($T_m$), 1 = electrical power ($P$) |
-| `T1` | Governor time constant - lead numerator (s) |
-| `T2` | Governor time constant - lag denominator (s) |
-| `T3` | Governor time constant - second-order denominator (s) |
+| `T1` | Governor time constant — lead numerator (s) |
+| `T2` | Governor time constant — lag denominator (s) |
+| `T3` | Governor time constant — second-order denominator (s) |
 | `K` | Actuator gain |
 | `T4` | Actuator lead time constant (s) |
 | `T5` | First-order actuator lag (s) |
@@ -179,8 +179,8 @@ $$
 | `T1` | Governor/valve time constant (s) |
 | `VMIN` | Minimum valve position / lower output limit (pu) |
 | `VMAX` | Maximum valve position / upper output limit (pu) |
-| `T2` | Turbine lead time constant - zero (s) |
-| `T3` | Turbine lag time constant - pole (s) |
+| `T2` | Turbine lead time constant — zero (s) |
+| `T3` | Turbine lag time constant — pole (s) |
 
 **Internal parameter:** `C = Tm · R` (initialised from the load-flow mechanical torque)
 
@@ -311,7 +311,7 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   400. 360. 6. 0. 2.05
 
 ## TGOV1 (`tor_TGOV1D`)
 
-The data-file model name is `TGOV1` (or `tor_TGOV1` - the `tor_` prefix is added automatically). Although this model is internally known as `tor_TGOV1D`, the name registered for use in data files is `TGOV1` (without the `D`).
+The data-file model name is `TGOV1` (or `tor_TGOV1` — the `tor_` prefix is added automatically). Although this model is internally known as `tor_TGOV1D`, the name registered for use in data files is `TGOV1` (without the `D`).
 
 ### Scientific Description
 
@@ -357,8 +357,8 @@ $$
 | `T1` | Steam chest / valve actuator time constant (s) |
 | `VMAX` | Maximum valve position (pu) |
 | `VMIN` | Minimum valve position (pu) |
-| `T2` | Lead time constant - reheater zero (s) |
-| `T3` | Lag time constant - reheater pole (s) |
+| `T2` | Lead time constant — reheater zero (s) |
+| `T3` | Lag time constant — reheater pole (s) |
 | `Dt` | Turbine damping coefficient (pu torque / pu speed deviation) |
 
 **Internal parameter:** `C = Tm · R` (initialised from load-flow mechanical torque)
@@ -376,8 +376,8 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   400. 360. 6. 0. 2.05
                           0.50   ! T1: steam chest/valve actuator time constant (s)
                           1.05   ! VMAX: maximum valve position (pu)
                           0.0    ! VMIN: minimum valve position (pu)
-                          2.10   ! T2: lead time constant - reheater zero (s)
-                          7.00   ! T3: lag time constant - reheater pole (s)
+                          2.10   ! T2: lead time constant — reheater zero (s)
+                          7.00   ! T3: lag time constant — reheater pole (s)
                           0.0  ; ! Dt: turbine damping coefficient
 ```
 </TabItem>
@@ -393,7 +393,7 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   400. 360. 6. 0. 2.05
 
 ## HYGOV (`tor_hygov`)
 
-The data-file model name is `HYGOV` (or `tor_HYGOV` - the `tor_` prefix is added automatically).
+The data-file model name is `HYGOV` (or `tor_HYGOV` — the `tor_` prefix is added automatically).
 
 ### Scientific Description
 

@@ -1,6 +1,6 @@
 ---
 title: Synchronous Machine Model
-description: Mathematical model of the synchronous machine in RAMSES - flux-current relationships, saturation, Park equations, and per unit system
+description: Mathematical model of the synchronous machine in RAMSES — flux-current relationships, saturation, Park equations, and per unit system
 ---
 
 This page documents the mathematical model of the synchronous machine implemented in RAMSES. The model uses the Equal-Mutual-Flux-Linkage (EMFL) per unit system and supports detailed (round rotor, salient pole) and simplified (no damper) configurations through model switches.
@@ -238,10 +238,10 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
 
 | Parameter | Description | Unit |
 |-----------|-------------|------|
-| `name` | Machine name (max 8 characters) | - |
-| `bus` | Connection bus name (max 8 characters) | - |
-| `FP` | Active power participation fraction (0–1) | - |
-| `FQ` | Reactive power participation fraction (0–1) | - |
+| `name` | Machine name (max 8 characters) | — |
+| `bus` | Connection bus name (max 8 characters) | — |
+| `FP` | Active power participation fraction (0–1) | — |
+| `FQ` | Reactive power participation fraction (0–1) | — |
 | `P` | Initial active power (used when FP = 0) | MW |
 | `Q` | Initial reactive power (used when FQ = 0) | Mvar |
 | `SNOM` | Nominal apparent power | MVA |
@@ -249,7 +249,7 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
 | `H` | Inertia constant | s |
 | `D` | Damping coefficient | pu |
 | `IBRATIO` | Field current base ratio $I_{fB}^{mac}/I_{fB}^{exc}$ (see above) | pu |
-| `XT/RL` | Keyword: `XT` for step-up transformer reactance, `RL` for line resistance | - |
+| `XT/RL` | Keyword: `XT` for step-up transformer reactance, `RL` for line resistance | — |
 | Value after XT/RL | Step-up transformer reactance or line resistance | pu |
 | `Xl` | Leakage reactance $L_\ell$ | pu |
 | `Xd` | d-axis synchronous reactance | pu |
@@ -258,8 +258,8 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
 | `Xq` | q-axis synchronous reactance | pu |
 | `X'q` | q-axis transient reactance (use `*` to set equal to `X'd`) | pu |
 | `X"q` | q-axis subtransient reactance (use `*` to set equal to `X"d`) | pu |
-| `m` | Saturation coefficient (use `*` for default) | - |
-| `n` | Saturation exponent (use `*` for default) | - |
+| `m` | Saturation coefficient (use `*` for default) | — |
+| `n` | Saturation exponent (use `*` for default) | — |
 | `Ra` | Armature resistance | pu |
 | `T'do` | d-axis open-circuit transient time constant | s |
 | `T"do` | d-axis open-circuit subtransient time constant | s |

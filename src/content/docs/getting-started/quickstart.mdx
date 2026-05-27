@@ -11,7 +11,7 @@ STEPSS provides three ways to run simulations:
 |-----------|:-------------------------:|:----------------------:|:-------:|
 | **Command Line** | `ramses -t cmd.txt` | `pfc -t cmd.txt` | `codegen model.txt` |
 | **GUI (Java)** | Via STEPSS GUI | Via STEPSS GUI | Via STEPSS GUI |
-| **Python** | Via PyRAMSES | - | - |
+| **Python** | Via PyRAMSES | — | — |
 
 ---
 
@@ -62,7 +62,7 @@ Dump discrete simulation trace in file [press enter to skip] :
    ```
 
    The command file contains, in order:
-   - **Data files** (one or more, space- or newline-separated) - read until a blank line
+   - **Data files** (one or more, space- or newline-separated) — read until a blank line
    - **Initialization dump file** (blank line to skip)
    - **Disturbance file** (required)
    - **Trajectory file** (blank line to skip)
@@ -165,7 +165,7 @@ pfc.exe [-t command_file] [-o output_file] [-c trigger_file] [-v verbosity]
 |------|-------------|
 | `-t command_file` | Read inputs from a command file (non-interactive mode) |
 | `-o output_file` | Redirect output to a file instead of the console |
-| `-c trigger_file` | Cycle mode - wait for trigger file to start/proceed |
+| `-c trigger_file` | Cycle mode — wait for trigger file to start/proceed |
 | `-v N` | Verbosity level (0 = silent, 1 = normal) |
 
 **Interactive mode** (no `-t` flag): PFC prompts for data files, then presents a command menu.
@@ -247,8 +247,8 @@ For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/s
 
 ## Next Steps
 
-- [File Formats](/user-guide/file-formats/) - Learn about data file syntax
-- [Network Modeling](/user-guide/network/) - Define your power system network
-- [Power Flow (PFC)](/user-guide/pfc/) - PFC data and control parameters
-- [Dynamic Models](/user-guide/dynamic-models/) - Add generators, loads, and controllers
-- [PyRAMSES API](/pyramses/api-reference/) - Full Python API documentation
+- [File Formats](/user-guide/file-formats/) — Learn about data file syntax
+- [Network Modeling](/user-guide/network/) — Define your power system network
+- [Power Flow (PFC)](/user-guide/pfc/) — PFC data and control parameters
+- [Dynamic Models](/user-guide/dynamic-models/) — Add generators, loads, and controllers
+- [PyRAMSES API](/pyramses/api-reference/) — Full Python API documentation
