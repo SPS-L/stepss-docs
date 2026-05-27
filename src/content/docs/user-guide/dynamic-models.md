@@ -54,11 +54,11 @@ Uppercase short names take no prefix; the prefixed names accept either `inj_` or
 
 | Data-file name | Equivalent | Description |
 |----------------|-----------|-------------|
-| `LOAD` | — | Generic exponential-recovery load |
-| `RESTLD` | — | Restorative load |
-| `INDMACH1`, `INDMACH2` | — | Single-cage / double-cage induction machines |
-| `SVC_GENERIC1` | — | Generic SVC model |
-| `THEVEQ` | — | Thévenin equivalent (infinite bus) |
+| `LOAD` | | Generic exponential-recovery load |
+| `RESTLD` | | Restorative load |
+| `INDMACH1`, `INDMACH2` | | Single-cage / double-cage induction machines |
+| `SVC_GENERIC1` | | Generic SVC model |
+| `THEVEQ` | | Thévenin equivalent (infinite bus) |
 | `PQ` | `inj_PQ` | Constant PQ load |
 | `IBG` | `inj_IBG` | Generic inverter-based generator |
 | `WT3` | `inj_WT3` | Type 3 wind turbine |
@@ -81,7 +81,7 @@ A Thévenin equivalent imposes a constant-frequency voltage source and forces th
 
 | Parameter | Description | Unit |
 |-----------|-------------|------|
-| `FP`, `FQ` | Fractions of bus injection (active, reactive) | — |
+| `FP`, `FQ` | Fractions of bus injection (active, reactive) | |
 | `P`, `Q` | Initial powers (used if fractions are zero) | pu |
 | `MVA` | Apparent power base used for per-unit values of the Thévenin equivalent | MVA |
 
@@ -97,7 +97,7 @@ Constant-impedance loads maintain the power factor at the initial voltage.
 
 | Parameter | Description | Unit |
 |-----------|-------------|------|
-| `FP`, `FQ` | Fractions of bus injection (active, reactive) | — |
+| `FP`, `FQ` | Fractions of bus injection (active, reactive) | |
 | `P`, `Q` | Initial powers (used if fractions are zero) | pu |
 
 The FP, FQ, P, Q fields are power participation fractions and initial power values used during initialization. See [Reference Frames & Initialization](/user-guide/reference-frames/) for detailed explanation.
@@ -128,7 +128,7 @@ User-defined two-port models use a `TWOP` record:
 TWOP MODEL_NAME TWOP_NAME BUS1 BUS2 IND FP1 FQ1 P1 Q1 FP2 FQ2 P2 Q2 DATA1 DATA2 ... ;
 ```
 
-For details on each field, see [User-Defined Models — TWOP Record](/developer/user-models/#twop-record-user-defined-two-ports).
+For details on each field, see [User-Defined Models, TWOP Record](/developer/user-models/#twop-record-user-defined-two-ports).
 
 ## Discrete Controllers
 
@@ -196,6 +196,6 @@ DCTL SIM_MINMAXSPEED CTRL_Name MAX_SPEED(pu) MIN_SPEED(pu) DEADTIME(s) Stop_Simu
 
 ## Next Steps
 
-- [Disturbances](/user-guide/disturbances/) — Define faults, trips, and parameter changes
-- [Solver Settings](/user-guide/solver-settings/) — Configure the numerical solver
-- [Model Reference](/models/ieee-exciters/) — Browse available exciter, governor, and injector models
+- [Disturbances](/user-guide/disturbances/), Define faults, trips, and parameter changes
+- [Solver Settings](/user-guide/solver-settings/), Configure the numerical solver
+- [Model Reference](/models/ieee-exciters/), Browse available exciter, governor, and injector models

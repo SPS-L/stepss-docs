@@ -20,9 +20,9 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
 Recognised governor model names (case-sensitive):
 
 - **Uppercase short names** (no prefix): `CONSTANT`, `1ST_ORDER`, `HYDRO_GENERIC1`, `THERMAL_GENERIC1`.
-- **Prefixed names** — RAMSES adds the `tor_` prefix automatically, so you can write either form: `ENTSOE_simp`/`tor_ENTSOE_simp`, `HYGOV`/`tor_HYGOV`, `GAST`/`tor_GAST`, `TGOV1`/`tor_TGOV1`, `DEGOV1`/`tor_DEGOV1`.
+- **Prefixed names**: RAMSES adds the `tor_` prefix automatically, so you can write either form: `ENTSOE_simp`/`tor_ENTSOE_simp`, `HYGOV`/`tor_HYGOV`, `GAST`/`tor_GAST`, `TGOV1`/`tor_TGOV1`, `DEGOV1`/`tor_DEGOV1`.
 
-All of the above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). Additional variants documented below but not in this list (`tor_gasturbm`, `tor_govclasm`, `tor_govhydr`, `tor_govnuc`) are not callable out of the box — they can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
+All of the above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). Additional variants documented below but not in this list (`tor_gasturbm`, `tor_govclasm`, `tor_govhydr`, `tor_govnuc`) are not callable out of the box. They can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
 :::
 
 ---
@@ -77,7 +77,7 @@ SYNC_MACH g6  g6  1. 1.  0.  0.   400. 360. 6. 0. 2.05
 <TabItem label="Notes">
 - Useful for machines operating at fixed setpoint, for testing generator models in isolation, or as a placeholder.
 - The mechanical power observable $P_m = T_m \cdot \omega$ will vary slightly with speed changes.
-- `TOR CONSTANT` takes no parameters — $T_{m0}$ is set automatically from the load-flow initialisation.
+- `TOR CONSTANT` takes no parameters, $T_{m0}$ is set automatically from the load-flow initialisation.
 </TabItem>
 </Tabs>
 
@@ -209,7 +209,7 @@ $$
 | `sigma` | 1 | Speed droop (pu/pu) |
 | `Tmes` | 2 | Speed measurement time constant (s) |
 | `Tsm` | 3 | Servo/gate time constant (s) |
-| `zdotmin` | 4 | Minimum gate rate (pu/s) — also additional parameter |
+| `zdotmin` | 4 | Minimum gate rate (pu/s), also additional parameter |
 | `zdotmax` | 5 | Maximum gate rate (pu/s) |
 | `zmin` | 6 | Minimum gate opening (pu) |
 | `zmax` | 7 | Maximum gate opening (pu) |

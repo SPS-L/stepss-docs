@@ -5,14 +5,14 @@ description: Academic publications and suggested reading
 
 ## Core RAMSES / STEPSS Publications
 
-1. P. Aristidou, D. Fabozzi, and T. Van Cutsem, "Dynamic simulation of large-scale power systems using a parallel Schur-complement-based decomposition method," *IEEE Transactions on Parallel and Distributed Systems*, vol. 25, no. 10, pp. 2561–2570, Oct. 2014. doi: [10.1109/TPDS.2013.252](https://doi.org/10.1109/TPDS.2013.252)
+1. P. Aristidou, D. Fabozzi, and T. Van Cutsem, "Dynamic simulation of large-scale power systems using a parallel Schur-complement-based decomposition method," *IEEE Transactions on Parallel and Distributed Systems*, vol. 25, no. 10, pp. 2561–2570, Oct. 2014. Doi: [10.1109/TPDS.2013.252](https://doi.org/10.1109/TPDS.2013.252)
 
-2. P. Aristidou, S. Lebeau, and T. Van Cutsem, "Power system dynamic simulations using a parallel two-level Schur-complement decomposition," *IEEE Transactions on Power Systems*, vol. 31, no. 5, pp. 3984–3995, Sept. 2016. doi: [10.1109/TPWRS.2015.2509023](https://doi.org/10.1109/TPWRS.2015.2509023)
+2. P. Aristidou, S. Lebeau, and T. Van Cutsem, "Power system dynamic simulations using a parallel two-level Schur-complement decomposition," *IEEE Transactions on Power Systems*, vol. 31, no. 5, pp. 3984–3995, Sept. 2016. Doi: [10.1109/TPWRS.2015.2509023](https://doi.org/10.1109/TPWRS.2015.2509023)
 
-3. D. Fabozzi, A. Chieh, B. Haut, and T. Van Cutsem, "Accelerated and localized Newton schemes for faster dynamic simulation of large power systems," *IEEE Transactions on Power Systems*, vol. 28, no. 4, pp. 4936–4947, Dec. 2013. doi: [10.1109/TPWRS.2013.2251915](https://doi.org/10.1109/TPWRS.2013.2251915)
+3. D. Fabozzi, A. Chieh, B. Haut, and T. Van Cutsem, "Accelerated and localized Newton schemes for faster dynamic simulation of large power systems," *IEEE Transactions on Power Systems*, vol. 28, no. 4, pp. 4936–4947, Dec. 2013. Doi: [10.1109/TPWRS.2013.2251915](https://doi.org/10.1109/TPWRS.2013.2251915)
 
 
-5. P. Aristidou and T. Van Cutsem, "A parallel processing approach to dynamic simulations of combined transmission and distribution systems," *International Journal of Electrical Power & Energy Systems*, vol. 72, pp. 58–65, Nov. 2015. doi: [10.1016/j.ijepes.2015.02.011](https://doi.org/10.1016/j.ijepes.2015.02.011)
+5. P. Aristidou and T. Van Cutsem, "A parallel processing approach to dynamic simulations of combined transmission and distribution systems," *International Journal of Electrical Power & Energy Systems*, vol. 72, pp. 58–65, Nov. 2015. Doi: [10.1016/j.ijepes.2015.02.011](https://doi.org/10.1016/j.ijepes.2015.02.011)
 
 ## Reference Frame and Solver
 
@@ -20,11 +20,11 @@ description: Academic publications and suggested reading
 
 ## Project Pages
 
-- [STEPSS — SPS-Lab](https://sps-lab.org/project/stepss/) — Main project page with overview and downloads
-- [PyRAMSES — SPS-Lab](https://sps-lab.org/project/pyramses/) — Python interface project page
-- [Thierry Van Cutsem — Software](https://thierryvancutsem.github.io/home/software.html) — Co-author's software page
+- [STEPSS, SPS-Lab](https://sps-lab.org/project/stepss/), Main project page with overview and downloads
+- [PyRAMSES, SPS-Lab](https://sps-lab.org/project/pyramses/), Python interface project page
+- [Thierry Van Cutsem, Software](https://thierryvancutsem.github.io/home/software.html), Co-author's software page
 
 ## External Resources
 
-- [PyRAMSES Documentation](/pyramses/overview/) — API reference and examples
-- [Sustainable Power Systems Lab](https://sps-lab.org/) — Research group homepage
+- [PyRAMSES Documentation](/pyramses/overview/), API reference and examples
+- [Sustainable Power Systems Lab](https://sps-lab.org/), Research group homepage

@@ -18,16 +18,16 @@ time(s) CONTINUE SOLVER disc_meth max_h(s) min_h(s) latency(pu) upd_over
 ```
 
 **Discretization method** (`disc_meth`):
-- `TR` — Trapezoidal
-- `BE` — Backward Euler
-- `BD` — BDF2
+- `TR`: Trapezoidal
+- `BE`: Backward Euler
+- `BD`: BDF2
 
 **Jacobian update override** (`upd_over`):
-- `ALL` — Update all injectors and network
-- `NET` — Update only network
-- `ABL` — Update only injectors
-- `IBL` — Update all injectors and network
-- `NOT` — Do not override
+- `ALL`: Update all injectors and network
+- `NET`: Update only network
+- `ABL`: Update only injectors
+- `IBL`: Update all injectors and network
+- `NOT`: Do not override
 
 **Example**:
 ```
@@ -55,7 +55,7 @@ Open or close breakers of a line:
 time(s) BREAKER BRANCH name_of_line orig_break(0/1) extrem_break(0/1)
 ```
 
-**Example** — opening both ends of a line at $t = 10$ s:
+**Example**, opening both ends of a line at $t = 10$ s:
 ```
 10.000 BREAKER BRANCH 1044-4032 0 0
 ```
@@ -76,7 +76,7 @@ time(s) BREAKER INJ name_of_injector breaker(0/1)
 
 ## Three-Phase Short-Circuit (Impedance)
 
-Apply a three-phase fault with specified impedance to ground. This requires two commands — one to apply the fault and one to clear it.
+Apply a three-phase fault with specified impedance to ground. This requires two commands, one to apply the fault and one to clear it.
 
 ```
 time(s) FAULT BUS name_of_bus rfault [xfault]
@@ -87,7 +87,7 @@ The fault has an impedance of `rfault + j*xfault` to ground:
 - `rfault` and `xfault` are in Ω
 - If `xfault` is omitted, a fully resistive fault is assumed
 
-**Example** — 100 ms bolted fault:
+**Example**, 100 ms bolted fault:
 ```
 10.000 FAULT BUS 1044 0. 0.
 10.100 CLEAR BUS 1044
@@ -102,7 +102,7 @@ time(s) VFAULT BUS name_of_bus Voltage_after_fault(pu)
 time(s) CLEAR BUS name_of_bus
 ```
 
-**Example** — 100 ms fault with 0.5 pu residual voltage:
+**Example**, 100 ms fault with 0.5 pu residual voltage:
 ```
 10.000 VFAULT BUS 1044 0.5
 10.100 CLEAR BUS 1044
@@ -140,7 +140,7 @@ time(s) CHGPRM EXC name_of_equipment name_of_parameter ±increment [MVAr/%] dura
 
 **Duration**: `0` = step change, `> 0` = ramp over given duration.
 
-**Example** — ramp voltage setpoint by +10% over 10 seconds:
+**Example**, ramp voltage setpoint by +10% over 10 seconds:
 ```
 10.000 CHGPRM EXC g1 V0 +10 % 10
 ```
@@ -157,7 +157,7 @@ time(s) CHGPRM TOR name_of_equipment name_of_parameter ±increment [MW/%] durati
 
 **Duration**: `0` = step change, `> 0` = ramp over given duration.
 
-**Example** — ramp active power setpoint by +1 MW over 10 seconds:
+**Example**, ramp active power setpoint by +1 MW over 10 seconds:
 ```
 10.000 CHGPRM TOR g1 P0 +1 MW 10
 ```
@@ -174,7 +174,7 @@ time(s) CHGPRM INJ/TWOP/DCTL name_of_equipment name_of_parameter ±increment [MW
 
 **Duration**: `0` = step change, `> 0` = ramp over given duration.
 
-**Example** — load increase of 50% active and 30% reactive over 60 seconds:
+**Example**, load increase of 50% active and 30% reactive over 60 seconds:
 ```
 10.000 CHGPRM INJ L_11 P0 +50 % 60
 10.000 CHGPRM INJ L_11 Q0 +30 % 60
@@ -204,5 +204,5 @@ time(s) LFRESV 'name_of_filename'
 
 ## Next Steps
 
-- [Solver Settings](/user-guide/solver-settings/) — Configure time steps, tolerances, and parallelism
-- [PyRAMSES Examples](/pyramses/examples/) — See complete simulation workflows in Python
+- [Solver Settings](/user-guide/solver-settings/), Configure time steps, tolerances, and parallelism
+- [PyRAMSES Examples](/pyramses/examples/). See complete simulation workflows in Python

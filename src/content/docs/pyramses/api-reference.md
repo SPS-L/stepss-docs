@@ -1,9 +1,9 @@
 ---
 title: API Reference
-description: PyRAMSES Python API — complete reference for pyramses.cfg, pyramses.sim, and pyramses.extractor
+description: PyRAMSES Python API, complete reference for pyramses.cfg, pyramses.sim, and pyramses.extractor
 ---
 
-## `pyramses.cfg` — Test Case Configuration
+## `pyramses.cfg`: Test Case Configuration
 
 The `pyramses.cfg` class defines a simulation scenario: data files, disturbance file, output files, observables, and runtime options.
 
@@ -266,19 +266,19 @@ Runtime observables are displayed live during simulation using Gnuplot.
 
 Add a runtime observable. The following observable types are supported:
 
-**`BV BUSNAME`** — Voltage magnitude of a bus:
+**`BV BUSNAME`**, Voltage magnitude of a bus:
 
 ```python
 case.addRunObs('BV 1041')
 ```
 
-**`MS MACHINE_NAME`** — Rotor speed of a synchronous machine:
+**`MS MACHINE_NAME`**, Rotor speed of a synchronous machine:
 
 ```python
 case.addRunObs('MS g1')
 ```
 
-**`BPE / BQE / BPO / BQO BRANCH_NAME`** — Active (P) or reactive (Q) power at the origin (O) or extremity (E) of a branch:
+**`BPE / BQE / BPO / BQO BRANCH_NAME`**, Active (P) or reactive (Q) power at the origin (O) or extremity (E) of a branch:
 
 ```python
 case.addRunObs('BPE 1041-01')   # active power at origin of branch 1041-01
@@ -287,19 +287,19 @@ case.addRunObs('BPO 1041-01')   # active power at extremity
 case.addRunObs('BQO 1041-01')   # reactive power at extremity
 ```
 
-**`ON INJECTOR_NAME OBSERVABLE_NAME`** — Named observable from an injector model:
+**`ON INJECTOR_NAME OBSERVABLE_NAME`**, Named observable from an injector model:
 
 ```python
 case.addRunObs('ON WT1a Pw')    # observable Pw from injector WT1a
 ```
 
-**`TO TORQUE_NAME OBSERVABLE_NAME`** — Named observable from a governor/torque model:
+**`TO TORQUE_NAME OBSERVABLE_NAME`**, Named observable from a governor/torque model:
 
 ```python
 case.addRunObs('TO g1 Pm')      # mechanical power from governor of g1
 ```
 
-**`RT RT`** — Real-time versus simulated-time plot (useful to gauge simulation speed):
+**`RT RT`**, Real-time versus simulated-time plot (useful to gauge simulation speed):
 
 ```python
 case.addRunObs('RT RT')
@@ -319,7 +319,7 @@ Gnuplot must be installed and available in the system PATH for runtime observabl
 
 ---
 
-## `pyramses.sim` — Simulation Control
+## `pyramses.sim`: Simulation Control
 
 The `pyramses.sim` class runs simulations. It wraps the RAMSES dynamic library and supports start/pause/continue, runtime queries, and disturbance injection.
 
@@ -344,13 +344,13 @@ ram = pyramses.sim(custLibDir='/path/to/')  # use custom library directory
 
 A properly configured `pyramses.cfg` test case is required before running a simulation.
 
-#### `execSim(case)` — run to completion
+#### `execSim(case)`: run to completion
 
 ```python
 ram.execSim(case)
 ```
 
-#### `execSim(case, t)` — start and pause at time t
+#### `execSim(case, t)`: start and pause at time t
 
 Start the simulation and pause at a specific time (in seconds):
 
@@ -358,7 +358,7 @@ Start the simulation and pause at a specific time (in seconds):
 ram.execSim(case, 10.0)    # start and pause at t = 10 s
 ```
 
-#### `contSim(t)` — continue to time t
+#### `contSim(t)`: continue to time t
 
 Resume a paused simulation until a specified time:
 
@@ -368,7 +368,7 @@ ram.contSim(ram.getSimTime() + 60.0)  # advance by 60 s from current time
 ram.contSim(ram.getInfTime())         # run to the end of the time horizon
 ```
 
-#### `endSim()` — terminate early
+#### `endSim()`: terminate early
 
 Terminate the simulation before reaching the time horizon:
 
@@ -523,7 +523,7 @@ Set `$OMEGA_REF SYN ;` in the solver settings data file when exporting the Jacob
 
 ---
 
-## `pyramses.extractor` — Result Extraction
+## `pyramses.extractor`: Result Extraction
 
 The `pyramses.extractor` class extracts and visualises time-series results from a trajectory file produced during simulation.
 
@@ -818,5 +818,5 @@ pyramses.curplot([
 
 ## Next Steps
 
-- [Examples](/pyramses/examples/) — Practical simulation examples and workflows
-- [Test Systems](/test-systems/nordic/) — Ready-to-run benchmark systems
+- [Examples](/pyramses/examples/), Practical simulation examples and workflows
+- [Test Systems](/test-systems/nordic/), Ready-to-run benchmark systems

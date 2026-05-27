@@ -71,10 +71,10 @@ ssa('jac_val.dat', 'jac_eqs.dat', 'jac_var.dat', 'jac_struc.dat', ...
 
 | Parameter | Description | Default |
 |-----------|-------------|---------|
-| `jac_val.dat` | Matrix values in coordinate format | — |
-| `jac_eqs.dat` | Equation descriptions (differential/algebraic) | — |
-| `jac_var.dat` | Variable descriptions (differential/algebraic) | — |
-| `jac_struc.dat` | Decomposed power system structure (optional) | — |
+| `jac_val.dat` | Matrix values in coordinate format | |
+| `jac_eqs.dat` | Equation descriptions (differential/algebraic) | |
+| `jac_var.dat` | Variable descriptions (differential/algebraic) | |
+| `jac_struc.dat` | Decomposed power system structure (optional) | |
 | `real_limit` | Real part threshold for dominant eigenvalues | $-\infty$ |
 | `damp_ratio` | Damping ratio threshold | 1.0 |
 | `method` | Analysis method: `'QZ'` or `'ARP'` | `'QZ'` |

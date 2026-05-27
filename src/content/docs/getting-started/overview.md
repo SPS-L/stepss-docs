@@ -36,7 +36,7 @@ The power flow computation uses the Newton-Raphson method in polar coordinates. 
 
 - Network data (buses, lines, transformers, etc.)
 - Power flow data specified at PV, PQ, and slack buses
-- PFC control parameters (tolerances, reactive power limits, etc.) — optional, defaults are used if not provided
+- PFC control parameters (tolerances, reactive power limits, etc.), optional, defaults are used if not provided
 
 PFC can optionally adjust transformer ratios to:
 - Bring voltage magnitudes inside specified deadbands (in-phase transformers)
@@ -67,7 +67,7 @@ All three methods are implicit, ensuring numerical robustness. BDF2 is an $L_1$-
 
 ### Solver Acceleration
 
-The solver was developed in response to the growing demand for simulations that last longer (e.g. long-term stability studies) or involve larger models (e.g. to account for the impact of active distribution networks).
+The solver was developed in response to the growing demand for simulations that last longer (e.g. Long-term stability studies) or involve larger models (e.g. To account for the impact of active distribution networks).
 
 The solver achieves high computational efficiency through two techniques:
 
@@ -87,8 +87,8 @@ A fast-to-compute metric is used to classify injectors, which seamlessly switch 
 
 ### Key References
 
-- D. Fabozzi, A. Chieh, B. Haut, and T. Van Cutsem, "Accelerated and localized Newton schemes for faster dynamic simulation of large power systems," *IEEE Trans. on Power Systems*, Vol. 28, No. 4, pp. 4936-4947, Dec. 2013. doi: [10.1109/TPWRS.2013.2251915](https://doi.org/10.1109/TPWRS.2013.2251915)
-- P. Aristidou, D. Fabozzi, and T. Van Cutsem, "Dynamic simulation of large-scale power systems using a parallel Schur-complement-based decomposition method," *IEEE Trans. on Parallel and Distributed Systems*, Vol. 25, No. 10, pp. 2561-2570, Sept. 2014. doi: [10.1109/TPDS.2013.252](https://doi.org/10.1109/TPDS.2013.252)
+- D. Fabozzi, A. Chieh, B. Haut, and T. Van Cutsem, "Accelerated and localized Newton schemes for faster dynamic simulation of large power systems," *IEEE Trans. On Power Systems*, Vol. 28, No. 4, pp. 4936-4947, Dec. 2013. Doi: [10.1109/TPWRS.2013.2251915](https://doi.org/10.1109/TPWRS.2013.2251915)
+- P. Aristidou, D. Fabozzi, and T. Van Cutsem, "Dynamic simulation of large-scale power systems using a parallel Schur-complement-based decomposition method," *IEEE Trans. On Parallel and Distributed Systems*, Vol. 25, No. 10, pp. 2561-2570, Sept. 2014. Doi: [10.1109/TPDS.2013.252](https://doi.org/10.1109/TPDS.2013.252)
 
 ## CODEGEN Module
 
@@ -101,7 +101,7 @@ Four types of user-defined models are supported:
 - **Injectors** (INJ): components connected to a single AC bus
 - **Two-ports** (TWOP): components connecting two buses
 
-The user model is **compiled, not interpreted** — resulting in efficient number-crunching code. While the solver code is proprietary, the models are designed to be freely shared, making STEPSS an **open-source simulation software** for the modeling part.
+The user model is **compiled, not interpreted**, resulting in efficient number-crunching code. While the solver code is proprietary, the models are designed to be freely shared, making STEPSS an **open-source simulation software** for the modeling part.
 
 ### CODEGEN Studio
 
@@ -115,7 +115,7 @@ STEPSS modules can be run through three interfaces:
 |-----------|:----------------:|:------------:|:-------:|
 | **Command Line** | `ramses -t cmd.txt` | `pfc -t cmd.txt` | `codegen model.txt` |
 | **GUI (Java)** | Full support | Full support | Full support |
-| **Python (PyRAMSES)** | Full support | — | — |
+| **Python (PyRAMSES)** | Full support | | |
 
 See the [Quick Start](/getting-started/quickstart/) for details on each interface.
 
@@ -131,5 +131,5 @@ See the [Quick Start](/getting-started/quickstart/) for details on each interfac
 
 ## Next Steps
 
-- [Installation](/getting-started/installation/) — Set up STEPSS on your system
-- [Quick Start](/getting-started/quickstart/) — Run your first simulation
+- [Installation](/getting-started/installation/), Set up STEPSS on your system
+- [Quick Start](/getting-started/quickstart/), Run your first simulation
