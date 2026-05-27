@@ -7,7 +7,7 @@ CODEGEN provides a library of reusable modeling blocks for constructing user-def
 
 :::note[Syntax Conventions]
 - Block keywords are prefixed with `&` (e.g., `& tf1p`)
-- State names (inputs/outputs) are plain identifiers — do **not** enclose them in brackets
+- State names (inputs/outputs) are plain identifiers - do **not** enclose them in brackets
 - Parameters (data values) are enclosed in braces: `{T}`, `{Kp}`, `{1/{omegac}}`
 - Square brackets `[v]`, `[p]`, `[q]`, `[if]`, `[vf]` denote **system variables** provided by the simulator (bus voltage, active power, reactive power, field current, field voltage)
 
@@ -439,7 +439,7 @@ where $\text{nint}(\cdot)$ returns the nearest integer.
 
 $$z \leftarrow \text{nint}(x_i + c)$$
 
-**Notes — particular cases**
+**Notes - particular cases**
 
 - With $c = 0$: the output is the integer nearest to $x_i$.
 - With $c = -0.5$: the output is the *floor* of $x_i$ (largest integer $\le x_i$).
@@ -713,7 +713,7 @@ else:
 
 **Notes**
 
-At $t = 0$, if $x_D < x_i(0) < x_I$ the initial operating branch is indeterminate — the system could operate on either the $(y_{IA}, y_{DB})$ line ($z = 1$) or the $(y_{DA}, y_{IB})$ line ($z = -1$). The user must therefore supply `z0` to resolve the ambiguity.
+At $t = 0$, if $x_D < x_i(0) < x_I$ the initial operating branch is indeterminate - the system could operate on either the $(y_{IA}, y_{DB})$ line ($z = 1$) or the $(y_{DA}, y_{IB})$ line ($z = -1$). The user must therefore supply `z0` to resolve the ambiguity.
 
 If $x_i(0) < x_D$ then $z$ is initialised to $-1$; if $x_i(0) > x_I$ then $z$ is initialised to $1$, and `z0` is ignored in both cases.
 
@@ -796,7 +796,7 @@ f
 
 **Discrete variables:** none
 
-**Equations, initialization, and notes:** identical to **f\_inj** — refer to that block for the full mathematical description. The only difference is that this block uses the voltage at the first bus of a two-port rather than an injector bus.
+**Equations, initialization, and notes:** identical to **f\_inj** - refer to that block for the full mathematical description. The only difference is that this block uses the voltage at the first bus of a two-port rather than an injector bus.
 
 ---
 
@@ -818,7 +818,7 @@ f
 
 **Discrete variables:** none
 
-**Equations, initialization, and notes:** identical to **f\_inj** — refer to that block for the full mathematical description. The only difference is that this block uses the voltage at the second bus of a two-port rather than an injector bus.
+**Equations, initialization, and notes:** identical to **f\_inj** - refer to that block for the full mathematical description. The only difference is that this block uses the voltage at the second bus of a two-port rather than an injector bus.
 
 ---
 
@@ -865,7 +865,7 @@ boolean expression C5
 
 **Internal states:** none
 
-**Discrete variable:** $z$ — the index of the currently active state
+**Discrete variable:** $z$ - the index of the currently active state
 
 **Syntax rules**
 

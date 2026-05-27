@@ -21,7 +21,7 @@ export default defineConfig({
 					langs: [fortranFreeForm],
 				},
 			},
-			description: 'Static and Transient Electric Power Systems Simulation — Documentation',
+			description: 'Static and Transient Electric Power Systems Simulation - Documentation',
 			logo: {
 				light: './src/assets/icon-light.svg',
 				dark: './src/assets/icon-dark.svg',

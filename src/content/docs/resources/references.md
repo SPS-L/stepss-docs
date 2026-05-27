@@ -20,11 +20,11 @@ description: Academic publications and suggested reading
 
 ## Project Pages
 
-- [STEPSS — SPS-Lab](https://sps-lab.org/project/stepss/) — Main project page with overview and downloads
-- [PyRAMSES — SPS-Lab](https://sps-lab.org/project/pyramses/) — Python interface project page
-- [Thierry Van Cutsem — Software](https://thierryvancutsem.github.io/home/software.html) — Co-author's software page
+- [STEPSS - SPS-Lab](https://sps-lab.org/project/stepss/) - Main project page with overview and downloads
+- [PyRAMSES - SPS-Lab](https://sps-lab.org/project/pyramses/) - Python interface project page
+- [Thierry Van Cutsem - Software](https://thierryvancutsem.github.io/home/software.html) - Co-author's software page
 
 ## External Resources
 
-- [PyRAMSES Documentation](/pyramses/overview/) — API reference and examples
-- [Sustainable Power Systems Lab](https://sps-lab.org/) — Research group homepage
+- [PyRAMSES Documentation](/pyramses/overview/) - API reference and examples
+- [Sustainable Power Systems Lab](https://sps-lab.org/) - Research group homepage

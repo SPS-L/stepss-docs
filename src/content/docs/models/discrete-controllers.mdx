@@ -25,9 +25,9 @@ Where `model_name` is the controller type, `ctl_name` is a unique instance name,
 Recognised discrete-controller model names (case-sensitive):
 
 - **Uppercase short names** (no prefix): `PST`, `LTC`, `LTC2`, `OLTC2`, `LTCINV`, `MAIS`, `UVLS`, `RT`, `UVPROT`, `FRT`, `VOLT_VAR`, `SIM_MINMAXVOLT`, `SIM_MINMAXSPEED`.
-- **Prefixed name** — RAMSES adds the `dctl_` prefix automatically, so both `line_prot` and `dctl_line_prot` resolve to the line-protection model.
+- **Prefixed name** - RAMSES adds the `dctl_` prefix automatically, so both `line_prot` and `dctl_line_prot` resolve to the line-protection model.
 
-All of the above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). `MAIS` is a generic AGC-style integrator that does not have a dedicated documentation section below. Additional variants documented below but not in this list (`dctl_hvdc_lim`, `dctl_injprot`, `dctl_losprot`, and the Hydro-Québec family) are not callable out of the box — they can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
+All of the above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). `MAIS` is a generic AGC-style integrator that does not have a dedicated documentation section below. Additional variants documented below but not in this list (`dctl_hvdc_lim`, `dctl_injprot`, `dctl_losprot`, and the Hydro-Québec family) are not callable out of the box - they can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
 :::
 
 ---
@@ -35,10 +35,10 @@ All of the above are built into every RAMSES distribution (standalone executable
 ## Tap Changers
 
 :::note[TRFO and DCTL LTC]
-The [TRFO record](/user-guide/network/#data-format--combined-model-trfo) combines the transformer model with load tap changer data (tap range, positions, controlled bus, voltage setpoint), but this data is used **only by PFC** for ratio adjustment during power flow computation. To control a transformer's ratio during dynamic simulation with RAMSES, a DCTL LTC controller (below) must be associated with the transformer — whether it was defined with TRANSFO or TRFO.
+The [TRFO record](/user-guide/network/#data-format--combined-model-trfo) combines the transformer model with load tap changer data (tap range, positions, controlled bus, voltage setpoint), but this data is used **only by PFC** for ratio adjustment during power flow computation. To control a transformer's ratio during dynamic simulation with RAMSES, a DCTL LTC controller (below) must be associated with the transformer - whether it was defined with TRANSFO or TRFO.
 :::
 
-### `LTC` (`dctl_ltc`) — Load Tap Changer (Standard)
+### `LTC` (`dctl_ltc`) - Load Tap Changer (Standard)
 
 #### Description
 
@@ -94,7 +94,7 @@ DCTL  LTC  LTC_TR1  TR1-HV-MV  BUS_MV  1  0.85  1.15  33  0.01  30.0  10.0 ;
 
 ---
 
-### `LTC2` (`dctl_ltc2`) — Load Tap Changer (Variant 2)
+### `LTC2` (`dctl_ltc2`) - Load Tap Changer (Variant 2)
 
 #### Description
 
@@ -131,7 +131,7 @@ DCTL  LTC2  LTC2_TR1  TR1-HV-MV  BUS_MV  -1  88.  120.  33  0.01  1.0  30  8 ;
 
 ---
 
-### `LTCINV` (`dctl_ltcinv`) — Inverse-Time Load Tap Changer
+### `LTCINV` (`dctl_ltcinv`) - Inverse-Time Load Tap Changer
 
 #### Description
 
@@ -170,7 +170,7 @@ where $\tau_{max}$ is the maximum delay and `accel` is the acceleration factor (
 | `half_deadband` | `w(7)` | Voltage half-deadband (pu) |
 | `Vset` | `w(8)` | Voltage setpoint (pu) |
 | `delay_max` | `w(9)` | Maximum delay before tap change (s) |
-| `accel` | `w(10)` | Acceleration factor (s) — smaller = faster |
+| `accel` | `w(10)` | Acceleration factor (s) - smaller = faster |
 
 #### Usage Example
 
@@ -180,7 +180,7 @@ DCTL  LTCINV  LTCINV_TR1  TR1-HV-MV  BUS_MV  1  0.85  1.15  33  0.01  1.025  60.
 
 ---
 
-### `OLTC2` (`dctl_oltc2`) — On-Load Tap Changer Type 2
+### `OLTC2` (`dctl_oltc2`) - On-Load Tap Changer Type 2
 
 #### Description
 
@@ -231,7 +231,7 @@ DCTL  OLTC2  OLTC_TR2  FROM_BUS  TO_BUS  1  1  0.88  1.12  25  0.0075
 
 ## Protection
 
-### `UVPROT` (`dctl_uvprot`) — Under-Voltage Protection Relay
+### `UVPROT` (`dctl_uvprot`) - Under-Voltage Protection Relay
 
 #### Description
 
@@ -269,7 +269,7 @@ DCTL  UVPROT  UV_GEN1  BUS_HV  GEN1  0.85  0.5 ;
 
 ---
 
-### `UVLS` (`dctl_uvls`) — Under-Voltage Load Shedding
+### `UVLS` (`dctl_uvls`) - Under-Voltage Load Shedding
 
 #### Description
 
@@ -325,7 +325,7 @@ DCTL  UVLS  UVLS1  BUS_MV  LOAD1  0.90  0.5  5.0  20.0  0.3  2.0  5.0  50.0  5 ;
 
 ---
 
-### `FRT` (`dctl_FRT`) — Fault Ride-Through Controller
+### `FRT` (`dctl_FRT`) - Fault Ride-Through Controller
 
 #### Description
 
@@ -352,13 +352,13 @@ Two internal timers (`w(8)`, `w(9)`) track time spent in violation zones.
 | Field | Working variable | Description |
 |-------|-----------------|-------------|
 | `inj_name` | `w(10)` | Controlled injector |
-| `Val1` | `w(1)` | Voltage threshold 1 (pu) — upper FRT boundary |
+| `Val1` | `w(1)` | Voltage threshold 1 (pu) - upper FRT boundary |
 | `t1` | `w(2)` | Time limit for zone 1 (s) |
 | `Val2` | `w(3)` | Voltage threshold 2 (pu) |
 | `t2` | `w(4)` | Time limit for zone 2 (s) |
 | `Val3` | `w(5)` | Voltage threshold 3 (pu) |
 | `t3` | `w(6)` | Time limit for zone 3 (s) |
-| `Val4` | `w(7)` | Voltage threshold 4 (pu) — below this: trip immediately |
+| `Val4` | `w(7)` | Voltage threshold 4 (pu) - below this: trip immediately |
 
 8 fields required. Field 1 is the injector name, fields 2–8 map to `Val1, t1, Val2, t2, Val3, t3, Val4`.
 
@@ -370,7 +370,7 @@ DCTL  FRT  FRT_WTG1  WT1  0.90  0.15  0.70  0.5  0.20  1.0  0.05 ;
 
 ---
 
-### `dctl_injprot` — Injector Protection
+### `dctl_injprot` - Injector Protection
 
 :::caution
 `dctl_injprot` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
@@ -411,12 +411,12 @@ The controller latches once tripped and cannot reset. State variable `w(7)`:
 #### Usage Example
 
 ```
-DCTL  injprot  PROT_WTG1  WT1  I  0.0  1.2  0.1 ;   ! Not callable in a standard RAMSES distribution — see URAMSES guide
+DCTL  injprot  PROT_WTG1  WT1  I  0.0  1.2  0.1 ;   ! Not callable in a standard RAMSES distribution - see URAMSES guide
 ```
 
 ---
 
-### `dctl_losprot` — Loss-of-Synchronism Protection
+### `dctl_losprot` - Loss-of-Synchronism Protection
 
 :::caution
 `dctl_losprot` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
@@ -450,12 +450,12 @@ The timer resets if the speed returns within bounds. The controller latches perm
 #### Usage Example
 
 ```
-DCTL  losprot  LOS_GEN2  GEN2  1.05  0.2 ;   ! Not callable in a standard RAMSES distribution — see URAMSES guide
+DCTL  losprot  LOS_GEN2  GEN2  1.05  0.2 ;   ! Not callable in a standard RAMSES distribution - see URAMSES guide
 ```
 
 ---
 
-### `line_prot` (`DCTL_line_prot`) — Line Overcurrent Protection
+### `line_prot` (`DCTL_line_prot`) - Line Overcurrent Protection
 
 The data-file model name is `line_prot` (or `dctl_line_prot`). RAMSES adds the `dctl_` prefix automatically.
 
@@ -493,7 +493,7 @@ DCTL  line_prot  LINEPROT1  1.05  2  L1-L2  L3-L4 ;
 
 ---
 
-### `PST` (`dctl_pst`) — Phase-Shifting Transformer Control
+### `PST` (`dctl_pst`) - Phase-Shifting Transformer Control
 
 #### Description
 
@@ -536,7 +536,7 @@ DCTL  PST  PST_L1  PST-TR1  LINE-MON  1  -0.5  0.5  21  0.02  30.0  10.0 ;
 
 ---
 
-### `RT` (`dctl_rt`) — Real-Time Simulation Control
+### `RT` (`dctl_rt`) - Real-Time Simulation Control
 
 #### Description
 
@@ -563,7 +563,7 @@ DCTL  RT  RT_CTL  1.0  0.01 ;
 
 ---
 
-### `dctl_hvdc_lim` — HVDC LCC Limiter/Controller
+### `dctl_hvdc_lim` - HVDC LCC Limiter/Controller
 
 :::caution
 `dctl_hvdc_lim` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
@@ -616,7 +616,7 @@ It interacts directly with the HVDC two-port model's internal parameters.
 #### Usage Example
 
 ```
-DCTL  hvdc_lim  HVDCLIM1  HVDClink     ! Not callable in a standard RAMSES distribution — see URAMSES guide
+DCTL  hvdc_lim  HVDCLIM1  HVDClink     ! Not callable in a standard RAMSES distribution - see URAMSES guide
       0.85  1.15  0.00625
       0.85  1.15  0.00625
       15.0  18.0  15.0  18.0
@@ -629,7 +629,7 @@ DCTL  hvdc_lim  HVDCLIM1  HVDClink     ! Not callable in a standard RAMSES distr
 
 ## Monitoring
 
-### `SIM_MINMAXSPEED` (`dctl_sim_minmaxspeed`) — Speed Monitoring (Min/Max)
+### `SIM_MINMAXSPEED` (`dctl_sim_minmaxspeed`) - Speed Monitoring (Min/Max)
 
 #### Description
 
@@ -667,7 +667,7 @@ DCTL  SIM_MINMAXSPEED  SPEEDMON  1.2  0.5  0.5  1 ;
 
 ---
 
-### `SIM_MINMAXVOLT` (`dctl_sim_minmaxvolt`) — Voltage Monitoring (Min/Max)
+### `SIM_MINMAXVOLT` (`dctl_sim_minmaxvolt`) - Voltage Monitoring (Min/Max)
 
 #### Description
 
@@ -703,7 +703,7 @@ DCTL  SIM_MINMAXVOLT  VOLTMON  1.15  0.80  1.0  0 ;
 
 ---
 
-### `VOLT_VAR` (`dctl_voltage_variability`) — Voltage Variability Monitor
+### `VOLT_VAR` (`dctl_voltage_variability`) - Voltage Variability Monitor
 
 The data-file model name is `VOLT_VAR`.
 

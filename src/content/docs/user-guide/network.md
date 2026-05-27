@@ -46,14 +46,14 @@ LINE NAME BUS1 BUS2 R X WC2 SNOM BR ;
 
 | Field | Description | Unit |
 |-------|-------------|------|
-| `NAME` | Line name (max 20 characters) | — |
-| `BUS1` | First bus name | — |
-| `BUS2` | Second bus name | — |
+| `NAME` | Line name (max 20 characters) | - |
+| `BUS1` | First bus name | - |
+| `BUS2` | Second bus name | - |
 | `R` | Series resistance | Ω |
 | `X` | Series reactance | Ω |
 | `WC2` | Half shunt susceptance $\omega C/2$ | μS |
 | `SNOM` | Nominal apparent power, used to display line loading or in user-defined models (0 = infinite) | MVA |
-| `BR` | Breaker status (0 = open, other = closed) | — |
+| `BR` | Breaker status (0 = open, other = closed) | - |
 
 Line orientation is arbitrary: BUS1 and BUS2 may be swapped. Only one LINE record per line is allowed.
 
@@ -132,7 +132,7 @@ $$
 n = 100 \cdot \frac{V_{o2} \cdot V_{B1}}{V_{o1} \cdot V_{B2}}
 $$
 
-### Data Format — Full Model (TRANSFO)
+### Data Format - Full Model (TRANSFO)
 
 ```
 TRANSFO NAME FROMBUS TOBUS R X B1 B2 N PHI SNOM BR ;
@@ -140,9 +140,9 @@ TRANSFO NAME FROMBUS TOBUS R X B1 B2 N PHI SNOM BR ;
 
 | Field | Description | Unit |
 |-------|-------------|------|
-| `NAME` | Transformer name (max 20 characters) | — |
-| `FROMBUS` | "From" bus name | — |
-| `TOBUS` | "To" bus name | — |
+| `NAME` | Transformer name (max 20 characters) | - |
+| `FROMBUS` | "From" bus name | - |
+| `TOBUS` | "To" bus name | - |
 | `R` | Series resistance | % |
 | `X` | Leakage reactance | % |
 | `B1` | Shunt susceptance (from side) | % |
@@ -150,7 +150,7 @@ TRANSFO NAME FROMBUS TOBUS R X B1 B2 N PHI SNOM BR ;
 | `N` | Transformer ratio magnitude | % |
 | `PHI` | Transformer ratio phase angle | degree |
 | `SNOM` | Nominal apparent power (must not be zero) | MVA |
-| `BR` | Breaker status | — |
+| `BR` | Breaker status | - |
 
 Only one TRANSFO or TRFO record per transformer is allowed.
 
@@ -166,7 +166,7 @@ All transformers are memorized, even those out of service. An out-of-service tra
 To connect a transformer through a single end, add a bus at the open end and set BR to a nonzero value.
 :::
 
-### Data Format — Combined Model (TRFO)
+### Data Format - Combined Model (TRFO)
 
 ```
 TRFO NAME FROMBUS TOBUS CONBUS R X B N SNOM NFIRST NLAST NBPOS TOLV VDES BR ;
@@ -180,10 +180,10 @@ See [PFC Data](/user-guide/pfc/) for details on ratio adjustment.
 
 | Field | Description | Unit |
 |-------|-------------|------|
-| `NAME` | Transformer name (max 20 characters) | — |
-| `FROMBUS` | "From" bus name (max 8 characters) | — |
-| `TOBUS` | "To" bus name (max 8 characters) | — |
-| `CONBUS` | Controlled bus for PFC ratio adjustment (max 8 characters). Not used by RAMSES, but a dummy name must be provided | — |
+| `NAME` | Transformer name (max 20 characters) | - |
+| `FROMBUS` | "From" bus name (max 8 characters) | - |
+| `TOBUS` | "To" bus name (max 8 characters) | - |
+| `CONBUS` | Controlled bus for PFC ratio adjustment (max 8 characters). Not used by RAMSES, but a dummy name must be provided | - |
 | `R` | Series resistance | % |
 | `X` | Leakage reactance | % |
 | `B` | Shunt susceptance (from side; $B_2 = 0$) | % |
@@ -191,10 +191,10 @@ See [PFC Data](/user-guide/pfc/) for details on ratio adjustment.
 | `SNOM` | Nominal apparent power (must not be zero) | MVA |
 | `NFIRST` | Ratio at first tap position (lower bound), used by PFC for ratio adjustment | % |
 | `NLAST` | Ratio at last tap position (upper bound), used by PFC for ratio adjustment | % |
-| `NBPOS` | Number of tap positions (including first and last), used by PFC for ratio adjustment | — |
+| `NBPOS` | Number of tap positions (including first and last), used by PFC for ratio adjustment | - |
 | `TOLV` | Voltage tolerance for tap adjustment, used by PFC | pu |
 | `VDES` | Desired controlled bus voltage, used by PFC | pu |
-| `BR` | Breaker status (0 = open/out of service, other = closed/in service) | — |
+| `BR` | Breaker status (0 = open/out of service, other = closed/in service) | - |
 
 ## Non-Reciprocal Two-Ports
 
@@ -270,10 +270,10 @@ SHUNT NAME BUS_NAME QNOM BR ;
 
 | Field | Description | Unit |
 |-------|-------------|------|
-| `NAME` | Shunt name (max 20 characters) | — |
-| `BUS_NAME` | Name of the bus to which the shunt is connected (max 8 characters) | — |
+| `NAME` | Shunt name (max 20 characters) | - |
+| `BUS_NAME` | Name of the bus to which the shunt is connected (max 8 characters) | - |
 | `QNOM` | Nominal reactive power produced by the shunt at the nominal bus voltage (positive = capacitor, negative = reactor) | Mvar |
-| `BR` | Breaker status (1 = in service, 0 = out of service) | — |
+| `BR` | Breaker status (1 = in service, 0 = out of service) | - |
 
 Only one SHUNT record per named shunt is allowed. **Multiple shunts at the same bus** are allowed, each with its own name; in this case, the susceptances are added (taking signs into account).
 
@@ -285,5 +285,5 @@ The SHUNT record is used by RAMSES. For PFC, shunt data is specified in the exte
 
 ## Next Steps
 
-- [Power Flow (PFC)](/user-guide/pfc/) — Configure generators, loads, and compute the initial operating point
-- [Dynamic Models](/user-guide/dynamic-models/) — Add synchronous machines and controllers
+- [Power Flow (PFC)](/user-guide/pfc/) - Configure generators, loads, and compute the initial operating point
+- [Dynamic Models](/user-guide/dynamic-models/) - Add synchronous machines and controllers

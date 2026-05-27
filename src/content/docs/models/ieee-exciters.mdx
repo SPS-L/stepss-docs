@@ -5,7 +5,7 @@ description: IEEE-standard excitation system, PSS, and OEL models available in R
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-These excitation system models implement the IEEE Std 421.5-2016 "IEEE Recommended Practice for Excitation System Models for Power System Stability Studies" (and selected ENTSO-E variants) within RAMSES. Each model is defined using the CODEGEN domain-specific language (DSL) and compiled into Fortran for time-domain simulation. The DSL describes block diagrams as interconnected transfer function primitives (`tf1p`, `tf1p1z`, `tf1plim`, `tfder1p`, `inlim`, `pictl`, etc.), initial conditions, and algebraic constraints — forming a self-contained, portable model definition.
+These excitation system models implement the IEEE Std 421.5-2016 "IEEE Recommended Practice for Excitation System Models for Power System Stability Studies" (and selected ENTSO-E variants) within RAMSES. Each model is defined using the CODEGEN domain-specific language (DSL) and compiled into Fortran for time-domain simulation. The DSL describes block diagrams as interconnected transfer function primitives (`tf1p`, `tf1p1z`, `tf1plim`, `tfder1p`, `inlim`, `pictl`, etc.), initial conditions, and algebraic constraints - forming a self-contained, portable model definition.
 
 :::note[Usage in Dynamic Data Files]
 Exciter models in RAMSES are defined as sub-records within a `SYNC_MACH` block using the `EXC` keyword, followed by the model name and its parameters. They are not standalone records. The `EXC` line appears after the machine parameters and before the `TOR` (torque/governor) line. The entire block ends with a single `;` after the `TOR` record.
@@ -21,7 +21,7 @@ RAMSES adds the `exc_` prefix to the model name automatically, so both `AC1A` an
 
 `ST1A`, `ST1A_IEEEST`, `ST1A_PSS2B`, `ST1A_PSS4B`, `AC1A`, `AC4A`, `IEEET5`, `SEXS`, `SEXS_IEEEST`, `EXPIC1_PSS2B`, `ENTSOE_simp` (each is also accepted with the `exc_` prefix).
 
-The additional IEEE variants documented in the catalogue below (e.g. `AC1A_MAXEX2`, `AC1A_RETRO`, `AC8B*`, `DC3A`, `EXPIC1`, `SEXS_STAB3_lim`, `ST1A_lim`, `ST1A_PSS3B`, `ST1A_*_MAXEX2`, `ST1A_*_OELHQ`, `ST2A`, and the Hydro-Québec `EXHQSC*` family) are not callable out of the box — they can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
+The additional IEEE variants documented in the catalogue below (e.g. `AC1A_MAXEX2`, `AC1A_RETRO`, `AC8B*`, `DC3A`, `EXPIC1`, `SEXS_STAB3_lim`, `ST1A_lim`, `ST1A_PSS3B`, `ST1A_*_MAXEX2`, `ST1A_*_OELHQ`, `ST2A`, and the Hydro-Québec `EXHQSC*` family) are not callable out of the box - they can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
 :::
 
 ---
@@ -30,34 +30,34 @@ The additional IEEE variants documented in the catalogue below (e.g. `AC1A_MAXEX
 
 | Model Name | Base Type | PSS | OEL / Limiter | IEEE Reference |
 |---|---|---|---|---|
-| `AC1A` | AC type 1 | — | — | IEEE 421.5 Type AC1A |
-| `AC1A_MAXEX2` | AC type 1 | — | MAXEX2 field current limiter | IEEE 421.5 Type AC1A |
-| `AC1A_RETRO` | AC type 1 (retrofit) | PSS4B (internal) | — | — |
-| `AC1A_RETRO_PSS4B` | AC type 1 (retrofit) | PSS4B | — | — |
-| `AC4A` | AC type 4 | — | — | IEEE 421.5 Type AC4A |
-| `AC8B` | AC type 8 | — | — | IEEE 421.5 Type AC8B |
+| `AC1A` | AC type 1 | - | - | IEEE 421.5 Type AC1A |
+| `AC1A_MAXEX2` | AC type 1 | - | MAXEX2 field current limiter | IEEE 421.5 Type AC1A |
+| `AC1A_RETRO` | AC type 1 (retrofit) | PSS4B (internal) | - | - |
+| `AC1A_RETRO_PSS4B` | AC type 1 (retrofit) | PSS4B | - | - |
+| `AC4A` | AC type 4 | - | - | IEEE 421.5 Type AC4A |
+| `AC8B` | AC type 8 | - | - | IEEE 421.5 Type AC8B |
 | `AC8B_PSS3B_lim` | AC type 8 | PSS3B | Integral OEL + SCL | IEEE 421.5 Type AC8B |
-| `AC8B_lim` | AC type 8 | — | Integral OEL + SCL | IEEE 421.5 Type AC8B |
-| `DC3A` | DC type 3 | — | — | IEEE 421.5 Type DC3A |
-| `ENTSOE_simp` | ENTSO-E simplified | IEEEST (internal) | — | ENTSO-E |
+| `AC8B_lim` | AC type 8 | - | Integral OEL + SCL | IEEE 421.5 Type AC8B |
+| `DC3A` | DC type 3 | - | - | IEEE 421.5 Type DC3A |
+| `ENTSOE_simp` | ENTSO-E simplified | IEEEST (internal) | - | ENTSO-E |
 | `ENTSOE_lim` | ENTSO-E simplified | IEEEST (internal) | Integral OEL | ENTSO-E |
-| `EXPIC1` | AC/ST (PIC type) | — | — | — |
-| `EXPIC1_PSS2B` | AC/ST (PIC type) | PSS2B | — | — |
-| `EXPIC1_PSS2B_MAXEX2` | AC/ST (PIC type) | PSS2B | MAXEX2 | — |
-| `IEEET5` | DC type 5 | — | — | IEEE 421.5 Type DC5A (legacy) |
-| `SEXS` | ST simplified | — | — | CIGRÉ simplified |
-| `SEXS_IEEEST` | ST simplified | IEEEST | — | CIGRÉ simplified |
-| `SEXS_STAB3_lim` | ST simplified | STAB3 | Integral OEL | — |
-| `ST1A` | ST type 1 | — | — | IEEE 421.5 Type ST1A |
-| `ST1A_IEEEST` | ST type 1 | IEEEST | — | IEEE 421.5 Type ST1A |
+| `EXPIC1` | AC/ST (PIC type) | - | - | - |
+| `EXPIC1_PSS2B` | AC/ST (PIC type) | PSS2B | - | - |
+| `EXPIC1_PSS2B_MAXEX2` | AC/ST (PIC type) | PSS2B | MAXEX2 | - |
+| `IEEET5` | DC type 5 | - | - | IEEE 421.5 Type DC5A (legacy) |
+| `SEXS` | ST simplified | - | - | CIGRÉ simplified |
+| `SEXS_IEEEST` | ST simplified | IEEEST | - | CIGRÉ simplified |
+| `SEXS_STAB3_lim` | ST simplified | STAB3 | Integral OEL | - |
+| `ST1A` | ST type 1 | - | - | IEEE 421.5 Type ST1A |
+| `ST1A_IEEEST` | ST type 1 | IEEEST | - | IEEE 421.5 Type ST1A |
 | `ST1A_IEEEST_MAXEX2` | ST type 1 | IEEEST | MAXEX2 | IEEE 421.5 Type ST1A |
-| `ST1A_PSS2B` | ST type 1 | PSS2B | — | IEEE 421.5 Type ST1A |
+| `ST1A_PSS2B` | ST type 1 | PSS2B | - | IEEE 421.5 Type ST1A |
 | `ST1A_PSS2B_MAXEX2` | ST type 1 | PSS2B | MAXEX2 | IEEE 421.5 Type ST1A |
-| `ST1A_PSS3B` | ST type 1 | PSS3B | — | IEEE 421.5 Type ST1A |
-| `ST1A_PSS4B` | ST type 1 | PSS4B | — | IEEE 421.5 Type ST1A |
+| `ST1A_PSS3B` | ST type 1 | PSS3B | - | IEEE 421.5 Type ST1A |
+| `ST1A_PSS4B` | ST type 1 | PSS4B | - | IEEE 421.5 Type ST1A |
 | `ST1A_PSS4B_MAXEX2` | ST type 1 | PSS4B | MAXEX2 | IEEE 421.5 Type ST1A |
-| `ST1A_lim` | ST type 1 | — | Integral OEL + SCL | IEEE 421.5 Type ST1A |
-| `ST2A` | ST type 2 | — | — | IEEE 421.5 Type ST2A (via EXPIC1) |
+| `ST1A_lim` | ST type 1 | - | Integral OEL + SCL | IEEE 421.5 Type ST1A |
+| `ST2A` | ST type 2 | - | - | IEEE 421.5 Type ST2A (via EXPIC1) |
 
 ---
 
@@ -138,7 +138,7 @@ where $S_E(V_E)$ is the saturation function interpolated from the two-point satu
 
 | Model | Description |
 |---|---|
-| `AC1A` | Base model — IEEE Type AC1A |
+| `AC1A` | Base model - IEEE Type AC1A |
 | `AC1A_MAXEX2` | Adds MAXEX2 field current limiter; VOEL moves to reference summation point (LV gate removed) |
 | `AC1A_RETRO` | Retrofit variant with internal PSS4B; uses first-order AVR without separate exciter block |
 | `AC1A_RETRO_PSS4B` | Retrofit variant with external PSS4B speed input |
@@ -204,7 +204,7 @@ The variable upper limit is updated algebraically at each time step, making AC4A
 
 | Model | Description |
 |---|---|
-| `AC4A` | Base model — IEEE Type AC4A, no PSS or OEL |
+| `AC4A` | Base model - IEEE Type AC4A, no PSS or OEL |
 
 #### Usage Example
 
@@ -219,7 +219,7 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 
 ### AC8B
 
-The AC8B is a rotating AC exciter with a PID voltage regulator (rather than the proportional-integral amplifier of earlier types). It corresponds to IEEE Std 421.5-2016 Type AC8B. The PID structure — proportional gain $K_{PR}$, integral gain $K_{IR}$, and derivative gain $K_{DR}$ — provides improved transient response compared to Type AC1A.
+The AC8B is a rotating AC exciter with a PID voltage regulator (rather than the proportional-integral amplifier of earlier types). It corresponds to IEEE Std 421.5-2016 Type AC8B. The PID structure - proportional gain $K_{PR}$, integral gain $K_{IR}$, and derivative gain $K_{DR}$ - provides improved transient response compared to Type AC1A.
 
 #### Mathematical Description
 
@@ -281,7 +281,7 @@ $$\dot{V}_E = \frac{1}{T_E}(V_R - V_{FE}), \quad V_{EMIN} \le V_E \le \frac{V_{F
 
 | Model | Description |
 |---|---|
-| `AC8B` | Base model — IEEE Type AC8B |
+| `AC8B` | Base model - IEEE Type AC8B |
 | `AC8B_PSS3B_lim` | Adds PSS3B dual-input stabilizer and integral OEL + SCL (stator current limiter) |
 | `AC8B_lim` | Adds integral OEL and SCL without PSS |
 
@@ -341,7 +341,7 @@ $$\dot{E}_{fd} = \frac{1}{T_E}\left[V_R - \left(K_E + S_E(E_{fd})\right) E_{fd}\
 
 | Model | Description |
 |---|---|
-| `DC3A` | Base model — IEEE Type DC3A, non-continuously acting rheostat controller |
+| `DC3A` | Base model - IEEE Type DC3A, non-continuously acting rheostat controller |
 
 #### Usage Example
 
@@ -437,7 +437,7 @@ $$V_F(s) = E_{fd} \cdot \frac{sK_F/T_F}{1 + sT_F}$$
 
 | Model | Description |
 |---|---|
-| `ST1A` | Base model — IEEE Type ST1A |
+| `ST1A` | Base model - IEEE Type ST1A |
 | `ST1A_IEEEST` | Adds IEEEST single-input PSS (speed or power input, selectable) |
 | `ST1A_IEEEST_MAXEX2` | Adds IEEEST PSS + MAXEX2 field current limiter |
 | `ST1A_PSS2B` | Adds PSS2B dual-input stabilizer |
@@ -571,13 +571,13 @@ $$\dot{E}_{fd} = \frac{1}{T_E}\left[V_R - \left(K_E + S_E(E_{fd})\right) E_{fd}\
 
 | Model | Description |
 |---|---|
-| `IEEET5` | Base model — non-continuously acting DC exciter |
+| `IEEET5` | Base model - non-continuously acting DC exciter |
 
 ---
 
 ### SEXS
 
-The SEXS (Simplified Excitation System) is a minimal two-parameter static exciter model from CIGRÉ publications, widely used for cases where detailed exciter data is unavailable. It has no measurement filter, no line drop compensation, and no rate feedback — just a lead-lag network and a limited first-order block.
+The SEXS (Simplified Excitation System) is a minimal two-parameter static exciter model from CIGRÉ publications, widely used for cases where detailed exciter data is unavailable. It has no measurement filter, no line drop compensation, and no rate feedback - just a lead-lag network and a limited first-order block.
 
 #### Mathematical Description
 
@@ -680,7 +680,7 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 
 Power System Stabilizers (PSS) inject an additional signal $V_{PSS}$ at the AVR summation point to damp electromechanical oscillations. All variants listed in the model index table include one of the PSS types described here.
 
-### PSS2B — Dual-Input Stabilizer
+### PSS2B - Dual-Input Stabilizer
 
 PSS2B accepts two input signals (typically speed $\omega$ and electrical power $P_e$) and processes them through independent washout chains before combining. It corresponds to IEEE Std 421.5-2016 Type PSS2B.
 
@@ -725,7 +725,7 @@ $$V_{PSS} = \text{clamp}(V_{PSS,unlim}, V_{STMIN}, V_{STMAX})$$
 
 ---
 
-### PSS3B — Two-Input Second-Order Filter Stabilizer
+### PSS3B - Two-Input Second-Order Filter Stabilizer
 
 PSS3B processes two input channels through measurement filters and washout stages, then combines them and applies two cascaded second-order lead-lag filters. It corresponds to IEEE Std 421.5-2016 Type PSS3B.
 
@@ -754,7 +754,7 @@ $$V_{PSS} = \text{clamp}(V_{PSS,unlim}, V_{STMIN}, V_{STMAX})$$
 
 ---
 
-### PSS4B — Three-Band Multi-Input Stabilizer
+### PSS4B - Three-Band Multi-Input Stabilizer
 
 PSS4B is a three-band stabilizer that separates the speed deviation signal into low-, intermediate-, and high-frequency components. Each band uses a pair of lead-lag filters. This model corresponds to IEEE Std 421.5-2016 Type PSS4B.
 
@@ -796,7 +796,7 @@ $$V_{PSS} = \text{clamp}(V_{PSSL} + V_{PSSI} + V_{PSSH},\, V_{STMin}, V_{STMax})
 
 ---
 
-### IEEEST — Single-Input Stabilizer
+### IEEEST - Single-Input Stabilizer
 
 The IEEEST is a general-purpose single-input PSS with selectable input signal (speed deviation, electrical power, or computed accelerating power). It corresponds to IEEE Std 421.5-2016 Type PSS1A. Two second-order lead-lag filters provide frequency shaping before two first-order lead-lags and a washout stage.
 
@@ -822,7 +822,7 @@ Input selection (`speedinput`): 1 = rotor speed deviation, 3 = electrical power,
 
 ---
 
-### STAB3 — Power-Input Stabilizer
+### STAB3 - Power-Input Stabilizer
 
 The STAB3 is a simplified PSS that takes electrical power $P_e$ as input, applies two sequential first-order filters and a washout-type derivative block, producing a stabilizing signal.
 
@@ -846,7 +846,7 @@ $$V_{PSS} = \text{clamp}(stab_3, -V_{LIM}, V_{LIM})$$
 
 Over-Excitation Limiters (OEL) prevent sustained field current overloads that would thermally damage the field winding. They generate a signal $V_{OEL}$ that reduces the AVR output when field current exceeds thermal limits.
 
-### MAXEX2 — Field Current Limiter with Timer and Hysteresis
+### MAXEX2 - Field Current Limiter with Timer and Hysteresis
 
 The MAXEX2 is a field current limiter derived from IEEE work, using a simplified three-point piece-wise linear timer It is designed for the EXST1/ST1A topology where the OEL output is injected at the reference summation point (not the LV gate).
 

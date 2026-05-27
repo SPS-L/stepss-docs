@@ -36,10 +36,10 @@ The system is divided into several areas interconnected through a meshed 400 kV 
 Each generator is modeled as a detailed synchronous machine (`SYNC_MACH`) with:
 
 - **Machine model**: Subtransient model with d- and q-axis dynamics (round-rotor or salient-pole depending on unit type)
-- **Excitation system**: `EXC GENERIC1` — a generic AVR with field current limiter, OEL, and optional PSS (SPEEDIN type)
+- **Excitation system**: `EXC GENERIC1` - a generic AVR with field current limiter, OEL, and optional PSS (SPEEDIN type)
 - **Governor/turbine**:
-  - Hydro units (g1–g5, g8–g12, g19–g20): `TOR HYDRO_GENERIC1` — hydraulic turbine with governor
-  - Thermal units (g6–g7, g13–g18): `TOR CONSTANT` — constant mechanical torque
+  - Hydro units (g1–g5, g8–g12, g19–g20): `TOR HYDRO_GENERIC1` - hydraulic turbine with governor
+  - Thermal units (g6–g7, g13–g18): `TOR CONSTANT` - constant mechanical torque
 
 Loads are represented using the `INJEC vfd_load` model (variable-frequency-dependent exponential recovery load) with voltage-dependent active and reactive power characteristics.
 
@@ -53,8 +53,8 @@ The repository provides two operating points:
 
 | File | Description |
 |---|---|
-| `dyn_A.dat` / `volt_rat_A.dat` | Operating Point A — base case, moderately stressed |
-| `dyn_B.dat` / `volt_rat_B.dat` | Operating Point B — heavily stressed, closer to voltage collapse |
+| `dyn_A.dat` / `volt_rat_A.dat` | Operating Point A - base case, moderately stressed |
+| `dyn_B.dat` / `volt_rat_B.dat` | Operating Point B - heavily stressed, closer to voltage collapse |
 
 Operating Point B is the primary case for voltage stability studies; it features higher load levels in the central area and reduced reactive power reserves.
 
@@ -68,7 +68,7 @@ Operating Point B is the primary case for voltage stability studies; it features
 | `dyn_A.dat` / `dyn_B.dat` | Dynamic data files (generators, controllers, network, loads) |
 | `volt_rat_A.dat` / `volt_rat_B.dat` | Power flow solutions (bus voltages and angles) |
 | `settings1.dat` | Solver configuration (time step, tolerances, threading) |
-| `obs.dat` | Observation file — monitors all buses, branches, machines, injectors |
+| `obs.dat` | Observation file - monitors all buses, branches, machines, injectors |
 | `nothing.dst` | Empty disturbance file (undisturbed simulation) |
 | `trip_gen.dst` | Generator trip disturbance scenario |
 | `short_trip_branch.dst` | Short-circuit followed by branch trip |
@@ -146,7 +146,7 @@ ext = pyramses.extractor(case.getTrj())
 ```
 </TabItem>
 <TabItem label="Jupyter Notebook">
-Open `Execute.ipynb` directly — it contains a complete guided tutorial with inline plots for:
+Open `Execute.ipynb` directly - it contains a complete guided tutorial with inline plots for:
 - Bus voltage evolution
 - Generator frequency deviations
 - Governor valve output and mechanical power
@@ -162,7 +162,7 @@ After a generator trip on Operating Point B, the simulation demonstrates:
 
 - **Frequency transient**: immediate frequency drop followed by primary governor response from hydro units
 - **Voltage dynamics**: progressive voltage decline in the central area as load restoration (tap changers, thermostatic loads) increases demand beyond available reactive reserves
-- **Long-term voltage instability**: if the system lacks sufficient reactive support, voltages collapse over tens of seconds — a classic long-term voltage stability phenomenon
+- **Long-term voltage instability**: if the system lacks sufficient reactive support, voltages collapse over tens of seconds - a classic long-term voltage stability phenomenon
 
 ---
 
@@ -174,5 +174,5 @@ After a generator trip on Operating Point B, the simulation demonstrates:
 
 ## See Also
 
-- [PyRAMSES Examples](/pyramses/examples/#nordic-test-system-generator-trip) — Complete Python simulation workflow with this test system
-- [PyRAMSES API Reference](/pyramses/api-reference/) — Full API documentation for scripting simulations
+- [PyRAMSES Examples](/pyramses/examples/#nordic-test-system-generator-trip) - Complete Python simulation workflow with this test system
+- [PyRAMSES API Reference](/pyramses/api-reference/) - Full API documentation for scripting simulations

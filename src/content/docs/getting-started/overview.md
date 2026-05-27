@@ -36,7 +36,7 @@ The power flow computation uses the Newton-Raphson method in polar coordinates. 
 
 - Network data (buses, lines, transformers, etc.)
 - Power flow data specified at PV, PQ, and slack buses
-- PFC control parameters (tolerances, reactive power limits, etc.) — optional, defaults are used if not provided
+- PFC control parameters (tolerances, reactive power limits, etc.) - optional, defaults are used if not provided
 
 PFC can optionally adjust transformer ratios to:
 - Bring voltage magnitudes inside specified deadbands (in-phase transformers)
@@ -101,7 +101,7 @@ Four types of user-defined models are supported:
 - **Injectors** (INJ): components connected to a single AC bus
 - **Two-ports** (TWOP): components connecting two buses
 
-The user model is **compiled, not interpreted** — resulting in efficient number-crunching code. While the solver code is proprietary, the models are designed to be freely shared, making STEPSS an **open-source simulation software** for the modeling part.
+The user model is **compiled, not interpreted** - resulting in efficient number-crunching code. While the solver code is proprietary, the models are designed to be freely shared, making STEPSS an **open-source simulation software** for the modeling part.
 
 ### CODEGEN Studio
 
@@ -115,7 +115,7 @@ STEPSS modules can be run through three interfaces:
 |-----------|:----------------:|:------------:|:-------:|
 | **Command Line** | `ramses -t cmd.txt` | `pfc -t cmd.txt` | `codegen model.txt` |
 | **GUI (Java)** | Full support | Full support | Full support |
-| **Python (PyRAMSES)** | Full support | — | — |
+| **Python (PyRAMSES)** | Full support | - | - |
 
 See the [Quick Start](/getting-started/quickstart/) for details on each interface.
 
@@ -131,5 +131,5 @@ See the [Quick Start](/getting-started/quickstart/) for details on each interfac
 
 ## Next Steps
 
-- [Installation](/getting-started/installation/) — Set up STEPSS on your system
-- [Quick Start](/getting-started/quickstart/) — Run your first simulation
+- [Installation](/getting-started/installation/) - Set up STEPSS on your system
+- [Quick Start](/getting-started/quickstart/) - Run your first simulation

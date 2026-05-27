@@ -49,8 +49,8 @@ Selects the sparse linear solver used for Jacobian factorization:
 $SPARSE_SOLVER name ;
 ```
 
-- `KLU` — SuiteSparse KLU solver (default)
-- `ma41` — HSL MA41 solver
+- `KLU` - SuiteSparse KLU solver (default)
+- `ma41` - HSL MA41 solver
 
 ## System Parameters
 
@@ -74,8 +74,8 @@ FNOM Frequency(Hz) ;
 $OMEGA_REF SYN/COI ;
 ```
 
-- `SYN` — Synchronous reference frame (suitable for short-term simulations)
-- `COI` — Center of inertia reference (suitable for long-term simulations)
+- `SYN` - Synchronous reference frame (suitable for short-term simulations)
+- `COI` - Center of inertia reference (suitable for long-term simulations)
 
 See [Reference Frames](/user-guide/reference-frames/) for details.
 
@@ -127,8 +127,8 @@ $MAX_FAULT value ;
 $SCHEME DE/IN ;
 ```
 
-- `DE` — Decomposed scheme
-- `IN` — Integrated scheme
+- `DE` - Decomposed scheme
+- `IN` - Integrated scheme
 
 ### Latency Settings
 
@@ -208,5 +208,5 @@ $FULL_UPDATE F ;
 
 ## Next Steps
 
-- [PyRAMSES API](/pyramses/api-reference/) — Run simulations programmatically from Python
-- [Test Systems](/test-systems/nordic/) — Try the Nordic or 5-bus benchmark systems
+- [PyRAMSES API](/pyramses/api-reference/) - Run simulations programmatically from Python
+- [Test Systems](/test-systems/nordic/) - Try the Nordic or 5-bus benchmark systems
