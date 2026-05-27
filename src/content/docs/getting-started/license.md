@@ -44,6 +44,8 @@ STEPSS has been developed by:
 - **Dr. Petros Aristidou** (petros.aristidou@cut.ac.cy)
 - **Dr. Thierry Van Cutsem** (thierry.h.van.cutsem@gmail.com)
 
+For general inquiries, licensing questions, and commercial use, please use the default contact: **stepss@sps-lab.org**.
+
 ## Intellectual Property Rights
 
 STEPSS is made up of three modules: **PFC** (power flow computations), **RAMSES** (the solver of differential-algebraic equations), and **CODEGEN** (a tool to develop models).

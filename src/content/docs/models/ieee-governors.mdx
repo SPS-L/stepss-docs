@@ -16,6 +16,16 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
               EXC model_name  param1  param2  ...
               TOR model_name  param1  param2  ... ;
 ```
+
+RAMSES adds the `tor_` prefix to the model name automatically, so both `DEGOV1` and `tor_DEGOV1` resolve to the same model. The IEEE governor names available in every RAMSES distribution are:
+
+| Data-file name | Equivalent |
+|----------------|-----------|
+| `DEGOV1` | `tor_DEGOV1` |
+| `ENTSOE_simp` | `tor_ENTSOE_simp` |
+| `GAST` | `tor_GAST` |
+| `TGOV1` | `tor_TGOV1` |
+| `HYGOV` | `tor_HYGOV` |
 :::
 
 ---
@@ -299,7 +309,9 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   400. 360. 6. 0. 2.05
 
 ---
 
-## tor_TGOV1D
+## TGOV1 (`tor_TGOV1D`)
+
+The data-file model name is `TGOV1` (or `tor_TGOV1` — the `tor_` prefix is added automatically). Although this model is internally known as `tor_TGOV1D`, the name registered for use in data files is `TGOV1` (without the `D`).
 
 ### Scientific Description
 
@@ -360,7 +372,7 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   400. 360. 6. 0. 2.05
                     XT   0.15  2.2  0.3   0.2   2.   0.4  0.2  0.1  6.0257  0.  7.00  0.05  1.5  0.05
               EXC GENERIC1   3.0618 -0.1  1.  0.  100. -1. -20.0  10.  120. 5.  12.5 0.1  0.  5.
                                 1     75.   15.    0.22    0.012     0.22    0.012    -0.1    0.1
-              TOR TGOV1D  0.05   ! R: permanent droop (pu/pu)
+              TOR TGOV1  0.05   ! R: permanent droop (pu/pu)
                           0.50   ! T1: steam chest/valve actuator time constant (s)
                           1.05   ! VMAX: maximum valve position (pu)
                           0.0    ! VMIN: minimum valve position (pu)
@@ -379,7 +391,9 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   400. 360. 6. 0. 2.05
 
 ---
 
-## tor_hygov
+## HYGOV (`tor_hygov`)
+
+The data-file model name is `HYGOV` (or `tor_HYGOV` — the `tor_` prefix is added automatically).
 
 ### Scientific Description
 
@@ -471,7 +485,7 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
                     XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
               EXC GENERIC1   1.8991 -0.1  0.  1.  100. -1. -11  10.  70.  10.  20. 0.1  0.  4.
                                 1     75.   15.    0.2    0.01     0.2    0.01    -0.1    0.1
-              TOR hygov  0.05   ! R: permanent droop (pu/pu)
+              TOR HYGOV  0.05   ! R: permanent droop (pu/pu)
                          0.30   ! r: transient droop (pu/pu)
                          5.00   ! Tr: transient droop reset time (s)
                          0.05   ! Tf: filter time constant for speed error (s)

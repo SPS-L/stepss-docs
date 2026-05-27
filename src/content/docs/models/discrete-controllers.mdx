@@ -20,7 +20,14 @@ Discrete controllers are defined with the `DCTL` keyword as standalone records i
 DCTL model_name ctl_name param1 param2 ... ;
 ```
 
-Where `model_name` is the controller type (e.g., `LTC2`, `uvls`, `FRT`), `ctl_name` is a unique instance name, and the remaining parameters are model-specific.
+Where `model_name` is the controller type, `ctl_name` is a unique instance name, and the remaining parameters are model-specific.
+
+Recognised discrete-controller model names (case-sensitive):
+
+- **Uppercase short names** (no prefix): `PST`, `LTC`, `LTC2`, `OLTC2`, `LTCINV`, `MAIS`, `UVLS`, `RT`, `UVPROT`, `FRT`, `VOLT_VAR`, `SIM_MINMAXVOLT`, `SIM_MINMAXSPEED`.
+- **Prefixed name** — RAMSES adds the `dctl_` prefix automatically, so both `line_prot` and `dctl_line_prot` resolve to the line-protection model.
+
+All of the above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). `MAIS` is a generic AGC-style integrator that does not have a dedicated documentation section below. Additional variants documented below but not in this list (`dctl_hvdc_lim`, `dctl_injprot`, `dctl_losprot`, and the Hydro-Québec family) are not callable out of the box — they can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
 :::
 
 ---
@@ -31,7 +38,7 @@ Where `model_name` is the controller type (e.g., `LTC2`, `uvls`, `FRT`), `ctl_na
 The [TRFO record](/user-guide/network/#data-format--combined-model-trfo) combines the transformer model with load tap changer data (tap range, positions, controlled bus, voltage setpoint), but this data is used **only by PFC** for ratio adjustment during power flow computation. To control a transformer's ratio during dynamic simulation with RAMSES, a DCTL LTC controller (below) must be associated with the transformer — whether it was defined with TRANSFO or TRFO.
 :::
 
-### `dctl_ltc` — Load Tap Changer (Standard)
+### `LTC` (`dctl_ltc`) — Load Tap Changer (Standard)
 
 #### Description
 
@@ -82,12 +89,12 @@ where $\tau_{delay} = \tau_{first}$ for the first operation, $\tau_{next}$ there
 #### Usage Example
 
 ```
-DCTL  ltc  LTC_TR1  TR1-HV-MV  BUS_MV  1  0.85  1.15  33  0.01  30.0  10.0 ;
+DCTL  LTC  LTC_TR1  TR1-HV-MV  BUS_MV  1  0.85  1.15  33  0.01  30.0  10.0 ;
 ```
 
 ---
 
-### `dctl_ltc2` — Load Tap Changer (Variant 2)
+### `LTC2` (`dctl_ltc2`) — Load Tap Changer (Variant 2)
 
 #### Description
 
@@ -124,7 +131,7 @@ DCTL  LTC2  LTC2_TR1  TR1-HV-MV  BUS_MV  -1  88.  120.  33  0.01  1.0  30  8 ;
 
 ---
 
-### `dctl_ltcinv` — Inverse-Time Load Tap Changer
+### `LTCINV` (`dctl_ltcinv`) — Inverse-Time Load Tap Changer
 
 #### Description
 
@@ -168,12 +175,12 @@ where $\tau_{max}$ is the maximum delay and `accel` is the acceleration factor (
 #### Usage Example
 
 ```
-DCTL  ltcinv  LTCINV_TR1  TR1-HV-MV  BUS_MV  1  0.85  1.15  33  0.01  1.025  60.0  0.1 ;
+DCTL  LTCINV  LTCINV_TR1  TR1-HV-MV  BUS_MV  1  0.85  1.15  33  0.01  1.025  60.0  0.1 ;
 ```
 
 ---
 
-### `dctl_oltc2` — On-Load Tap Changer Type 2
+### `OLTC2` (`dctl_oltc2`) — On-Load Tap Changer Type 2
 
 #### Description
 
@@ -216,7 +223,7 @@ End-stop flags `w(15)` and `w(16)` prevent further tap changes when the ratio is
 #### Usage Example
 
 ```
-DCTL  oltc2  OLTC_TR2  FROM_BUS  TO_BUS  1  1  0.88  1.12  25  0.0075
+DCTL  OLTC2  OLTC_TR2  FROM_BUS  TO_BUS  1  1  0.88  1.12  25  0.0075
              1.02  45.0  15.0  0.0  0.0 ;
 ```
 
@@ -224,7 +231,7 @@ DCTL  oltc2  OLTC_TR2  FROM_BUS  TO_BUS  1  1  0.88  1.12  25  0.0075
 
 ## Protection
 
-### `dctl_uvprot` — Under-Voltage Protection Relay
+### `UVPROT` (`dctl_uvprot`) — Under-Voltage Protection Relay
 
 #### Description
 
@@ -257,12 +264,12 @@ Internal variables: `w(5)` = measured voltage, `w(6)` = start time of violation,
 #### Usage Example
 
 ```
-DCTL  uvprot  UV_GEN1  BUS_HV  GEN1  0.85  0.5 ;
+DCTL  UVPROT  UV_GEN1  BUS_HV  GEN1  0.85  0.5 ;
 ```
 
 ---
 
-### `dctl_uvls` — Under-Voltage Load Shedding
+### `UVLS` (`dctl_uvls`) — Under-Voltage Load Shedding
 
 #### Description
 
@@ -313,12 +320,12 @@ Internal variables: `w(12)`–`w(18)` (previous voltage, timers, area accumulato
 #### Usage Example
 
 ```
-DCTL  uvls  UVLS1  BUS_MV  LOAD1  0.90  0.5  5.0  20.0  0.3  2.0  5.0  50.0  5 ;
+DCTL  UVLS  UVLS1  BUS_MV  LOAD1  0.90  0.5  5.0  20.0  0.3  2.0  5.0  50.0  5 ;
 ```
 
 ---
 
-### `dctl_FRT` — Fault Ride-Through Controller
+### `FRT` (`dctl_FRT`) — Fault Ride-Through Controller
 
 #### Description
 
@@ -365,6 +372,10 @@ DCTL  FRT  FRT_WTG1  WT1  0.90  0.15  0.70  0.5  0.20  1.0  0.05 ;
 
 ### `dctl_injprot` — Injector Protection
 
+:::caution
+`dctl_injprot` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::
+
 #### Description
 
 A **generic injector protection** relay that monitors any observable variable of an injector (e.g., current magnitude, active power, reactive power) and trips the injector if the variable goes outside prescribed bounds for a sustained time.
@@ -400,12 +411,16 @@ The controller latches once tripped and cannot reset. State variable `w(7)`:
 #### Usage Example
 
 ```
-DCTL  injprot  PROT_WTG1  WT1  I  0.0  1.2  0.1 ;
+DCTL  injprot  PROT_WTG1  WT1  I  0.0  1.2  0.1 ;   ! Not callable in a standard RAMSES distribution — see URAMSES guide
 ```
 
 ---
 
 ### `dctl_losprot` — Loss-of-Synchronism Protection
+
+:::caution
+`dctl_losprot` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::
 
 #### Description
 
@@ -435,12 +450,14 @@ The timer resets if the speed returns within bounds. The controller latches perm
 #### Usage Example
 
 ```
-DCTL  losprot  LOS_GEN2  GEN2  1.05  0.2 ;
+DCTL  losprot  LOS_GEN2  GEN2  1.05  0.2 ;   ! Not callable in a standard RAMSES distribution — see URAMSES guide
 ```
 
 ---
 
-### `DCTL_line_prot` — Line Overcurrent Protection
+### `line_prot` (`DCTL_line_prot`) — Line Overcurrent Protection
+
+The data-file model name is `line_prot` (or `dctl_line_prot`). RAMSES adds the `dctl_` prefix automatically.
 
 #### Description
 
@@ -469,14 +486,14 @@ The action is immediate (no time delay); the oversize factor allows temporary ov
 #### Usage Example
 
 ```
-DCTL  dctl_line_prot  LINEPROT1  1.05  2  L1-L2  L3-L4 ;
+DCTL  line_prot  LINEPROT1  1.05  2  L1-L2  L3-L4 ;
 ```
 
 ---
 
 ---
 
-### `dctl_pst` — Phase-Shifting Transformer Control
+### `PST` (`dctl_pst`) — Phase-Shifting Transformer Control
 
 #### Description
 
@@ -514,12 +531,12 @@ The direction parameter defines whether increasing the tap increases or decrease
 #### Usage Example
 
 ```
-DCTL  pst  PST_L1  PST-TR1  LINE-MON  1  -0.5  0.5  21  0.02  30.0  10.0 ;
+DCTL  PST  PST_L1  PST-TR1  LINE-MON  1  -0.5  0.5  21  0.02  30.0  10.0 ;
 ```
 
 ---
 
-### `dctl_rt` — Real-Time Simulation Control
+### `RT` (`dctl_rt`) — Real-Time Simulation Control
 
 #### Description
 
@@ -541,12 +558,16 @@ Observable: `elapsed` (wall-clock elapsed time in seconds).
 #### Usage Example
 
 ```
-DCTL  rt  RT_CTL  1.0  0.01 ;
+DCTL  RT  RT_CTL  1.0  0.01 ;
 ```
 
 ---
 
 ### `dctl_hvdc_lim` — HVDC LCC Limiter/Controller
+
+:::caution
+`dctl_hvdc_lim` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::
 
 #### Description
 
@@ -595,7 +616,7 @@ It interacts directly with the HVDC two-port model's internal parameters.
 #### Usage Example
 
 ```
-DCTL  hvdc_lim  HVDCLIM1  HVDClink
+DCTL  hvdc_lim  HVDCLIM1  HVDClink     ! Not callable in a standard RAMSES distribution — see URAMSES guide
       0.85  1.15  0.00625
       0.85  1.15  0.00625
       15.0  18.0  15.0  18.0
@@ -608,7 +629,7 @@ DCTL  hvdc_lim  HVDCLIM1  HVDClink
 
 ## Monitoring
 
-### `dctl_sim_minmaxspeed` — Speed Monitoring (Min/Max)
+### `SIM_MINMAXSPEED` (`dctl_sim_minmaxspeed`) — Speed Monitoring (Min/Max)
 
 #### Description
 
@@ -641,12 +662,12 @@ Parameter names exported: `SPEEDMIN`, `SPEEDMAX`, `DEADTIME`.
 #### Usage Example
 
 ```
-DCTL  sim_minmaxspeed  SPEEDMON  1.2  0.5  0.5  1 ;
+DCTL  SIM_MINMAXSPEED  SPEEDMON  1.2  0.5  0.5  1 ;
 ```
 
 ---
 
-### `dctl_sim_minmaxvolt` — Voltage Monitoring (Min/Max)
+### `SIM_MINMAXVOLT` (`dctl_sim_minmaxvolt`) — Voltage Monitoring (Min/Max)
 
 #### Description
 
@@ -677,12 +698,14 @@ Parameter names exported: `VMIN`, `VMAX`, `DEADTIME`.
 #### Usage Example
 
 ```
-DCTL  sim_minmaxvolt  VOLTMON  1.15  0.80  1.0  0 ;
+DCTL  SIM_MINMAXVOLT  VOLTMON  1.15  0.80  1.0  0 ;
 ```
 
 ---
 
-### `dctl_voltage_variability` — Voltage Variability Monitor
+### `VOLT_VAR` (`dctl_voltage_variability`) — Voltage Variability Monitor
+
+The data-file model name is `VOLT_VAR`.
 
 #### Description
 
@@ -708,5 +731,5 @@ The controller accumulates per-bus variances and a system-wide sum.
 #### Usage Example
 
 ```
-DCTL  dctl_voltage_variability  VVAR  60.0  5 ;
+DCTL  VOLT_VAR  VVAR  60.0  5 ;
 ```

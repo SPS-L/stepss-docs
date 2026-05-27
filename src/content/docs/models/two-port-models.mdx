@@ -7,22 +7,27 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 Two-port models in RAMSES connect **two AC (or AC/DC) buses** and inject currents at both ends simultaneously. Each model receives the voltage and current phasors at bus 1 ($v_{x1}, v_{y1}, i_{x1}, i_{y1}$) and bus 2 ($v_{x2}, v_{y2}, i_{x2}, i_{y2}$) and computes the algebraic or differential equations governing the device.
 
-The RAMSES data keyword is `TWOPOR`:
+The RAMSES data keyword is `TWOP`:
 
 ```
-TWOPOR name bus1 bus2 model_name
-       param1 param2 ... ;
+TWOP model_name twop_name bus_orig bus_extr S_or_A
+     FP_ORIG FQ_ORIG P_ORIG Q_ORIG
+     FP_EXTR FQ_EXTR P_EXTR Q_EXTR
+     param1 param2 ... ;
 ```
 
 :::note[Usage in Dynamic Data Files]
-Two-port models are defined with the `TWOPOR` keyword as standalone records in the dynamic data file. The syntax is:
+The record fields, in order, are:
 
-```
-TWOPOR name bus1 bus2 model_name
-       param1 param2 ... ;
-```
+- `model_name` — two-port model type (e.g., `HVDC_LCC`, `DCL_WCL`, `HVDC_VSC_SC`). The `twop_` prefix is added automatically if omitted, so both `HVDC_LCC` and `twop_HVDC_LCC` are accepted.
+- `twop_name` — unique instance name.
+- `bus_orig`, `bus_extr` — origin and extremity bus names.
+- `S_or_A` — `S` (series-branch insertion) or `A` (shunt-style anchor) flag.
+- `FP_ORIG`/`FQ_ORIG`/`P_ORIG`/`Q_ORIG` — initial active/reactive power injection at the origin bus. Either the fraction (`FP_ORIG`/`FQ_ORIG`, of the load at that bus) or the absolute power (`P_ORIG`/`Q_ORIG`, in MW/Mvar) must be zero.
+- `FP_EXTR`/`FQ_EXTR`/`P_EXTR`/`Q_EXTR` — same pattern for the extremity bus.
+- Remaining fields are the model-specific parameter list.
 
-Where `name` is a unique instance name, `bus1` and `bus2` are the two connection buses, `model_name` is the two-port model type (e.g., `HVDC_LCC`, `HVDC_VSC`), and the remaining parameters are model-specific.
+Three two-port models are available in every RAMSES distribution (both the standalone executable and the shared library used by PyRAMSES): `HVDC_LCC` / `twop_HVDC_LCC`, `DCL_WCL` / `twop_DCL_WCL`, and `HVDC_VSC_SC` / `twop_HVDC_VSC_SC`. Other two-port models documented below (`twop_HVDC_VSC`, the Hydro-Québec family `twop_CSVGN5`, `twop_CHENIER`, etc.) are not callable out of the box — they can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
 :::
 
 ---
@@ -152,7 +157,9 @@ The rectifier minimises $\alpha$ (advances firing) to maintain the current order
 #### Usage Example
 
 ```
-TWOPOR  HVDClink  BUS_RECT  BUS_INV  HVDC_LCC
+TWOP  HVDC_LCC  HVDClink  BUS_RECT  BUS_INV  S
+      0. 0. 0. 0.     ! FP/FQ/P/Q at origin (rectifier) bus
+      0. 0. 0. 0.     ! FP/FQ/P/Q at extremity (inverter) bus
         2          ! p: bipolar
         1          ! rec_ctl: current control
         1          ! inv_ctl: voltage control
@@ -176,6 +183,10 @@ TWOPOR  HVDClink  BUS_RECT  BUS_INV  HVDC_LCC
 ---
 
 ### `twop_HVDC_VSC` — Voltage Source Converter HVDC
+
+:::caution
+`twop_HVDC_VSC` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)). For a built-in VSC-HVDC model, use `twop_HVDC_VSC_SC` instead.
+:::
 
 #### Description
 
@@ -315,7 +326,9 @@ FRT boost ────► iqref2 ───────────────�
 #### Usage Example
 
 ```
-TWOPOR  VSC1  AC_BUS  DC_BUS  HVDC_VSC
+TWOP  HVDC_VSC  VSC1  AC_BUS  DC_BUS  S
+      0. 0. 0. 0.     ! FP/FQ/P/Q at AC bus
+      0. 0. 0. 0.     ! FP/FQ/P/Q at DC bus
         0.003   ! R (pu)
         0.15    ! L (pu)
         3.5     ! Hdc (s)
@@ -415,7 +428,9 @@ P0, ΔP ─► ΔP/Snom ──────────────┼─► N1 �
 #### Usage Example
 
 ```
-TWOPOR  VSC_SC1  AC_BUS  DC_BUS  HVDC_VSC_SC
+TWOP  HVDC_VSC_SC  VSC_SC1  AC_BUS  DC_BUS  S
+      0. 0. 0. 0.     ! FP/FQ/P/Q at AC bus
+      0. 0. 0. 0.     ! FP/FQ/P/Q at DC bus
         0.003   ! R (pu)
         0.15    ! L (pu)
         3.5     ! Hdc (s)
@@ -629,7 +644,9 @@ The offshore converter establishes the AC voltage and frequency for the wind far
 #### Usage Example
 
 ```
-TWOPOR  WF_HVDC  OFFSHORE_BUS  ONSHORE_BUS  DCL_WCL
+TWOP  DCL_WCL  WF_HVDC  OFFSHORE_BUS  ONSHORE_BUS  S
+      0. 0. 0. 0.     ! FP/FQ/P/Q at offshore bus
+      0. 0. 0. 0.     ! FP/FQ/P/Q at onshore bus
         0.003    ! R_1 (pu)
         0.15     ! L_1 (pu)
         3.5      ! Hdc_1 (s)

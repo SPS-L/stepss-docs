@@ -16,11 +16,20 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
               EXC model_name  param1  param2  ...
               TOR model_name  param1  param2  ... ;
 ```
+
+Recognised governor model names (case-sensitive):
+
+- **Uppercase short names** (no prefix): `CONSTANT`, `1ST_ORDER`, `HYDRO_GENERIC1`, `THERMAL_GENERIC1`.
+- **Prefixed names** — RAMSES adds the `tor_` prefix automatically, so you can write either form: `ENTSOE_simp`/`tor_ENTSOE_simp`, `HYGOV`/`tor_HYGOV`, `GAST`/`tor_GAST`, `TGOV1`/`tor_TGOV1`, `DEGOV1`/`tor_DEGOV1`.
+
+All of the above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). Additional variants documented below but not in this list (`tor_gasturbm`, `tor_govclasm`, `tor_govhydr`, `tor_govnuc`) are not callable out of the box — they can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
 :::
 
 ---
 
-## tor_constant
+## CONSTANT (`tor_constant`)
+
+The data-file model name is `CONSTANT`.
 
 ### Scientific Description
 
@@ -74,7 +83,9 @@ SYNC_MACH g6  g6  1. 1.  0.  0.   400. 360. 6. 0. 2.05
 
 ---
 
-## tor_1storder
+## 1ST_ORDER (`tor_1storder`)
+
+The data-file model name is `1ST_ORDER` (uppercase, with the underscore).
 
 ### Scientific Description
 
@@ -135,7 +146,7 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
                     XT   0.15  1.1  0.25   0.2   0.7   *   0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
               EXC GENERIC1   1.8991 -0.1  0.  1.  100. -1. -11  10.  70.  10.  20. 0.1  0.  4.
                                 1     75.   15.    0.2    0.01     0.2    0.01    -0.1    0.1
-              TOR 1STORDER  0.30  0.50  0.05 ;  ! FHP  T2  R
+              TOR 1ST_ORDER  0.30  0.50  0.05 ;  ! FHP  T2  R
 ```
 </TabItem>
 <TabItem label="Notes">
@@ -147,7 +158,9 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 
 ---
 
-## tor_thermal_generic1
+## THERMAL_GENERIC1 (`tor_thermal_generic1`)
+
+The data-file model name is `THERMAL_GENERIC1`.
 
 ### Scientific Description
 
@@ -233,7 +246,9 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 
 ---
 
-## tor_hydro_generic1
+## HYDRO_GENERIC1 (`tor_hydro_generic1`)
+
+The data-file model name is `HYDRO_GENERIC1`.
 
 ### Scientific Description
 
@@ -328,6 +343,10 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 
 ## tor_gasturbm
 
+:::caution
+`tor_gasturbm` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::
+
 ### Scientific Description
 
 The `tor_gasturbm` model is a **gas turbine** governor following a multi-stage combustion model. It captures the compressor, fuel system, combustion chamber delay, and turbine torque characteristic. The name suffix `m` indicates a modified version.
@@ -405,6 +424,10 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 
 ## tor_govclasm
 
+:::caution
+`tor_govclasm` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::
+
 ### Scientific Description
 
 The `tor_govclasm` model is a **classical thermal governor** with a composite control law including deadband, droop, integral control, and combustion dynamics. The name stands for "governor classical model".
@@ -474,6 +497,10 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 ---
 
 ## tor_govhydr
+
+:::caution
+`tor_govhydr` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::
 
 ### Scientific Description
 
@@ -545,6 +572,10 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 ---
 
 ## tor_govnuc
+
+:::caution
+`tor_govnuc` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::
 
 ### Scientific Description
 

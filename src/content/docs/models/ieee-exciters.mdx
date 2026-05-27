@@ -16,6 +16,12 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
               EXC model_name  param1  param2  ...
               TOR model_name  param1  param2  ... ;
 ```
+
+RAMSES adds the `exc_` prefix to the model name automatically, so both `AC1A` and `exc_AC1A` are accepted. The following IEEE exciter models are available in every RAMSES distribution (standalone executable and shared library used by PyRAMSES):
+
+`ST1A`, `ST1A_IEEEST`, `ST1A_PSS2B`, `ST1A_PSS4B`, `AC1A`, `AC4A`, `IEEET5`, `SEXS`, `SEXS_IEEEST`, `EXPIC1_PSS2B`, `ENTSOE_simp` (each is also accepted with the `exc_` prefix).
+
+The additional IEEE variants documented in the catalogue below (e.g. `AC1A_MAXEX2`, `AC1A_RETRO`, `AC8B*`, `DC3A`, `EXPIC1`, `SEXS_STAB3_lim`, `ST1A_lim`, `ST1A_PSS3B`, `ST1A_*_MAXEX2`, `ST1A_*_OELHQ`, `ST2A`, and the Hydro-Québec `EXHQSC*` family) are not callable out of the box — they can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
 :::
 
 ---

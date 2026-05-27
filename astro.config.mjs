@@ -29,6 +29,7 @@ export default defineConfig({
 			},
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/SPS-L/stepss-docs' },
+				{ icon: 'email', label: 'Contact (stepss@sps-lab.org)', href: 'mailto:stepss@sps-lab.org' },
 			],
 			editLink: {
 				baseUrl: 'https://github.com/SPS-L/stepss-docs/edit/main/',

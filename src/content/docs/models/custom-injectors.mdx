@@ -14,14 +14,23 @@ Injector models are defined with the `INJEC` keyword as standalone records in th
 INJEC model_name inj_name bus FP FQ P Q param1 param2 ... ;
 ```
 
-Where `model_name` is the model identifier (e.g., `vfd_load`, `load`, `IBG`), `inj_name` is a unique instance name, `bus` is the connection bus, `FP`/`FQ` are participation factors, and `P`/`Q` are initial values (typically 0 when solved from power flow).
+Where `model_name` is the model identifier, `inj_name` is a unique instance name, `bus` is the connection bus, `FP`/`FQ` are participation factors, and `P`/`Q` are initial values in MW/Mvar (one of each pair must be zero — either the fraction or the absolute power).
+
+Recognised injector model names (case-sensitive):
+
+- **Uppercase short names** (no prefix): `LOAD`, `RESTLD`, `THEVEQ`, `INDMACH1`, `INDMACH2`, `SVC_GENERIC1`.
+- **Prefixed names** — RAMSES adds the `inj_` prefix automatically: `VFAULT`/`inj_VFAULT`, `vfd_load`/`inj_vfd_load`, `PQ`/`inj_PQ`, `IBG`/`inj_IBG`, `WT3`/`inj_WT3`, `WT4`/`inj_WT4`, `BESS`/`inj_BESS`, `GFOL`/`inj_GFOL`, `GFOR`/`inj_GFOR`.
+
+All of the above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). Additional variants documented below but not in this list (`inj_GFOR_v2`, `inj_INDM1`, `inj_norton`, `inj_PVG`, `inj_PV`) are not callable out of the box — they can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
+
+> **Note on case sensitivity.** Match the case used above exactly. The uppercase short names must be uppercase. For the prefixed family, `vfd_load` and `VFAULT` use those exact cases — most others follow the convention `inj_<UPPERCASE>` (e.g. `inj_PQ`, `inj_GFOR`).
 :::
 
 ---
 
 ## Load Models
 
-### `inj_load` — Exponential Recovery Load
+### `LOAD` (built-in exponential recovery load)
 
 #### Description
 
@@ -76,13 +85,13 @@ Internal computed parameters include the steady-state exponents for each compone
 #### Usage Example
 
 ```
-INJEC  load  LOAD1  BUS1  1.  1.  0.  0.  1.5  0.3  1.0  0.2  2.0  0.5  1.8  0.4  2.5  0.1  3.0  2.0  ;
+INJEC  LOAD  LOAD1  BUS1  1.  1.  0.  0.  1.5  0.3  1.0  0.2  2.0  0.5  1.8  0.4  2.5  0.1  3.0  2.0  ;
 ```
 *Parameters: `DP A1 alpha1 A2 alpha2 alpha3 DQ B1 beta1 B2 beta2 beta3`*
 
 ---
 
-### `inj_vfd_load` — Variable Frequency Drive Load
+### `vfd_load` / `inj_vfd_load` — Variable Frequency Drive Load
 
 #### Description
 
@@ -153,7 +162,7 @@ INJEC  vfd_load  VFD1  BUS_IND  1.  1.  0.  0.  1.5  0.7  2.0  0.2  1.0  0.5
 
 ---
 
-### `inj_restld` — Restorative Load
+### `RESTLD` — Restorative Load (built-in)
 
 #### Description
 
@@ -203,12 +212,12 @@ where the ratio $V/V_0$ governs the voltage dependence through `vrat`.
 #### Usage Example
 
 ```
-INJEC  restld  RESTLD1  BUS2  1.  1.  0.  0.  1.5  0.5  2.0  0.0  2.0  1.2  0.5  2.5  0.0  2.0  60.0  ;
+INJEC  RESTLD  RESTLD1  BUS2  1.  1.  0.  0.  1.5  0.5  2.0  0.0  2.0  1.2  0.5  2.5  0.0  2.0  60.0  ;
 ```
 
 ---
 
-### `inj_PQ` — Constant PQ Load
+### `PQ` / `inj_PQ` — Constant PQ Load
 
 #### Description
 
@@ -249,12 +258,12 @@ Initial conditions $P_0$, $Q_0$, $V_0$ are computed automatically at initializat
 #### Usage Example
 
 ```
-INJEC  PQ  LOAD_PQ  BUS3  1.  1.  0.  0.  0.01  ;
+INJEC  inj_PQ  LOAD_PQ  BUS3  1.  1.  0.  0.  0.01  ;
 ```
 
 ---
 
-### `inj_theveq` — Thévenin Equivalent
+### `THEVEQ` — Thévenin Equivalent (built-in)
 
 #### Description
 
@@ -296,14 +305,14 @@ Internal parameters `ETH` (Thévenin voltage magnitude, pu) and `phase` (interna
 #### Usage Example
 
 ```
-INJEC  theveq  EQUIV1  SLACK_BUS  1.  1.  0.  0.  2000.0  ;
+INJEC  THEVEQ  EQUIV1  SLACK_BUS  1.  1.  0.  0.  2000.0  ;
 ```
 
 ---
 
 ## Induction Machine Models
 
-### `inj_indmach1` — Single-Cage Induction Machine
+### `INDMACH1` (`inj_indmach1`) — Single-Cage Induction Machine
 
 #### Description
 
@@ -365,12 +374,12 @@ $$T_m = T_{m0}\left(A\,\omega_m^2 + B\,\omega_m + 1 - A - B\right)$$
 #### Usage Example
 
 ```
-INJEC  indmach1  MTR1  BUS_MV  1.  1.  0.  0.  10.0  0.01  0.10  2.50  0.015  0.10  1.5  0.8  0.1  0.0  ;
+INJEC  INDMACH1  MTR1  BUS_MV  1.  1.  0.  0.  10.0  0.01  0.10  2.50  0.015  0.10  1.5  0.8  0.1  0.0  ;
 ```
 
 ---
 
-### `inj_indmach2` — Double-Cage Induction Machine
+### `INDMACH2` (`inj_indmach2`) — Double-Cage Induction Machine
 
 #### Description
 
@@ -424,12 +433,16 @@ The swing equation is identical to `inj_indmach1`.
 #### Usage Example
 
 ```
-INJEC  indmach2  MTR2  BUS_MV  1.  1.  0.  0.  10.0  0.01  0.08  2.00  0.02  0.06  0.04  0.10  1.5  0.8  0.1  0.0  ;
+INJEC  INDMACH2  MTR2  BUS_MV  1.  1.  0.  0.  10.0  0.01  0.08  2.00  0.02  0.06  0.04  0.10  1.5  0.8  0.1  0.0  ;
 ```
 
 ---
 
 ### `inj_INDM1` — Alternative Induction Machine (INDM1)
+
+:::caution
+`inj_INDM1` is documented here for reference but is not callable out of the box in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)). For built-in single-cage motors, use `INDMACH1` instead.
+:::
 
 #### Description
 
@@ -488,7 +501,7 @@ INJEC  INDM1  MTR3  BUS_MV  1.  1.  0.  0.  10.0  0.01  0.10  2.50  0.015  0.10 
 
 ## Renewable Generation / Inverter-Based Resources
 
-### `inj_IBG` — Inverter-Based Generator (Generic IBR)
+### `IBG` / `inj_IBG` — Inverter-Based Generator (Generic IBR)
 
 #### Description
 
@@ -579,7 +592,9 @@ INJEC  IBG  IBG1  BUS_GEN  1.  1.  0.  0.  1.2  1.0  0.5  0.02  0.01  0.5  1.0  
 
 ---
 
-### `inj_WT3WithChanges` — Type 3 Wind Turbine (DFIG)
+### `WT3` (`inj_WT3WithChanges`) — Type 3 Wind Turbine (DFIG)
+
+The data-file model name is `WT3` (or `inj_WT3`).
 
 #### Description
 
@@ -630,12 +645,12 @@ $$\Delta P_{\mathrm{ref}} = D_{\mathrm{dn}}\,\mathrm{sat}(\Delta f, f_{\mathrm{d
 | 63–97 | REEC_A | Elec ctrl | LVRT/HVRT, current limits, inner PI | various |
 | 98+ | REGC_A | Generator | Generator electrical conversion | various |
 
-Full parameter list has 80+ entries; refer to the embedded Fortran header comments in `inj_WT3WithChanges.f90`.
+Full parameter list has 80+ entries; refer to a working example data file for the complete ordering.
 
 #### Usage Example
 
 ```
-INJEC  WT3WithChanges  WT3_1  BUS_WIND  1.  1.  0.  0.
+INJEC  WT3  WT3_1  BUS_WIND  1.  1.  0.  0.
     100.0  0.0  0.02  0  0.0  0.05  0  0.0  0.3  -0.3  2.0  0.4  0.3  -0.3  0.0  0.15  0.9  0.05
     0.0  -0.06  0.06  -0.05  0.05  0.05  -0.05  2.0  1.0  1.0  -1.0  0.02  0  0  0.8
     1.5  1.5  0.01  0.5  ... ;
@@ -643,7 +658,9 @@ INJEC  WT3WithChanges  WT3_1  BUS_WIND  1.  1.  0.  0.
 
 ---
 
-### `inj_WT4WithChanges` — Type 4 Wind Turbine (Full Converter)
+### `WT4` (`inj_WT4WithChanges`) — Type 4 Wind Turbine (Full Converter)
+
+The data-file model name is `WT4` (or `inj_WT4`).
 
 #### Description
 
@@ -678,7 +695,7 @@ The REEC_A electrical controller supplies current commands with the same LVRT/HV
 #### Usage Example
 
 ```
-INJEC  WT4WithChanges  WT4_1  BUS_WIND  1.  1.  0.  0.
+INJEC  WT4  WT4_1  BUS_WIND  1.  1.  0.  0.
     100.0  0.0  0.02  0  0.0  0.05  0  0.0  0.3  -0.3  2.0  0.4  0.3  -0.3  0.0  0.15  0.9  0.05
     0.0  -0.06  0.06  -0.05  0.05  0.05  -0.05  2.0  1.0  1.0  -1.0  0.02  0  0  5.0  1.5  1.0  1.5  20.0  ... ;
 ```
@@ -686,6 +703,10 @@ INJEC  WT4WithChanges  WT4_1  BUS_WIND  1.  1.  0.  0.
 ---
 
 ### `inj_PVG` — Photovoltaic Generator
+
+:::caution
+`inj_PVG` is documented here for reference but is not callable out of the box in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)). For built-in IBR modelling, use `IBG`, `WT3`, or `WT4`.
+:::
 
 #### Description
 
@@ -730,7 +751,9 @@ INJEC  PVG  PV1  BUS_PV  1.  1.  0.  0.  1.2  1.0  0.5  0.02  0.01  0.5  1.0  0.
 
 ---
 
-### `inj_GFOR` — Grid-Forming Converter
+### `GFOR` / `inj_GFOR` — Grid-Forming Converter
+
+The data-file model name is `GFOR` (or `inj_GFOR`). `GFOR` resolves to the original grid-forming converter described below. A newer alternative implementation (described in the next section) is not dispatched by default.
 
 #### Description
 
@@ -805,6 +828,10 @@ INJEC  GFOR  GFM1  BUS_BESS  1.  1.  0.  0.  0.005  0.15  1.0  50.0  5.0  0.05  
 ---
 
 ### `inj_GFOR_v2` — Grid-Forming Converter v2
+
+:::caution
+`inj_GFOR_v2` is an alternative grid-forming converter implementation documented here for reference. It is **not** the model dispatched by `GFOR` in a standard RAMSES distribution (which uses the implementation shown in the previous section). To use this newer variant, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::
 
 #### Description
 
@@ -992,7 +1019,9 @@ INJEC  GFOR_v2  GFOR_V2_SS  BUS_BESS  1.  1.  0.  0.
 
 ---
 
-### `inj_GFol` — Grid-Following Converter
+### `GFOL` (`inj_GFol`) — Grid-Following Converter
+
+The data-file model name is `GFOL` (or `inj_GFOL`).
 
 #### Description
 
@@ -1073,7 +1102,7 @@ $$p_{\mathrm{dc}} = v_{\mathrm{dc}} \cdot i_{\mathrm{dc}} = v_{\mathrm{md}} i_d 
 #### Usage Example
 
 ```
-INJEC  GFol  GFOL1  BUS_IBR  1.  1.  0.  0.  0.005  0.15  0.0  0.0  100.0  100.0
+INJEC  GFOL  GFOL1  BUS_IBR  1.  1.  0.  0.  0.005  0.15  0.0  0.0  100.0  100.0
                               2.0  20.0  0.1  -10.0  10.0  2.0  20.0
                               0.05  1.0  0.1  1.1  0.9  0.7  0.4  1  ;
 ```
@@ -1082,7 +1111,9 @@ INJEC  GFol  GFOL1  BUS_IBR  1.  1.  0.  0.  0.005  0.15  0.0  0.0  100.0  100.0
 
 ## Energy Storage
 
-### `inj_BESSWithChanges` — Battery Energy Storage System
+### `BESS` (`inj_BESSWithChanges`) — Battery Energy Storage System
+
+The data-file model name is `BESS` (or `inj_BESS`).
 
 #### Description
 
@@ -1113,7 +1144,7 @@ $$P_{\min} = \begin{cases} 0 & \mathrm{SOC} \le \mathrm{SOC}_{\min}\\ P_{\min,\m
 | 74–75 | `pmax`, `pmin` | REEC_C | Active current limits (pu on SNOM) | pu |
 | 76 | `Tpord` | REEC_C | Active power order time constant | s |
 
-Full parameter listing (125 parameters) is detailed in the embedded header of `inj_BESSWithChanges.f90`.
+Full parameter listing has approximately 125 parameters; refer to a working example data file for the complete ordering.
 
 #### State Variables
 

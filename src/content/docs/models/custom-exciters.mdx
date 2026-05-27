@@ -16,11 +16,20 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
               EXC model_name  param1  param2  ...
               TOR model_name  param1  param2  ... ;
 ```
+
+Recognised exciter model names (case-sensitive):
+
+- **Uppercase short names** (no prefix): `CONSTANT`, `1ST_ORDER`, `GENERIC1`, `GENERIC2`.
+- **Prefixed names** — RAMSES adds the `exc_` prefix automatically, so you can write either form: `kundur`/`exc_kundur`, `ENTSOE_simp`, `ST1A`, `SEXS`, `SEXS_IEEEST`, `GENERIC3`/`exc_GENERIC3`, `GENERIC4`/`exc_GENERIC4`, `AC1A`, `AC4A`, `IEEET5`, `ST1A_IEEEST`, `ST1A_PSS4B`, `ST1A_PSS2B`, `EXPIC1_PSS2B`.
+
+All of the above are built into every RAMSES distribution (the standalone executable and the shared library used by PyRAMSES). Additional IEEE variants that appear in the catalogue below but are not in this list (e.g. `AC1A_MAXEX2`, `AC8B`, `DC3A`, `EXHQSC*`, `ST1A_PSS3B`, `ST2A`, `SEXS_STAB3_lim`, etc.) are not callable out of the box — they can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
 :::
 
 ---
 
-## exc_constant
+## CONSTANT (`exc_constant`)
+
+The data-file model name is `CONSTANT`.
 
 ### Scientific Description
 
@@ -69,7 +78,9 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
 
 ---
 
-## exc_1storder
+## 1ST_ORDER (`exc_1storder`)
+
+The data-file model name is `1ST_ORDER` (uppercase, with the underscore).
 
 ### Scientific Description
 
@@ -115,7 +126,7 @@ $$
 ```
 SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
                     XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
-              EXC 1storder  200.0  0.05  0.0  6.0
+              EXC 1ST_ORDER  200.0  0.05  0.0  6.0
                             ! KA    TA    Vfmin Vfmax
               TOR CONSTANT ;
 ```
@@ -123,13 +134,15 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
 <TabItem label="Notes">
 - This model is the Fortran-coded equivalent of a simple `tf1plim` block with input $V_{ref} - V$.
 - `KA` and `TA` together set the closed-loop bandwidth.
-- The model name in the data file is `1storder` (not `exc_1storder`).
+- The model name in the data file is `1ST_ORDER` (uppercase, with the underscore).
 </TabItem>
 </Tabs>
 
 ---
 
-## exc_kundur
+## exc_kundur (`kundur`)
+
+The data-file model name is `kundur` or `exc_kundur` — the `exc_` prefix is added automatically.
 
 ### Scientific Description
 
@@ -209,7 +222,9 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
 
 ---
 
-## exc_generic1
+## GENERIC1 (`exc_generic1`)
+
+The data-file model name is `GENERIC1`.
 
 ### Scientific Description
 
@@ -286,7 +301,9 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
 
 ---
 
-## exc_generic2
+## GENERIC2 (`exc_generic2`)
+
+The data-file model name is `GENERIC2`.
 
 ### Scientific Description
 
@@ -373,7 +390,7 @@ The OEL uses a three-level piecewise-linear characteristic $(s_1, T_{oel1})$, $(
 ```
 SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
                     XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
-              EXC generic2  0.0  0.02  1.0  0.10  1.00  200.0  0.05  5.0  1.0  6.0  -6.0  1.0  0.0  0.50
+              EXC GENERIC2  0.0  0.02  1.0  0.10  1.00  200.0  0.05  5.0  1.0  6.0  -6.0  1.0  0.0  0.50
                             ! Xc   Tr   C    Tc    Tb    Ka     Ta    Ki   Kp  VrmaxD VrminD G   Ke  Te
                             3.10  0.066  4.18  0.91  6.0  -6.0  1.0  1.0  0.05  9.5  1.40  0.154  0.033  0.154  0.033
                             ! E1   SeE1   E2   SeE2  Vrmax Vrmin typss W   Tf   Kpss  Tw    T1     T2     T3     T4
@@ -386,7 +403,9 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
 
 ---
 
-## exc_GENERIC3
+## exc_GENERIC3 (`GENERIC3`)
+
+The data-file model name is `exc_GENERIC3` (or `GENERIC3` — the `exc_` prefix is added automatically).
 
 ### Scientific Description
 
@@ -481,7 +500,7 @@ The CODEGEN block structure from the `.txt` file:
 ```
 SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
                     XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
-              EXC GENERIC3  200.0  0.05  10.0  0.04  0.0  5.0
+              EXC exc_GENERIC3  200.0  0.05  10.0  0.04  0.0  5.0
                             ! G     Ta    Tb    Te    vfmin vfmax
                             9.5  1.40  0.154  0.033  0.154  0.033  0.10
                             ! Kpss Tw   T1     T2     T3     T4     C
@@ -494,7 +513,9 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
 
 ---
 
-## exc_GENERIC4
+## exc_GENERIC4 (`GENERIC4`)
+
+The data-file model name is `exc_GENERIC4` (or `GENERIC4` — the `exc_` prefix is added automatically).
 
 ### Scientific Description
 
@@ -546,7 +567,7 @@ The OEL integrates the overcurrent error $(I_f - if_{1lim})$, capped at $if_{2li
 ```
 SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
                     XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
-              EXC GENERIC4  200.0  0.05  10.0  0.04  0.0  5.0
+              EXC exc_GENERIC4  200.0  0.05  10.0  0.04  0.0  5.0
                             ! G     Ta    Tb    Te    vfmin vfmax
                             9.5  1.40  0.154  0.033  0.154  0.033  0.10
                             ! Kpss Tw   T1     T2     T3     T4     C
@@ -558,6 +579,6 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
 <TabItem label="Notes">
 - `exc_GENERIC4` is the compiled-code equivalent of `exc_GENERIC3`. Use when simulation speed is a priority, as the Fortran subroutine is faster than the interpreted CODEGEN version.
 - Parameter order and meaning are identical to `exc_GENERIC3`.
-- The model name in the data file is `GENERIC4` (not `exc_GENERIC4`).
+- The model name in the data file is `exc_GENERIC4` (or `GENERIC4` — the `exc_` prefix is added automatically).
 </TabItem>
 </Tabs>

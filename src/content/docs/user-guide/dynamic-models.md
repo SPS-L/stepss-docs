@@ -20,15 +20,23 @@ For the complete mathematical model, per unit system, and detailed parameter des
 
 ### Available Exciter Models
 
-The following exciter types are available in the current version:
+RAMSES adds the `exc_` prefix to the model name automatically, so both `AC1A` and `exc_AC1A` are accepted.
 
-`1storder`, `constant`, `kundur`, `generic1`, `generic2`, `ST1A`, `ST1A_lim`, `ST1A_PSS2B`, `ST1A_PSS3B`, `ST1A_PSS4B`, `ST1A_IEEEST`, `ST2A`, `AC1A`, `AC1A_RETRO`, `AC4A`, `AC8B`, `DC3A`, `IEEET5`, `EXPIC1`, `ENTSOE_simp`, and many more with combinations of PSS and OEL models.
+Uppercase short names (no prefix): `CONSTANT`, `1ST_ORDER`, `GENERIC1`, `GENERIC2`.
+
+Prefixed names (either form): `kundur` / `exc_kundur`, `ENTSOE_simp`, `ST1A`, `SEXS`, `SEXS_IEEEST`, `GENERIC3` / `exc_GENERIC3`, `GENERIC4` / `exc_GENERIC4`, `AC1A`, `AC4A`, `IEEET5`, `ST1A_IEEEST`, `ST1A_PSS4B`, `ST1A_PSS2B`, `EXPIC1_PSS2B`.
+
+All names above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). Additional IEEE variants listed in the [IEEE Exciter Models](/models/ieee-exciters/) page (`AC1A_MAXEX2`, `AC1A_RETRO*`, `AC8B*`, `DC3A`, `EXPIC1`, `SEXS_STAB3_lim`, `ST1A_lim`, etc., and the `EXHQSC*` family) are not callable out of the box and require extending RAMSES through URAMSES.
 
 For detailed documentation of each model, see the [Model Reference](/models/ieee-exciters/) section.
 
 ### Available Torque Controller Models
 
-`1storder`, `constant`, `DEGOV1`, `hydro_generic1`, `thermal_generic1`, `ENTSOE_simp`
+Uppercase short names (no prefix): `CONSTANT`, `1ST_ORDER`, `HYDRO_GENERIC1`, `THERMAL_GENERIC1`.
+
+Prefixed names (either form, `tor_` is added automatically): `ENTSOE_simp` / `tor_ENTSOE_simp`, `HYGOV` / `tor_HYGOV`, `GAST` / `tor_GAST`, `TGOV1` / `tor_TGOV1` (internally `tor_TGOV1D`), `DEGOV1` / `tor_DEGOV1`.
+
+All names above are built into every RAMSES distribution. Additional governors listed in the [Custom Governor Models](/models/custom-governors/) page (`tor_gasturbm`, `tor_govclasm`, `tor_govhydr`, `tor_govnuc`) are not callable out of the box and require extending RAMSES through URAMSES.
 
 For detailed documentation of each model, see the [Model Reference](/models/ieee-exciters/) section.
 
@@ -42,18 +50,26 @@ INJEC INJ_TYPE NAME BUS_NAME FP FQ P Q parameters_passed_to_INJ ;
 
 ### Available Injector Models
 
-| Model | Description |
-|-------|-------------|
-| `load` | Generic load model |
-| `PQ` | Constant PQ load |
-| `restld` | Restorative load |
-| `indmach1`, `indmach2` | Induction machine models |
-| `IBG` | Inverter-based generator |
-| `WT3WithChanges`, `WT4WithChanges` | Wind turbine models |
-| `BESSWithChanges` | Battery energy storage system |
-| `vfd_load` | Variable frequency drive load |
-| `svc` | SVC model |
-| `theveq` | Thévenin equivalent (infinite bus) |
+Uppercase short names take no prefix; the prefixed names accept either `inj_` or no prefix (RAMSES adds it automatically).
+
+| Data-file name | Equivalent | Description |
+|----------------|-----------|-------------|
+| `LOAD` | — | Generic exponential-recovery load |
+| `RESTLD` | — | Restorative load |
+| `INDMACH1`, `INDMACH2` | — | Single-cage / double-cage induction machines |
+| `SVC_GENERIC1` | — | Generic SVC model |
+| `THEVEQ` | — | Thévenin equivalent (infinite bus) |
+| `PQ` | `inj_PQ` | Constant PQ load |
+| `IBG` | `inj_IBG` | Generic inverter-based generator |
+| `WT3` | `inj_WT3` | Type 3 wind turbine |
+| `WT4` | `inj_WT4` | Type 4 wind turbine |
+| `BESS` | `inj_BESS` | Battery energy storage |
+| `GFOL` | `inj_GFOL` | Grid-following converter |
+| `GFOR` | `inj_GFOR` | Grid-forming converter |
+| `vfd_load` | `inj_vfd_load` | Variable-frequency-drive load |
+| `VFAULT` | `inj_VFAULT` | Internal voltage-fault injector (auto-added by RAMSES) |
+
+All injectors listed in the table above are compiled into every RAMSES build. Additional injector variants documented in the [Injector Models](/models/custom-injectors/) page (`inj_GFOR_v2`, `inj_INDM1`, `inj_norton`, `inj_PVG`, `inj_PV`) are not callable out of the box and require extending RAMSES through URAMSES.
 
 ## Thévenin Equivalent (Infinite Bus)
 
@@ -92,12 +108,15 @@ Two-port components connect two buses:
 
 ### Available Two-Port Models
 
-| Model | Description |
-|-------|-------------|
-| `HVDC_LCC` | Line-commutated converter HVDC |
-| `HVDC_VSC` | Voltage source converter HVDC |
-| `HVDC_VSC_SC` | VSC-HVDC with short-circuit contribution |
-| `DCL_WCL` | DC link model |
+RAMSES adds the `twop_` prefix to the model name automatically, so both `HVDC_LCC` and `twop_HVDC_LCC` are accepted.
+
+| Data-file name | Equivalent | Description |
+|----------------|-----------|-------------|
+| `HVDC_LCC` | `twop_HVDC_LCC` | Line-commutated converter HVDC |
+| `HVDC_VSC_SC` | `twop_HVDC_VSC_SC` | Self-commutating (grid-forming) VSC-HVDC |
+| `DCL_WCL` | `twop_DCL_WCL` | DC link with wind-converter link (offshore wind HVDC) |
+
+The three models above are built into every RAMSES distribution. Other two-port models documented in the [Two-Port Models](/models/two-port-models/) page (`twop_HVDC_VSC` and the Hydro-Québec family `twop_CHENIER`, `twop_CSVGN5`, `twop_HQSVC`, `twop_DC_BHPM`, `twop_DC_CHAAUT`, `twop_DC_CHTFWX`, `twop_DC_LVCL_1`) are not callable out of the box and require extending RAMSES through URAMSES.
 
 For detailed documentation of each model, see the [Model Reference](/models/ieee-exciters/) section.
 
@@ -119,19 +138,22 @@ DCTL CTRL_TYPE CTLNAME parameters ;
 
 ### Available Discrete Controller Models
 
+The following discrete-controller names are built into every RAMSES distribution (use them uppercase, with no `dctl_` prefix):
+
 | Model | Description |
 |-------|-------------|
-| `ltc`, `ltc2`, `ltcinv` | Load tap changer controllers |
-| `oltc2` | On-load tap changer |
-| `uvls` | Under-voltage load shedding |
-| `uvprot` | Under-voltage protection |
-| `pst` | Phase-shifting transformer controller |
-| `rt` | Real-time synchronizer |
-| `mais` | Multi-area islanding scheme |
+| `LTC`, `LTC2`, `LTCINV` | Load tap changer controllers |
+| `OLTC2` | On-load tap changer |
+| `UVLS` | Under-voltage load shedding |
+| `UVPROT` | Under-voltage protection |
+| `PST` | Phase-shifting transformer controller |
+| `RT` | Real-time synchronizer |
+| `MAIS` | Multi-area islanding scheme |
 | `FRT` | Fault ride-through |
-| `sim_minmaxvolt` | Voltage stopping criteria |
-| `sim_minmaxspeed` | Speed stopping criteria |
-| `voltage_variability` | Voltage variability monitor |
+| `SIM_MINMAXVOLT` | Voltage stopping criteria |
+| `SIM_MINMAXSPEED` | Speed stopping criteria |
+| `VOLT_VAR` | Voltage variability monitor |
+| `line_prot` | Line overcurrent protection (`dctl_line_prot` also accepted) |
 
 ### Load Tap Changer (LTC)
 
