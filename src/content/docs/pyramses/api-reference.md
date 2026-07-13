@@ -30,9 +30,9 @@ for i in range(12):
     list_of_cases.append(pyramses.cfg('cmd' + str(i) + '.txt'))
 ```
 
-#### `writeCmdFile(filename)`
+#### `writeCmdFile(filename=None)`
 
-Save the current configuration to a command file. Useful for reproducing a run later.
+Save the current configuration to a command file. Useful for reproducing a run later. When called without an argument, it returns the command-file content as a string instead of writing a file.
 
 ```python
 case.writeCmdFile('cmd.txt')
@@ -281,10 +281,10 @@ case.addRunObs('MS g1')
 **`BPE / BQE / BPO / BQO BRANCH_NAME`**, Active (P) or reactive (Q) power at the origin (O) or extremity (E) of a branch:
 
 ```python
-case.addRunObs('BPE 1041-01')   # active power at origin of branch 1041-01
-case.addRunObs('BQE 1041-01')   # reactive power at origin
-case.addRunObs('BPO 1041-01')   # active power at extremity
-case.addRunObs('BQO 1041-01')   # reactive power at extremity
+case.addRunObs('BPO 1041-01')   # active power at origin of branch 1041-01
+case.addRunObs('BQO 1041-01')   # reactive power at origin
+case.addRunObs('BPE 1041-01')   # active power at extremity
+case.addRunObs('BQE 1041-01')   # reactive power at extremity
 ```
 
 **`ON INJECTOR_NAME OBSERVABLE_NAME`**, Named observable from an injector model:
@@ -293,10 +293,10 @@ case.addRunObs('BQO 1041-01')   # reactive power at extremity
 case.addRunObs('ON WT1a Pw')    # observable Pw from injector WT1a
 ```
 
-**`TO TORQUE_NAME OBSERVABLE_NAME`**, Named observable from a governor/torque model:
+**`TO TWOP_NAME OBSERVABLE_NAME`**, Named observable from a two-port model:
 
 ```python
-case.addRunObs('TO g1 Pm')      # mechanical power from governor of g1
+case.addRunObs('TO hvdc1 P1')   # observable P1 from two-port hvdc1
 ```
 
 **`RT RT`**, Real-time versus simulated-time plot (useful to gauge simulation speed):
@@ -376,6 +376,32 @@ Terminate the simulation before reaching the time horizon:
 ram.endSim()
 ```
 
+#### `pauseSim(t_pause)`: schedule a pause
+
+Schedule a pause at a given simulated time; it takes effect on the next `execSim()` or `contSim()` call:
+
+```python
+ram.pauseSim(10.0)
+ram.execSim(case)   # will pause at t = 10 s
+```
+
+#### `getEndSim()`
+
+Return `0` while the simulation is still running, `1` once it has ended:
+
+```python
+if ram.getEndSim():
+    print('simulation finished')
+```
+
+#### `getLastErr()`
+
+Return the last error message issued by RAMSES as a string. Useful after catching a `RAMSESError`:
+
+```python
+msg = ram.getLastErr()
+```
+
 ---
 
 ### Querying State
@@ -416,6 +442,14 @@ loads    = ram.getAllCompNames('LOAD')    # list of all load names
 
 Supported component types: `BUS`, `SYNC`, `INJ`, `DCTL`, `BRANCH`, `TWOP`, `SHUNT`, `LOAD`.
 
+#### `getCompName(comp_type, num)`
+
+Return the name of the `num`-th component (1-based) of the given type. Accepts the same component types as `getAllCompNames()`.
+
+```python
+first_bus = ram.getCompName('BUS', 1)   # e.g. 'B1'
+```
+
 #### `getBusVolt(names)`
 
 Return voltage magnitudes (in pu) for a list of bus names.
@@ -428,7 +462,7 @@ voltages = ram.getBusVolt(bus_names)
 
 #### `getBusPha(names)`
 
-Return voltage phase angles (in radians) for a list of bus names.
+Return voltage phase angles (in degrees) for a list of bus names.
 
 ```python
 phases = ram.getBusPha(bus_names)
@@ -441,6 +475,14 @@ Return power flows for a list of branch names. Each entry is `[P_from, Q_from, P
 ```python
 powers = ram.getBranchPow(['1041-01'])
 # powers[0] == [P_from, Q_from, P_to, Q_to]
+```
+
+#### `getBranchCur(names)`
+
+Return branch currents for a list of branch names. Each entry contains the x–y current components at the origin and extremity: `[ix_orig, iy_orig, ix_extr, iy_extr]`.
+
+```python
+currents = ram.getBranchCur(['1011-1013', '1012-1014'])
 ```
 
 #### `getObs(comp_types, comp_names, obs_names)`
@@ -465,6 +507,101 @@ comp_type = ['EXC', 'EXC']
 comp_name = ['g1',  'g2']
 prm_name  = ['V0',  'KPSS']
 prms = ram.getPrm(comp_type, comp_name, prm_name)
+```
+
+#### `getPrmNames(comp_types, comp_names)`
+
+List the parameter names of one or more model instances. Accepts single strings or equal-length lists; component types are `EXC`, `TOR`, `INJ`, `DCTL`, `TWOP`.
+
+```python
+names = ram.getPrmNames('EXC', 'g1')   # list of parameter names of g1's exciter
+```
+
+---
+
+### Runtime Observable Recording
+
+Observables can also be selected programmatically after the simulation starts, instead of via an observables file. Call the three methods in order, after `execSim(case, 0.0)`:
+
+#### `initObserv(traj_filenm)`
+
+Initialize the runtime observable recording system and set the output trajectory file.
+
+#### `addObserv(string)`
+
+Register one observable selector in RAMSES format (e.g. `'BUS *'`, `'SYNC g1'`). Call once per selector.
+
+#### `finalObserv()`
+
+Finalize the selection, allocate the recording buffers, and write the trajectory file header.
+
+```python
+ram.execSim(case, 0.0)
+ram.initObserv('obs.trj')
+ram.addObserv('BUS *')      # record all bus voltages
+ram.addObserv('SYNC g1')    # record machine g1
+ram.finalObserv()
+ram.contSim(ram.getInfTime())
+```
+
+---
+
+### Subsystems
+
+Subsystems select a group of buses for aggregate queries.
+
+#### `defineSS(ssID, filter1, filter2, filter3)`
+
+Define subsystem `ssID` as the intersection of three filters: voltage levels, zones, and bus names. Each filter is a list of strings; an empty list deactivates that filter.
+
+```python
+ram.defineSS(1, ['735'], [], [])   # subsystem 1 = all 735 kV buses
+```
+
+#### `getSS(ssID)`
+
+Return the list of buses belonging to a subsystem.
+
+```python
+buses = ram.getSS(1)
+```
+
+#### `getTrfoSS(ssID, location, in_service, rettype)`
+
+Return transformer information for a subsystem. `location`: `1` = both ends inside the subsystem, `2` = tie transformers, `3` = both. `in_service`: `1` = in-service only, `2` = all. `rettype` selects the returned quantity: `NAME`, `From`, `To`, `Status`, `Tap`, `Currentf`, `Currentt`, `Pf`, `Qf`, `Pt`, `Qt`.
+
+```python
+status = ram.getTrfoSS(1, 3, 2, 'Status')
+```
+
+---
+
+### User Model Libraries
+
+Compiled user-defined model libraries (built with URAMSES) can be loaded at runtime.
+
+#### `load_MDL(MDLName)`
+
+Load a shared library of user-defined models (`.dll` on Windows, `.so` on Linux). The models stay available for the lifetime of the `sim` instance.
+
+```python
+ram.load_MDL('MDLs.dll')
+```
+
+#### `unload_MDL(MDLName)`
+
+Unload a previously loaded user-model library.
+
+```python
+ram.unload_MDL('MDLs.dll')
+```
+
+#### `get_MDL_no()`
+
+Return the number of user-model libraries currently loaded.
+
+```python
+n = ram.get_MDL_no()
 ```
 
 ---
@@ -501,21 +638,19 @@ ram.contSim(ram.getInfTime())
 
 #### `getJac()`
 
-Export the system Jacobian matrix in descriptor form (`E`, `A` matrices) at the current pause point. Writes four files to the working directory:
+Export the system Jacobian in descriptor form at the current pause point. Returns a tuple `(A, E)` of `scipy.sparse.csc_matrix` objects, where `A` holds the numerical Jacobian values and `E` is the structural incidence matrix of the descriptor system. Two intermediate text files are also written to the working directory:
 
 | File | Contents |
 |------|----------|
-| `jac_val.dat` | Non-zero values |
-| `jac_eqs.dat` | Equation names |
-| `jac_var.dat` | Variable names |
-| `jac_struc.dat` | Sparsity structure |
+| `py_val.dat` | Jacobian values (parsed into `A`) |
+| `py_eqs.dat` | Structural incidence matrix (parsed into `E`) |
 
 ```python
 ram.execSim(case, 10.0)
-ram.getJac()
+A, E = ram.getJac()
 ```
 
-These files can be used for small-signal stability analysis with the [RAMSES Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis) tool.
+The matrices can be used for small-signal stability analysis, e.g. with the [RAMSES Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis) tool or `scipy.sparse.linalg`.
 
 :::note
 Set `$OMEGA_REF SYN ;` in the solver settings data file when exporting the Jacobian for eigenanalysis.
@@ -579,12 +714,12 @@ Retrieve voltage time series for a bus. Returns an object with:
 | Attribute | Description |
 |-----------|-------------|
 | `.mag` | Voltage magnitude (pu) |
-| `.pha` | Voltage phase angle (rad) |
+| `.pha` | Voltage phase angle (deg) |
 
 ```python
 bus = ext.getBus('4044')
 bus.mag.plot()   # voltage magnitude (pu)
-bus.pha.plot()   # voltage phase angle (rad)
+bus.pha.plot()   # voltage phase angle (deg)
 ```
 
 ---
@@ -732,6 +867,35 @@ branch.RA.plot()   # transformer phase angle (deg)
 
 ---
 
+#### `getShunt(name)`
+
+Retrieve shunt compensation time series.
+
+| Attribute | Description |
+|-----------|-------------|
+| `.Q` | Reactive power produced (Mvar) |
+
+```python
+ext.getShunt('sh1').Q.plot()
+```
+
+---
+
+#### `getLoad(name)`
+
+Retrieve load time series.
+
+| Attribute | Description |
+|-----------|-------------|
+| `.P` | Active power consumed (MW) |
+| `.Q` | Reactive power consumed (Mvar) |
+
+```python
+ext.getLoad('L_1').P.plot()
+```
+
+---
+
 ### Multi-Curve Plotting
 
 #### `pyramses.curplot(curves)`
@@ -789,7 +953,7 @@ ram.addDisturb(100.0, 'FAULT BUS 4032 0. 0.')
 ram.addDisturb(100.1, 'CLEAR BUS 4032')
 
 # Export Jacobian at this operating point
-ram.getJac()
+A, E = ram.getJac()
 
 # Run to end
 ram.contSim(ram.getInfTime())

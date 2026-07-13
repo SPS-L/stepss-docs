@@ -23,6 +23,24 @@ For a minimal installation (no plotting or notebook support):
 pip install pyramses
 ```
 
+## Linux System Prerequisites
+
+On Linux, the following system libraries must be installed before running PyRAMSES:
+
+```bash
+sudo apt install libopenblas0 libgfortran5 libgomp1
+```
+
+These packages provide:
+
+| Package | Purpose |
+|---------|---------|
+| `libopenblas0` | OpenBLAS BLAS/LAPACK routines used by the solver |
+| `libgfortran5` | GNU Fortran runtime required by the Fortran components of RAMSES |
+| `libgomp1` | OpenMP runtime for multi-core parallel execution |
+
+On most desktop Linux distributions these are already present. If `pyramses` fails to import with a shared-library error, install the packages above and retry.
+
 ## MKL Dependencies
 
 The simulator depends on the Intel Math Kernel Library (MKL) for LAPACK/BLAS and OpenMP. These are automatically installed as dependencies when installing via pip.
@@ -47,13 +65,6 @@ sudo apt-get install gnuplot-x11
 ```
 
 </TabItem>
-<TabItem label="macOS (Homebrew)">
-
-```bash
-brew install gnuplot
-```
-
-</TabItem>
 <TabItem label="Windows">
 
 Download and install from [gnuplot.info](http://www.gnuplot.info/). Make sure the installation directory is added to your system PATH.
@@ -70,7 +81,9 @@ Gnuplot must be in the system PATH. You can check availability with `pyramses.__
 | Platform | Library | Notes |
 |----------|---------|-------|
 | **Windows** | `ramses.dll` | Primary platform, full support |
-| **Linux** | `ramses.so` | Full support with gfortran/OpenBLAS |
+| **Linux** | `ramses.so` | Full support (requires the [system libraries above](#linux-system-prerequisites)) |
+
+macOS is not supported: no RAMSES binary is bundled for it.
 
 ## Next Steps
 

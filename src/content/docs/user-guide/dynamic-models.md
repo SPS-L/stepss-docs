@@ -69,7 +69,7 @@ Uppercase short names take no prefix; the prefixed names accept either `inj_` or
 | `vfd_load` | `inj_vfd_load` | Variable-frequency-drive load |
 | `VFAULT` | `inj_VFAULT` | Internal voltage-fault injector (auto-added by RAMSES) |
 
-All injectors listed in the table above are compiled into every RAMSES build. Additional injector variants documented in the [Injector Models](/models/custom-injectors/) page (`inj_GFOR_v2`, `inj_INDM1`, `inj_norton`, `inj_PVG`, `inj_PV`) are not callable out of the box and require extending RAMSES through URAMSES.
+All injectors listed in the table above are compiled into every RAMSES build. Additional injector variants documented in the [Injector Models](/models/custom-injectors/) page (`inj_GFOR_v2`, `inj_INDM1`, `inj_norton`, `inj_PVG`) are not callable out of the box and require extending RAMSES through URAMSES.
 
 ## Thévenin Equivalent (Infinite Bus)
 
@@ -167,8 +167,8 @@ DCTL LTC CTLNAME TRFONAME BUS_NAME DIR NMIN NMAX NBPOS TOL DELAY1 DELAY2 ;
 | `TRFONAME` | Name of the controlled transformer |
 | `BUS_NAME` | Name of the controlled bus |
 | `DIR` | Direction of tap change |
-| `NMIN` | Minimum tap ratio |
-| `NMAX` | Maximum tap ratio |
+| `NMIN` | Minimum tap ratio (% of nominal, e.g. `85.`) |
+| `NMAX` | Maximum tap ratio (% of nominal, e.g. `115.`) |
 | `NBPOS` | Number of tap positions |
 | `TOL` | Voltage tolerance |
 | `DELAY1` | First delay (initial action) |

@@ -35,6 +35,9 @@ export default defineConfig({
 				baseUrl: 'https://github.com/SPS-L/stepss-docs/edit/main/',
 			},
 			customCss: [
+				'@fontsource/inter/400.css',
+				'@fontsource/inter/600.css',
+				'@fontsource/jetbrains-mono/400.css',
 				'./src/styles/custom.css',
 				'katex/dist/katex.min.css',
 			],

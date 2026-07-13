@@ -79,17 +79,21 @@ where $\tau_{delay} = \tau_{first}$ for the first operation, $\tau_{next}$ there
 | `branch_name` | `w(1)` | Transformer branch name (must be type `trfo`) |
 | `bus_name` | `w(2)` | Monitored (controlled) bus name |
 | `direction` | `w(3)` | Sign convention: >0 means increasing ratio raises voltage |
-| `ratio_min` | `w(4)` | Minimum transformer ratio (pu/pu) |
-| `ratio_max` | `w(5)` | Maximum transformer ratio (pu/pu) |
+| `ratio_min` | `w(4)` | Minimum transformer ratio (**% of nominal**, e.g. `85.` for 0.85 pu) |
+| `ratio_max` | `w(5)` | Maximum transformer ratio (**% of nominal**, e.g. `115.` for 1.15 pu) |
 | `nb_positions` | `w(6)` | Number of tap positions (step = (max−min)/(nb−1)) |
 | `half_deadband` | `w(7)` | Voltage half-deadband $\delta V$ (pu) |
 | `delay_first` | `w(8)` | Delay before first tap change (s) |
 | `delay_next` | `w(9)` | Delay between subsequent tap changes (s) |
 
+:::caution
+The ratio limits are given in **percent**, not per unit: the model divides `ratio_min` and `ratio_max` by 100 when reading the data. A record with `0.85 1.15` would silently produce limits of 0.0085/0.0115 pu.
+:::
+
 #### Usage Example
 
 ```
-DCTL  LTC  LTC_TR1  TR1-HV-MV  BUS_MV  1  0.85  1.15  33  0.01  30.0  10.0 ;
+DCTL  LTC  LTC_TR1  TR1-HV-MV  BUS_MV  1  85.  115.  33  0.01  30.0  10.0 ;
 ```
 
 ---
@@ -115,8 +119,8 @@ $$
 | `branch_name` | `w(1)` | Transformer branch (type `trfo`) |
 | `bus_name` | `w(2)` | Monitored bus |
 | `direction` | `w(3)` | >0: ratio increase raises voltage |
-| `ratio_min` | `w(4)` | Minimum ratio (pu) |
-| `ratio_max` | `w(5)` | Maximum ratio (pu) |
+| `ratio_min` | `w(4)` | Minimum ratio (% of nominal) |
+| `ratio_max` | `w(5)` | Maximum ratio (% of nominal) |
 | `nb_positions` | `w(6)` | Number of tap positions |
 | `half_deadband` | `w(7)` | Voltage half-deadband (pu) |
 | `Vset` | `w(8)` | Voltage setpoint (pu) |
@@ -164,8 +168,8 @@ where $\tau_{max}$ is the maximum delay and `accel` is the acceleration factor (
 | `branch_name` | `w(1)` | Transformer branch |
 | `bus_name` | `w(2)` | Monitored bus |
 | `direction` | `w(3)` | Sign convention |
-| `ratio_min` | `w(4)` | Minimum ratio (pu) |
-| `ratio_max` | `w(5)` | Maximum ratio (pu) |
+| `ratio_min` | `w(4)` | Minimum ratio (% of nominal) |
+| `ratio_max` | `w(5)` | Maximum ratio (% of nominal) |
 | `nb_positions` | `w(6)` | Number of tap positions |
 | `half_deadband` | `w(7)` | Voltage half-deadband (pu) |
 | `Vset` | `w(8)` | Voltage setpoint (pu) |
@@ -175,7 +179,7 @@ where $\tau_{max}$ is the maximum delay and `accel` is the acceleration factor (
 #### Usage Example
 
 ```
-DCTL  LTCINV  LTCINV_TR1  TR1-HV-MV  BUS_MV  1  0.85  1.15  33  0.01  1.025  60.0  0.1 ;
+DCTL  LTCINV  LTCINV_TR1  TR1-HV-MV  BUS_MV  1  85.  115.  33  0.01  1.025  60.0  0.1 ;
 ```
 
 ---

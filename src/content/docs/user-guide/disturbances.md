@@ -34,6 +34,19 @@ time(s) CONTINUE SOLVER disc_meth max_h(s) min_h(s) latency(pu) upd_over
 0.000 CONTINUE SOLVER BD 0.0200 0.001 0. ALL
 ```
 
+## Continue Display
+
+Changes the sampling time step used for the output of observed variables from that point of the simulation onwards:
+
+```
+time(s) CONTINUE DISPLAY new_plot_step(s)
+```
+
+**Example**, reducing the output sampling to one point per second after $t = 20$ s:
+```
+20.000 CONTINUE DISPLAY 1.0
+```
+
 ## Stop
 
 Signals the end of the simulation. **Must be the last line**:
@@ -72,6 +85,19 @@ time(s) BREAKER INJ name_of_injector breaker(0/1)
 **Example**:
 ```
 10.000 BREAKER INJ L_11 0
+```
+
+## Trip Two-Port
+
+Disconnect a two-port component (e.g. an HVDC link) at both ends. Only opening is supported, so the breaker status must be `0`:
+
+```
+time(s) BREAKER TWOP name_of_twoport 0
+```
+
+**Example**:
+```
+10.000 BREAKER TWOP hvdc1 0
 ```
 
 ## Three-Phase Short-Circuit (Impedance)

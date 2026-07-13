@@ -59,7 +59,7 @@ ram.execSim(case, 10.0)
 # Bus voltages
 busNames = ['g1', 'g2', 'g3']
 voltages = ram.getBusVolt(busNames)   # list of voltage magnitudes (pu)
-phases   = ram.getBusPha(busNames)    # list of phase angles (rad)
+phases   = ram.getBusPha(busNames)    # list of phase angles (deg)
 
 # Branch power flows
 branch_pq = ram.getBranchPow(['1041-01'])  # [[P_from, Q_from, P_to, Q_to]]
@@ -164,7 +164,9 @@ for disturbance_time in [5.0, 10.0, 20.0]:
 
 ## Eigenanalysis Workflow
 
-Export the system Jacobian for small-signal stability analysis:
+Export the system Jacobian for small-signal stability analysis. There are two routes.
+
+**In Python**, `getJac()` returns the descriptor-form pair directly as SciPy sparse matrices (it also writes the intermediate files `py_val.dat` and `py_eqs.dat` to the working directory):
 
 ```python
 import pyramses
@@ -175,16 +177,23 @@ ram = pyramses.sim()
 # Pause at steady-state operating point
 ram.execSim(case, 0.0)
 
-# Export Jacobian matrices (writes jac_val.dat, jac_eqs.dat, jac_var.dat, jac_struc.dat)
-ram.getJac()
+# A: Jacobian values, E: structural incidence matrix (scipy.sparse.csc_matrix)
+A, E = ram.getJac()
 ram.endSim()
 ```
 
-The generated files can then be analysed in MATLAB using the [RAMSES Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis) tool:
+**For the MATLAB [RAMSES Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis) tool**, use the `JAC` disturbance instead, which writes the four files the tool expects (`<name>_val.dat`, `<name>_eqs.dat`, `<name>_var.dat`, `<name>_struc.dat`):
+
+```python
+ram.execSim(case, 0.0)
+ram.addDisturb(0.001, "JAC 'jac'")   # writes jac_val.dat, jac_eqs.dat, jac_var.dat, jac_struc.dat
+ram.contSim(0.001)
+ram.endSim()
+```
 
 ```matlab
 % In MATLAB:
-ssa('jac_val.dat', 'jac_eqs.dat', 'jac_var.dat', 'jac_struc.dat')
+ssa('jac_val.dat', 'jac_eqs.dat', 'jac_var.dat', 'jac_struc.dat', [], [], [])
 ```
 
 :::note

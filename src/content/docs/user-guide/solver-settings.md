@@ -31,6 +31,26 @@ Refresh interval for runtime observable plots (requires Gnuplot):
 $GP_REFRESH_RATE time_interval(s) ;
 ```
 
+### Gnuplot Invocation
+
+Enable or disable launching Gnuplot for runtime observables. When set to `F`, the runtime observable data are still written to file but Gnuplot is never called; useful for batch/headless runs:
+
+```
+$CALL_GP T/F ;
+```
+
+Default: `T`.
+
+### Gnuplot Output Mode
+
+Select whether runtime observables are displayed in an interactive terminal window or written to PNG image files:
+
+```
+$GP_MODE term/png ;
+```
+
+Default: `term`.
+
 ### Observable Buffer Size
 
 Internal memory reserved for storing observables during simulation:
@@ -119,6 +139,16 @@ $SKIP_CONV T/F ;
 $MAX_FAULT value ;
 ```
 
+### Minimum Branch Impedance
+
+Branches whose series impedance magnitude is below this threshold have their resistance/reactance floored to it, to avoid a singular network admittance matrix:
+
+```
+$ZMIN value(pu) ;
+```
+
+Default: `1e-05`.
+
 ## Advanced Solver Options
 
 ### Solution Scheme
@@ -135,6 +165,16 @@ $SCHEME DE/IN ;
 ```
 $LATENCY OBS_TIME_WINDOW(s) EARLY_STOP(T/F) ;
 ```
+
+### Subnetwork Latency
+
+Apply the latency technique at the subnetwork level: subnetworks whose currents change less than the latency tolerance are not recomputed at each step. Only active when subnetworks exist:
+
+```
+$LAT_SUBNETS T/F ;
+```
+
+Default: `F`.
 
 ### Load Restoration Time Constant
 
@@ -177,6 +217,24 @@ $OMP STA/DYN/GUI chunk ;
 | `GUI` | Guided assignment |
 
 `chunk` is the number of consecutive injectors assigned to each thread.
+
+## Miscellaneous
+
+### User Model Library
+
+Load a compiled user-model library (MDL file) at startup, making its models available to the simulation (Windows/Intel builds only):
+
+```
+$BASE_MDL filename ;
+```
+
+### License
+
+Provide the licensee e-mail and the 64-character license key. A valid key unlocks the full version, removing the free-tier limit of 1000 buses:
+
+```
+$LICENSE email license_key ;
+```
 
 ## Typical Configuration
 
