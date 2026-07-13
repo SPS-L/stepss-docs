@@ -96,6 +96,7 @@ export default defineConfig({
 					label: 'Model Reference',
 					items: [
 						{ label: 'Synchronous Machine', slug: 'models/synchronous-machine' },
+						{ label: 'SM Parameter Conversion', slug: 'models/synchronous-machine-param-conversion' },
 						{
 							label: 'Exciters',
 							items: [

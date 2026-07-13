@@ -273,3 +273,15 @@ The `EXC` and `TOR` sub-records specify the excitation system and turbine-govern
 :::note
 The FP, FQ, P, Q fields control how the machine's initial operating point is determined from the power flow solution. See [Reference Frames & Initialization](/user-guide/reference-frames/) for details.
 :::
+
+---
+
+## Parameter Conversion (XT ↔ RL)
+
+For a detailed derivation of how STEPSS converts the `XT` standard parameters
+(reactances and open-circuit time constants) to the `RL` Park parameters
+(inductances and resistances) — including the exact algorithm from the source,
+known conversion pitfalls when cross-checking against EMT simulators, and a
+reference Python implementation — see:
+
+➜ [Synchronous Machine — Parameter Conversion (XT ↔ RL)](/models/synchronous-machine-param-conversion/)
