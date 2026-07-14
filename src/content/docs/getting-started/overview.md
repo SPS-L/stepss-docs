@@ -19,7 +19,7 @@ In the figure above, files shown in blue are provided by the user; those in blac
 
 | Module | Full Name | Description |
 |--------|-----------|-------------|
-| **PFC** | Power Flow Computation | Determines the initial operating point using the Newton-Raphson method in polar coordinates. Computes bus voltage magnitudes and phase angles, with optional transformer ratio adjustment. |
+| **PFC / Helios** | Power Flow Computation | Determines the initial operating point using the Newton-Raphson method in polar coordinates. Computes bus voltage magnitudes and phase angles, with optional transformer ratio adjustment. Two engines are available: the original Fortran PFC and Helios, a modern C++ reimplementation reading the same data format; Helios is the recommended engine going forward. |
 | **RAMSES** | RApid Multithreaded Simulation of Electric power Systems | Simulates the dynamic evolution of the power system in response to disturbances. Supports Backward Euler, Trapezoidal, and BDF2 integration methods. Exploits OpenMP parallelism. |
 | **CODEGEN** | CODE GENerator | Translates user-defined models from text descriptions into Fortran 2003 code for compilation and linking with RAMSES. Supports excitation controllers, torque controllers, injectors, and two-port components. |
 
@@ -32,7 +32,7 @@ Each module can be used independently:
 
 ## PFC Module
 
-The power flow computation uses the Newton-Raphson method in polar coordinates. Input data consists of:
+The power flow computation uses the Newton-Raphson method in polar coordinates. It is available in two implementations — the original Fortran **PFC** and the modern C++ **Helios** — which read the same input data and produce numerically equivalent results; see [Power Flow Data & Settings](/user-guide/pfc/) for the details and the few differences. Input data consists of:
 
 - Network data (buses, lines, transformers, etc.)
 - Power flow data specified at PV, PQ, and slack buses
@@ -113,7 +113,7 @@ STEPSS modules can be run through three interfaces:
 
 | Interface | RAMSES (Dynamic) | PFC (Static) | CODEGEN |
 |-----------|:----------------:|:------------:|:-------:|
-| **Command Line** | `ramses -t cmd.txt` | `pfc -t cmd.txt` | `codegen model.txt` |
+| **Command Line** | `ramses -t cmd.txt` | `pfc -t cmd.txt` or `helios -t cmd.txt` | `codegen model.txt` |
 | **GUI (Java)** | Full support | Full support | Full support |
 | **Python (PyRAMSES)** | Full support | | |
 
@@ -125,7 +125,7 @@ See the [Quick Start](/getting-started/quickstart/) for details on each interfac
 |---------|---------|
 | **STEPSS GUI** | Windows and Linux, Java 20 |
 | **PyRAMSES** | Windows and Linux, Python 3.x |
-| **Command-line executables** | Windows and Linux (ramses, pfc) |
+| **Command-line executables** | Windows and Linux (ramses, pfc); helios additionally supports macOS |
 | **CODEGEN compilation** | Visual Studio 2022 + Intel oneAPI Fortran |
 | **Free version limits** | 1000 buses max, 2 OpenMP cores |
 

@@ -70,7 +70,7 @@ export default defineConfig({
 							],
 						},
 						{
-							label: 'Power Flow (PFC)',
+							label: 'Power Flow (PFC & Helios)',
 							items: [
 								{ label: 'Power Flow Data & Settings', slug: 'user-guide/pfc' },
 							],

@@ -1,9 +1,16 @@
 ---
-title: Power Flow (PFC)
-description: Power flow computation data and settings
+title: Power Flow (PFC & Helios)
+description: Power flow data and settings, common to the PFC and Helios engines
 ---
 
-PFC uses the following network records documented in [Network Modeling](/user-guide/network/): BUS, LINE, SWITCH, TRANSFO, TRFO, NRTP.
+STEPSS provides two power-flow engines:
+
+- **PFC** — the original Fortran implementation.
+- **Helios** — a modern C++ reimplementation that reads the same data format and produces numerically equivalent results. Helios is the actively developed engine and the recommended choice going forward.
+
+Everything on this page applies to **both engines** unless marked otherwise; where the text says "PFC", read it as the power-flow computation performed by either engine. The few implementation differences are summarised [at the end of this page](#implementation-differences-pfc-vs-helios).
+
+The power flow uses the following network records documented in [Network Modeling](/user-guide/network/): BUS, LINE, SWITCH, TRANSFO, TRFO, NRTP.
 
 The additional records specific to power flow computations are documented below.
 
@@ -58,13 +65,21 @@ For PV buses, if the upper reactive power limit QMAX is exceeded, the bus switch
 
 QMIN and QMAX are used only if VIMP is nonzero (PV bus).
 
-A variant with additional fields exists:
+An extended variant with active power limits and a participation factor exists:
 
 ```
-GENER NAME BUS P Q VIMP SNOM QMIN QMAX PMIN PMAX BR ;
+GENER NAME BUS P Q VIMP SNOM QMIN QMAX PMIN PMAX PART BR ;
 ```
 
-The `PMIN` and `PMAX` fields (minimum/maximum active power in MW) are currently ignored by STEPSS.
+| Field | Description | Unit |
+|-------|-------------|------|
+| `PMIN` | Minimum active power the generator can produce | MW |
+| `PMAX` | Maximum active power the generator can produce | MW |
+| `PART` | Participation factor used when redistributing an active power imbalance | |
+
+`PMIN`/`PMAX` are not enforced during Newton iterations. They are used to clamp the specified `P` before the computation (the slack generator is exempted; in Helios this exemption can be disabled with `$PLIM 0`), and together with `PART` when generation is redispatched after system modifications or contingencies.
+
+Both variants also accept an additional bus-name field between `BUS` and `P` (making 10 or 13 fields in total); that field is accepted and ignored by both engines.
 
 Only one generator is allowed per bus.
 
@@ -264,9 +279,10 @@ The following records control the computation. Each record starts with `$` and h
 | `$TOLREAC` | 0.1 | Mvar | Convergence tolerance on reactive power mismatch ($\epsilon_Q$) |
 | `$NBITMA` | 20 | | Maximum number of Newton iterations |
 | `$MISQLIM` | 20 | MVA | Apparent power mismatch threshold below which generator/SVC reactive limits are checked and enforced (set to 0 to skip) |
-| `$MISBLOC` | 10 | MVA | Apparent power mismatch threshold below which the Jacobian is kept constant |
+| `$MISBLOC` | 10 | MVA | Apparent power mismatch threshold below which the Jacobian is kept constant (see note below for the Helios behaviour) |
 | `$MISADJ` | 10 | MVA | Apparent power mismatch threshold below which transformer ratios and phase shifts are adjusted (set to 0 to skip) |
 | `$DIVDET` | 0 | | Set to 1 to activate divergence detection; 0 to skip |
+| `$PLIM` | 1 | | **Helios only.** 1 = the slack generator's PMIN/PMAX are bypassed during initial P clamping (the PFC behaviour); 0 = the slack is clamped like any other generator |
 
 :::note
 Divergence is detected when $\varphi(k) > 1.1\,\varphi(k-1)$, where:
@@ -275,6 +291,21 @@ $$\varphi(k) = \sum_i \sqrt{(f_i - P_i^o)^2 + (g_i - Q_i^o)^2}$$
 
 Under normal convergence, $\varphi$ decreases at each iteration; an increase signals divergence. The test is temporarily suspended following limit adjustments or transformer ratio changes, as these cause increases in $\varphi$ unrelated to divergence.
 :::
+
+## Implementation Differences (PFC vs Helios)
+
+The two engines read the same data format and produce numerically equivalent results. The differences that can matter in practice:
+
+| Aspect | PFC (Fortran) | Helios (C++) |
+|--------|---------------|--------------|
+| Sparse linear solver | MA37 (HSL) | KLU (SuiteSparse) |
+| `$MISBLOC` | Jacobian values and factorization frozen below the threshold | Jacobian recomputed every iteration; the threshold only controls whether the factorization reuses the previous pivot ordering. Iteration counts can therefore differ slightly |
+| `$PLIM` | Not available (slack P limits always bypassed) | Available; default 1 reproduces the PFC behaviour |
+| BUS record | 6 fields required | `QSHUNT` optional (5 fields accepted, defaults to 0) |
+| `PSHIFT-I` (current-controlled phase shifter) | Accepted (stored, not adjusted) | Not supported — hard error |
+| `TURLIM` (legacy P-limit record) | Accepted for compatibility | Not supported — hard error; use the extended GENER variant |
+| Unknown records | Handled or error | Warned and skipped |
+| Numerical output | Reference | May differ in the last displayed decimal, due to the different linear solvers |
 
 ## Record Sharing Between PFC and RAMSES
 
