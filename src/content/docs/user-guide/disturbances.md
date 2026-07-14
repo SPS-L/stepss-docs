@@ -23,11 +23,11 @@ time(s) CONTINUE SOLVER disc_meth max_h(s) min_h(s) latency(pu) upd_over
 - `BD`: BDF2
 
 **Jacobian update override** (`upd_over`):
-- `ALL`: Update all injectors and network
-- `NET`: Update only network
-- `ABL`: Update only injectors
-- `IBL`: Update all injectors and network
-- `NOT`: Do not override
+- `ALL`: Force a full Jacobian refactorisation
+- `NET`: Force a refactorisation of the network Jacobian
+- `ABL`: Force an update of the injector Jacobian at every bus
+- `IBL`: Do not force any Jacobian update; the bus and network Jacobians are left as the solver last set them
+- `NOT`: Do not override; the solver's own bus Jacobian flags are restored
 
 **Example**:
 ```

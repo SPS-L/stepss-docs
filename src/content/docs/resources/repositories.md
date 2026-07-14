@@ -9,11 +9,11 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 
 | Repository | Role | Language | Visibility |
 |------------|------|----------|------------|
-| [STEPSS-GUI](https://github.com/SPS-L/STEPSS-GUI) | Java-based GUI front-end (v3.40) | Java | Public |
-| [stepss-PyRAMSES](https://github.com/SPS-L/stepss-PyRAMSES) | Python API/wrapper for RAMSES | Python | Public |
-| [STEPSS-Userguide](https://github.com/SPS-L/STEPSS-Userguide) | LaTeX user documentation and models reference | LaTeX | Public |
-| [stepss-URAMSES](https://github.com/SPS-L/stepss-URAMSES) | User-defined device models framework | Fortran | Public |
-| [RAMSES-Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis) | Small-signal / eigenvalue analysis tools | MATLAB | Public |
+| [stepss-java-ui](https://github.com/SPS-L/stepss-java-ui) | Java-based GUI front-end (v3.40) | Java | Public |
+| [stepss-pyramses](https://github.com/SPS-L/stepss-pyramses) | Python API/wrapper for RAMSES | Python | Public |
+| [stepss-userguide](https://github.com/SPS-L/stepss-userguide) | LaTeX user documentation and models reference | LaTeX | Public |
+| [stepss-uramses](https://github.com/SPS-L/stepss-uramses) | User-defined device models framework | Fortran | Public |
+| [stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) | Small-signal / eigenvalue analysis tools | MATLAB | Public |
 | [stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) | Visual block diagram editor for CODEGEN models | Python/JS | Public |
 | stepss-ramses | Core RAMSES simulation engine | Fortran | Private |
 | stepss-PFC | Power-flow calculator (Newton-Raphson) | Fortran | Private |
@@ -27,42 +27,42 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 
 The main graphical user interface for STEPSS, built with Java (Swing/AWT) and the Ant build system.
 
-- **Repository**: [github.com/SPS-L/STEPSS-GUI](https://github.com/SPS-L/STEPSS-GUI)
+- **Repository**: [github.com/SPS-L/stepss-java-ui](https://github.com/SPS-L/stepss-java-ui)
 - **License**: Apache License 2.0
 - **Requirements**: Java 20 (64-bit)
 - **Build**: `ant build`
 - **Run**: `java -jar dist/stepss.jar`
 
-### stepss-PyRAMSES
+### stepss-pyramses
 
 Python interface to the RAMSES simulator providing scripting access to simulations.
 
-- **Repository**: [github.com/SPS-L/stepss-PyRAMSES](https://github.com/SPS-L/stepss-PyRAMSES)
+- **Repository**: [github.com/SPS-L/stepss-pyramses](https://github.com/SPS-L/stepss-pyramses)
 - **Install**: `pip install pyramses`
 - **Documentation**: [PyRAMSES section](/pyramses/overview/) on this site
 - **Includes**: Nordic test system example
 
-### STEPSS-Userguide
+### stepss-userguide
 
 The original LaTeX source for the STEPSS documentation (models reference and user guide).
 
-- **Repository**: [github.com/SPS-L/STEPSS-Userguide](https://github.com/SPS-L/STEPSS-Userguide)
+- **Repository**: [github.com/SPS-L/stepss-userguide](https://github.com/SPS-L/stepss-userguide)
 - **Build**: `pdflatex stepss_doc.tex` (run twice)
 - **Main file**: `stepss_doc.tex`
 
-### stepss-URAMSES
+### stepss-uramses
 
 Framework for compiling and linking custom Fortran models with RAMSES.
 
-- **Repository**: [github.com/SPS-L/stepss-URAMSES](https://github.com/SPS-L/stepss-URAMSES)
+- **Repository**: [github.com/SPS-L/stepss-uramses](https://github.com/SPS-L/stepss-uramses)
 - **Platforms**: Windows (Intel Fortran) and Linux (gfortran)
 - **Build (Linux)**: `make -f Makefile.gfortran all`
 
-### RAMSES-Eigenanalysis
+### stepss-eigenanalysis
 
 MATLAB-based tool for small-signal stability analysis using eigenvalues extracted from RAMSES.
 
-- **Repository**: [github.com/SPS-L/RAMSES-Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis)
+- **Repository**: [github.com/SPS-L/stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis)
 - **Requirements**: MATLAB R2016a+, PyRAMSES
 - **Methods**: QZ, ARPACK, JDQR
 
@@ -71,9 +71,9 @@ MATLAB-based tool for small-signal stability analysis using eigenvalues extracte
 Browser-based visual editor for building CODEGEN user-defined models with drag-and-drop blocks.
 
 - **Repository**: [github.com/SPS-L/stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio)
-- **Requirements**: Python 3.x
-- **Install**: `pip install -r requirements.txt`
-- **Run**: `python server/app.py` → open `http://localhost:8765`
+- **Requirements**: Python 3.10 or later
+- **Install**: `pip install stepss-cg-studio`
+- **Run**: `cg-studio` → open `http://localhost:8765`
 - **Documentation**: [CODEGEN Studio guide](/developer/cg-studio/) on this site
 
 ## Contributing

@@ -7,10 +7,10 @@ description: Licensing information for the STEPSS suite
 
 | Component | License | Repository |
 |-----------|---------|------------|
-| STEPSS GUI | Apache License 2.0 | [SPS-L/STEPSS-GUI](https://github.com/SPS-L/STEPSS-GUI) |
-| PyRAMSES | Apache License 2.0 | [SPS-L/stepss-PyRAMSES](https://github.com/SPS-L/stepss-PyRAMSES) |
-| URAMSES | Apache License 2.0 | [SPS-L/stepss-URAMSES](https://github.com/SPS-L/stepss-URAMSES) |
-| RAMSES-Eigenanalysis | Apache License 2.0 | [SPS-L/RAMSES-Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis) |
+| STEPSS GUI | Apache License 2.0 | [SPS-L/stepss-java-ui](https://github.com/SPS-L/stepss-java-ui) |
+| PyRAMSES | Apache License 2.0 | [SPS-L/stepss-pyramses](https://github.com/SPS-L/stepss-pyramses) |
+| URAMSES | Apache License 2.0 | [SPS-L/stepss-uramses](https://github.com/SPS-L/stepss-uramses) |
+| stepss-eigenanalysis | Apache License 2.0 | [SPS-L/stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) |
 | RAMSES | Proprietary, free for non-commercial use | See [RAMSES Solver License](#ramses-solver-license) below |
 | PFC | Proprietary, free to use (compiled executable) | See [PFC and CODEGEN License](#pfc-and-codegen-license) below |
 | CODEGEN | Proprietary, free to use (compiled executable) | See [PFC and CODEGEN License](#pfc-and-codegen-license) below |

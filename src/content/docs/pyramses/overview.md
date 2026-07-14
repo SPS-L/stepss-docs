@@ -36,4 +36,4 @@ PyRAMSES supports both Windows and Linux operating systems. Pre-compiled RAMSES 
 
 ## Repository
 
-Source code: [SPS-L/stepss-PyRAMSES](https://github.com/SPS-L/stepss-PyRAMSES)
+Source code: [SPS-L/stepss-pyramses](https://github.com/SPS-L/stepss-pyramses)

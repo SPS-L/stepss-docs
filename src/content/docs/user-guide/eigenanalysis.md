@@ -3,7 +3,7 @@ title: Eigenanalysis
 description: Small-signal stability analysis with the RAMSES Eigenanalysis tool
 ---
 
-The [RAMSES Eigenanalysis tool](https://github.com/SPS-L/RAMSES-Eigenanalysis) is a MATLAB-based tool for computing eigenvalues and eigenvectors of power system models in descriptor form, extracted from RAMSES simulations.
+The [RAMSES Eigenanalysis tool](https://github.com/SPS-L/stepss-eigenanalysis) is a MATLAB-based tool for computing eigenvalues and eigenvectors of power system models in descriptor form, extracted from RAMSES simulations.
 
 ## Overview
 
@@ -23,8 +23,8 @@ The tool analyzes small-signal stability by computing eigenvalues of the system 
 ## Installation
 
 ```matlab
-addpath('path/to/RAMSES-Eigenanalysis')
-addpath('path/to/RAMSES-Eigenanalysis/scripts')
+addpath('path/to/stepss-eigenanalysis')
+addpath('path/to/stepss-eigenanalysis/scripts')
 ```
 
 ## Workflow
@@ -111,4 +111,4 @@ After computing eigenvalues, the tool provides an interactive menu to:
 
 ## Repository
 
-Source code: [SPS-L/RAMSES-Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis)
+Source code: [SPS-L/stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis)

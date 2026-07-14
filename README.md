@@ -4,7 +4,7 @@
 
 Built with [Astro Starlight](https://starlight.astro.build/) and deployed to GitHub Pages.
 
-🔗 **Live site**: [https://sps-l.github.io/stepss-docs/](https://sps-l.github.io/stepss-docs/)
+🔗 **Live site**: [https://stepss.sps-lab.org/](https://stepss.sps-lab.org/)
 
 ## Local Development
 
@@ -89,11 +89,11 @@ Trigger a manual deployment from the GitHub Actions tab → "Deploy to GitHub Pa
 
 | Repository | Description |
 |------------|-------------|
-| [STEPSS-GUI](https://github.com/SPS-L/STEPSS-GUI) | Java GUI |
-| [stepss-PyRAMSES](https://github.com/SPS-L/stepss-PyRAMSES) | Python API |
-| [STEPSS-Userguide](https://github.com/SPS-L/STEPSS-Userguide) | LaTeX source docs |
-| [stepss-URAMSES](https://github.com/SPS-L/stepss-URAMSES) | User-defined models |
-| [RAMSES-Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis) | Eigenvalue analysis |
+| [stepss-java-ui](https://github.com/SPS-L/stepss-java-ui) | Java GUI |
+| [stepss-pyramses](https://github.com/SPS-L/stepss-pyramses) | Python API |
+| [stepss-userguide](https://github.com/SPS-L/stepss-userguide) | LaTeX source docs |
+| [stepss-uramses](https://github.com/SPS-L/stepss-uramses) | User-defined models |
+| [stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) | Eigenvalue analysis |
 
 ## Authors
 

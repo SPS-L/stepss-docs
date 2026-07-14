@@ -650,7 +650,7 @@ ram.execSim(case, 10.0)
 A, E = ram.getJac()
 ```
 
-The matrices can be used for small-signal stability analysis, e.g. with the [RAMSES Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis) tool or `scipy.sparse.linalg`.
+The matrices can be used for small-signal stability analysis, e.g. with the [RAMSES Eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) tool or `scipy.sparse.linalg`.
 
 :::note
 Set `$OMEGA_REF SYN ;` in the solver settings data file when exporting the Jacobian for eigenanalysis.

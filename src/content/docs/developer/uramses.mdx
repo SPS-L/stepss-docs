@@ -5,7 +5,7 @@ description: Compiling and linking user-defined Fortran models with RAMSES
 
 import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
 
-[URAMSES](https://github.com/SPS-L/stepss-URAMSES) provides the framework and tools needed to compile and link custom Fortran models with PyRAMSES and STEPSS.
+[URAMSES](https://github.com/SPS-L/stepss-uramses) provides the framework and tools needed to compile and link custom Fortran models with PyRAMSES and STEPSS.
 
 ## Prerequisites
 
@@ -88,7 +88,7 @@ URAMSES/
 make -f Makefile.gfortran all
 
 # Build only the shared library (for PyRAMSES)
-make -f Makefile.gfortran lib
+make -f Makefile.gfortran dll
 
 # Build only the executable
 make -f Makefile.gfortran exe
@@ -170,4 +170,4 @@ The `FUNCTIONS_IN_MODELS.f90` module provides utility functions available in all
 
 ## Repository
 
-Source code: [SPS-L/stepss-URAMSES](https://github.com/SPS-L/stepss-URAMSES)
+Source code: [SPS-L/stepss-uramses](https://github.com/SPS-L/stepss-uramses)

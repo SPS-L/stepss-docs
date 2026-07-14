@@ -182,7 +182,7 @@ A, E = ram.getJac()
 ram.endSim()
 ```
 
-**For the MATLAB [RAMSES Eigenanalysis](https://github.com/SPS-L/RAMSES-Eigenanalysis) tool**, use the `JAC` disturbance instead, which writes the four files the tool expects (`<name>_val.dat`, `<name>_eqs.dat`, `<name>_var.dat`, `<name>_struc.dat`):
+**For the MATLAB [RAMSES Eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) tool**, use the `JAC` disturbance instead, which writes the four files the tool expects (`<name>_val.dat`, `<name>_eqs.dat`, `<name>_var.dat`, `<name>_struc.dat`):
 
 ```python
 ram.execSim(case, 0.0)

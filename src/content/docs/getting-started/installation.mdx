@@ -15,7 +15,7 @@ All needed files can be downloaded from the [Google Drive folder](https://drive.
 
 ## Installing Java
 
-STEPSS comes with a Java-based Graphical User Interface (GUI) that requires **Java Version 20 (64-bit)**.
+STEPSS comes with a Java-based Graphical User Interface (GUI) that requires a **64-bit Java Runtime Environment**. The GUI targets Java 8 and runs on any later version, so a recent JRE or JDK is fine — there is no need to uninstall a Java you already have.
 
 <Steps>
 
@@ -23,16 +23,13 @@ STEPSS comes with a Java-based Graphical User Interface (GUI) that requires **Ja
    ```bash
    java -version
    ```
+   If this reports a 64-bit Java, you are ready — skip to the next section.
 
-2. **Uninstall older versions** (if necessary):
-   - Go to Windows Parameters → Applications
-   - Locate Java and click Uninstall
-
-3. **Install Java 20**:
-   - Download `jdk-20_windows-x64_bin.exe` from the [Google Drive](https://drive.google.com/drive/folders/1HcUSD-FOx6192HURJnxltYJuKuNA8Vwz?usp=drive_link)
+2. **Install Java** (only if the command is not recognised):
+   - Download a 64-bit JDK from [oracle.com](https://www.oracle.com/java/technologies/downloads/), or from the [Google Drive](https://drive.google.com/drive/folders/1HcUSD-FOx6192HURJnxltYJuKuNA8Vwz?usp=drive_link)
    - Double-click to install and follow the instructions
 
-4. **Associate STEPSS with Java**:
+3. **Associate STEPSS with Java**:
    - Right-click on `stepss.jar`
    - Select "Open with" → "Always use this application"
 
@@ -42,10 +39,10 @@ STEPSS comes with a Java-based Graphical User Interface (GUI) that requires **Ja
 
 <Steps>
 
-1. Download `STEPSS.jar` from the [Google Drive](https://drive.google.com/drive/folders/1HcUSD-FOx6192HURJnxltYJuKuNA8Vwz?usp=drive_link)
+1. Download `stepss.jar` from the [Google Drive](https://drive.google.com/drive/folders/1HcUSD-FOx6192HURJnxltYJuKuNA8Vwz?usp=drive_link)
 2. Place it in any convenient location (e.g., your Desktop)
 3. **Do not uncompress the archive**
-4. Launch by double-clicking `STEPSS.jar`
+4. Launch by double-clicking `stepss.jar`
 
 </Steps>
 
@@ -59,11 +56,11 @@ Current version: **3.40**
 This step can be **skipped** if you do not plan to develop new models for RAMSES using CODEGEN.
 </Aside>
 
-The Intel OneAPI compiler requires **Microsoft Visual Studio Community 2022**.
+The Intel oneAPI compiler requires **Microsoft Visual Studio Community 2019 or later** (2022 recommended). If you already have a version that meets this requirement, there is no need to uninstall it.
 
 <Steps>
 
-1. Download the launcher from the [Google Drive](https://drive.google.com/drive/folders/1HcUSD-FOx6192HURJnxltYJuKuNA8Vwz?usp=drive_link):
+1. Download a Community installer from [visualstudio.microsoft.com](https://visualstudio.microsoft.com/downloads/), or the launcher from the [Google Drive](https://drive.google.com/drive/folders/1HcUSD-FOx6192HURJnxltYJuKuNA8Vwz?usp=drive_link):
    `vs_community__e942d3d4864d4a80b72975352289d007.exe`
 2. Execute by double-clicking
 3. During installation, under the "Workloads" view, select **"Desktop development with C++"**
@@ -76,20 +73,23 @@ The Intel OneAPI compiler requires **Microsoft Visual Studio Community 2022**.
 This step can be **skipped** if you do not plan to develop new models for RAMSES.
 </Aside>
 
-Three packages need to be installed **in order**:
+STEPSS is compiled with **`ifx`**, the Intel oneAPI Fortran compiler. Use a oneAPI release of **version 2024.0 or later**, which provides `ifx`.
+
+<Aside type="caution">
+The older `ifort` ("Fortran Compiler Classic") is deprecated by Intel and is no longer supported. Do not use it.
+</Aside>
+
+Two packages need to be installed **in order**, both free of charge from Intel:
 
 <Steps>
 
-1. Download and install the **OneAPI BaseKit**:
-   `w_BaseKit_p_2023.1.0.47256_offline.exe`
+1. Download and install the **Intel oneAPI Base Toolkit**
 
-2. Download and install the **Fortran Compiler Classic** package:
-   `w_ifort_runtime_p_2023.1.0.46319.exe`
+2. Download and install the **Intel oneAPI HPC Toolkit**, which contains the `ifx` Fortran compiler
 
-3. Download and install the **HPC Toolkit**:
-   `w_HPCKit_p_2023.1.0.46357_offline.exe`
+   Both are available from [Intel's oneAPI HPC Toolkit download page](https://www.intel.com/content/www/us/en/developer/tools/oneapi/hpc-toolkit-download.html).
 
-4. **Restart your computer**
+3. **Restart your computer**
 
 </Steps>
 
@@ -101,25 +101,21 @@ This step can be **skipped** if you do not plan to build user-defined models vis
 
 [CODEGEN Studio](/developer/cg-studio/) is a browser-based visual editor for assembling CODEGEN models using drag-and-drop blocks.
 
+CODEGEN Studio requires **Python 3.10 or later**.
+
 <Steps>
 
-1. Clone the repository:
+1. Install from PyPI:
    ```bash
-   git clone https://github.com/SPS-L/stepss-cg-studio
-   cd stepss-cg-studio
+   pip install stepss-cg-studio
    ```
 
-2. Install Python dependencies:
+2. Launch it:
    ```bash
-   pip install -r requirements.txt
+   cg-studio
    ```
 
-3. Start the server:
-   ```bash
-   python server/app.py
-   ```
-
-4. Open `http://localhost:8765` in your browser
+3. Open `http://localhost:8765` in your browser
 
 </Steps>
 
