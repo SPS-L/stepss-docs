@@ -39,6 +39,7 @@ For example, a time constant can be specified as: `2.` (a literal value), `{'{'}
 | [`tf1plim`](#tf1plim) | First-order with non-windup output limits |
 | [`tf1pvlim`](#tf1pvlim) | First-order with variable non-windup limits |
 | [`tf1p2lim`](#tf1p2lim) | First-order with rate limits and output limits |
+| [`tf1p2limr`](#tf1p2limr) | As `tf1p2lim`, with integrator reset driven by `CHGPRM` |
 | [`tf1p1z`](#tf1p1z) | One zero, one pole: $G(1 + sT_z)/(1 + sT_p)$ |
 | [`tf2p2z`](#tf2p2z) | Two zeros, two poles |
 | [`tfder1p`](#tfder1p) | Derivative (washout): $sT/(1 + sT)$ |
@@ -1608,6 +1609,42 @@ else:  z_2 ← 0
 #### Notes
 
 The time constant $T$ can be zero. In this case $x_1 = 0$ throughout the simulation, the block behaves as a gain $x_j = G x_i$, and both limiters are ignored ($x_{max} \to \infty$, $x_{min} \to -\infty$, $T\dot{x}_{max} \to \infty$, $T\dot{x}_{min} \to -\infty$).
+
+---
+
+### `tf1p2limr`
+
+**As [`tf1p2lim`](#tf1p2lim) — one time constant, rate limits and non-windup output limits — with the addition of an integrator reset.**
+
+The block behaves exactly like `tf1p2lim` until the reset condition is met. When the parameter $p_{reset}$ becomes equal to the flag $f_{reset}$, the internal state is driven to zero and the block passes its input straight through ($x_j = x_i$) until the condition clears. The flag is intended to be set during the simulation with a `CHGPRM` disturbance, which makes the reset controllable from the disturbance file.
+
+Uses the same block diagram as [`tf1p2lim`](#tf1p2lim).
+
+#### Syntax
+
+```
+& tf1p2limr
+name of variable x_i
+name of variable x_j
+data name, parameter name or math expression for G
+data name, parameter name or math expression for T
+data name, parameter name or math expression for x_min
+data name, parameter name or math expression for x_max
+data name, parameter name or math expression for dx_min/dt
+data name, parameter name or math expression for dx_max/dt
+data name, parameter name or math expression for the reset parameter
+data name, parameter name or math expression for the reset flag
+```
+
+The two trailing arguments are the only difference from `tf1p2lim`.
+
+#### Internal States
+
+As `tf1p2lim`.
+
+#### Discrete Variables
+
+As `tf1p2lim`, plus the reset state: the block switches to the pass-through equation $0 = x_j - x_i$ while the reset is active.
 
 ---
 
