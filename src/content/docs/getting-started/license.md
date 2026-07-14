@@ -11,9 +11,21 @@ description: Licensing information for the STEPSS suite
 | PyRAMSES | Apache License 2.0 | [SPS-L/stepss-pyramses](https://github.com/SPS-L/stepss-pyramses) |
 | URAMSES | Apache License 2.0 | [SPS-L/stepss-uramses](https://github.com/SPS-L/stepss-uramses) |
 | stepss-eigenanalysis | Apache License 2.0 | [SPS-L/stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) |
+| CODEGEN Studio | MIT License | [SPS-L/stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) |
+| Helios | LGPL-3.0-or-later, with a commercial option | [SPS-L/stepss-helios](https://github.com/SPS-L/stepss-helios) |
 | RAMSES | Proprietary, free for non-commercial use | See [RAMSES Solver License](#ramses-solver-license) below |
 | PFC | Proprietary, free to use (compiled executable) | See [PFC and CODEGEN License](#pfc-and-codegen-license) below |
 | CODEGEN | Proprietary, free to use (compiled executable) | See [PFC and CODEGEN License](#pfc-and-codegen-license) below |
+
+## Documentation License
+
+The STEPSS **documentation** — this website and the PDF user guide — is licensed
+under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
+You may share and adapt it, including for commercial purposes, provided you give
+appropriate credit.
+
+This applies to the documentation only. It grants **no rights over the STEPSS
+software itself**, which remains under the terms set out below.
 
 ## RAMSES Solver License
 

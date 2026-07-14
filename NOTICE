@@ -1,0 +1,43 @@
+NOTICE
+
+This repository is the documentation website for STEPSS (Static and Transient
+Electric Power Systems Simulation), published at https://stepss.sps-lab.org.
+
+It contains two kinds of material, under two different licences.
+
+Documentation content — CC BY 4.0
+---------------------------------
+
+The documentation itself is licensed under the Creative Commons Attribution 4.0
+International licence. See LICENSE.
+
+This covers the pages under src/content/docs/ and the figures under
+public/images/. You are free to share and adapt this material, including
+commercially, provided you give appropriate credit.
+
+  Copyright 2026 Sustainable Power Systems Lab (SPS-L),
+                 Cyprus University of Technology
+  Authors: Dr. Petros Aristidou, Dr. Thierry Van Cutsem
+
+Website code — MIT
+------------------
+
+The Astro/Starlight machinery that builds the site — astro.config.mjs,
+package.json, tsconfig.json, and the components and styles under src/ that are
+not documentation pages — is licensed under the MIT Licence. See LICENSE-CODE.
+
+Not covered by either licence
+-----------------------------
+
+  public/stepss_userguide.pdf
+
+    This is the compiled STEPSS user guide, built from the stepss-userguide
+    repository. It is redistributed here for convenience and remains under the
+    licence of that repository; it is NOT placed under CC BY 4.0 by its presence
+    here.
+
+The STEPSS software that this website documents — RAMSES, PFC, CODEGEN and the
+other components — is NOT covered by either licence. Documenting the software
+under CC BY 4.0 grants no rights over the software itself. Each component repository
+states its own terms; several are proprietary or non-commercial. See
+https://stepss.sps-lab.org/getting-started/license/.

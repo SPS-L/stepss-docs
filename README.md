@@ -99,3 +99,11 @@ Trigger a manual deployment from the GitHub Actions tab → "Deploy to GitHub Pa
 
 - [Dr. Petros Aristidou](https://sps-lab.org) — Cyprus University of Technology
 - Dr. Thierry Van Cutsem — University of Liège
+
+## License
+
+- **Documentation content** (`src/content/docs/`, `public/images/`) — [CC BY 4.0](LICENSE). Share and adapt freely, including commercially, with appropriate credit.
+- **Website code** (Astro config, components, styles) — [MIT](LICENSE-CODE).
+- **`public/stepss_userguide.pdf`** — the compiled user guide, redistributed from [stepss-userguide](https://github.com/SPS-L/stepss-userguide) under that repository's licence.
+
+The STEPSS **software** documented here is not covered by either licence — several components are proprietary or non-commercial. See [NOTICE](NOTICE) and the [licence page](https://stepss.sps-lab.org/getting-started/license/).
