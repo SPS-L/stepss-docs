@@ -17,6 +17,7 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 | [stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) | Visual block diagram editor for CODEGEN models | Python/JS | Public |
 | stepss-ramses | Core RAMSES simulation engine | Fortran | Private |
 | stepss-PFC | Power-flow calculator (Newton-Raphson) | Fortran | Private |
+| stepss-helios | Modern C++ reimplementation of the PFC power-flow calculator | C++ | Private |
 | stepss-dyngraph | Dynamic graph / topology module | Fortran | Private |
 | stepss-Codegen | DSL-to-Fortran model code generator | Fortran | Private |
 | stepss-docs | This documentation website | Astro/Starlight | Public |
