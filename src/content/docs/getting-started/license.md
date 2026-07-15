@@ -11,11 +11,13 @@ description: Licensing information for the STEPSS suite
 | PyRAMSES | Apache License 2.0 | [SPS-L/stepss-pyramses](https://github.com/SPS-L/stepss-pyramses) |
 | URAMSES | Apache License 2.0 | [SPS-L/stepss-uramses](https://github.com/SPS-L/stepss-uramses) |
 | stepss-eigenanalysis | Apache License 2.0 | [SPS-L/stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) |
-| CODEGEN Studio | MIT License | [SPS-L/stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) |
-| Helios | LGPL-3.0-or-later, with a commercial option | [SPS-L/stepss-helios](https://github.com/SPS-L/stepss-helios) |
+| CODEGEN Studio | Apache License 2.0 | [SPS-L/stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) |
+| stepss-dyngraph | Apache License 2.0 | [SPS-L/stepss-dyngraph](https://github.com/SPS-L/stepss-dyngraph) |
+| RamsesNN | MIT License | [SPS-L/stepss-RamsesNN](https://github.com/SPS-L/stepss-RamsesNN) |
+| Helios | Academic Public License (free for non-commercial use), with a commercial option | See [Helios License](#helios-license) below |
 | RAMSES | Proprietary, free for non-commercial use | See [RAMSES Solver License](#ramses-solver-license) below |
-| PFC | Proprietary, free to use (compiled executable) | See [PFC and CODEGEN License](#pfc-and-codegen-license) below |
-| CODEGEN | Proprietary, free to use (compiled executable) | See [PFC and CODEGEN License](#pfc-and-codegen-license) below |
+| PFC | Proprietary, free executables (Academic Public License) | See [PFC and CODEGEN License](#pfc-and-codegen-license) below |
+| CODEGEN | Proprietary, free executables (Academic Public License) | See [PFC and CODEGEN License](#pfc-and-codegen-license) below |
 
 ## Documentation License
 
@@ -46,9 +48,17 @@ software itself**, which remains under the terms set out below.
 
 For extensions to larger models or execution using more than two cores, contact the Authors.
 
+## Helios License
+
+**STEPSS-Helios** (the modern power-flow engine, also bundled as `libhelios_api` in PyRAMSES) is the property of the **Sustainable Power Systems Laboratory, Cyprus University of Technology**, and is distributed under the **STEPSS-Helios Academic Public License**:
+
+- Permission is granted to use Helios **free of charge** for any **non-commercial purpose**, including teaching and research at universities, colleges, and other educational institutions, research at non-profit research institutions, and personal non-profit purposes.
+- For **commercial use**, a commercial license is required — contact **info@sps-lab.org**.
+- Helios is provided **"as is"**, without warranty of any kind.
+
 ## PFC and CODEGEN License
 
-**PFC** (power flow computation) and **CODEGEN** (model generator) are the property of **Dr. Thierry Van Cutsem**. They are distributed as compiled executables that are **free to use** but are not open-source. Their source code is not included in any of the STEPSS repositories.
+**PFC** (power flow computation) and **CODEGEN** (model generator) are the property of **Dr. Thierry Van Cutsem**. They are distributed under the **Academic Public License for the use of STEPSS** as compiled executables that are **free to use for non-commercial purposes**; commercial use requires contacting the Authors. They are not open-source: their source code is not included in any of the public STEPSS repositories.
 
 ## Authors
 
