@@ -92,6 +92,7 @@ export default defineConfig({
 						{ label: 'Overview',      slug: 'pyramses/overview' },
 						{ label: 'Installation',  slug: 'pyramses/installation' },
 						{ label: 'API Reference', slug: 'pyramses/api-reference' },
+						{ label: 'Power Flow (Helios)', slug: 'pyramses/helios' },
 						{ label: 'Examples',      slug: 'pyramses/examples' },
 					],
 				},

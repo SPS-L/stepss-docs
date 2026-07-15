@@ -7,15 +7,17 @@ import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
 
 PyRAMSES (Python-based RApid Multithreaded Simulation of Electric power Systems) is a time-domain dynamic simulator for electric power systems. It provides a Python interface to the RAMSES simulation engine, enabling users to define test cases, run simulations, extract results, and perform post-processing-all within Python scripts or Jupyter notebooks.
 
-PyRAMSES supports both Windows and Linux operating systems and integrates with standard scientific Python libraries (NumPy, SciPy, Matplotlib).
+PyRAMSES supports Windows and Linux for dynamic simulation (the bundled [Helios power-flow engine](/pyramses/helios/) additionally runs on macOS) and integrates with standard scientific Python libraries (NumPy, SciPy, Matplotlib).
 
 ## Installation
 
 Install PyRAMSES and all recommended dependencies via pip:
 
 ```bash
-pip install matplotlib scipy numpy mkl jupyter ipython pyramses
+pip install jupyter ipython pyramses
 ```
+
+Required dependencies (matplotlib, scipy, numpy, and — on Windows/Linux — mkl) are installed automatically.
 
 For a minimal installation (no plotting or notebook support):
 

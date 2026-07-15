@@ -10,14 +10,14 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 | Repository | Role | Language | Visibility |
 |------------|------|----------|------------|
 | [stepss-java-ui](https://github.com/SPS-L/stepss-java-ui) | Java-based GUI front-end (v3.40) | Java | Public |
-| [stepss-pyramses](https://github.com/SPS-L/stepss-pyramses) | Python API/wrapper for RAMSES | Python | Public |
+| [stepss-pyramses](https://github.com/SPS-L/stepss-pyramses) | Python API/wrapper for RAMSES and the Helios power-flow engine | Python | Public |
 | [stepss-userguide](https://github.com/SPS-L/stepss-userguide) | LaTeX user documentation and models reference | LaTeX | Public |
 | [stepss-uramses](https://github.com/SPS-L/stepss-uramses) | User-defined device models framework | Fortran | Public |
 | [stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) | Small-signal / eigenvalue analysis tools | MATLAB | Public |
 | [stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) | Visual block diagram editor for CODEGEN models | Python/JS | Public |
 | stepss-ramses | Core RAMSES simulation engine | Fortran | Private |
 | stepss-PFC | Power-flow calculator (Newton-Raphson) | Fortran | Private |
-| stepss-helios | Modern C++ reimplementation of the PFC power-flow calculator | C++ | Private |
+| stepss-helios | Modern C++ reimplementation of the PFC power-flow calculator, with a C API shared library wrapped by PyRAMSES (`pyramses.helios`); releases ship CLI and C API binaries for Linux/macOS/Windows | C++ | Private |
 | stepss-dyngraph | Dynamic graph / topology module | Fortran | Private |
 | stepss-Codegen | DSL-to-Fortran model code generator | Fortran | Private |
 | stepss-docs | This documentation website | Astro/Starlight | Public |
@@ -36,12 +36,12 @@ The main graphical user interface for STEPSS, built with Java (Swing/AWT) and th
 
 ### stepss-pyramses
 
-Python interface to the RAMSES simulator providing scripting access to simulations.
+Python interface to the RAMSES simulator providing scripting access to simulations, plus the `pyramses.helios` module for AC power flows with the bundled Helios engine (Windows, Linux, and macOS).
 
 - **Repository**: [github.com/SPS-L/stepss-pyramses](https://github.com/SPS-L/stepss-pyramses)
 - **Install**: `pip install pyramses`
 - **Documentation**: [PyRAMSES section](/pyramses/overview/) on this site
-- **Includes**: Nordic test system example
+- **Includes**: Nordic test system example; runnable power-flow examples under `examples/helios/`
 
 ### stepss-userguide
 

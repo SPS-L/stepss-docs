@@ -115,7 +115,7 @@ STEPSS modules can be run through three interfaces:
 |-----------|:----------------:|:------------:|:-------:|
 | **Command Line** | `ramses -t cmd.txt` | `pfc -t cmd.txt` or `helios -t cmd.txt` | `codegen model.txt` |
 | **GUI (Java)** | Full support | Full support | Full support |
-| **Python (PyRAMSES)** | Full support | | |
+| **Python (PyRAMSES)** | Full support | Full support (`pyramses.helios`, Helios engine) | |
 
 See the [Quick Start](/getting-started/quickstart/) for details on each interface.
 
@@ -124,7 +124,7 @@ See the [Quick Start](/getting-started/quickstart/) for details on each interfac
 | Feature | Details |
 |---------|---------|
 | **STEPSS GUI** | Windows and Linux, Java 20 |
-| **PyRAMSES** | Windows and Linux, Python 3.x |
+| **PyRAMSES** | Windows and Linux, Python 3.x; Helios power flow additionally on macOS |
 | **Command-line executables** | Windows and Linux (ramses, pfc); helios additionally supports macOS |
 | **CODEGEN compilation** | Visual Studio 2022 + Intel oneAPI Fortran |
 | **Free version limits** | 1000 buses max, 2 OpenMP cores |
