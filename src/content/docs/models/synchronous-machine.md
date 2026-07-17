@@ -229,12 +229,30 @@ The synchronous machine is declared in the data file with the `SYNC_MACH` record
 
 ```
 SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
-                XT/RL Xl Xd X'd X"d Xq X'q X"q m n Ra T'do T"do T'qo T"qo
+          TYPE_MOD  <14 machine parameters, see below>
           EXC exc_type param1 param2 ...
           TOR tor_type param1 param2 ... ;
 ```
 
-### Parameter Descriptions
+`TYPE_MOD` is a keyword selecting which of two **equivalent parameter formats**
+the 14 machine parameters that follow are given in:
+
+- **`RL`** — the inductances and resistances of the Park model are supplied
+  directly:
+
+  ```
+  RL  Ll Mdu Llf Lld1 Mqu Llq1 Llq2 m n Ra Rf Rd1 Rq1 Rq2
+  ```
+
+- **`XT`** — characteristic reactances and open-circuit time constants are
+  supplied; RAMSES converts them internally to the Park parameters (see
+  [Parameter Conversion](/models/synchronous-machine-param-conversion/)):
+
+  ```
+  XT  Xl Xd X'd X"d Xq X'q X"q m n Ra T'do T"do T'qo T"qo
+  ```
+
+### Common parameters
 
 | Parameter | Description | Unit |
 |-----------|-------------|------|
@@ -249,24 +267,68 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
 | `H` | Inertia constant | s |
 | `D` | Damping coefficient | pu |
 | `IBRATIO` | Field current base ratio $I_{fB}^{mac}/I_{fB}^{exc}$ (see above) | pu |
-| `XT/RL` | Keyword: `XT` for step-up transformer reactance, `RL` for line resistance | |
-| Value after XT/RL | Step-up transformer reactance or line resistance | pu |
+| `TYPE_MOD` | Parameter format keyword: `RL` or `XT` (case-insensitive) | |
+
+### Machine parameters — `XT` format
+
+| Parameter | Description | Unit |
+|-----------|-------------|------|
 | `Xl` | Leakage reactance $L_\ell$ | pu |
-| `Xd` | d-axis synchronous reactance | pu |
-| `X'd` | d-axis transient reactance | pu |
-| `X"d` | d-axis subtransient reactance | pu |
-| `Xq` | q-axis synchronous reactance | pu |
-| `X'q` | q-axis transient reactance (use `*` to set equal to `X'd`) | pu |
-| `X"q` | q-axis subtransient reactance (use `*` to set equal to `X"d`) | pu |
-| `m` | Saturation coefficient (use `*` for default) | |
-| `n` | Saturation exponent (use `*` for default) | |
+| `Xd` | d-axis synchronous reactance ($M_d^u = X_d - X_\ell$) | pu |
+| `X'd` | d-axis transient reactance (must be smaller than `Xd`) | pu |
+| `X"d` | d-axis subtransient reactance (`*` if no $d1$ damper winding) | pu |
+| `Xq` | q-axis synchronous reactance ($M_q^u = X_q - X_\ell$) | pu |
+| `X'q` | q-axis transient reactance (`*` if no $q1$ winding; must be smaller than `Xq`) | pu |
+| `X"q` | q-axis subtransient reactance (`*` if no $q2$ winding) | pu |
+| `m` | Saturation coefficient | |
+| `n` | Saturation exponent | |
 | `Ra` | Armature resistance | pu |
 | `T'do` | d-axis open-circuit transient time constant | s |
-| `T"do` | d-axis open-circuit subtransient time constant | s |
-| `T'qo` | q-axis open-circuit transient time constant (use `*` for round-rotor default) | s |
-| `T"qo` | q-axis open-circuit subtransient time constant | s |
+| `T"do` | d-axis open-circuit subtransient time constant (`*` if no $d1$ damper winding) | s |
+| `T'qo` | q-axis open-circuit transient time constant (`*` if no $q1$ winding) | s |
+| `T"qo` | q-axis open-circuit subtransient time constant (`*` if no $q2$ winding) | s |
 
-All reactances and resistances are in per unit on the machine base ($S_{nom}$, nominal voltage).
+### Machine parameters — `RL` format
+
+| Parameter | Description | Unit |
+|-----------|-------------|------|
+| `Ll` | Stator leakage inductance $L_\ell$ | pu |
+| `Mdu` | Unsaturated d-axis mutual inductance $M_d^u$ | pu |
+| `Llf` | Field winding leakage inductance $L_{\ell f}$ | pu |
+| `Lld1` | $d1$ damper leakage inductance $L_{\ell d1}$ (`*` if no $d1$ winding) | pu |
+| `Mqu` | Unsaturated q-axis mutual inductance $M_q^u$ | pu |
+| `Llq1` | $q1$ winding leakage inductance $L_{\ell q1}$ (`*` if no $q1$ winding) | pu |
+| `Llq2` | $q2$ winding leakage inductance $L_{\ell q2}$ (`*` if no $q2$ winding) | pu |
+| `m` | Saturation coefficient | |
+| `n` | Saturation exponent | |
+| `Ra` | Armature resistance | pu |
+| `Rf` | Field winding resistance $R_f$ | pu |
+| `Rd1` | $d1$ damper resistance $R_{d1}$ (`*` if no $d1$ winding) | pu |
+| `Rq1` | $q1$ winding resistance $R_{q1}$ (`*` if no $q1$ winding) | pu |
+| `Rq2` | $q2$ winding resistance $R_{q2}$ (`*` if no $q2$ winding) | pu |
+
+### Omitting rotor circuits
+
+A rotor circuit the machine does not have is skipped by putting `*` in **both**
+of its fields — the inductance/reactance **and** the matching
+resistance/time-constant field (specifying only one is an error):
+
+| Circuit | `RL` fields | `XT` fields | Model switch set to 0 |
+|---------|-------------|-------------|-----------------------|
+| $d1$ damper | `Lld1`, `Rd1` | `X"d`, `T"do` | $S_{d1}$ |
+| $q1$ winding | `Llq1`, `Rq1` | `X'q`, `T'qo` | $S_{q1}$ |
+| $q2$ winding | `Llq2`, `Rq2` | `X"q`, `T"qo` | $S_{q2}$ |
+
+The combination $S_{d1} = 0$ with $S_{q1} = S_{q2} = 1$ (field winding plus
+both q-axis windings but no d-axis damper) is rejected. In the `XT` format,
+if the fitted Park parameters come out negative, RAMSES logs an
+"unrealistic Park inductances or resistances" warning — the supplied
+reactances and time constants are physically inconsistent.
+
+All reactances, inductances and resistances are in per unit on the machine base
+($S_{nom}$, nominal voltage), using the EMFL per unit system for the rotor
+quantities. Time constants are entered in seconds and normalised internally by
+$t_b = 1/(2\pi f_{nom})$.
 
 The `EXC` and `TOR` sub-records specify the excitation system and turbine-governor models. See the [Model Reference](/models/ieee-exciters/) for available models.
 
