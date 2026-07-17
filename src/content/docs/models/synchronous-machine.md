@@ -3,7 +3,7 @@ title: Synchronous Machine Model
 description: Mathematical model of the synchronous machine in RAMSES, flux-current relationships, saturation, Park equations, and per unit system
 ---
 
-This page documents the mathematical model of the synchronous machine implemented in RAMSES. The model uses the Equal-Mutual-Flux-Linkage (EMFL) per unit system and supports detailed (round rotor, salient pole) and simplified (no damper) configurations through model switches.
+This page documents the mathematical model of the synchronous machine implemented in RAMSES. The model is a detailed sixth-order model, including four rotor windings with saturation effects. It uses the Equal-Mutual-Flux-Linkage (EMFL) per unit system and supports detailed (round rotor, salient-pole) and simplified (field winding only) configurations through model switches.
 
 ---
 
@@ -20,8 +20,22 @@ To accommodate different rotor configurations within a single model, integer "mo
 | Model | Switches |
 |-------|----------|
 | Detailed, round rotor | $S_{d1} = 1,\; S_{q1} = 1,\; S_{q2} = 1$ |
-| Detailed, salient pole | $S_{d1} = 1,\; S_{q1} = 1,\; S_{q2} = 0$ |
-| Simplified, no damper | $S_{d1} = 0,\; S_{q1} = 0,\; S_{q2} = 0$ |
+| Detailed, salient-pole rotor | $S_{d1} = 1,\; S_{q1} = 1,\; S_{q2} = 0$ |
+| Detailed, salient-pole rotor | $S_{d1} = 1,\; S_{q1} = 0,\; S_{q2} = 1$ |
+| Simplified, field winding only | $S_{d1} = 0,\; S_{q1} = 0,\; S_{q2} = 0$ |
+
+The second and third combinations yield the same results. Models with fewer rotor windings are specified by skipping the corresponding data in the `SYNC_MACH` record (see [below](#omitting-rotor-circuits)).
+
+---
+
+## Park Transformation
+
+The well-known Park transformation is used to replace time-varying inductances and oscillatory stator currents and voltages with constant values. The machine is represented by equivalent windings along the direct ($d$) and quadrature ($q$) axes — a field winding $f$ and damper winding $d1$ on the $d$ axis, and windings $q1$, $q2$ on the $q$ axis:
+
+<p align="center">
+<img src="/images/sync-windings.jpg" alt="Synchronous machine windings" style="width:42%" />
+<img src="/images/sync-park.jpg" alt="Equivalent windings of the Park transformation" style="width:50%" />
+</p>
 
 ---
 
@@ -109,6 +123,12 @@ $$
 
 ## Reference Frame
 
+All synchronous machines have their rotor positions referred to the $x$ axis of the network reference frame (see [Reference Frames & Initialization](/user-guide/reference-frames/)). The **rotor angle** $\delta$ of a machine is the angle difference between its $q$ axis and the $x$ reference axis. In steady state, the machine internal emf (proportional to field current) is aligned along the $q$ axis; $\delta$ is thus the phase angle of that emf with respect to the $x$ axis.
+
+<p align="center">
+<img src="/images/sync-delta.jpg" alt="Definition of the rotor angle delta" style="width:65%" />
+</p>
+
 The $d$ and $q$ components of the stator voltage and current relate to the network $(x, y)$ components through the rotor angle $\delta$:
 
 $$
@@ -132,6 +152,23 @@ $$
 ---
 
 ## Park Equations
+
+### Original form
+
+$$
+v_d = -R_a i_d - \omega \psi_q \qquad\qquad v_q = -R_a i_q + \omega \psi_d
+$$
+
+$$
+\frac{d\psi_f}{dt} = \omega_N (K_f v_f - R_f i_f) \qquad
+\frac{d\psi_{d1}}{dt} = -\omega_N R_{d1} i_{d1} \qquad
+\frac{d\psi_{q1}}{dt} = -\omega_N R_{q1} i_{q1} \qquad
+\frac{d\psi_{q2}}{dt} = -\omega_N R_{q2} i_{q2}
+$$
+
+where $R_a$ is the stator (armature) resistance, $R_f$ the field winding resistance, $R_{d1}$, $R_{q1}$, $R_{q2}$ the rotor winding resistances, $\omega$ the rotor speed (pu), $\omega_N = 2\pi f_{nom}$ the nominal angular frequency (rad/s), $v_f$ the field voltage, and $K_f$ a coefficient to pass from per unit values of the excitation system to per unit values of the machine.
+
+The stator equations are transformed to the $(x, y)$ frame using the rotation matrices above, and the rotor currents are eliminated using the flux-current relationships, yielding the equations actually solved by RAMSES:
 
 ### Stator equations (algebraic, in $x$-$y$ frame)
 
@@ -166,14 +203,16 @@ $$
 ## Rotor Motion
 
 $$
-\frac{1}{\omega_N} \frac{d\delta}{dt} = \omega - \omega_{coi}
+\frac{1}{\omega_N} \frac{d\delta}{dt} = \omega - \omega_{ref}
 $$
 
 $$
-2H \frac{d\omega}{dt} = K_m T_m - T_e - D(\omega - \omega_{coi})
+2H \frac{d\omega}{dt} = K_m T_m - T_e - D(\omega - \omega_{ref})
 $$
 
-where the electromagnetic torque $T_e$ is:
+where $H$ is the inertia constant (in s), $T_m$ the mechanical torque produced by the turbine, $K_m$ a coefficient to pass from per unit values of the turbine to per unit values of the machine, and $\omega_{ref}$ the angular speed of the reference axes — $\omega_{coi}$ in the COI reference frame, or 1 pu in the synchronous frame (selected by the `$OMEGA_REF` solver setting).
+
+The electromagnetic torque $T_e$ is:
 
 $$
 T_e = \psi_{ad} i_q - \psi_{aq} i_d = \psi_{ad}(\cos\delta\, i_x + \sin\delta\, i_y) - \psi_{aq}(-\sin\delta\, i_x + \cos\delta\, i_y)
@@ -225,7 +264,15 @@ $$
 
 ## SYNC_MACH Record
 
-The synchronous machine is declared in the data file with the `SYNC_MACH` record:
+The machine model requires the nominal system frequency, given by the **mandatory** `FNOM` record (see [Solver Settings](/user-guide/solver-settings/)):
+
+```
+FNOM F ;
+```
+
+where `F` is the nominal frequency in Hz.
+
+The synchronous machine itself is declared with the `SYNC_MACH` record:
 
 ```
 SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
@@ -256,16 +303,16 @@ the 14 machine parameters that follow are given in:
 
 | Parameter | Description | Unit |
 |-----------|-------------|------|
-| `name` | Machine name (max 8 characters) | |
+| `name` | Machine name (max 20 characters) | |
 | `bus` | Connection bus name (max 8 characters) | |
 | `FP` | Active power participation fraction (0–1) | |
 | `FQ` | Reactive power participation fraction (0–1) | |
 | `P` | Initial active power (used when FP = 0) | MW |
 | `Q` | Initial reactive power (used when FQ = 0) | Mvar |
-| `SNOM` | Nominal apparent power | MVA |
-| `Pnom` | Nominal active power of the turbine | MW |
+| `SNOM` | Nominal apparent power, used as base power in the machine model | MVA |
+| `Pnom` | Nominal active power of the turbine, used as base power for the turbine model | MW |
 | `H` | Inertia constant | s |
-| `D` | Damping coefficient | pu |
+| `D` | Damping coefficient (usually set to zero when the damper windings are modelled) | pu |
 | `IBRATIO` | Field current base ratio $I_{fB}^{mac}/I_{fB}^{exc}$ (see above) | pu |
 | `TYPE_MOD` | Parameter format keyword: `RL` or `XT` (case-insensitive) | |
 
@@ -280,8 +327,8 @@ the 14 machine parameters that follow are given in:
 | `Xq` | q-axis synchronous reactance ($M_q^u = X_q - X_\ell$) | pu |
 | `X'q` | q-axis transient reactance (`*` if no $q1$ winding; must be smaller than `Xq`) | pu |
 | `X"q` | q-axis subtransient reactance (`*` if no $q2$ winding) | pu |
-| `m` | Saturation coefficient | |
-| `n` | Saturation exponent | |
+| `m` | Saturation coefficient (set to 0 to neglect saturation) | |
+| `n` | Saturation exponent (ignored when `m` = 0) | |
 | `Ra` | Armature resistance | pu |
 | `T'do` | d-axis open-circuit transient time constant | s |
 | `T"do` | d-axis open-circuit subtransient time constant (`*` if no $d1$ damper winding) | s |
@@ -299,8 +346,8 @@ the 14 machine parameters that follow are given in:
 | `Mqu` | Unsaturated q-axis mutual inductance $M_q^u$ | pu |
 | `Llq1` | $q1$ winding leakage inductance $L_{\ell q1}$ (`*` if no $q1$ winding) | pu |
 | `Llq2` | $q2$ winding leakage inductance $L_{\ell q2}$ (`*` if no $q2$ winding) | pu |
-| `m` | Saturation coefficient | |
-| `n` | Saturation exponent | |
+| `m` | Saturation coefficient (set to 0 to neglect saturation) | |
+| `n` | Saturation exponent (ignored when `m` = 0) | |
 | `Ra` | Armature resistance | pu |
 | `Rf` | Field winding resistance $R_f$ | pu |
 | `Rd1` | $d1$ damper resistance $R_{d1}$ (`*` if no $d1$ winding) | pu |
@@ -335,6 +382,33 @@ The `EXC` and `TOR` sub-records specify the excitation system and turbine-govern
 :::note
 The FP, FQ, P, Q fields control how the machine's initial operating point is determined from the power flow solution. See [Reference Frames & Initialization](/user-guide/reference-frames/) for details.
 :::
+
+---
+
+## Initialization Output
+
+At initialization RAMSES prints one block per synchronous machine. Example:
+
+```
+NUMBER OF SYNCHRONOUS MACHINES :    1
+
+machine              at bus                 V            P           Q        delta    sat    island  br
+                     excit model          vf(pu)   torque model               Tm(pu)
+
+G5                   5                    1.0000    450.00186     68.49769    70.99   1.0000       1    1
+                     exc_GENERIC3         2.3680   THERMAL_GENERIC1          0.97826
+```
+
+Here the machine G5, connected to bus 5, is in service (`br = 1`) and injects about 450 MW and 68 Mvar into the grid under a bus voltage of 1 pu.
+
+- `delta` is the initial value of the rotor angle $\delta$, in **degrees**.
+- `sat` is the saturation factor
+  $$
+  sat = 1 + m \left( \sqrt{\psi_{ad}^2 + \psi_{aq}^2} \right)^n \geq 1
+  $$
+  the ratio between the field current in the saturated machine and the corresponding field current when saturation is neglected, for the same operating conditions. It characterizes the extra excitation current needed in the presence of saturated material ($sat = 1$ when `m` is set to zero).
+- `vf` is the initial field voltage on the **exciter base**, which is indirectly defined by the `IBRATIO` parameter of the machine.
+- `Tm` is the initial mechanical torque on the **turbine base**, which is defined by the `Pnom` parameter of the machine.
 
 ---
 
