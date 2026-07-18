@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Documentation site for STEPSS (Static and Transient Electric Power Systems Simulation), built with **Astro 6 + Starlight 0.38**. Deployed to GitHub Pages at https://stepss.sps-lab.org/. Repo: `SPS-L/stepss-docs`.
+Documentation site for STEPSS (Static and Transient Electric Power Systems Simulation), built with **Astro 7 + Starlight 0.41**. Deployed to GitHub Pages at https://stepss.sps-lab.org/. Repo: `SPS-L/stepss-docs`.
 
 ## Commands
 
@@ -24,7 +24,7 @@ There are no tests or linters configured. **Always run `npm run build` after cha
 - **Styling**: Custom theme overrides in `src/styles/custom.css` (blue accent, Inter/JetBrains Mono fonts).
 - **Math**: KaTeX via `remark-math` + `rehype-katex` + `starlight-katex`. Use `$...$` inline and `$$...$$` display.
 - **Images**: Diagrams (SVGs) go in `public/images/` and are referenced as absolute paths (`/images/foo.svg`). Use `<img src="/images/..." alt="..." style="width:60%" />` for sizing control. Logos/icons are in `src/assets/`.
-- **Static files**: PDF user guide, CNAME, and favicon in `public/`.
+- **Static files**: PDF user guide, CNAME, and favicon in `public/`. `public/stepss_userguide.pdf` is a copy of the compiled `stepss_doc.pdf` from the `stepss-userguide` repo — refresh it whenever the user guide is rebuilt.
 
 ## Content Conventions
 
