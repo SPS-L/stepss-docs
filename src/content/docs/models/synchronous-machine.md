@@ -177,7 +177,7 @@ $$
 $$
 
 $$
-0 = -\cos\delta\, v_x - \sin\delta\, v_y - (R_a \cos\delta + \omega_N L_\ell \sin\delta)\, i_x - (R_a \sin\delta - \omega L_\ell \cos\delta)\, i_y + \omega \psi_{ad}
+0 = -\cos\delta\, v_x - \sin\delta\, v_y - (R_a \cos\delta + \omega L_\ell \sin\delta)\, i_x - (R_a \sin\delta - \omega L_\ell \cos\delta)\, i_y + \omega \psi_{ad}
 $$
 
 ### Rotor equations (differential)
