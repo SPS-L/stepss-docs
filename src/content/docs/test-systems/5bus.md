@@ -5,7 +5,7 @@ description: A small 5-bus test system for learning PyRAMSES and power system dy
 
 The 5-bus test system is a minimal power system suitable for learning PyRAMSES and experimenting with dynamic simulation concepts. It is small enough to trace every computation step while still demonstrating the full simulation workflow.
 
-**Repository:** [SPS-L/5_bus_test_system](https://github.com/SPS-L/5_bus_test_system)
+**Repository:** [SPS-L/stepss-5-bus-test-system](https://github.com/SPS-L/stepss-5-bus-test-system)
 
 ---
 
@@ -46,7 +46,7 @@ ext.getSync('G').Q.plot()     # reactive power
 
 ## Download
 
-The test system files are available in the [5_bus_test_system repository](https://github.com/SPS-L/5_bus_test_system).
+The test system files are available in the [stepss-5-bus-test-system repository](https://github.com/SPS-L/stepss-5-bus-test-system).
 
 ## See Also
 
