@@ -15,14 +15,8 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 | [stepss-uramses](https://github.com/SPS-L/stepss-uramses) | User-defined device models framework | Fortran | Public |
 | [stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) | Small-signal / eigenvalue analysis tools | MATLAB | Public |
 | [stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) | Visual block diagram editor for CODEGEN models | Python/JS | Public |
-| [stepss-IEEE-Nordic-Test-system](https://github.com/SPS-L/stepss-IEEE-Nordic-Test-system) | IEEE Nordic voltage-stability benchmark in RAMSES format | RAMSES data | Public |
-| [stepss-5-bus-test-system](https://github.com/SPS-L/stepss-5-bus-test-system) | 5-bus PyRAMSES tutorial system (EEN452 course) | RAMSES data | Public |
-| [stepss-Kundur-Two-Area-System](https://github.com/SPS-L/stepss-Kundur-Two-Area-System) | Kundur two-area system, with and without PSS | RAMSES data | Public |
-| [stepss-GB-Network](https://github.com/SPS-L/stepss-GB-Network) | Reduced Great Britain system with HVDC-LCC links | RAMSES data | Public |
 | stepss-ramses | Core RAMSES simulation engine | Fortran | Private |
 | stepss-test-systems | Curated collection of test cases and network models | RAMSES data | Private |
-| stepss-Cyprus-TN-Dynamic-Model | Cyprus transmission network dynamic model | RAMSES data | Private |
-| stepss-75-bus-test-system | 75-bus distribution system, MPC voltage-control cases | RAMSES data | Private |
 | stepss-PFC | Power-flow calculator (Newton-Raphson) | Fortran | Private |
 | stepss-helios | Modern C++ reimplementation of the PFC power-flow calculator, with a C API shared library wrapped by PyRAMSES (`pyramses.helios`); releases ship CLI and C API binaries for Linux/macOS/Windows | C++ | Private |
 | stepss-dyngraph | Dynamic graph / topology module | Fortran | Private |
@@ -84,37 +78,9 @@ Browser-based visual editor for building CODEGEN user-defined models with drag-a
 - **Run**: `cg-studio` → open `http://localhost:8765`
 - **Documentation**: [CODEGEN Studio guide](/developer/cg-studio/) on this site
 
-### IEEE-Nordic-Test-system
-
-The IEEE Nordic test system (PES-TR19) in RAMSES format: all operating points and load-increase variants, disturbance scenarios, UVLS and DSA data, official documentation, example scripts, and a Jupyter notebook tutorial.
-
-- **Repository**: [github.com/SPS-L/stepss-IEEE-Nordic-Test-system](https://github.com/SPS-L/stepss-IEEE-Nordic-Test-system)
-- **License**: Apache License 2.0
-- **Documentation**: [Nordic Test System page](/test-systems/nordic/) on this site
-
-### 5-bus-test-system
-
-A minimal 5-bus system with startup material for dynamic simulation studies with PyRAMSES, used in the EEN452 course at the Cyprus University of Technology.
-
-- **Repository**: [github.com/SPS-L/stepss-5-bus-test-system](https://github.com/SPS-L/stepss-5-bus-test-system)
-- **License**: Apache License 2.0
-- **Documentation**: [5-Bus Test System page](/test-systems/5bus/) on this site
-
-### Kundur-Two-Area-System
-
-The classic Kundur two-area, four-machine system in RAMSES format, with PSS and no-PSS dynamic data variants for inter-area oscillation studies.
-
-- **Repository**: [github.com/SPS-L/stepss-Kundur-Two-Area-System](https://github.com/SPS-L/stepss-Kundur-Two-Area-System)
-- **License**: Apache License 2.0
-- **Documentation**: [Kundur Two-Area System page](/test-systems/kundur/) on this site
-
-### GB-Network
-
-A reduced Great Britain transmission system (87 buses, 37 machines) with HVDC-LCC interconnections, for dynamic simulation and wide-area monitoring studies.
-
-- **Repository**: [github.com/SPS-L/stepss-GB-Network](https://github.com/SPS-L/stepss-GB-Network)
-- **License**: Apache License 2.0
-- **Documentation**: [GB Network page](/test-systems/gb-network/) on this site
+:::note
+Test-system data repositories (Nordic, 5-bus, Kundur, GB Network, and others) are not listed here — see the [Test Systems](/test-systems/nordic/) section of this site.
+:::
 
 ## Contributing
 
