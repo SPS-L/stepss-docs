@@ -3,7 +3,7 @@ title: 5-Bus Test System
 description: A small 5-bus test system for learning PyRAMSES and power system dynamics
 ---
 
-The 5-bus test system is a minimal power system suitable for learning PyRAMSES and experimenting with dynamic simulation concepts. It is small enough to trace every computation step while still demonstrating the full simulation workflow.
+The 5-bus test system is a minimal power system suitable for learning the STEPSS tools and experimenting with dynamic simulation concepts. It is small enough to trace every computation step while still demonstrating the full simulation workflow, and runs with either PyRAMSES (shown below) or the [STEPSS Java interface](https://github.com/SPS-L/stepss-java-ui).
 
 **Repository:** [SPS-L/stepss-5-bus-test-system](https://github.com/SPS-L/stepss-5-bus-test-system)
 
