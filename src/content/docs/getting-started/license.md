@@ -50,7 +50,7 @@ For extensions to larger models or execution using more than two cores, contact 
 
 ## Helios License
 
-**STEPSS-Helios** (the modern power-flow engine, also bundled as `libhelios_api` in PyRAMSES) is the property of the **Sustainable Power Systems Laboratory, Cyprus University of Technology**, and is distributed under the **STEPSS-Helios Academic Public License**:
+**STEPSS-Helios** (the modern power-flow engine, also bundled as `libhelios_api` in PyRAMSES) is the property of **Dr. Petros Aristidou**, and is distributed under the **STEPSS-Helios Academic Public License**:
 
 - Permission is granted to use Helios **free of charge** for any **non-commercial purpose**, including teaching and research at universities, colleges, and other educational institutions, research at non-profit research institutions, and personal non-profit purposes.
 - For **commercial use**, a commercial license is required — contact **info@sps-lab.org**.

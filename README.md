@@ -1,8 +1,8 @@
 # STEPSS Documentation
 
-**Static and Transient Electric Power Systems Simulation** — Official documentation site.
+**The official documentation website for Static and Transient Electric Power Systems Simulation.**
 
-Built with [Astro Starlight](https://starlight.astro.build/) and deployed to GitHub Pages.
+This repository holds the documentation website, part of the [STEPSS](https://stepss.sps-lab.org/) power system simulation platform. It is built with [Astro](https://astro.build/) 7 and [Starlight](https://starlight.astro.build/) 0.41 and deployed to GitHub Pages.
 
 🔗 **Live site**: [https://stepss.sps-lab.org/](https://stepss.sps-lab.org/)
 
@@ -27,10 +27,12 @@ npm run preview
 ```
 src/content/docs/
 ├── index.mdx                    # Landing page
-├── getting-started/             # Installation, overview, quick start, license
-├── user-guide/                  # Network, PFC, disturbances, solver, models
-├── pyramses/                    # PyRAMSES overview, install, API, examples
-├── developer/                   # CODEGEN, user models, URAMSES
+├── getting-started/             # Overview, installation, quick start, license
+├── user-guide/                  # Network, PFC, disturbances, solver, file formats, eigenanalysis
+├── models/                      # Synchronous machine, exciters, governors, injectors, two-ports
+├── pyramses/                    # PyRAMSES overview, install, API, Helios, examples
+├── developer/                   # CODEGEN, CG Studio, user models, URAMSES
+├── test-systems/                # Nordic and 5-bus test systems
 └── resources/                   # References, repositories
 ```
 
@@ -81,6 +83,8 @@ The site deploys automatically via GitHub Actions when pushing to `main`. The wo
 3. Builds the static site with `astro build`
 4. Deploys to GitHub Pages
 
+Pull requests get a build check via a separate workflow (`.github/workflows/pr-check.yml`).
+
 ### Manual Deployment
 
 Trigger a manual deployment from the GitHub Actions tab → "Deploy to GitHub Pages" → "Run workflow".
@@ -95,15 +99,19 @@ Trigger a manual deployment from the GitHub Actions tab → "Deploy to GitHub Pa
 | [stepss-uramses](https://github.com/SPS-L/stepss-uramses) | User-defined models |
 | [stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) | Eigenvalue analysis |
 
-## Authors
-
-- [Dr. Petros Aristidou](https://sps-lab.org) — Cyprus University of Technology
-- Dr. Thierry Van Cutsem — University of Liège
-
 ## License
 
-- **Documentation content** (`src/content/docs/`, `public/images/`) — [CC BY 4.0](LICENSE). Share and adapt freely, including commercially, with appropriate credit.
-- **Website code** (Astro config, components, styles) — [MIT](LICENSE-CODE).
+- **Documentation content** (`src/content/docs/`, `public/images/`) is licensed under [CC BY 4.0](LICENSE). Share and adapt freely, including commercially, with appropriate credit.
+- **Website code** (Astro config, components, styles) is licensed under [MIT](LICENSE-CODE).
 - **`public/stepss_userguide.pdf`** — the compiled user guide, redistributed from [stepss-userguide](https://github.com/SPS-L/stepss-userguide) under that repository's licence.
 
 The STEPSS **software** documented here is not covered by either licence — several components are proprietary or non-commercial. See [NOTICE](NOTICE) and the [licence page](https://stepss.sps-lab.org/getting-started/license/).
+
+## Authors
+
+Developed and maintained by the [Sustainable Power Systems Laboratory (SPS-L)](https://sps-lab.org/) at the Cyprus University of Technology, under the direction of Dr. Petros Aristidou.
+
+Documentation authors:
+
+- [Dr. Petros Aristidou](https://sps-lab.org) — Cyprus University of Technology
+- Dr. Thierry Van Cutsem — University of Liège
