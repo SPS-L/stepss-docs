@@ -141,6 +141,8 @@ export default defineConfig({
 					items: [
 						{ label: 'Nordic Test System', slug: 'test-systems/nordic' },
 						{ label: '5-Bus Test System',  slug: 'test-systems/5bus' },
+						{ label: 'Kundur Two-Area System', slug: 'test-systems/kundur' },
+						{ label: 'GB Network', slug: 'test-systems/gb-network' },
 					],
 				},
 				{
