@@ -5,12 +5,12 @@ description: A 74-bus, 20-generator benchmark for voltage stability and long-ter
 
 import { Tabs, TabItem, LinkCard, CardGrid } from '@astrojs/starlight/components';
 
-The Nordic test system is a well-established benchmark for voltage stability and long-term dynamics studies, originally defined in the [IEEE PES Technical Report on Test Systems for Voltage Stability Analysis and Security Assessment](https://resourcecenter.ieee.org/publications/technical-reports/PESTR19). It represents a realistic multi-area transmission network and is used extensively in research and education.
+The Nordic test system is a well-established benchmark for voltage stability and long-term dynamics studies, originally defined in the [IEEE PES Technical Report on Test Systems for Voltage Stability Analysis and Security Assessment](https://resourcecenter.ieee-pes.org/publications/technical-reports/PESTR19.html). It represents a realistic multi-area transmission network and is used extensively in research and education.
 
 <LinkCard
-  title="Nordic_JhubStart Repository"
-  description="Ready-to-run PyRAMSES simulation files with Jupyter notebook tutorial"
-  href="https://github.com/SPS-L/Nordic_JhubStart"
+  title="IEEE-Nordic-Test-system Repository"
+  description="Complete RAMSES data set: all operating points, disturbance scenarios, documentation, example scripts, and a Jupyter notebook tutorial"
+  href="https://github.com/SPS-L/IEEE-Nordic-Test-system"
 />
 
 ---
@@ -49,30 +49,34 @@ Under-load tap changers are modeled with `DCTL LTC2` discrete controllers on all
 
 ## Operating Points
 
-The repository provides two operating points:
+The repository provides two main operating points plus a family of load-increase variants:
 
 | File | Description |
 |---|---|
-| `dyn_A.dat` / `volt_rat_A.dat` | Operating Point A, base case, moderately stressed |
-| `dyn_B.dat` / `volt_rat_B.dat` | Operating Point B, heavily stressed, closer to voltage collapse |
+| `lf_A.dat` / `dyn_A.dat` / `volt_rat_A.dat` | Operating Point A, base case, moderately stressed |
+| `lf_B.dat` / `dyn_B.dat` / `volt_rat_B.dat` | Operating Point B, heavily stressed, closer to voltage collapse |
+| `lf_B_plus_*.dat` / `volt_rat_B_plus*.dat` | Operating Point B with total load increased by 25 to 500 MW |
 
-Operating Point B is the primary case for voltage stability studies; it features higher load levels in the central area and reduced reactive power reserves.
+Operating Point B is the primary case for voltage stability studies; it features higher load levels in the central area and reduced reactive power reserves. The `B_plus` variants (documented in `doc/variants.pdf`) progressively stress the system further and are useful for tracing the loadability limit.
 
 ---
 
 ## Repository Contents
 
-| File | Description |
+| Path | Description |
 |---|---|
-| `Execute.ipynb` | Jupyter notebook with step-by-step simulation tutorial |
-| `dyn_A.dat` / `dyn_B.dat` | Dynamic data files (generators, controllers, network, loads) |
-| `volt_rat_A.dat` / `volt_rat_B.dat` | Power flow solutions (bus voltages and angles) |
+| `lf_*.dat` / `dyn_*.dat` / `volt_rat_*.dat` | Load-flow data, dynamic data, and power-flow solutions for all operating points |
 | `settings1.dat` | Solver configuration (time step, tolerances, threading) |
 | `obs.dat` | Observation file, monitors all buses, branches, machines, injectors |
+| `uvls.dat` | Undervoltage load-shedding (UVLS) controllers |
 | `nothing.dst` | Empty disturbance file (undisturbed simulation) |
-| `trip_gen.dst` | Generator trip disturbance scenario |
-| `short_trip_branch.dst` | Short-circuit followed by branch trip |
-| `variants.pdf` | Documentation of system variants and operating points |
+| `trip_gen.dst` / `trip_branch.dst` | Generator and branch trip disturbance scenarios |
+| `short_trip_branch.dst` | Short-circuit followed by branch trip (`_changeLTCs` variant modifies tap-changer behavior) |
+| `eigen.dst` / `dampJac.dst` | Jacobian export runs for [eigenanalysis](/user-guide/eigenanalysis/) |
+| `cmd*.txt` / `sim_*.cfg` | RAMSES command files (`cmd_DSA*.txt` drive dynamic security assessment runs) |
+| `doc/` | IEEE PES-TR19 report, detailed system report (V6), and operating-point variants description |
+| `scripts/` | PyRAMSES, Python, and MATLAB/Simulink example scripts |
+| `jupyterhub-tutorial/` | Self-contained tutorial with `Execute.ipynb`, a step-by-step voltage collapse notebook |
 
 ---
 
@@ -80,15 +84,12 @@ Operating Point B is the primary case for voltage stability studies; it features
 
 ### Generator Trip (`trip_gen.dst`)
 
-Trips generator g2 at $t = 1$ s and observes the system response. Additional shunt compensation is switched at $t = 11$ s and $t = 21$ s:
+Trips generator g2 at $t = 1$ s and observes the long-term system response:
 
 ```
-0.000 CONTINUE SOLVER BD 0.010 0.001 0.0 ALL
+0.000 CONTINUE SOLVER BD 0.020 0.001 0.0 ABL
 1.000 BREAKER SYNC_MACH g2 0
-5.000 CONTINUE SOLVER BD 0.010 0.001 0.0 ALL
-120.000 STOP
-11.000 CHGPRM SHUNT SH1042 QNOM 80
-21.000 CHGPRM SHUNT SH1042 QNOM 80
+100.000 STOP
 ```
 
 ### Short-Circuit with Branch Trip (`short_trip_branch.dst`)
@@ -96,13 +97,14 @@ Trips generator g2 at $t = 1$ s and observes the system response. Additional shu
 Applies a three-phase fault on bus 4032 at $t = 1$ s, cleared after 100 ms by tripping the faulted branch:
 
 ```
-0.000 CONTINUE SOLVER BD 0.020 0.001 0. ABL
-1.000 FAULT BUS 4032 0. 0.8
+0.000 CONTINUE SOLVER BD 0.020 0.001 0.00 ABL
+1.000 FAULT BUS 4032 0. 0.
 1.100 CLEAR BUS 4032
 1.100 BREAKER BRANCH 4032-4044 0 0
-5.000 CONTINUE SOLVER BD 0.020 0.001 0. ABL
-240.000 STOP
+200.000 STOP
 ```
+
+The `jupyterhub-tutorial/` folder contains its own variants of these scenarios (e.g. with shunt compensation switching) used by the tutorial notebook.
 
 ---
 
@@ -120,11 +122,11 @@ Install PyRAMSES following the [installation guide](/pyramses/installation/).
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/SPS-L/Nordic_JhubStart.git
-   cd Nordic_JhubStart
+   git clone https://github.com/SPS-L/IEEE-Nordic-Test-system.git
+   cd IEEE-Nordic-Test-system
    ```
 
-2. Open `Execute.ipynb` in Jupyter and run cells sequentially, or use the following Python script:
+2. Open `jupyterhub-tutorial/Execute.ipynb` in Jupyter and run cells sequentially, or use the following Python script from the repository root:
 
 <Tabs>
 <TabItem label="Python Script">
@@ -166,9 +168,13 @@ After a generator trip on Operating Point B, the simulation demonstrates:
 
 ---
 
+## License
+
+The [IEEE-Nordic-Test-system](https://github.com/SPS-L/IEEE-Nordic-Test-system) repository is licensed under the [Apache License 2.0](https://github.com/SPS-L/IEEE-Nordic-Test-system/blob/main/LICENSE). The IEEE PES-TR19 report redistributed in its `doc/` folder remains © IEEE.
+
 ## References
 
-- T. Van Cutsem, M. Classes, "Description, modelling and simulation results of a test system for voltage stability analysis," IEEE PES Technical Report PES-TR19, 2013. Available from the [IEEE Resource Center](https://resourcecenter.ieee.org/publications/technical-reports/PESTR19)
+- IEEE PES Task Force on Test Systems for Voltage Stability Analysis and Security Assessment (chaired by T. Van Cutsem), "Test Systems for Voltage Stability Analysis and Security Assessment," IEEE PES Technical Report PES-TR19, Aug. 2015. Available from the [IEEE Resource Center](https://resourcecenter.ieee-pes.org/publications/technical-reports/PESTR19.html)
 - [RAMSES project page](https://sps-lab.org/project/pyramses/) at the Sustainable Power Systems Lab
 - [STEPSS project page](https://sps-lab.org/project/stepss/) at the Sustainable Power Systems Lab
 

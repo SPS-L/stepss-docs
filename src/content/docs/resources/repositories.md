@@ -15,7 +15,9 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 | [stepss-uramses](https://github.com/SPS-L/stepss-uramses) | User-defined device models framework | Fortran | Public |
 | [stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) | Small-signal / eigenvalue analysis tools | MATLAB | Public |
 | [stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) | Visual block diagram editor for CODEGEN models | Python/JS | Public |
+| [IEEE-Nordic-Test-system](https://github.com/SPS-L/IEEE-Nordic-Test-system) | IEEE Nordic voltage-stability benchmark in RAMSES format | RAMSES data | Public |
 | stepss-ramses | Core RAMSES simulation engine | Fortran | Private |
+| stepss-test-systems | Curated collection of test cases and network models | RAMSES data | Private |
 | stepss-PFC | Power-flow calculator (Newton-Raphson) | Fortran | Private |
 | stepss-helios | Modern C++ reimplementation of the PFC power-flow calculator, with a C API shared library wrapped by PyRAMSES (`pyramses.helios`); releases ship CLI and C API binaries for Linux/macOS/Windows | C++ | Private |
 | stepss-dyngraph | Dynamic graph / topology module | Fortran | Private |
@@ -76,6 +78,14 @@ Browser-based visual editor for building CODEGEN user-defined models with drag-a
 - **Install**: `pip install stepss-cg-studio`
 - **Run**: `cg-studio` → open `http://localhost:8765`
 - **Documentation**: [CODEGEN Studio guide](/developer/cg-studio/) on this site
+
+### IEEE-Nordic-Test-system
+
+The IEEE Nordic test system (PES-TR19) in RAMSES format: all operating points and load-increase variants, disturbance scenarios, UVLS and DSA data, official documentation, example scripts, and a Jupyter notebook tutorial.
+
+- **Repository**: [github.com/SPS-L/IEEE-Nordic-Test-system](https://github.com/SPS-L/IEEE-Nordic-Test-system)
+- **License**: Apache License 2.0
+- **Documentation**: [Nordic Test System page](/test-systems/nordic/) on this site
 
 ## Contributing
 
