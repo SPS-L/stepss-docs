@@ -7,6 +7,10 @@ The 5-bus test system is a minimal power system suitable for learning the STEPSS
 
 **Repository:** [SPS-L/stepss-5-bus-test-system](https://github.com/SPS-L/stepss-5-bus-test-system)
 
+## One-line Diagram
+
+<img src="/images/5bus_oneline.png" alt="One-line diagram of the 5-bus test system" style="width:70%" />
+
 ---
 
 ## Quick Start

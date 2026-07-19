@@ -7,6 +7,10 @@ The GB Network is a 50 Hz reduced-order representation of the Great Britain tran
 
 **Repository:** [SPS-L/stepss-GB-Network](https://github.com/SPS-L/stepss-GB-Network)
 
+## One-line Diagram
+
+<img src="/images/gb_oneline.png" alt="One-line diagram of the GB network with HVDC-LCC links" style="width:80%" />
+
 ---
 
 ## Quick Start
