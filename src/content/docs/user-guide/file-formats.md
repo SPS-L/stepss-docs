@@ -29,8 +29,8 @@ LINE A-B BUS_A BUS_B 3.030.0 150.0 1400.0 1 ;     ❌ Missing space
 A record may **span multiple lines**; the semicolon indicates the end. Spanning over several lines is highly recommended for records that include many fields. Note that, depending on the text editor and its settings, a long record could appear truncated when displayed.
 
 ```
-INJEC GFOL VSC1 A 1.0 1.0 0.0 0.0 0.005 0.15 1.00 1044.0 0.005 0.15 33.3
- 10.0 0.002 -999.0 10.0 0.1667 50.0 0.10  0.4  0.5  1.0  0.95  0.5 99.0 1 ;
+INJEC GFOL VSC1 A 1.0 1.0 0.0 0.0 0.005 0.15 1.02 1200.0 0.005 0.15 0.573 6.0
+ 0.0033 0.0333 10.0 0.002 -999.0 10.0 0.1667 50.0 0.10 0.4 0.5 1.0 -1000. -2000. 1.001 1 ;
 ```
 
 Some records have optional fields, which are always located at the end of the record.

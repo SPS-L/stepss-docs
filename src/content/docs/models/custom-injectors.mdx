@@ -21,7 +21,7 @@ Recognised injector model names (case-sensitive):
 - **Uppercase short names** (no prefix): `LOAD`, `RESTLD`, `THEVEQ`, `INDMACH1`, `INDMACH2`, `SVC_GENERIC1`.
 - **Prefixed names**: RAMSES adds the `inj_` prefix automatically: `VFAULT`/`inj_VFAULT`, `vfd_load`/`inj_vfd_load`, `PQ`/`inj_PQ`, `IBG`/`inj_IBG`, `WT3`/`inj_WT3`, `WT4`/`inj_WT4`, `BESS`/`inj_BESS`, `GFOL`/`inj_GFOL`, `GFOR`/`inj_GFOR`.
 
-All of the above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). Additional variants documented below but not in this list (`inj_GFOR_v2`, `inj_INDM1`, `inj_norton`, `inj_PVG`) are not callable out of the box. They can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
+All of the above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). Additional variants documented below but not in this list (`inj_INDM1`, `inj_norton`, `inj_PVG`) are not callable out of the box. They can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
 
 > **Note on case sensitivity.** Match the case used above exactly. The uppercase short names must be uppercase. For the prefixed family, `vfd_load` and `VFAULT` use those exact cases. Most others follow the convention `inj_<UPPERCASE>` (e.g. `inj_PQ`, `inj_GFOR`).
 :::
@@ -751,360 +751,254 @@ INJEC  PVG  PV1  BUS_PV  1.  1.  0.  0.  1.2  1.0  0.5  0.02  0.01  0.5  1.0  0.
 
 ---
 
-### `GFOR` / `inj_GFOR`: Grid-Forming Converter
+### `GFOR` / `inj_GFOR`: Grid-Forming Converter (VSM)
 
-The data-file model name is `GFOR` (or `inj_GFOR`). `GFOR` resolves to the original grid-forming converter described below. A newer alternative implementation (described in the next section) is not dispatched by default.
+The data-file model name is `GFOR` (or `inj_GFOR`).
 
 #### Description
 
-A grid-forming voltage source converter implementing Virtual Synchronous Machine (VSM) dynamics. The converter's output voltage phase angle and magnitude are controlled to mimic the behaviour of a synchronous machine: an inertia-like integrator creates a synthetic swing equation, a droop loop regulates frequency, and a current limiter protects against overcurrents using a virtual impedance that attenuates the modulated voltage.
+A grid-forming voltage source converter implementing Virtual Synchronous Machine (VSM) dynamics, modelled under the phasor approximation. The converter is an MMC-type VSC connected to the grid through its transformer (no LC filter); the DC side is not modelled (the DC voltage is assumed constant) so the focus is on the AC grid dynamics.
+
+The modulated voltage magnitude is held at its setpoint $V_m^0$ in normal operation, while the phase angle $\delta_m$ is driven by a synthetic swing equation with inertia emulation ($H$) and oscillation damping ($D$) against a PLL estimate of the grid frequency. Participation in primary frequency control is optional, through the droop $R_{\mathrm{droop}}$. Overcurrents are limited by proportionally scaling the $d$-$q$ current vector back to the $I_{\mathrm{max}}$ circle with a small time constant.
+
+The model was contributed by Thierry Van Cutsem (July 2026). The block diagrams below are reproduced from the companion notes shipped with the model (`models/inj/custom/Grid_forming_model.pptx` in the RAMSES repository).
 
 #### Scientific Description
 
-The phase reactor algebraic equations (pu on machine base) are:
+**Reference frame.** The $d$ axis is attached to the internal phase angle $\delta_m$ of the modulated voltage. Voltages and currents at the point of common coupling are transformed as:
 
-$$\frac{v_x}{r} + R_{\mathrm{pr}} i_{xt} - \omega_{\mathrm{ref}} L_{\mathrm{pr}} i_{yt} = V_m \cos(\delta_m)$$
+$$v_d = v_x\cos\delta_m + v_y\sin\delta_m, \qquad v_q = -v_x\sin\delta_m + v_y\cos\delta_m$$
 
-$$\frac{v_y}{r} + R_{\mathrm{pr}} i_{yt} + \omega_{\mathrm{ref}} L_{\mathrm{pr}} i_{xt} = V_m \sin(\delta_m)$$
+with the analogous transformation for the converter-side currents $i_{xt} = k\, i_x$, $i_{yt} = k\, i_y$, where $k = r\, S_{\mathrm{base}}/S_{\mathrm{nom}}$ converts to per-unit on the converter base.
 
-The VSM swing equation is:
+**Transformer.** The voltage-current relationship across the connection transformer (resistance $R$, inductance $L$, ideal ratio $r$) in the $d$-$q$ frame is:
 
-$$2H \frac{d\omega_P}{dt} = \Delta P = \left[P_0 + \frac{1 - \omega_m}{R_{\mathrm{VSC}}}\right]\gamma - P$$
+$$v_{md} = \frac{v_d}{r} + R\, i_d - \omega_m L\, i_q, \qquad v_{mq} = \frac{v_q}{r} + R\, i_q + \omega_m L\, i_d$$
 
-$$\omega_m = \omega_P - K_p P$$
+**PLL.** The PLL only serves to estimate the grid angular frequency $\tilde{\omega}_g$ for the damping term. It is the same model as in the grid-following converter (see the [PLL diagram there](#gfol--inj_gfol-grid-following-converter)), with PI gains derived from the time constant $T_{\mathrm{pll}}$:
 
-$$\frac{d\delta_m}{dt} = (\omega_m - \omega_{\mathrm{ref}})\cdot 2\pi f_0$$
+$$K_{p\omega} = \frac{10}{\omega_N T_{\mathrm{pll}}}, \qquad K_{i\omega} = \frac{25}{\omega_N T_{\mathrm{pll}}^2}, \qquad \omega_N = 2\pi f_N$$
 
-The attenuation factor $\gamma$ limits power during overcurrent:
+The PLL is frozen (hysteresis) when the PCC voltage falls below 0.4 pu and reactivated when it recovers above 0.5 pu (fixed thresholds in this model).
 
-$$\gamma = \left(\frac{V_m}{V_{m0}}\right)^n$$
+**Active power and phase angle control (VSM).**
 
-When the current exceeds $I_{\mathrm{max}}$, the virtual impedance modifies the modulated voltage:
+<img src="/images/models/inj_gfor_vsm.png" alt="GFOR virtual synchronous machine active power and phase angle control block diagram" style="width:75%" />
 
-$$\Delta I = I - I_{\mathrm{lim}}, \quad \Delta V_m = -\frac{1}{K_c}\Delta I \quad \text{(limited to } [L_1, L_2]\text{)}$$
+$$2H\frac{d\omega_m}{dt} = P^* - P_{\mathrm{virt}} - D\left(\omega_m - \tilde{\omega}_g\right) + \frac{1 - \omega_m}{R_{\mathrm{droop}}}$$
 
-$$V_{m,\mathrm{cl}} = V_{m0} - \Delta V_m$$
+$$\frac{d\delta_m}{dt} = \omega_N\left(\omega_m - \omega_{\mathrm{ref}}\right)$$
+
+where $P^*$ is the active power setpoint and $P_{\mathrm{virt}}$ is the *virtual power* computed from the **unsaturated** currents:
+
+$$P_{\mathrm{virt}} = \frac{v_d}{r}\, i_d^* + \frac{v_q}{r}\, i_q^*$$
+
+$P_{\mathrm{virt}}$ equals the actual active power $P$ when the current is not limited, and yields improved large-disturbance stability while the current is limited (the angle dynamics do not wind up).
+
+**Current limitation.** The currents $(i_d^*, i_q^*)$ that would result from normal voltage control (i.e. $v_{md} = V_m^0$, $v_{mq} = 0$) are first determined from:
+
+$$V_m^0 = \frac{v_d}{r} + R\, i_d^* - \omega_m L\, i_q^*, \qquad 0 = \frac{v_q}{r} + R\, i_q^* + \omega_m L\, i_d^*$$
+
+The current overload ratio $\rho = \sqrt{(i_d^*)^2 + (i_q^*)^2}\,/\,I_{\mathrm{max}}$ is passed through a first-order lag with time constant $T_e$ (typically 1 ms) and a non-windup **lower limit of 1**, giving $\rho_s$. Both current components are then decreased in the same proportion:
+
+$$i_{ds}^* = \frac{i_d^*}{\rho_s}, \qquad i_{qs}^* = \frac{i_q^*}{\rho_s}$$
+
+<img src="/images/models/inj_gfor_currentlim.png" alt="GFOR current limitation: proportional scaling of the dq current vector back to the Imax circle" style="width:45%" />
+
+and the modulated voltage is set to the value that yields the saturated currents:
+
+$$v_{md} = \frac{v_d}{r} + R\, i_{ds}^* - \omega_m L\, i_{qs}^*, \qquad v_{mq} = \frac{v_q}{r} + R\, i_{qs}^* + \omega_m L\, i_{ds}^*$$
+
+When $I < I_{\mathrm{max}}$: $\rho_s = 1$, the currents are unsaturated, and $v_{md} = V_m^0$, $v_{mq} = 0$.
 
 #### Parameters
 
-| # | Name | Description | Unit |
-|---|------|-------------|------|
-| 1 | `Rpr` | Phase reactor resistance | pu |
-| 2 | `Lpr` | Phase reactor inductance | pu |
-| 3 | `r` | Transformer turns ratio | |
-| 4 | `Snom` | Nominal apparent power | MVA |
-| 5 | `H` | Inertia constant | s |
-| 6 | `RVSC` | Steady-state frequency droop | pu |
-| 7 | `Kp` | Proportional gain in active power control | |
-| 8 | `Imax` | Maximum current | pu |
-| 9 | `n` | Exponent in attenuation factor $\gamma$ | |
-| 10 | `Kc` | Gain of current limiter integral control | |
-| 11 | `L1` | Lower limit of current correction | pu |
-| 12 | `L2` | Upper limit of current correction | pu |
+Default values are those of the `Benchmark_1_VSC` test case shipped with RAMSES (`examples/Benchmark_1_VSC`, converter of 1100 MVA). Per-unit values refer to the nominal apparent power of the converter.
+
+| # | Name | Description | Unit | Default |
+|---|------|-------------|------|---------|
+| 1 | `R` | Resistance of connection transformer | pu | 0.005 |
+| 2 | `L` | Inductance of connection transformer | pu | 0.15 |
+| 3 | `r` | Ratio of ideal transformer | | 1.02 |
+| 4 | `Snom` | Nominal apparent power | MVA | 1100 |
+| 5 | `H` | Inertia constant | s | 5.0 |
+| 6 | `D` | Damping constant of virtual synchronous machine | | 300 |
+| 7 | `Tpll` | Time constant of PLL | s | 0.1 |
+| 8 | `Rdroop` | Droop of primary frequency control | pu | 999 |
+| 9 | `Imax` | Maximum current (typically 1–1.2) | pu | 1.0 |
+| 10 | `Te` | Time constant of current saturation | s | 0.001 |
+
+A very large `Rdroop` (e.g. 999) effectively disables participation in primary frequency control.
+
+Five additional parameters are computed at initialization from the power-flow solution: `k` (current conversion factor), `vmx0`, `vmy0` (components of the initial modulated voltage), `Vmo` (its magnitude $V_m^0$, i.e. the voltage setpoint) and `Po` (the active power setpoint $P^*$, pu on `Snom` base). `Vmo` and `Po` can be modified during the simulation with `CHGPRM` disturbances to change the voltage and active power setpoints.
 
 #### State Variables
 
-| Variable | Description |
-|----------|-------------|
+The model has 33 states (2 output currents + 31 internal). Key internal states:
+
+| Variable | Description | Unit |
+|----------|-------------|------|
 | `wref` | Angular speed of reference axes | pu |
-| `ixt`, `iyt` | Converter-side currents (on machine base) | pu |
-| `Vm` | Modulated voltage magnitude | pu |
-| `deltam` | Modulated voltage phase angle | rad |
-| `P` | Active power (on Snom base) | pu |
-| `gamma` | Attenuation factor | |
-| `omegam1` | VSM inertia integrator output | pu |
-| `omegam` | VSM frequency estimate | pu |
-| `deltaomegam` | Phase-angle integrator input | rad/s |
-| `I` | Current magnitude | pu |
-| `deltaVm_un`, `deltaVm` | Voltage corrections (before/after limiter) | pu |
-| `Pout`, `Qout` | Active and reactive power (MW, Mvar) | |
+| `ixt`, `iyt` | Converter-side currents (on `Snom` base) | pu |
+| `Vm`, `deltam` | Modulated voltage magnitude and phase angle | pu, rad |
+| `V` | Voltage magnitude at PCC | pu |
+| `mult_pll` | PLL freezing factor (hysteresis output) | |
+| `w_pll`, `theta_pll` | PLL frequency and angle estimates | pu, rad |
+| `P`, `Pvirt` | Active power and virtual power (on `Snom` base) | pu |
+| `omegam` | Angular frequency of modulated voltage | pu |
+| `vd`, `vq`, `id`, `iq` | PCC voltage and current in $d$-$q$ frame | pu |
+| `id*`, `iq*` | Unsaturated currents | pu |
+| `id*s`, `iq*s` | Saturated currents | pu |
+| `rho`, `rhos` | Current overload ratio and its saturated value | |
+| `Q` | Reactive power (on `Snom` base) | pu |
+
+**Observables:** `P`, `Pvirt`, `Q`, `Vm`, `vmd`, `vmq`, `deltam`, `omegam`, `w_pll`, `I`, `id`, `id*`, `id*s`, `iq`, `iq*`, `iq*s`, `rho`, `rhos`.
 
 #### Usage Example
 
+The `Benchmark_1_VSC` case (grid-forming converter against a Thévenin equivalent):
+
 ```
-INJEC  GFOR  GFM1  BUS_BESS  1.  1.  0.  0.  0.005  0.15  1.0  50.0  5.0  0.05  0.01  1.1  2.0  0.5  0.0  0.05  ;
+#                 name   bus  FP   FQ   P   Q    R      L     r     Snom   H     D    Tpll  Rdroop Imax   Te
+INJEC    GFOR     HVDC    A   1.   1.   0.  0.  0.005  0.15  1.02  1100.  5.0   300.  0.100  999.   1.0  0.001 ;
 ```
 
----
-
-### `inj_GFOR_v2`: Grid-Forming Converter v2
-
-:::caution
-`inj_GFOR_v2` is an alternative grid-forming converter implementation documented here for reference. It is **not** the model dispatched by `GFOR` in a standard RAMSES distribution (which uses the implementation shown in the previous section). To use this newer variant, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::note
+At operating points where the initial current is below $I_{\mathrm{max}}$, RAMSES reports a small initial mismatch on the $\rho_s$ lag equation ("INJECTORS NOT IN STEADY STATE"). This is benign: $\rho_s$ starts exactly at its lower limit of 1 and is clamped there by the discrete update within the first time step.
 :::
 
-#### Description
-
-An advanced grid-forming VSC model with three selectable active-power synchronization modes, comprehensive reactive-power control options, DC-link dynamics, and integrated battery storage. The model is suitable for detailed studies of grid-forming inverters in islanded or weak-grid conditions.
-
-**Synchronization mode** (selected by `delta_m_switch`):
-1. **VSM**, Virtual Synchronous Machine: swing equation with inertia constant $H$, droop $R_{\mathrm{vsm}}$, and damping $K_p$
-2. **Droop**, P-$\omega$ droop control filtered by $T_d$
-3. **Selfsync**, Self-synchronization using power error integration with gains $K_s$ and $K_s'$
-
-**Reactive power control** (selected by `QV_switch`):
-- 0: No reactive power control ($V_{m0} = V_{\mathrm{ref}}$)
-- 1: Q-V droop control (Options A, B, or C switchable via `QV_switch_state`)
-
-**Current limiting** (selected by `VI_CL_switch`):
-- 0: Virtual Impedance, attenuates modulated voltage using virtual $R_{vi}$ and $X_{vi}$
-- 1: Current Limiter, integral control corrects $V_m$ to enforce $I \le I_{\max}$
-
-**DC link and battery**: The DC voltage $v_{\mathrm{dc}}$ evolves according to capacitor dynamics. A PI controller regulates $v_{\mathrm{dc}}$ to its setpoint. Battery SOC is tracked via integration of battery current. SOC limits automatically clamp battery current.
-
-#### Scientific Description
-
-**VSM active power loop:**
-
-$$2H\frac{d\omega_P}{dt} = \left[P_0 + \frac{1-\omega_m}{R_{\mathrm{vsm}}}\right]\gamma - P = \Delta P$$
-
-$$\omega_m = \omega_P - K_p P$$
-
-$$\frac{d\delta_{m,\mathrm{vsm}}}{dt} = (\omega_m - \omega_{\mathrm{ref}})\cdot 2\pi f_0$$
-
-**Droop active power loop:**
-
-$$\frac{d\omega_{\mathrm{droop}}}{dt} = \frac{\omega_{\mathrm{meas}} - \omega_{\mathrm{droop}}}{T_d}$$
-
-$$\frac{d\delta_{m,\mathrm{droop}}}{dt} = \left[(P_0 - \omega_{\mathrm{droop}}) m_p + 1 - \omega_{\mathrm{ref}}\right] \cdot 2\pi f_0$$
-
-**Selfsync active power loop:**
-
-$$\frac{d P_s}{dt} = \frac{P - P_s}{T_s}, \qquad \Delta P_{\mathrm{ss}} = P_0 - P_s$$
-
-$$\frac{d\delta_{\mathrm{ss}}}{dt} = \left[K_s\Delta P_{\mathrm{ss}} + 1 - \omega_{\mathrm{ref}}\right]\cdot 2\pi f_0$$
-
-$$\delta_{m,\mathrm{sync}} = \delta_{\mathrm{ss}} + K_s'\Delta P_{\mathrm{ss}}$$
-
-**Phase reactor (algebraic):**
-
-$$\frac{v_x}{r} + R_{\mathrm{pr}} i_{xt} - \omega_{\mathrm{ref}} L_{\mathrm{pr}} i_{yt} = V_m \cos(\delta_m)$$
-
-$$\frac{v_y}{r} + R_{\mathrm{pr}} i_{yt} + \omega_{\mathrm{ref}} L_{\mathrm{pr}} i_{xt} = V_m \sin(\delta_m)$$
-
-**Virtual Impedance current limiting:**
-
-$$f_I = \max(0,\; I - I_{\mathrm{lim}}), \qquad R_{vi} = K_{pvi}\, f_I, \qquad X_{vi} = \sigma_{xr} K_{pvi}\, f_I$$
-
-$$\begin{pmatrix} V_{m0}\cos\delta_m'\\ V_{m0}\sin\delta_m' \end{pmatrix} = \begin{pmatrix} V_m\cos\delta_m + R_{vi}i_{xt} - X_{vi}i_{yt}\\ V_m\sin\delta_m + R_{vi}i_{yt} + X_{vi}i_{xt} \end{pmatrix}$$
-
-**Modulation index:**
-
-$$m = m_0 + \Delta m, \qquad f(m) = 1 + A\left(1 - e^{-(m-1)/A}\right), \qquad A = -1 + \frac{4}{\pi}$$
-
-$$V_{m,s} = m \cdot v_{\mathrm{dc}} \quad (\text{limited to } [0,\, m_{\max}])$$
-
-**DC link dynamics:**
-
-$$C_{\mathrm{dc}}\frac{dv_{\mathrm{dc}}}{dt} = i_{\mathrm{dcs}} - i_{\mathrm{dc}}$$
-
-$$i_{\mathrm{dcs}} = i_{\mathrm{res}} + I_{\mathrm{bat,f}}$$
-
-where $i_{\mathrm{res}}$ is the non-battery DC current (proportional to AC power) and $I_{\mathrm{bat,f}}$ is the battery current filtered by $T_{\mathrm{simp}}$.
-
-**Battery SOC:**
-
-$$\frac{d\mathrm{SOC}}{dt} = -\frac{I_{\mathrm{bat}}}{C_{\mathrm{bat}} \cdot I_{\mathrm{base,DC}}}$$
-
-Battery current is clamped by rated current and by SOC limits:
-
-$$I_{\mathrm{bat}} \in \left[\max\!\left(-I_{\mathrm{rated}}, I_{\mathrm{SOC-}}^{\min}\right),\; \min\!\left(I_{\mathrm{rated}}, I_{\mathrm{SOC+}}^{\max}\right)\right]$$
-
-#### Parameters
-
-| # | Name | Description | Unit |
-|---|------|-------------|------|
-| 1 | `Snom` | Nominal apparent power | MVA |
-| 2 | `Pnom` | Nominal DC-side power (base) | MW |
-| 3 | `VB` | AC base voltage | kV |
-| 4 | `Vdc0pu` | Initial DC link voltage | pu |
-| 5 | `Rpr` | Phase reactor resistance | pu |
-| 6 | `Lpr` | Phase reactor inductance | pu |
-| 7 | `r` | Transformer turns ratio | |
-| 8 | `H` | VSM inertia constant | s |
-| 9 | `R_vsm` | VSM frequency droop | pu |
-| 10 | `Kp` | VSM damping constant | |
-| 11 | `Td` | Droop filter time constant | s |
-| 12 | `Ts` | Selfsync filter time constant | s |
-| 13 | `Ks` | Selfsync integral gain | |
-| 14 | `Ks_prime` | Selfsync feedforward gain | |
-| 15 | `mp` | Droop proportional gain (P-$\omega$) | |
-| 16 | `T_QF` | Reactive power filter time constant | s |
-| 17 | `Kq` | Reactive power control gain | |
-| 18 | `Kqvp` | Q-V PI proportional gain | |
-| 19 | `Kqvi` | Q-V PI integral gain | |
-| 20 | `Tvf` | Voltage filter time constant | s |
-| 21 | `dv` | Voltage control proportional gain | |
-| 22 | `Tconv` | Converter delay time constant | s |
-| 23 | `Imax` | Maximum current | pu |
-| 24 | `Ilim` | Current threshold for virtual impedance activation | pu |
-| 25 | `n` | Exponent in attenuation factor $\gamma$ | |
-| 26 | `Kc` | Current limiter integral gain | |
-| 27 | `L1` | Lower limit of current correction | pu |
-| 28 | `L2` | Upper limit of current correction | pu |
-| 29 | `Kpvi` | Virtual resistance gain | |
-| 30 | `sigma_xr` | Virtual reactance-to-resistance ratio | |
-| 31 | `QV_switch` | Reactive power control flag (0=none, 1=active) | flag |
-| 32 | `VI_CL_switch` | Current limiting mode (0=VI, 1=CL) | flag |
-| 33 | `delta_m_switch` | Synchronization mode (1=VSM, 2=Droop, 3=Selfsync) | flag |
-| 34 | `Cdcpu` | DC capacitance | pu |
-| 35 | `Kppi` | DC voltage PI proportional gain | |
-| 36 | `Kipi` | DC voltage PI integral gain | |
-| 37 | `Tsimp` | Battery source simplified transfer function time constant | s |
-| 38 | `m_max` | Upper limit on modulation index | |
-| 39 | `SOC0` | Initial state of charge | |
-| 40 | `Q_battery` | Battery nominal capacity | Ah |
-| 41 | `Vbat_pu` | Battery voltage | pu |
-| 42 | `I_batrated` | Battery rated current | kA |
-| 43 | `SOC_upperlimit` | SOC upper limit | % |
-| 44 | `SOC_lowerlimit` | SOC lower limit | % |
-| 45 | `BatFrac` | Fraction of power supplied by battery | |
-
-#### State Variables (selected)
-
-| Variable | Description |
-|----------|-------------|
-| `Vmo_pu_machbase` | Modulated voltage setpoint (machine base) | pu |
-| `wref` | Reference angular speed | pu |
-| `ixt`, `iyt` | Converter-side currents | pu |
-| `delta_m_rad` | Modulated voltage phase angle | rad |
-| `delta_m_VSM` | Phase angle from VSM integrator | rad |
-| `delta_m_droop` | Phase angle from droop integrator | rad |
-| `delta_m_sync` | Phase angle from selfsync integrator | rad |
-| `P` | Active power (Snom base) | pu |
-| `P_m` | Droop-filtered active power | pu |
-| `P_s` | Selfsync-filtered active power | pu |
-| `omega_m` | VSM frequency (pu) | pu |
-| `I_pu_machbase` | Current magnitude | pu |
-| `Rvi`, `Xvi` | Virtual impedance components | pu |
-| `Vm_pu_machbase` | Modulated voltage magnitude | pu |
-| `vdc` | DC link voltage | pu |
-| `SOC` | Battery state of charge | |
-| `i_int` | Integrated battery current (for SOC) | |
-| `Pout_MW`, `Qout_MVAR` | Power outputs | MW, Mvar |
-
-**Observables:** `Vm_pu_machbase`, `delta_m_rad`, `omega_m`, `Pout_MW`, `Qout_MVAR`, `I_pu_machbase`, `i_dc`, `vdc`, `SOC`, and more.
-
-#### Usage Example
-
-<Tabs>
-  <TabItem label="VSM Mode">
-```
-INJEC  GFOR_v2  GFOR_V2_VSM  BUS_BESS  1.  1.  0.  0.
-  50.0  50.0  20.0  1.0  0.005  0.15  1.0  5.0  0.05  0.01
-  0.5  0.5  1.0  0.0  0.02  0.5  1.0  1.0  5.0  0.1
-  0.0  0.05  1.1  0.9  2.0  0.5  0.0  0.05  0.5  1.5
-  1  0  1  0.005  0.5  5.0  0.05  1.05  0.5  100.0  1.0  0.1  90.0  10.0  0.5  ;
-```
-  </TabItem>
-  <TabItem label="Droop Mode">
-```
-INJEC  GFOR_v2  GFOR_V2_DRP  BUS_BESS  1.  1.  0.  0.
-  50.0  50.0  20.0  1.0  0.005  0.15  1.0  5.0  0.05  0.01
-  0.5  0.5  1.0  0.0  0.02  0.5  1.0  1.0  5.0  0.1
-  0.0  0.05  1.1  0.9  2.0  0.5  0.0  0.05  0.5  1.5
-  1  0  2  0.005  0.5  5.0  0.05  1.05  0.5  100.0  1.0  0.1  90.0  10.0  0.5  ;
-```
-  </TabItem>
-  <TabItem label="Selfsync Mode">
-```
-INJEC  GFOR_v2  GFOR_V2_SS  BUS_BESS  1.  1.  0.  0.
-  50.0  50.0  20.0  1.0  0.005  0.15  1.0  0.0  0.0  0.0
-  0.5  0.5  1.0  0.0  0.0  0.5  1.0  1.0  5.0  0.1
-  0.0  0.05  1.1  0.9  2.0  0.5  0.0  0.05  0.5  1.5
-  1  0  3  0.005  0.5  5.0  0.05  1.05  0.5  100.0  1.0  0.1  90.0  10.0  0.5  ;
-```
-  </TabItem>
-</Tabs>
-
 ---
 
-### `GFOL` (`inj_GFol`): Grid-Following Converter
+### `GFOL` / `inj_GFOL`: Grid-Following Converter
 
 The data-file model name is `GFOL` (or `inj_GFOL`).
 
 #### Description
 
-A grid-following VSC model for representing inverter-interfaced generation or storage in following mode. The converter synchronises to the grid via a PLL and regulates active and reactive power through outer PI controllers and an inner current loop. It includes low-voltage protection (PLL freeze), reactive current support during voltage dips, a DC link energy balance equation, and optional voltage-droop reactive support.
+A grid-following voltage source converter modelled under the phasor approximation. As for the grid-forming model, the converter is an MMC-type VSC connected through its transformer (no LC filter) and the DC side is not modelled. The model is rather detailed: it includes measurement low-pass filters, a PLL with blocking/unblocking hysteresis, outer active power and voltage/reactive power control loops, inner $d$-$q$ current control loops, a rate-limited $d$-axis current limit with priority to the reactive current, and a piecewise-linear dynamic voltage support characteristic.
+
+The model was contributed by Thierry Van Cutsem (July 2026). The block diagrams below are reproduced from the companion notes shipped with the model (`models/inj/custom/Grid_following_model.pptx` in the RAMSES repository).
 
 #### Scientific Description
 
-The PLL tracks the terminal voltage angle using:
+**Reference frame.** The VSC control frame $(d, q)$ tracks the PCC voltage phasor through the PLL angle $\tilde{\delta}_g$ (state `theta_pll`):
 
-$$\frac{d\theta_{\mathrm{pll}}}{dt} = \Delta\omega_{\mathrm{pll}}, \qquad \frac{d\Delta\omega_{\mathrm{pll}}}{dt} = \frac{K_{iw}}{\tau}\, v_q$$
+$$v_d = v_x\cos\tilde{\delta}_g + v_y\sin\tilde{\delta}_g, \qquad v_q = -v_x\sin\tilde{\delta}_g + v_y\cos\tilde{\delta}_g$$
 
-where $\tau$ is the PLL response time and $v_q$ is the $q$-axis voltage. The phase reactor in $d$-$q$ frame:
+with the analogous transformation for the converter-side currents ($i_{xt} = k\, i_x$, $k = r\, S_{\mathrm{base}}/S_{\mathrm{nom}}$). In steady state $v_q = 0$ and $v_d = V$.
 
-$$L\frac{di_d}{dt} = -R\, i_d + v_{\mathrm{md}} - v_d + \omega\, L\, i_q$$
+**Phase Locked Loop.**
 
-$$L\frac{di_q}{dt} = -R\, i_q + v_{\mathrm{mq}} - v_q - \omega\, L\, i_d$$
+<img src="/images/models/inj_gfol_pll.png" alt="GFOL phase locked loop block diagram with blocking hysteresis" style="width:75%" />
 
-Active power outer loop:
+The $q$-axis voltage error drives a PI controller whose output is the grid frequency estimate $\tilde{\omega}_g$ (state `w_pll`); integrating $\omega_N(\tilde{\omega}_g - \omega_{\mathrm{ref}})$ gives the PLL angle. The PI gains follow from the PLL response time $\tau$:
 
-$$\frac{dP_B}{dt} = \frac{P_0 - P}{K_{ip}}, \qquad i_{d,\mathrm{ref}} = P_B + K_{pp}\, (P_0 - P)$$
+$$K_{p\omega} = \frac{10}{\omega_N \tau}, \qquad K_{i\omega} = \frac{25}{\omega_N \tau^2}, \qquad \omega_N = 2\pi f_N$$
 
-Reactive outer loop (voltage droop or Q control):
+The PLL is blocked once the PCC voltage $V$ falls below `Vpllb` and reactivated once $V$ recovers above `Vpllu` (hysteresis).
 
-$$\frac{dV_B}{dt} = \frac{V_{\mathrm{comp}} - V_0}{K_{iq}}, \qquad i_{q,\mathrm{ref}} = V_B + K_{pq}\, (V_{\mathrm{comp}} - V_0)$$
+**Inner current control.**
 
-During voltage dips below $V_{s1}$:
+<img src="/images/models/inj_gfol_currentctl.png" alt="GFOL dq current control loops block diagram" style="width:55%" />
 
-$$i_{q,\mathrm{support}} = \frac{I_{\mathrm{max}}(V_{s1} - V_t)}{V_{s1} - V_{s2}}$$
+$$v_{md} = \frac{v_d}{r} - \tilde{\omega}_g L\, i_q + \left(K_p + \frac{K_i}{s}\right)\left(i_d^{\mathrm{ref}} - i_d\right)$$
 
-The DC power balance (assuming lossless converter):
+$$v_{mq} = \tilde{\omega}_g L\, i_d + \left(K_p + \frac{K_i}{s}\right)\left(i_q^{\mathrm{ref}} - i_q\right)$$
 
-$$p_{\mathrm{dc}} = v_{\mathrm{dc}} \cdot i_{\mathrm{dc}} = v_{\mathrm{md}} i_d + v_{\mathrm{mq}} i_q$$
+combined with the transformer voltage-current relationship in the $d$-$q$ frame:
+
+$$v_{md} = \frac{v_d}{r} + R\, i_d - \tilde{\omega}_g L\, i_q, \qquad v_{mq} = \frac{v_q}{r} + R\, i_q + \tilde{\omega}_g L\, i_d$$
+
+**Active power control.**
+
+<img src="/images/models/inj_gfol_pctl.png" alt="GFOL active power control and rate-limited d-axis current limit block diagram" style="width:75%" />
+
+The measured active power is filtered with time constant $T_{\mathrm{lpf}}$ and compared with the setpoint $P^0$; a PI controller ($K_{pp}$, $K_{ip}$) with non-windup limits $\pm I_d^{\max}$ produces $i_d^{\mathrm{ref}}$. The limit gives **priority to the reactive current**:
+
+$$I_d^{\max,\mathrm{stat}} = \sqrt{\max\left(I_{\mathrm{max}}^2 - i_q^2,\; 0\right)}$$
+
+and $I_d^{\max}$ tracks this static value through a first-order lag ($T_{\mathrm{rlim}}$, typically 0.002 s) with rate limits `dPdt_min`/`dPdt_max` — limiting, in particular, the rate of recovery of the active current after it has been decreased by an increase of $i_q$.
+
+**Voltage / reactive power control.**
+
+<img src="/images/models/inj_gfol_qctl.png" alt="GFOL voltage/reactive power control and dynamic voltage support block diagram" style="width:85%" />
+
+Depending on `vqswitch`, either the compensated voltage or the reactive power is controlled:
+
+$$V_c = \left|\frac{\bar{v}}{r} + (R_c + jX_c)\,\bar{i}\right| \quad (\texttt{vqswitch}=1), \qquad Q = \frac{v_q}{r} i_d - \frac{v_d}{r} i_q \quad (\texttt{vqswitch}=0)$$
+
+The controlled quantity is filtered ($T_{\mathrm{lpf}}$) and its deviation from setpoint drives a PI controller ($K_{pv}$, $K_{iv}$) with non-windup limits $\pm i_{q1}^{\max}$, giving the component $i_{q1}$. The error is zeroed (controller frozen) while $V < V_{s2}$. A second component $i_{q2}$ implements dynamic voltage support as a piecewise-linear function of $V$: zero above $V_{s1}$, decreasing linearly to $-I_{\mathrm{max}}$ at $V_{s2}$, constant below. The total $i_{q1} + i_{q2}$, limited to $\pm I_{\mathrm{max}}$, is the reactive current reference $i_q^{\mathrm{ref}}$.
+
+With $R_c = R$, $X_c = \omega L$ and $r = 1$, controlling $V_c$ amounts to controlling the magnitude of the modulated voltage.
 
 #### Parameters
 
-| # | Name | Description | Unit |
-|---|------|-------------|------|
-| 1 | `R` | Series transformer resistance | pu |
-| 2 | `L` | Series transformer reactance/inductance | pu |
-| 3 | `Rc` | Virtual resistance for voltage control | pu |
-| 4 | `Xc` | Virtual reactance for voltage control | pu |
-| 5 | `Snom` | Nominal apparent power | MVA |
-| 6 | `Pnom` | Nominal active power | MW |
-| 7 | `Kpp` | Active power PI: proportional gain | |
-| 8 | `Kip` | Active power PI: integral gain | |
-| 9 | `T_filp` | Active power recovery filter time constant | s |
-| 10 | `dPdt_min` | Minimum active power ramp rate | pu/s |
-| 11 | `dPdt_max` | Maximum active power ramp rate | pu/s |
-| 12 | `Kpq` | Reactive power PI: proportional gain | |
-| 13 | `Kiq` | Reactive power PI: integral gain | |
-| 14 | `tau` | PLL response time | s |
-| 15 | `vdc` | DC voltage setpoint | pu |
-| 16 | `Vs_pll` | PLL freeze voltage threshold | pu |
-| 17 | `Imax` | Maximum current | pu |
-| 18 | `Vs1` | Voltage threshold for reactive support activation | pu |
-| 19 | `Vs2` | Voltage threshold for full reactive support | pu |
-| 20 | `qlim` | Reactive power limit (±) | pu |
-| 21 | `vqswitch` | 1 = voltage control, 0 = reactive power control | flag |
+Default values are those of the `Benchmark_1_VSC` test case shipped with RAMSES (`examples/Benchmark_1_VSC`, converter of 1200 MVA). Per-unit values refer to the nominal apparent power of the converter.
+
+| # | Name | Description | Unit | Default |
+|---|------|-------------|------|---------|
+| 1 | `R` | Phase reactor resistance | pu | 0.005 |
+| 2 | `L` | Phase reactor inductance | pu | 0.15 |
+| 3 | `r` | Ratio of ideal transformer | | 1.02 |
+| 4 | `Snom` | Nominal apparent power | MVA | 1200 |
+| 5 | `Rc` | Resistance used in compensated voltage | pu | 0.005 |
+| 6 | `Xc` | Reactance used in compensated voltage | pu | 0.15 |
+| 7 | `Kp` | Current control: proportional gain | | 0.573 |
+| 8 | `Ki` | Current control: integral gain | | 6.0 |
+| 9 | `Tlpf` | Measurement time constant (low-pass filter) | s | 0.0033 |
+| 10 | `Kpp` | Active power control: proportional gain | | 0.0333 |
+| 11 | `Kip` | Active power control: integral gain | | 10.0 |
+| 12 | `Trlim` | Time constant of the $I_d^{\max}$ rate limiter | s | 0.002 |
+| 13 | `dPdt_min` | Min rate of change of the $d$-current limit | pu/s | -999 |
+| 14 | `dPdt_max` | Max rate of change of the $d$-current limit | pu/s | 10.0 |
+| 15 | `Kpv` | Reactive power control: proportional gain | | 0.1667 |
+| 16 | `Kiv` | Reactive power control: integral gain | | 50.0 |
+| 17 | `tau` | Response time of PLL | s | 0.10 |
+| 18 | `Vpllb` | Voltage below which the PLL is blocked | pu | 0.4 |
+| 19 | `Vpllu` | Voltage above which the PLL is unblocked | pu | 0.5 |
+| 20 | `Imax` | Maximum current (typically 1–1.2) | pu | 1.0 |
+| 21 | `Vs1` | Voltage below which dynamic reactive support starts | pu | -1000 |
+| 22 | `Vs2` | Voltage at which reactive support is maximum ($V_{s2} < V_{s1}$) | pu | -2000 |
+| 23 | `iqmax` | Limit (±) on quadrature current component $i_{q1}$ | pu | 1.001 |
+| 24 | `vqswitch` | 1 = voltage control, 0 = reactive power control | flag | 1 |
+
+Setting `Vs1` and `Vs2` to large negative values (as in the benchmark) disables the dynamic voltage support, following the recommendation in the companion notes that a more elaborate control should be considered for that function. Typical values of `Kiv` are 50 pu/s for voltage control and 10 pu/s for reactive power control.
+
+Six additional parameters are computed at initialization from the power-flow solution: `k` (current conversion factor), `P0`, `Q0` (active/reactive power setpoints, pu on `Snom` base), `Vc0` (compensated voltage setpoint), `Imin` and `iq1max` ($= \min(\texttt{iqmax}, I_{\mathrm{max}})$). `P0`, `Q0` and `Vc0` can be modified during the simulation with `CHGPRM` disturbances.
 
 #### State Variables
 
-| Variable | Description |
-|----------|-------------|
-| `P` | Active power delivered | pu |
-| `ix_1`, `iy_1` | VSC currents in $x$-$y$ frame (Snom base) | pu |
-| `w_pll`, `Dw_pll` | PLL speed and deviation | pu |
-| `theta_pll` | PLL angle | rad |
-| `id`, `iq` | $d$-$q$ currents | pu |
-| `vmd`, `vmq` | Modulated voltages | pu |
-| `PB`, `VB` | PI integrator states | |
-| `idc` | DC current | pu |
-| `id_lim` | Limited active current | pu |
-| `Q` | Reactive power | pu |
-| `P_MW`, `Q_MVAr` | Power outputs | MW, Mvar |
+The model has 52 states (2 output currents + 50 internal). Key internal states:
 
-**Observables:** `Pdc`, `Q`, `P_MW`, `Q_MVAr`, `I`, `V`, `PSnom`
+| Variable | Description | Unit |
+|----------|-------------|------|
+| `wref` | Angular speed of reference axes | pu |
+| `ixt`, `iyt` | Converter-side currents (on `Snom` base) | pu |
+| `mult_pll` | PLL freezing factor (hysteresis output) | |
+| `w_pll`, `theta_pll` | PLL frequency and angle estimates | pu, rad |
+| `V`, `vd`, `vq` | PCC voltage magnitude and $d$-$q$ components | pu |
+| `id`, `iq` | Converter currents in $d$-$q$ frame | pu |
+| `vmd`, `vmq` | Modulated voltage components | pu |
+| `Md`, `Mq` | Current-control PI outputs | pu |
+| `Idmax_stat`, `Idmax`, `Idmin` | Static / rate-limited / minimum $d$-current limits | pu |
+| `P`, `Pfil` | Active power and its filtered value | pu |
+| `id_pi`, `idref` | Active-power PI output and $d$-current reference | pu |
+| `Vc`, `Vcfil` | Compensated voltage and its filtered value | pu |
+| `Q`, `Qfil` | Reactive power and its filtered value | pu |
+| `mult_V` | Voltage/reactive controller freezing factor | |
+| `iq_1`, `iq_2`, `iqref` | Reactive current components and reference | pu |
+
+**Observables:** `P_MW`, `Q_Mvar`, `Vc`, `Vm`, `vmd`, `vmq`, `I`, `w_pll`, `theta_pll_deg`, `mult_pll`, `Idmax`, `Md`, `idref`, `id`, `id_pi`, `iq_1`, `iq_2`, `iqref`, `iq`.
 
 #### Usage Example
 
+The `Benchmark_1_VSC` case (grid-following converter against a Thévenin equivalent):
+
 ```
-INJEC  GFOL  GFOL1  BUS_IBR  1.  1.  0.  0.  0.005  0.15  0.0  0.0  100.0  100.0
-                              2.0  20.0  0.1  -10.0  10.0  2.0  20.0
-                              0.05  1.0  0.1  1.1  0.9  0.7  0.4  1  ;
+#              name    bus  FP   FQ   P   Q    R      L      r     Snom    Rc     Xc      Kp     Ki   Tlpf     Kpp    Kip   Trlim  dPdt_min dPdt_max  Kpv     Kiv
+INJEC  GFOL    HVDC1    A   1.   1.   0.  0.  0.005  0.15   1.02   1200.  0.005   0.15   0.5730   6.  0.0033  0.0333   10.   0.002    -999.    10.    0.1667  50.
+# tau   Vpllb  Vpllu   Imax    Vs1    Vs2    iq1max   vqswitch
+  0.10    0.4    0.5   1.000   -1000  -2000  1.001        1     ;
 ```
 
 ---
