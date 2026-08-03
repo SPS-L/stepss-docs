@@ -761,8 +761,6 @@ A grid-forming voltage source converter implementing Virtual Synchronous Machine
 
 The modulated voltage magnitude is held at its setpoint $V_m^0$ in normal operation, while the phase angle $\delta_m$ is driven by a synthetic swing equation with inertia emulation ($H$) and oscillation damping ($D$) against a PLL estimate of the grid frequency. Participation in primary frequency control is optional, through the droop $R_{\mathrm{droop}}$. Overcurrents are limited by proportionally scaling the $d$-$q$ current vector back to the $I_{\mathrm{max}}$ circle with a small time constant.
 
-The model was contributed by Thierry Van Cutsem (July 2026). The block diagrams below are reproduced from the companion notes shipped with the model (`models/inj/custom/Grid_forming_model.pptx` in the RAMSES repository).
-
 #### Scientific Description
 
 **Reference frame.** The $d$ axis is attached to the internal phase angle $\delta_m$ of the modulated voltage. Voltages and currents at the point of common coupling are transformed as:
@@ -813,7 +811,7 @@ When $I < I_{\mathrm{max}}$: $\rho_s = 1$, the currents are unsaturated, and $v_
 
 #### Parameters
 
-Default values are those of the `Benchmark_1_VSC` test case shipped with RAMSES (`examples/Benchmark_1_VSC`, converter of 1100 MVA). Per-unit values refer to the nominal apparent power of the converter.
+Default values correspond to a 1100 MVA converter. Per-unit values refer to the nominal apparent power of the converter.
 
 | # | Name | Description | Unit | Default |
 |---|------|-------------|------|---------|
@@ -856,7 +854,7 @@ The model has 33 states (2 output currents + 31 internal). Key internal states:
 
 #### Usage Example
 
-The `Benchmark_1_VSC` case (grid-forming converter against a Thévenin equivalent):
+A 1100 MVA grid-forming converter:
 
 ```
 #                 name   bus  FP   FQ   P   Q    R      L     r     Snom   H     D    Tpll  Rdroop Imax   Te
@@ -876,8 +874,6 @@ The data-file model name is `GFOL` (or `inj_GFOL`).
 #### Description
 
 A grid-following voltage source converter modelled under the phasor approximation. As for the grid-forming model, the converter is an MMC-type VSC connected through its transformer (no LC filter) and the DC side is not modelled. The model is rather detailed: it includes measurement low-pass filters, a PLL with blocking/unblocking hysteresis, outer active power and voltage/reactive power control loops, inner $d$-$q$ current control loops, a rate-limited $d$-axis current limit with priority to the reactive current, and a piecewise-linear dynamic voltage support characteristic.
-
-The model was contributed by Thierry Van Cutsem (July 2026). The block diagrams below are reproduced from the companion notes shipped with the model (`models/inj/custom/Grid_following_model.pptx` in the RAMSES repository).
 
 #### Scientific Description
 
@@ -933,7 +929,7 @@ With $R_c = R$, $X_c = \omega L$ and $r = 1$, controlling $V_c$ amounts to contr
 
 #### Parameters
 
-Default values are those of the `Benchmark_1_VSC` test case shipped with RAMSES (`examples/Benchmark_1_VSC`, converter of 1200 MVA). Per-unit values refer to the nominal apparent power of the converter.
+Default values correspond to a 1200 MVA converter. Per-unit values refer to the nominal apparent power of the converter.
 
 | # | Name | Description | Unit | Default |
 |---|------|-------------|------|---------|
@@ -962,7 +958,7 @@ Default values are those of the `Benchmark_1_VSC` test case shipped with RAMSES 
 | 23 | `iqmax` | Limit (±) on quadrature current component $i_{q1}$ | pu | 1.001 |
 | 24 | `vqswitch` | 1 = voltage control, 0 = reactive power control | flag | 1 |
 
-Setting `Vs1` and `Vs2` to large negative values (as in the benchmark) disables the dynamic voltage support, following the recommendation in the companion notes that a more elaborate control should be considered for that function. Typical values of `Kiv` are 50 pu/s for voltage control and 10 pu/s for reactive power control.
+Setting `Vs1` and `Vs2` to large negative values (as in the defaults above) disables the dynamic voltage support; a more elaborate control is recommended for that function. Typical values of `Kiv` are 50 pu/s for voltage control and 10 pu/s for reactive power control.
 
 Six additional parameters are computed at initialization from the power-flow solution: `k` (current conversion factor), `P0`, `Q0` (active/reactive power setpoints, pu on `Snom` base), `Vc0` (compensated voltage setpoint), `Imin` and `iq1max` ($= \min(\texttt{iqmax}, I_{\mathrm{max}})$). `P0`, `Q0` and `Vc0` can be modified during the simulation with `CHGPRM` disturbances.
 
@@ -992,7 +988,7 @@ The model has 52 states (2 output currents + 50 internal). Key internal states:
 
 #### Usage Example
 
-The `Benchmark_1_VSC` case (grid-following converter against a Thévenin equivalent):
+A 1200 MVA grid-following converter (record spanning multiple lines):
 
 ```
 #              name    bus  FP   FQ   P   Q    R      L      r     Snom    Rc     Xc      Kp     Ki   Tlpf     Kpp    Kip   Trlim  dPdt_min dPdt_max  Kpv     Kiv
