@@ -7,9 +7,7 @@ import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 CODEGEN Studio is a browser-based visual editor for assembling [User-Defined Models](/developer/user-models/) using the [CODEGEN block library](/developer/codegen-library/). Instead of writing DSL files by hand, you drag blocks onto a canvas, connect them, fill in metadata, and export a valid `.txt` file ready for the `codegen` binary.
 
-## Getting Started
-
-### Installation
+## Installation
 
 Install from PyPI (requires Python ≥ 3.10):
 
@@ -28,7 +26,7 @@ Equivalent module form:
 python -m cg_studio
 ```
 
-#### CLI options
+### CLI options
 
 ```bash
 cg-studio --port 9000       # use a different port
@@ -36,7 +34,7 @@ cg-studio --host 0.0.0.0    # allow network access
 cg-studio --no-browser      # start server without opening browser
 ```
 
-#### Install from source (development)
+### Install from source (development)
 
 ```bash
 git clone https://github.com/SPS-L/stepss-cg-studio
@@ -45,7 +43,7 @@ pip install -e ".[dev]"
 cg-studio
 ```
 
-### Interface Overview
+## Interface Overview
 
 The interface has three columns:
 
