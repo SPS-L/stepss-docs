@@ -84,12 +84,16 @@ results = pf.run_contingencies(file='contingencies.txt')
 
 ```python
 pf.write_dump('solved_case.dat')      # re-loadable data file
-pf.write_voltrat('volt_rat.dat')      # LFRESV records — RAMSES initial conditions
+pf.write_voltrat('volt_rat.dat')      # LFRESV + TRANSFO records — RAMSES initial conditions
 pf.write_matlab('system.m')           # operating point + Y-bus script
 pf.write_diagram('template.svg', 'diagram.svg')
 ```
 
 `volt_rat.dat` is the natural bridge to dynamic simulation: solve a power flow with Helios, export it, and pass it to a RAMSES case via `case.addData('volt_rat.dat')`.
+
+:::note
+`write_voltrat()` emits one `LFRESV` record per bus plus one `TRANSFO` record per in-service LTC transformer, carrying its *solved* ratio — the same output as the Fortran PFC. Hand-maintained operating-point files (e.g. `volt_rat_B.dat` of the Nordic test system) often use `TRFO` records instead, which additionally carry the LTC ranges used on the power-flow side. The two styles are interchangeable as RAMSES input: RAMSES ignores the LTC fields of a `TRFO` record, and dynamic tap-changer behaviour is defined by the `DCTL LTC` records of the dynamic data file.
+:::
 
 ## Runnable Examples
 

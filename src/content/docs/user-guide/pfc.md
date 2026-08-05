@@ -261,6 +261,10 @@ The output LFRESV records from PFC can be fed back as input. This results in zer
 LFRESV is the output of PFC that initializes RAMSES dynamic simulation.
 :::
 
+:::note
+The exported operating-point file (the voltage/ratio dump of PFC, `write_voltrat()` in Helios) contains one LFRESV record per bus plus one TRANSFO record per in-service LTC transformer, carrying its *solved* ratio. Hand-maintained operating-point files (e.g. `volt_rat_B.dat` of the Nordic test system) often use TRFO records instead. The two styles are interchangeable as RAMSES input: RAMSES ignores the LTC fields of a TRFO record (see the record-sharing table below), and dynamic tap-changer behaviour is defined by the DCTL LTC records of the dynamic data.
+:::
+
 ## PFC Computation Control Parameters
 
 PFC uses Newton–Raphson iterations to solve the power flow equations. Convergence is achieved when both the active and reactive power mismatches fall below specified thresholds, all transformer ratio and phase-shift controls are satisfied, and all generators and SVCs are within their reactive limits.
