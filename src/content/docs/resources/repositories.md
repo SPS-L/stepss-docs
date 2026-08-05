@@ -57,8 +57,11 @@ The original LaTeX source for the STEPSS documentation (models reference and use
 Framework for compiling and linking custom Fortran models with RAMSES.
 
 - **Repository**: [github.com/SPS-L/stepss-uramses](https://github.com/SPS-L/stepss-uramses)
-- **Platforms**: Windows (Intel Fortran) and Linux (gfortran)
-- **Build (Linux)**: `make -f Makefile.gfortran all`
+- **Platforms**: Linux (gfortran), macOS (gfortran, Apple Silicon), Windows (MinGW gfortran or Intel Fortran)
+- **Build (Linux)**: `make -f Makefile.linux all`
+- **Build (macOS)**: `make -f Makefile.macos all`
+- **Build (Windows/MinGW)**: `make -f Makefile.mingw all`
+- **Build (Windows/Intel)**: Visual Studio with `URAMSES.sln`
 
 ### stepss-eigenanalysis
 
