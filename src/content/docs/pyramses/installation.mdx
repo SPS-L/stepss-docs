@@ -7,7 +7,7 @@ import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
 
 PyRAMSES (Python-based RApid Multithreaded Simulation of Electric power Systems) is a time-domain dynamic simulator for electric power systems. It provides a Python interface to the RAMSES simulation engine, enabling users to define test cases, run simulations, extract results, and perform post-processing-all within Python scripts or Jupyter notebooks.
 
-PyRAMSES supports Windows and Linux for dynamic simulation (the bundled [Helios power-flow engine](/pyramses/helios/) additionally runs on macOS) and integrates with standard scientific Python libraries (NumPy, SciPy, Matplotlib).
+PyRAMSES supports Windows, Linux, and macOS — for both dynamic simulation and the bundled [Helios power-flow engine](/pyramses/helios/) — and integrates with standard scientific Python libraries (NumPy, SciPy, Matplotlib).
 
 ## Installation
 
@@ -17,7 +17,7 @@ Install PyRAMSES and all recommended dependencies via pip:
 pip install jupyter ipython pyramses
 ```
 
-Required dependencies (matplotlib, scipy, numpy, and — on Windows/Linux — mkl) are installed automatically.
+Required dependencies (matplotlib, scipy, numpy) are installed automatically.
 
 For a minimal installation (no plotting or notebook support):
 
@@ -43,17 +43,15 @@ These packages provide:
 
 On most desktop Linux distributions these are already present. If `pyramses` fails to import with a shared-library error, install the packages above and retry.
 
-## MKL Dependencies
+## macOS System Prerequisites
 
-The simulator depends on the Intel Math Kernel Library (MKL) for LAPACK/BLAS and OpenMP. These are automatically installed as dependencies when installing via pip.
-
-To verify MKL is available, run:
+On macOS (Apple Silicon), install the GNU compiler runtimes and OpenBLAS via [Homebrew](https://brew.sh/) before running PyRAMSES:
 
 ```bash
-python -c "import numpy; numpy.show_config()"
+brew install gcc openblas
 ```
 
-Look for `blas_mkl_info` or `lapack_mkl_info` in the output confirming MKL is linked.
+These provide the `libgfortran`, `libgomp`, and `libopenblas` dylibs that the bundled arm64 binaries link against. Intel Macs are not supported.
 
 ## Optional: Gnuplot for Real-Time Plots
 
@@ -72,6 +70,13 @@ sudo apt-get install gnuplot-x11
 Download and install from [gnuplot.info](http://www.gnuplot.info/). Make sure the installation directory is added to your system PATH.
 
 </TabItem>
+<TabItem label="macOS">
+
+```bash
+brew install gnuplot
+```
+
+</TabItem>
 </Tabs>
 
 <Aside type="note">
@@ -84,8 +89,7 @@ Gnuplot must be in the system PATH. You can check availability with `pyramses.__
 |----------|---------|-------|
 | **Windows** | `ramses.dll` | Primary platform, full support |
 | **Linux** | `ramses.so` | Full support (requires the [system libraries above](#linux-system-prerequisites)) |
-
-macOS is not supported: no RAMSES binary is bundled for it.
+| **macOS** | `ramses.so` | Apple Silicon (arm64) only; requires the [Homebrew runtimes above](#macos-system-prerequisites) |
 
 ## Next Steps
 

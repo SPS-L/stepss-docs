@@ -3,9 +3,7 @@ title: PyRAMSES Overview
 description: Python-based RApid Multithreaded Simulation of Electric power Systems
 ---
 
-**PyRAMSES** is a Python module that provides an interface to the RAMSES dynamic simulator and the Helios AC power-flow engine. It covers the full workflow: defining test cases, launching simulations, querying system states at runtime, extracting and plotting results, and running power flows. The package embeds pre-compiled RAMSES binaries (Windows and Linux) plus Helios power-flow libraries (Windows, Linux, and macOS) and exposes them through a clean Python API.
-
-For more information, visit the [PyRAMSES project page](https://sps-lab.org/project/pyramses/).
+**PyRAMSES** is a Python module that provides an interface to the RAMSES dynamic simulator and the Helios AC power-flow engine. It covers the full workflow: defining test cases, launching simulations, querying system states at runtime, extracting and plotting results, and running power flows. The package embeds pre-compiled RAMSES and Helios power-flow libraries for Windows, Linux, and macOS and exposes them through a clean Python API.
 
 ## Package-Level Attributes
 
@@ -28,7 +26,7 @@ After importing the package, the following attributes are available:
 
 ## Platform Support
 
-PyRAMSES supports Windows and Linux for dynamic simulation; the bundled Helios power-flow engine additionally runs on macOS. All binaries are bundled directly in the package, no separate simulator installation is required.
+PyRAMSES supports Windows, Linux, and macOS for both dynamic simulation and power flows. All binaries are bundled directly in the package, no separate simulator installation is required. See the [installation guide](/pyramses/installation/) for per-platform system prerequisites.
 
 ## Further Reading
 
