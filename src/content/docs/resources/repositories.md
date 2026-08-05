@@ -58,10 +58,10 @@ Framework for compiling and linking custom Fortran models with RAMSES.
 
 - **Repository**: [github.com/SPS-L/stepss-uramses](https://github.com/SPS-L/stepss-uramses)
 - **Platforms**: Linux (gfortran), macOS (gfortran, Apple Silicon), Windows (MinGW gfortran or Intel Fortran)
-- **Build (Linux)**: `make -f Makefile.linux all`
-- **Build (macOS)**: `make -f Makefile.macos all`
-- **Build (Windows/MinGW)**: `make -f Makefile.windows all`
-- **Build (Windows/Intel)**: Visual Studio with `URAMSES.sln`
+- **Build (Linux)**: `make -f build/Makefile.linux all`
+- **Build (macOS)**: `make -f build/Makefile.macos all`
+- **Build (Windows/MinGW)**: `make -f build/Makefile.windows all`
+- **Build (Windows/Intel)**: Visual Studio with `build/msvs/URAMSES.sln`
 
 ### stepss-eigenanalysis
 
