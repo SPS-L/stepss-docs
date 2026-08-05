@@ -732,7 +732,7 @@ Retrieve the full set of synchronous machine observables. Returns an object with
 |-----------|-------------|
 | `.P` | Active power (MW) |
 | `.Q` | Reactive power (Mvar) |
-| `.S` | Rotor speed (pu) |
+| `.S` | Rotor speed (pu; 1 = nominal) |
 | `.A` | Rotor angle w.r.t. COI (deg) |
 | `.FV` | Field voltage (pu) |
 | `.FC` | Field current (pu) |
@@ -742,7 +742,14 @@ Retrieve the full set of synchronous machine observables. Returns an object with
 | `.DD` | d1 damper flux |
 | `.QD` | q1 damper flux |
 | `.QW` | q2 winding flux |
-| `.SC` | COI speed |
+| `.SC` | COI speed **deviation** (pu; 0 = nominal) |
+
+:::note
+The two speed observables use different conventions: `.S` is the whole rotor
+speed (1 = nominal), while `.SC` is the deviation of the centre-of-inertia
+(COI) speed from nominal (0 = nominal). The system frequency in Hz is
+`fnom * (1 + SC)` or, per machine, `fnom * S`.
+:::
 
 ```python
 gen = ext.getSync('g1')
