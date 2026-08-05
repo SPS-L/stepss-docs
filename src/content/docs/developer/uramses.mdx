@@ -106,7 +106,7 @@ URAMSES/
 ├── URAMSES.sln                  # Visual Studio solution (Windows/Intel)
 ├── Makefile.linux               # Makefile (Linux)
 ├── Makefile.macos               # Makefile (macOS, Apple Silicon)
-├── Makefile.mingw               # Makefile (Windows/MinGW)
+├── Makefile.windows             # Makefile (Windows/MinGW)
 ├── Release_intel_w64/           # Build output (Windows/Intel)
 ├── Release_gnu_w/               # Build output (Windows/MinGW)
 ├── Release_gnu_m/               # Build output (macOS)
@@ -183,16 +183,16 @@ From the **MSYS2 MinGW 64-bit** shell:
 
 ```bash
 # Build shared library + executable
-make -f Makefile.mingw all
+make -f Makefile.windows all
 
 # Build only the shared library (for PyRAMSES)
-make -f Makefile.mingw dll
+make -f Makefile.windows dll
 
 # Build only the executable
-make -f Makefile.mingw exe
+make -f Makefile.windows exe
 
 # Clean build artifacts
-make -f Makefile.mingw clean
+make -f Makefile.windows clean
 ```
 
 The shared library (`ramses.dll`) will be in `Release_gnu_w/`.
@@ -232,7 +232,7 @@ or copy those DLLs next to `ramses.dll`, when loading it from Python.
 2. **Register the model**: Add the model association in the corresponding `usr_*_models.f90` file in `src/`
 
 3. **Rebuild**: Compile and link the modified URAMSES with the Makefile for your
-   platform (`Makefile.linux`, `Makefile.macos` or `Makefile.mingw`), which
+   platform (`Makefile.linux`, `Makefile.macos` or `Makefile.windows`), which
    picks up new `.f90` files in `my_models/` automatically. Only the Intel Visual
    Studio route needs the file added to the project by hand.
 

@@ -60,7 +60,7 @@ Framework for compiling and linking custom Fortran models with RAMSES.
 - **Platforms**: Linux (gfortran), macOS (gfortran, Apple Silicon), Windows (MinGW gfortran or Intel Fortran)
 - **Build (Linux)**: `make -f Makefile.linux all`
 - **Build (macOS)**: `make -f Makefile.macos all`
-- **Build (Windows/MinGW)**: `make -f Makefile.mingw all`
+- **Build (Windows/MinGW)**: `make -f Makefile.windows all`
 - **Build (Windows/Intel)**: Visual Studio with `URAMSES.sln`
 
 ### stepss-eigenanalysis
