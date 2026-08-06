@@ -51,7 +51,7 @@ All documentation lives in `src/content/docs/` as Markdown (`.md`) or MDX (`.mdx
    ---
    ```
 3. Add the page to the sidebar in `astro.config.mjs`
-4. Commit and push — GitHub Actions will deploy automatically
+4. Commit and push; GitHub Actions will deploy automatically
 
 ### Math Support
 
@@ -103,9 +103,9 @@ Trigger a manual deployment from the GitHub Actions tab → "Deploy to GitHub Pa
 
 - **Documentation content** (`src/content/docs/`, `public/images/`) is licensed under [CC BY 4.0](LICENSE). Share and adapt freely, including commercially, with appropriate credit.
 - **Website code** (Astro config, components, styles) is licensed under [MIT](LICENSE-CODE).
-- **`public/stepss_docs.pdf`** — the compiled user guide, redistributed from [stepss-userguide](https://github.com/SPS-L/stepss-userguide) under that repository's licence.
+- **`public/stepss_docs.pdf`**: the compiled user guide, redistributed from [stepss-userguide](https://github.com/SPS-L/stepss-userguide) under that repository's licence.
 
-The STEPSS **software** documented here is not covered by either licence — several components are proprietary or non-commercial. See [NOTICE](NOTICE) and the [licence page](https://stepss.sps-lab.org/getting-started/license/).
+The STEPSS **software** documented here is not covered by either licence; several components are proprietary or non-commercial. See [NOTICE](NOTICE) and the [licence page](https://stepss.sps-lab.org/getting-started/license/).
 
 ## Authors
 
@@ -113,5 +113,5 @@ Developed and maintained by the [Sustainable Power Systems Laboratory (SPS-L)](h
 
 Documentation authors:
 
-- [Dr. Petros Aristidou](https://sps-lab.org) — Cyprus University of Technology
-- Dr. Thierry Van Cutsem — University of Liège
+- [Dr. Petros Aristidou](https://sps-lab.org): Cyprus University of Technology
+- Dr. Thierry Van Cutsem: University of Liège
