@@ -336,7 +336,7 @@ helios: status: NOT_RUN
 
 `NOT_RUN` means no solve was requested (for example `$NBITMA 0`), which exits `0`. Text on stdout is unchanged and remains compatible with PFC; scripts should use the exit status and this line rather than parsing stdout.
 
-These values are shared with the Helios C API, where `HELIOS_OK` is `0` and `HELIOS_NOT_CONVERGED` is `2` (`1` is reserved and never returned by the API). `HELIOS_NOT_CONVERGED` is `2` from Helios 1.4.0 onward; in 1.3.0 and earlier it was `1`. The `pyramses.helios.HeliosSession` wrapper exposes convergence as the boolean `pf.converged` and the `pf.solver_status` enum, neither of which is affected by the numbering.
+These values are shared with the Helios C API, where `HELIOS_OK` is `0` and `HELIOS_NOT_CONVERGED` is `2` (`1` is reserved and never returned by the API). `HELIOS_NOT_CONVERGED` is `2` from Helios 1.4.1 onward; in 1.3.0 and earlier it was `1`. The `pyramses.helios.HeliosSession` wrapper exposes convergence as the boolean `pf.converged` and the `pf.solver_status` enum, neither of which is affected by the numbering.
 
 ## Record Sharing Between PFC and RAMSES
 
