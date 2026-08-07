@@ -310,6 +310,33 @@ The two engines read the same data format and produce numerically equivalent res
 | `TURLIM` (legacy P-limit record) | Accepted for compatibility | Not supported — hard error; use the extended GENER variant |
 | Unknown records | Handled or error | Warned and skipped |
 | Numerical output | Reference | May differ in the last displayed decimal, due to the different linear solvers |
+| Process exit status | Always 0 | 0 converged, 1 input or usage error, 2 did not converge (see below) |
+
+### Exit Status (Helios)
+
+In non-interactive use (`-t` command file mode and pipe mode), Helios reports the outcome of the run through its process exit status:
+
+| Exit | Meaning |
+|------|---------|
+| `0` | Converged — the results are usable |
+| `1` | Input or usage error: bad command file, unreadable data file, parse failure, unknown command |
+| `2` | The solve ran but did not converge: maximum iterations, divergence, or a singular Jacobian. Results may still have been written, but they are **not** a valid power-flow solution |
+
+Only `0` means the results can be trusted. Where a command file modifies the system and re-solves, the status reflects the final solve. The interactive TUI always exits `0`.
+
+Each non-interactive run also writes one machine-readable line to stderr:
+
+```
+helios: status: CONVERGED (2 iterations)
+helios: status: NOT_CONVERGED (max iterations)
+helios: status: NOT_CONVERGED (diverged)
+helios: status: NOT_CONVERGED (singular)
+helios: status: NOT_RUN
+```
+
+`NOT_RUN` means no solve was requested (for example `$NBITMA 0`), which exits `0`. Text on stdout is unchanged and remains compatible with PFC; scripts should use the exit status and this line rather than parsing stdout.
+
+These values are shared with the Helios C API, where `HELIOS_OK` is `0` and `HELIOS_NOT_CONVERGED` is `2` (`1` is reserved and never returned by the API). `HELIOS_NOT_CONVERGED` is `2` from Helios 1.4.0 onward; in 1.3.0 and earlier it was `1`. The `pyramses.helios.HeliosSession` wrapper exposes convergence as the boolean `pf.converged` and the `pf.solver_status` enum, neither of which is affected by the numbering.
 
 ## Record Sharing Between PFC and RAMSES
 
