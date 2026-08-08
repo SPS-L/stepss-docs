@@ -1,0 +1,81 @@
+STEPSS / RAMSES changelog
+=========================
+
+This file is fetched by the STEPSS UI (Help -> Changelog) and mirrors the
+release notes published at
+https://github.com/SPS-L/stepss-ramses/releases
+
+
+3.55  (2026-08-05)
+------------------
+Linux build moved off ubuntu-22.04 (gfortran 11.4) to ubuntu-24.04 with
+gfortran 13.3. Linux binaries and module kits are rebuilt on that image.
+
+  * Simulation results are unchanged: the Nordic regression gate reproduces
+    the previous baseline bit-identically (max absolute difference 0.0 across
+    1417 observables and 751 samples), on both the RAMSES and URAMSES routes.
+  * BREAKING (Linux only): the glibc floor moves from 2.35 to 2.39. The Linux
+    binaries no longer run on Ubuntu 22.04 or Debian 12 (glibc 2.36). Stay on
+    3.54 or build from source if you need those.
+  * No recompilation of user models is required: gfortran 9 through 13 all
+    write module ABI version 15, so the Linux kit still reads with the same
+    range of compilers as before.
+  * macOS and Windows are untouched by this release.
+
+
+3.54  (2026-08-05)
+------------------
+Module kits rebuilt and regression coverage added on the URAMSES side.
+Simulation results are unchanged (Nordic gate bit-identical).
+
+  * Five exciter models are no longer compiled into the library, among them
+    exc_AC1A_OELHQ and exc_ST1A_OELHQ.
+
+
+3.52  (2026-08-05)
+------------------
+Build and packaging release. Simulation results are unchanged (Nordic gate
+reproduces the 3.51 baseline bit-identically).
+
+  * cmake is no longer required to build. check-deps demanded it even though
+    nothing in the tree uses it, which blocked builds on machines without it.
+    Building now needs only gfortran, gcc and the bundled libraries.
+
+
+3.51  (2026-08-04)
+------------------
+First release with native macOS support.
+
+  * gfortran builds for Apple Silicon (arm64): the standalone executable,
+    ramses.so for PyRAMSES, and a modules_mac kit for URAMSES.
+  * macOS builds are gated by the same Nordic voltage-collapse regression test
+    as Linux and Windows; arm64 agrees with the x86_64 baseline to ~5e-10.
+  * build/Makefile.gfortran handles Homebrew's keg-only OpenBLAS.
+  * macOS notes: binaries are unsigned, so clear quarantine with
+    "xattr -dr com.apple.quarantine <files>". Requires Homebrew gcc and
+    OpenBLAS at runtime. Intel Macs are not covered.
+
+
+3.50  (2026-08-04)
+------------------
+First release built and validated by the automated release CI.
+Highlights since 3.40:
+
+  * New grid-forming (GFOR / virtual synchronous machine) and grid-following
+    (GFOL) VSC injector models. These replace the earlier GFOR2 model and use
+    a different, shorter parameter list -- data files written against the old
+    model must be migrated.
+  * Major solver performance improvement: cached KLU CSC pattern (one-time
+    symbolic sort, O(nnz) refactorization path), orders of magnitude faster on
+    large cases.
+  * Updated startup banner: STEPSS platform, authors, and Academic Public
+    License details.
+  * Continuous integration: gfortran builds for Linux and Windows
+    (MSYS2/MINGW64, fully static, no runtime DLLs), both gated by a Nordic
+    voltage-collapse trajectory-regression test (cross-platform agreement
+    ~1e-10).
+
+
+3.40  (2020-10-04)
+------------------
+Last release before the automated release CI.
