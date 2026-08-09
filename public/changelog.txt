@@ -1,9 +1,17 @@
-STEPSS / RAMSES changelog
-=========================
+RAMSES changelog
+================
 
-This file is fetched by the STEPSS UI (Help -> Changelog) and mirrors the
-release notes published at
+The changelog of the RAMSES simulation engine, mirroring the release notes
+published at
 https://github.com/SPS-L/stepss-ramses/releases
+
+The STEPSS UI no longer fetches this file. Help -> Changelog now opens the
+UI's own release notes,
+https://github.com/SPS-L/stepss-java-ui/releases
+which describe the application rather than the bundled engine, and which
+embed the upstream notes of every component a release bumped - RAMSES among
+them. This file stays published because its URL is public and because it
+remains the plain-text mirror of the engine's history.
 
 
 3.55  (2026-08-05)
