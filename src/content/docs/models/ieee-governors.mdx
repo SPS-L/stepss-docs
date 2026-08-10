@@ -17,24 +17,41 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
               TOR model_name  param1  param2  ... ;
 ```
 
-RAMSES adds the `tor_` prefix to the model name automatically, so both `DEGOV1` and `tor_DEGOV1` resolve to the same model. The IEEE governor names available in every RAMSES distribution are:
+RAMSES adds the `tor_` prefix to the model name automatically, so both `DEGOV1` and `tor_DEGOV1` resolve to the same model. The IEEE governor names are:
 
-| Data-file name | Equivalent |
-|----------------|-----------|
-| `DEGOV1` | `tor_DEGOV1` |
-| `ENTSOE_simp` | `tor_ENTSOE_simp` |
-| `GAST` | `tor_GAST` |
-| `TGOV1` | `tor_TGOV1` |
-| `HYGOV` | `tor_HYGOV` |
+| Data-file name | With explicit prefix | Implemented by |
+|----------------|----------------------|----------------|
+| `DEGOV1` | `tor_DEGOV1` | `tor_DEGOV1` |
+| `ENTSOE_simp` | `tor_ENTSOE_simp` | `tor_ENTSOE_simp` |
+| `GAST` | `tor_GAST` | `tor_GAST` |
+| `TGOV1` | `tor_TGOV1` | `tor_TGOV1D` |
+| `HYGOV` | `tor_HYGOV` | `tor_hygov` |
+
+Only the first two columns are valid in a data file. The third column is the name of the Fortran subroutine, which you need only when registering the model in URAMSES.
+:::
+
+:::caution[Requires RAMSES 3.50 or later]
+These five models were introduced after the 3.40 release. Earlier distributions ship only `CONSTANT`, `1ST_ORDER`, `HYDRO_GENERIC1` and `THERMAL_GENERIC1` (see [Custom Governor Models](/models/custom-governors/)), and reject any of the names above with:
+
+```
+STOP CALL FROM tor_TGOV1:
+Torque model not found in definition
+```
+
+If you see this, check the banner RAMSES prints at startup. Versions 3.50 and later show a `Version:` line; if yours does not, upgrade before investigating anything else.
+:::
+
+:::caution[`TGOV1D` is not a valid data-file name]
+The TGOV1 model is implemented by a subroutine called `tor_TGOV1D`, but the name registered for data files is `TGOV1` (or `tor_TGOV1`), **without** the `D`. Writing `TGOV1D` or `tor_TGOV1D` after `TOR` produces the same "Torque model not found in definition" error, on every version.
 :::
 
 ---
 
-## tor_DEGOV1
+## DEGOV1 (`tor_DEGOV1`)
 
 ### Scientific Description
 
-The `tor_DEGOV1` model represents the **diesel engine governor** as defined in the IEEE Committee Report on governors. It consists of three main stages:
+The `DEGOV1` model represents the **diesel engine governor** as defined in the IEEE Committee Report on governors. It consists of three main stages:
 
 **1. Speed governor (electrical control / lead–lag)**
 
@@ -106,6 +123,8 @@ $$
 | `R` | Speed droop (pu/pu) |
 | `TE` | Engine time constant (s) |
 
+**Internal parameters:** `V60` (selected reference input, mechanical torque or electrical power according to `SWM`) and `REF` (`V60 · R`), both set at initialisation
+
 ### Usage Example
 
 <Tabs>
@@ -141,11 +160,11 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   600. 570. 6. 0. 2.05
 
 ---
 
-## tor_ENTSOE_simp
+## ENTSOE_simp (`tor_ENTSOE_simp`)
 
 ### Scientific Description
 
-The `tor_ENTSOE_simp` model is a simplified **ENTSO-E speed governor** suitable for primary frequency response studies. It is derived from the ENTSO-E recommendations for equivalent turbine-governor representation.
+The `ENTSOE_simp` model is a simplified **ENTSO-E speed governor** suitable for primary frequency response studies. It is derived from the ENTSO-E recommendations for equivalent turbine-governor representation.
 
 The governor equation forms a speed error with permanent droop $R$:
 
@@ -211,11 +230,11 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   400. 360. 6. 0. 2.05
 
 ---
 
-## tor_GAST
+## GAST (`tor_GAST`)
 
 ### Scientific Description
 
-The `tor_GAST` model represents a **gas turbine** unit, following the IEEE Committee Report (1973) and the NEPLAN/PowerWorld convention. It captures the speed governor, compressor discharge lag, and fuel/combustion dynamics.
+The `GAST` model represents a **gas turbine** unit, following the IEEE Committee Report (1973) and the NEPLAN/PowerWorld convention. It captures the speed governor, compressor discharge lag, and fuel/combustion dynamics.
 
 **Speed governor with droop and load reference:**
 
@@ -311,11 +330,9 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   400. 360. 6. 0. 2.05
 
 ## TGOV1 (`tor_TGOV1D`)
 
-The data-file model name is `TGOV1` (or `tor_TGOV1`. The `tor_` prefix is added automatically). Although this model is internally known as `tor_TGOV1D`, the name registered for use in data files is `TGOV1` (without the `D`).
-
 ### Scientific Description
 
-The `tor_TGOV1D` model represents a **simple steam turbine governor**, based on the IEEE TGOV1 structure with an added damping term. It is one of the most widely used simple governor models in power-system stability studies.
+The `TGOV1` model represents a **simple steam turbine governor**, based on the IEEE TGOV1 structure with an added damping term. It is one of the most widely used simple governor models in power-system stability studies.
 
 **Speed governor with permanent droop:**
 
@@ -393,11 +410,9 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   400. 360. 6. 0. 2.05
 
 ## HYGOV (`tor_hygov`)
 
-The data-file model name is `HYGOV` (or `tor_HYGOV`. The `tor_` prefix is added automatically).
-
 ### Scientific Description
 
-The `tor_hygov` model represents a **hydraulic turbine and governor** following a simplified penstock/water-column formulation, consistent with the IEEE representation for hydro governors (IEEE Std 1110).
+The `HYGOV` model represents a **hydraulic turbine and governor** following a simplified penstock/water-column formulation, consistent with the IEEE representation for hydro governors (IEEE Std 1110).
 
 **Governor with droop and PI controller:**
 

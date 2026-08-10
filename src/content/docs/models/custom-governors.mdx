@@ -22,7 +22,7 @@ Recognised governor model names (case-sensitive):
 - **Uppercase short names** (no prefix): `CONSTANT`, `1ST_ORDER`, `HYDRO_GENERIC1`, `THERMAL_GENERIC1`.
 - **Prefixed names**: RAMSES adds the `tor_` prefix automatically, so you can write either form: `ENTSOE_simp`/`tor_ENTSOE_simp`, `HYGOV`/`tor_HYGOV`, `GAST`/`tor_GAST`, `TGOV1`/`tor_TGOV1`, `DEGOV1`/`tor_DEGOV1`.
 
-All of the above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). Additional variants documented below but not in this list (`tor_gasturbm`, `tor_govclasm`, `tor_govhydr`, `tor_govnuc`) are not callable out of the box. They can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
+The four uppercase short names are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). The prefixed names are the [IEEE governors](/models/ieee-governors/) and require **RAMSES 3.50 or later**; on 3.40 they fail with "Torque model not found in definition". Additional variants documented below but not in this list (`tor_gasturbm`, `tor_govclasm`, `tor_govhydr`, `tor_govnuc`) are not callable out of the box. They can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
 :::
 
 ---
