@@ -21,6 +21,15 @@ There are no tests or linters configured. **Always run `npm run build` after cha
 
 - **Content**: All documentation lives in `src/content/docs/` as `.md` or `.mdx` files. URL slugs map directly from file paths (e.g., `user-guide/network.md` → `/user-guide/network/`).
 - **Sidebar/Navigation**: Defined entirely in `astro.config.mjs` under the `sidebar` array. New pages **must** be registered there with their `slug` to appear in navigation. The sidebar supports nested `items` arrays for sub-sections.
+  - Keep the tree **two levels deep at most**, and never create a group holding a
+    single page. `CODEGEN Blocks` is the one nested group, because it is a nine-page
+    reference.
+  - A sidebar `label` that differs from the page's own `title` shows up as two
+    names for one page (sidebar vs breadcrumb). Only diverge deliberately, as with
+    the deliberately-shortened model page labels.
+  - Each section with more than about four pages gets an index page at the section
+    root (`models/index.md`, `test-systems/index.md`). Link to **that**, never to an
+    arbitrary member page standing in for the section.
 - **Styling**: Custom theme overrides in `src/styles/custom.css` (blue accent, Inter/JetBrains Mono fonts).
 - **Math**: KaTeX via `remark-math` + `rehype-katex` + `starlight-katex`. Use `$...$` inline and `$$...$$` display.
 - **Images**: Diagrams (SVGs) go in `public/images/` and are referenced as absolute paths (`/images/foo.svg`). Use `<img src="/images/..." alt="..." style="width:60%" />` for sizing control. Logos/icons are in `src/assets/`.
@@ -65,7 +74,34 @@ Every page requires YAML frontmatter with `title` and `description`. The landing
 
 ### Domain content patterns
 - Data format documentation follows a consistent structure: concept explanation → circuit/block diagram (SVG) → data format code block → parameter table with Field/Description/Unit columns.
-- Model reference pages (exciters, governors, injectors) use `<Tabs>`/`<TabItem>` to group variants, with each tab containing a block diagram, parameter table, and initialization notes.
+- Model reference pages carry one section per model, in this order: scientific
+  description (with a block-diagram SVG where one exists), parameter table, then
+  a usage example showing a RAMSES data-file excerpt. `models/ieee-governors.mdx`
+  is the reference implementation; match it when adding a model.
+- `<Tabs>`/`<TabItem>` are used **within** a usage example (data file vs notes),
+  not to group model variants. Pages that need no components are `.md`.
+
+### One owner per topic
+
+Every fact has exactly one page that states it; every other page links to that
+page. The site previously carried the model-name rosters in eight places and
+documented THEVEQ, IMPLOAD, LTC, RT and SIM_MINMAX* twice each, and the copies
+drifted into contradicting one another on version floors, units and file counts.
+
+The division that holds today:
+
+| Topic | Owner |
+|---|---|
+| Record **syntax** (`SYNC_MACH`, `INJEC`, `IMPLOAD`, `TWOP`, `DCTL`) | `user-guide/dynamic-models.md` |
+| Which model names exist and their state | `models/index.md` |
+| A model's parameters, equations, examples | its family page under `models/` |
+| Power-flow records, settings, menu, exit status | `user-guide/power-flow.md` |
+| The Python API for any of the above | the matching `pyramses/` page |
+
+Before adding a table or explanation, check whether its owner already has one. If
+you find the same fact in two places, delete one and link instead. A tutorial page
+(`quickstart`, `examples`) shows one path and links out; it does not carry
+reference tables.
 
 ### Model pages follow the RAMSES code
 

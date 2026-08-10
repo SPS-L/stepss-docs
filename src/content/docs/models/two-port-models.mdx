@@ -1,6 +1,6 @@
 ---
 title: Two-Port Models
-description: HVDC and FACTS two-port device models in RAMSES
+description: HVDC two-port device models connecting two buses in RAMSES
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
@@ -34,7 +34,7 @@ Three two-port models are available in every RAMSES distribution (both the stand
 
 ## HVDC Models
 
-### `twop_HVDC_LCC`: Line-Commutated Converter HVDC
+### HVDC_LCC (`twop_HVDC_LCC`): Line-Commutated Converter HVDC
 
 #### Description
 
@@ -182,7 +182,7 @@ TWOP  HVDC_LCC  HVDClink  BUS_RECT  BUS_INV  S
 
 ---
 
-### `twop_HVDC_VSC`: Voltage Source Converter HVDC
+### twop_HVDC_VSC: Voltage Source Converter HVDC (not registered)
 
 :::caution
 `twop_HVDC_VSC` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)). For a built-in VSC-HVDC model, use `twop_HVDC_VSC_SC` instead.
@@ -353,7 +353,7 @@ TWOP  HVDC_VSC  VSC1  AC_BUS  DC_BUS  S
 
 ---
 
-### `twop_HVDC_VSC_SC`: VSC-HVDC with Self-Commutation (Grid-Forming)
+### HVDC_VSC_SC (`twop_HVDC_VSC_SC`): VSC-HVDC with Self-Commutation (Grid-Forming)
 
 #### Description
 
@@ -452,7 +452,7 @@ TWOP  HVDC_VSC_SC  VSC_SC1  AC_BUS  DC_BUS  S
 
 ---
 
-### `twop_DCL_WCL`: DC Link with Wind Converter Link (Offshore Wind HVDC)
+### DCL_WCL (`twop_DCL_WCL`): DC Link with Wind Converter Link (Offshore Wind HVDC)
 
 #### Description
 

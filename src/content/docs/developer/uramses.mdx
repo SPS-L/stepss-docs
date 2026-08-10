@@ -18,10 +18,10 @@ import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
 
 ```bash
 # Ubuntu/Debian
-sudo apt install gfortran libopenblas-dev
+sudo apt install gfortran make libopenblas-dev
 
 # Fedora/RHEL
-sudo dnf install gcc-gfortran openblas-devel
+sudo dnf install gcc-gfortran make openblas-devel
 
 # Arch Linux
 sudo pacman -S gcc-fortran openblas
@@ -58,7 +58,9 @@ the `msys-2.0` runtime and produces a DLL that CPython cannot load.
 <TabItem label="Windows (Intel)">
 
 - **Microsoft Visual Studio** 2019 or later
-- **Intel oneAPI Fortran Compiler** (see [Installation](/getting-started/installation/))
+- **Intel oneAPI Fortran Compiler**, installed from Intel's own distribution;
+  the [Installation](/getting-started/installation/) page covers the gfortran
+  toolchains only
 - **PyRAMSES** or **STEPSS**
 
 </TabItem>
@@ -345,7 +347,9 @@ generate.
 
 ## Helper Functions
 
-The `FUNCTIONS_IN_MODELS.f90` module provides utility functions available in all models. Refer to the source code for the complete list of available helper routines.
+The `FUNCTIONS_IN_MODELS.f90` module provides utility functions available in all
+models. See the [Functions Reference](/developer/codegen-blocks/functions/) for the
+complete list with signatures.
 
 ## Repository
 

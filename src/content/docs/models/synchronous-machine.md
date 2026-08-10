@@ -377,7 +377,7 @@ All reactances, inductances and resistances are in per unit on the machine base
 quantities. Time constants are entered in seconds and normalised internally by
 $t_b = 1/(2\pi f_{nom})$.
 
-The `EXC` and `TOR` sub-records specify the excitation system and turbine-governor models. See the [Model Reference](/models/ieee-exciters/) for available models.
+The `EXC` and `TOR` sub-records specify the excitation system and turbine-governor models. See the [Model Reference](/models/) for available models.
 
 :::note
 The FP, FQ, P, Q fields control how the machine's initial operating point is determined from the power flow solution. See [Reference Frames & Initialization](/user-guide/reference-frames/) for details.

@@ -3,8 +3,6 @@ title: IEEE Exciter Models
 description: IEEE-standard excitation system, PSS, and OEL models available in RAMSES
 ---
 
-import { Tabs, TabItem } from '@astrojs/starlight/components';
-
 These excitation system models implement the IEEE Std 421.5-2016 "IEEE Recommended Practice for Excitation System Models for Power System Stability Studies" (and selected ENTSO-E variants) within RAMSES. Each model is defined using the CODEGEN domain-specific language (DSL) and compiled into Fortran for time-domain simulation. The DSL describes block diagrams as interconnected transfer function primitives (`tf1p`, `tf1p1z`, `tf1plim`, `tfder1p`, `inlim`, `pictl`, etc.), initial conditions, and algebraic constraints, forming a self-contained, portable model definition.
 
 :::note[Usage in Dynamic Data Files]
@@ -17,49 +15,51 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
               TOR model_name  param1  param2  ... ;
 ```
 
-RAMSES adds the `exc_` prefix to the model name automatically, so both `AC1A` and `exc_AC1A` are accepted. The following IEEE exciter models are available in every RAMSES distribution (standalone executable and shared library used by PyRAMSES):
+RAMSES adds the `exc_` prefix to the model name automatically, so both `AC1A` and `exc_AC1A` are accepted.
 
-`ST1A`, `ST1A_IEEEST`, `ST1A_PSS2B`, `ST1A_PSS4B`, `AC1A`, `AC4A`, `IEEET5`, `SEXS`, `SEXS_IEEEST`, `EXPIC1_PSS2B`, `ENTSOE_simp` (each is also accepted with the `exc_` prefix).
+Not every model in the catalogue below is callable by name. The **State** column of the Model Index says which is which:
 
-The other variants in the catalogue below (`AC1A_MAXEX2`, `AC1A_RETRO`, `AC1A_RETRO_PSS4B`, `AC8B`, `AC8B_PSS3B_lim`, `DC3A`, `EXPIC1`, `EXPIC1_PSS2B_MAXEX2`, `SEXS_STAB3_lim`, `ST1A_lim`, `ST1A_PSS3B`, the `*_MAXEX2` variants and `ST2A`) are compiled into the library but registered under no name, so RAMSES rejects them in a data file. Each becomes callable by adding one case to the URAMSES router and relinking, without recompiling the model itself (see the [URAMSES guide](/developer/uramses/)).
+- **Registered**, callable from a data file as it stands.
+- **Not registered**, compiled into the library but mapped to no name, so RAMSES rejects it in a data file. Each becomes callable by adding one case to the URAMSES router and relinking, without recompiling the model itself (see the [URAMSES guide](/developer/uramses/)).
+- **DSL only**, present as a CODEGEN model description but not as compiled Fortran. `ENTSOE_lim` ships as a ready-made example in the URAMSES `custom_models/` directory; `AC8B_lim` is listed for reference only and is not distributed.
 
-`ENTSOE_lim` and `AC8B_lim` are a step further out: they exist only as CODEGEN model descriptions, not as compiled Fortran. `ENTSOE_lim` ships as a ready-made example in the URAMSES `custom_models/` directory; `AC8B_lim` is listed below for reference only and is not distributed.
+The [Model Reference index](/models/) carries the same information across all model families.
 :::
 
 ---
 
 ## Model Index
 
-| Model Name | Base Type | PSS | OEL / Limiter | IEEE Reference |
-|---|---|---|---|---|
-| `AC1A` | AC type 1 | | | IEEE 421.5 Type AC1A |
-| `AC1A_MAXEX2` | AC type 1 | | MAXEX2 field current limiter | IEEE 421.5 Type AC1A |
-| `AC1A_RETRO` | AC type 1 (retrofit) | PSS4B (internal) | | |
-| `AC1A_RETRO_PSS4B` | AC type 1 (retrofit) | PSS4B | | |
-| `AC4A` | AC type 4 | | | IEEE 421.5 Type AC4A |
-| `AC8B` | AC type 8 | | | IEEE 421.5 Type AC8B |
-| `AC8B_PSS3B_lim` | AC type 8 | PSS3B | Integral OEL + SCL | IEEE 421.5 Type AC8B |
-| `AC8B_lim` | AC type 8 | | Integral OEL + SCL | IEEE 421.5 Type AC8B |
-| `DC3A` | DC type 3 | | | IEEE 421.5 Type DC3A |
-| `ENTSOE_simp` | ENTSO-E simplified | IEEEST (internal) | | ENTSO-E |
-| `ENTSOE_lim` | ENTSO-E simplified | IEEEST (internal) | Integral OEL | ENTSO-E |
-| `EXPIC1` | AC/ST (PIC type) | | | |
-| `EXPIC1_PSS2B` | AC/ST (PIC type) | PSS2B | | |
-| `EXPIC1_PSS2B_MAXEX2` | AC/ST (PIC type) | PSS2B | MAXEX2 | |
-| `IEEET5` | DC type 5 | | | IEEE 421.5 Type DC5A (legacy) |
-| `SEXS` | ST simplified | | | CIGRÉ simplified |
-| `SEXS_IEEEST` | ST simplified | IEEEST | | CIGRÉ simplified |
-| `SEXS_STAB3_lim` | ST simplified | STAB3 | Integral OEL | |
-| `ST1A` | ST type 1 | | | IEEE 421.5 Type ST1A |
-| `ST1A_IEEEST` | ST type 1 | IEEEST | | IEEE 421.5 Type ST1A |
-| `ST1A_IEEEST_MAXEX2` | ST type 1 | IEEEST | MAXEX2 | IEEE 421.5 Type ST1A |
-| `ST1A_PSS2B` | ST type 1 | PSS2B | | IEEE 421.5 Type ST1A |
-| `ST1A_PSS2B_MAXEX2` | ST type 1 | PSS2B | MAXEX2 | IEEE 421.5 Type ST1A |
-| `ST1A_PSS3B` | ST type 1 | PSS3B | | IEEE 421.5 Type ST1A |
-| `ST1A_PSS4B` | ST type 1 | PSS4B | | IEEE 421.5 Type ST1A |
-| `ST1A_PSS4B_MAXEX2` | ST type 1 | PSS4B | MAXEX2 | IEEE 421.5 Type ST1A |
-| `ST1A_lim` | ST type 1 | | Integral OEL + SCL | IEEE 421.5 Type ST1A |
-| `ST2A` | ST type 2 | | | IEEE 421.5 Type ST2A (via EXPIC1) |
+| Model Name | State | Base Type | PSS | OEL / Limiter | IEEE Reference |
+|---|---|---|---|---|---|
+| `AC1A` | Registered | AC type 1 | | | IEEE 421.5 Type AC1A |
+| `AC1A_MAXEX2` | Not registered | AC type 1 | | MAXEX2 field current limiter | IEEE 421.5 Type AC1A |
+| `AC1A_RETRO` | Not registered | AC type 1 (retrofit) | PSS4B (internal) | | |
+| `AC1A_RETRO_PSS4B` | Not registered | AC type 1 (retrofit) | PSS4B | | |
+| `AC4A` | Registered | AC type 4 | | | IEEE 421.5 Type AC4A |
+| `AC8B` | Not registered | AC type 8 | | | IEEE 421.5 Type AC8B |
+| `AC8B_PSS3B_lim` | Not registered | AC type 8 | PSS3B | Integral OEL + SCL | IEEE 421.5 Type AC8B |
+| `AC8B_lim` | DSL only | AC type 8 | | Integral OEL + SCL | IEEE 421.5 Type AC8B |
+| `DC3A` | Not registered | DC type 3 | | | IEEE 421.5 Type DC3A |
+| `ENTSOE_simp` | Registered | ENTSO-E simplified | IEEEST (internal) | | ENTSO-E |
+| `ENTSOE_lim` | DSL only | ENTSO-E simplified | IEEEST (internal) | Integral OEL | ENTSO-E |
+| `EXPIC1` | Not registered | AC/ST (PIC type) | | | |
+| `EXPIC1_PSS2B` | Registered | AC/ST (PIC type) | PSS2B | | |
+| `EXPIC1_PSS2B_MAXEX2` | Not registered | AC/ST (PIC type) | PSS2B | MAXEX2 | |
+| `IEEET5` | Registered | DC type 5 | | | IEEE 421.5 Type DC5A (legacy) |
+| `SEXS` | Registered | ST simplified | | | CIGRÉ simplified |
+| `SEXS_IEEEST` | Registered | ST simplified | IEEEST | | CIGRÉ simplified |
+| `SEXS_STAB3_lim` | Not registered | ST simplified | STAB3 | Integral OEL | |
+| `ST1A` | Registered | ST type 1 | | | IEEE 421.5 Type ST1A |
+| `ST1A_IEEEST` | Registered | ST type 1 | IEEEST | | IEEE 421.5 Type ST1A |
+| `ST1A_IEEEST_MAXEX2` | Not registered | ST type 1 | IEEEST | MAXEX2 | IEEE 421.5 Type ST1A |
+| `ST1A_PSS2B` | Registered | ST type 1 | PSS2B | | IEEE 421.5 Type ST1A |
+| `ST1A_PSS2B_MAXEX2` | Not registered | ST type 1 | PSS2B | MAXEX2 | IEEE 421.5 Type ST1A |
+| `ST1A_PSS3B` | Not registered | ST type 1 | PSS3B | | IEEE 421.5 Type ST1A |
+| `ST1A_PSS4B` | Registered | ST type 1 | PSS4B | | IEEE 421.5 Type ST1A |
+| `ST1A_PSS4B_MAXEX2` | Not registered | ST type 1 | PSS4B | MAXEX2 | IEEE 421.5 Type ST1A |
+| `ST1A_lim` | Not registered | ST type 1 | | Integral OEL + SCL | IEEE 421.5 Type ST1A |
+| `ST2A` | Not registered | ST type 2 | | | IEEE 421.5 Type ST2A (via EXPIC1) |
 
 ---
 
@@ -910,4 +910,4 @@ A stator current limiter (SCL) with analogous structure acts on $I_{st} = \sqrt{
 
 ---
 
-For full documentation of the CODEGEN DSL primitives used in these models (`tf1p`, `tf1p1z`, `tf1plim`, `inlim`, `pictl`, etc.), see the [CODEGEN Blocks Library](/developer/codegen-library/).
+For full documentation of the CODEGEN DSL primitives used in these models (`tf1p`, `tf1p1z`, `tf1plim`, `inlim`, `pictl`, etc.), see the [CODEGEN Blocks](/developer/codegen-blocks/) reference.

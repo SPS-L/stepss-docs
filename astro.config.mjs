@@ -11,8 +11,11 @@ export default defineConfig({
 	base: '/',
 	// The power-flow page used to live at /user-guide/pfc/ and is linked from the
 	// stepss-helios and stepss-cg-studio READMEs. Keep that URL working.
+	// The block library used to be one 2300-line page at /developer/codegen-library/;
+	// it is now one page per block category under /developer/codegen-blocks/.
 	redirects: {
 		'/user-guide/pfc': '/user-guide/power-flow/',
+		'/developer/codegen-library': '/developer/codegen-blocks/',
 	},
 	markdown: {
 		remarkPlugins: [remarkMath],
@@ -62,33 +65,22 @@ export default defineConfig({
 						{ label: 'Overview',     slug: 'getting-started/overview' },
 						{ label: 'Installation', slug: 'getting-started/installation' },
 						{ label: 'Quick Start',  slug: 'getting-started/quickstart' },
+						{ label: 'License',      slug: 'getting-started/license' },
 					],
 				},
 				{
+					// Flat, in workflow order: describe the network, solve the power
+					// flow, then set up and run the dynamic simulation, then analyse it.
 					label: 'Simulation Guide',
 					items: [
-						{
-							label: 'Data Formats',
-							items: [
-								{ label: 'File Formats',    slug: 'user-guide/file-formats' },
-								{ label: 'Network Modeling', slug: 'user-guide/network' },
-							],
-						},
-						{
-							label: 'Power Flow (Helios)',
-							items: [
-								{ label: 'Power Flow Data & Settings', slug: 'user-guide/power-flow' },
-							],
-						},
-						{
-							label: 'Dynamic Simulation',
-							items: [
-								{ label: 'Reference Frames & Initialization', slug: 'user-guide/reference-frames' },
-								{ label: 'Dynamic Models',                    slug: 'user-guide/dynamic-models' },
-								{ label: 'Disturbances',                      slug: 'user-guide/disturbances' },
-								{ label: 'Solver Settings',                   slug: 'user-guide/solver-settings' },
-							],
-						},
+						{ label: 'File Formats',        slug: 'user-guide/file-formats' },
+						{ label: 'Network Modeling',    slug: 'user-guide/network' },
+						{ label: 'Power Flow (Helios)', slug: 'user-guide/power-flow' },
+						{ label: 'Reference Frames & Initialization', slug: 'user-guide/reference-frames' },
+						{ label: 'Dynamic Data Records', slug: 'user-guide/dynamic-models' },
+						{ label: 'Disturbances',        slug: 'user-guide/disturbances' },
+						{ label: 'Solver Settings',     slug: 'user-guide/solver-settings' },
+						{ label: 'Eigenanalysis',       slug: 'user-guide/eigenanalysis' },
 					],
 				},
 				{
@@ -96,66 +88,67 @@ export default defineConfig({
 					items: [
 						{ label: 'Overview',      slug: 'pyramses/overview' },
 						{ label: 'Installation',  slug: 'pyramses/installation' },
-						{ label: 'API Reference', slug: 'pyramses/api-reference' },
-						{ label: 'Power Flow (Helios)', slug: 'pyramses/helios' },
 						{ label: 'Examples',      slug: 'pyramses/examples' },
+						{ label: 'API Reference', slug: 'pyramses/api-reference' },
+						// Not "Power Flow (Helios)": that label belongs to the engine
+						// reference under Simulation Guide. This page is the Python API.
+						{ label: 'Helios Power-Flow API', slug: 'pyramses/helios' },
 					],
 				},
 				{
 					label: 'Model Reference',
 					items: [
-						{ label: 'Synchronous Machine', slug: 'models/synchronous-machine' },
+						{ label: 'Model Index',             slug: 'models' },
+						{ label: 'Synchronous Machine',     slug: 'models/synchronous-machine' },
 						{ label: 'SM Parameter Conversion', slug: 'models/synchronous-machine-param-conversion' },
-						{
-							label: 'Exciters',
-							items: [
-								{ label: 'IEEE Exciters',    slug: 'models/ieee-exciters' },
-								{ label: 'Custom Exciters',  slug: 'models/custom-exciters' },
-							],
-						},
-						{
-							label: 'Governors',
-							items: [
-								{ label: 'IEEE Governors',   slug: 'models/ieee-governors' },
-								{ label: 'Custom Governors', slug: 'models/custom-governors' },
-							],
-						},
-						{ label: 'Injectors',            slug: 'models/custom-injectors' },
-						{ label: 'Two-Port Models',      slug: 'models/two-port-models' },
-						{ label: 'Discrete Controllers', slug: 'models/discrete-controllers' },
+						{ label: 'IEEE Exciters',           slug: 'models/ieee-exciters' },
+						{ label: 'Custom Exciters',         slug: 'models/custom-exciters' },
+						{ label: 'IEEE Governors',          slug: 'models/ieee-governors' },
+						{ label: 'Custom Governors',        slug: 'models/custom-governors' },
+						{ label: 'Injectors',               slug: 'models/custom-injectors' },
+						{ label: 'Two-Port Models',         slug: 'models/two-port-models' },
+						{ label: 'Discrete Controllers',    slug: 'models/discrete-controllers' },
 					],
 				},
 				{
 					label: 'Extending STEPSS',
 					items: [
-						{ label: 'User-Defined Models',    slug: 'developer/user-models' },
-						{ label: 'CODEGEN Blocks Library', slug: 'developer/codegen-library' },
+						{ label: 'User-Defined Models', slug: 'developer/user-models' },
+						{
+							label: 'CODEGEN Blocks',
+							items: [
+								{ label: 'Block Index',          slug: 'developer/codegen-blocks' },
+								{ label: 'Algebraic & Math',     slug: 'developer/codegen-blocks/algebraic' },
+								{ label: 'Transfer Functions',   slug: 'developer/codegen-blocks/transfer-functions' },
+								{ label: 'Integrators',          slug: 'developer/codegen-blocks/integrators' },
+								{ label: 'Controllers',          slug: 'developer/codegen-blocks/controllers' },
+								{ label: 'Limiters & Switching', slug: 'developer/codegen-blocks/limiters' },
+								{ label: 'Frequency Estimation', slug: 'developer/codegen-blocks/frequency' },
+								{ label: 'Automata & Timers',    slug: 'developer/codegen-blocks/automata' },
+								{ label: 'Functions Reference',  slug: 'developer/codegen-blocks/functions' },
+							],
+						},
 						{ label: 'CODEGEN Model Examples', slug: 'developer/codegen-examples' },
 						{ label: 'CODEGEN Studio',         slug: 'developer/cg-studio' },
 						{ label: 'URAMSES',                slug: 'developer/uramses' },
 					],
 				},
 				{
-					label: 'Analysis',
-					items: [
-						{ label: 'Eigenanalysis', slug: 'user-guide/eigenanalysis' },
-					],
-				},
-				{
+					// Ordered smallest to largest, which is also easiest to hardest.
 					label: 'Test Systems',
 					items: [
-						{ label: 'Nordic Test System', slug: 'test-systems/nordic' },
-						{ label: '5-Bus Test System',  slug: 'test-systems/5bus' },
+						{ label: 'Overview',               slug: 'test-systems' },
+						{ label: '5-Bus Test System',      slug: 'test-systems/5bus' },
 						{ label: 'Kundur Two-Area System', slug: 'test-systems/kundur' },
-						{ label: 'GB Network', slug: 'test-systems/gb-network' },
+						{ label: 'Nordic Test System',     slug: 'test-systems/nordic' },
+						{ label: 'GB Network',             slug: 'test-systems/gb-network' },
 					],
 				},
 				{
-					label: 'Reference',
+					label: 'Resources',
 					items: [
-						{ label: 'Repositories', slug: 'resources/repositories' },
-						{ label: 'References',   slug: 'resources/references' },
-						{ label: 'License',      slug: 'getting-started/license' },
+						{ label: 'Repositories',  slug: 'resources/repositories' },
+						{ label: 'Publications',  slug: 'resources/references' },
 					],
 				},
 			],

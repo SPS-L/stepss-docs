@@ -37,3 +37,9 @@ The disturbance file contains ready-made (commented) templates for line and mach
 ## Download
 
 The test system files are available in the [stepss-GB-Network repository](https://github.com/SPS-L/stepss-GB-Network).
+
+## See Also
+
+- [Test Systems](/test-systems/), the other benchmark networks
+- [Two-Port Models](/models/two-port-models/), the HVDC converter models used here
+- [Disturbances](/user-guide/disturbances/), syntax for the commented templates in `disturb.dst`

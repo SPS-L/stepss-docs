@@ -286,4 +286,4 @@ The SHUNT record is used by RAMSES. For the power flow, shunt data is specified 
 ## Next Steps
 
 - [Power Flow (Helios)](/user-guide/power-flow/), Configure generators, loads, and compute the initial operating point
-- [Dynamic Models](/user-guide/dynamic-models/), Add synchronous machines and controllers
+- [Dynamic Data Records](/user-guide/dynamic-models/), Add synchronous machines and controllers

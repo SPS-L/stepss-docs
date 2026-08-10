@@ -82,7 +82,7 @@ Browser-based visual editor for building CODEGEN user-defined models with drag-a
 - **Documentation**: [CODEGEN Studio guide](/developer/cg-studio/) on this site
 
 :::note
-Test-system data repositories (Nordic, 5-bus, Kundur, GB Network, and others) are not listed here; see the [Test Systems](/test-systems/nordic/) section of this site.
+Test-system data repositories (Nordic, 5-bus, Kundur, GB Network, and others) are not listed here; see the [Test Systems](/test-systems/) section of this site.
 :::
 
 ## Contributing

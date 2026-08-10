@@ -18,11 +18,11 @@ Two details that break hand calculations against STEPSS:
 
 ---
 
-## Authoritative field order
+## Authoritative Field Order
 
 From the RAMSES source (`sync.f90`, `get_sync_mach`):
 
-```text
+```
 SYNC_MACH NAME BUS FP FQ P Q SNOM PNOM H D IBRATIO
   RL  LL MDU  LLF  LLD1 MQU LLQ1 LLQ2 M N RA RF   RD1  RQ1  RQ2
   XT  LL XD   XPD  XSD  XQ  XPQ  XSQ  M N RA TPD0 TSD0 TPQ0 TSQ0
@@ -33,7 +33,7 @@ A rotor circuit the machine does not have is skipped with `*` in **both** its re
 
 ---
 
-## Conversion algorithm (XT → RL)
+## Conversion Algorithm (XT → RL)
 
 All parameters are in per unit; time constants are entered in seconds and normalised internally.
 
@@ -104,7 +104,7 @@ If any of $R_f, R_{d1}, L_{\ell f}, L_{\ell d1}$ (or q-axis equivalents) turns o
 
 ---
 
-## Reference Python implementation
+## Reference Python Implementation
 
 A standalone Python port of the `XT` branch is available at
 [`Sync_mach_Octave`](https://github.com/SPS-L/Sync_mach_Octave) (Octave) and
@@ -126,7 +126,7 @@ p = ramses_xt_to_park(
 
 ---
 
-## Worked examples
+## Worked Examples
 
 Inputs (both cases, 50 Hz, IBRATIO = 1): $L_\ell = 0.15$, $R_a = 0.003$, $X_d = 1.81$, $X'_d = 0.30$, $X''_d = 0.23$, $T'_{d0} = 8.0$ s, $T''_{d0} = 0.03$ s, $X_q = 1.76$, $X'_q = 0.65$, $T'_{q0} = 1.0$ s. The round-rotor case adds $X''_q = 0.25$, $T''_{q0} = 0.07$ s.
 
@@ -146,7 +146,7 @@ Inputs (both cases, 50 Hz, IBRATIO = 1): $L_\ell = 0.15$, $R_a = 0.003$, $X_d = 
 
 ---
 
-## Comparing with an EMT simulator
+## Comparing with an EMT Simulator
 
 When cross-checking STEPSS (RMS/phasor) against an EMT tool such as Typhoon HIL:
 
@@ -156,7 +156,7 @@ When cross-checking STEPSS (RMS/phasor) against an EMT tool such as Typhoon HIL:
 
 ---
 
-## See also
+## See Also
 
 - [Synchronous Machine Model](/models/synchronous-machine/), equations, per unit system, and `SYNC_MACH` record reference
 - [Octave reference implementation](https://github.com/SPS-L/Sync_mach_Octave)

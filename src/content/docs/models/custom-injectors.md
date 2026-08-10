@@ -3,8 +3,6 @@ title: Injector Models
 description: Load, machine, renewable generation, and BESS injector models in RAMSES
 ---
 
-import { Tabs, TabItem } from '@astrojs/starlight/components';
-
 RAMSES custom injector models represent loads, induction machines, inverter-based resources (IBR), and battery energy storage systems (BESS) connected to network buses.
 
 :::note[Usage in Dynamic Data Files]
@@ -23,14 +21,14 @@ Recognised injector model names (case-sensitive):
 
 All of the above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). `inj_INDM1` and `inj_PVG`, documented below, are compiled into the library but registered under no name; each becomes callable by adding one case to the URAMSES router (see the [URAMSES guide](/developer/uramses/)). `inj_norton` is excluded from the build entirely and is not available.
 
-> **Note on case sensitivity.** Match the case used above exactly. The uppercase short names must be uppercase. For the prefixed family, `vfd_load` and `VFAULT` use those exact cases. Most others follow the convention `inj_<UPPERCASE>` (e.g. `inj_PQ`, `inj_GFOR`).
+**Note on case sensitivity.** Match the case used above exactly. The uppercase short names must be uppercase. For the prefixed family, `vfd_load` and `VFAULT` use those exact cases. Most others follow the convention `inj_<UPPERCASE>` (e.g. `inj_PQ`, `inj_GFOR`).
 :::
 
 ---
 
 ## Load Models
 
-### `LOAD` (built-in exponential recovery load)
+### LOAD (`inj_load`): Exponential Recovery Load
 
 #### Description
 
@@ -91,7 +89,7 @@ INJEC  LOAD  LOAD1  BUS1  1.  1.  0.  0.  1.5  0.3  1.0  0.2  2.0  0.5  1.8  0.4
 
 ---
 
-### `vfd_load` / `inj_vfd_load`: Variable Frequency Drive Load
+### vfd_load (`inj_vfd_load`): Variable Frequency Drive Load
 
 #### Description
 
@@ -162,7 +160,7 @@ INJEC  vfd_load  VFD1  BUS_IND  1.  1.  0.  0.  1.5  0.7  2.0  0.2  1.0  0.5
 
 ---
 
-### `RESTLD`: Restorative Load (built-in)
+### RESTLD (`inj_restld`): Restorative Load
 
 #### Description
 
@@ -217,7 +215,7 @@ INJEC  RESTLD  RESTLD1  BUS2  1.  1.  0.  0.  1.5  0.5  2.0  0.0  2.0  1.2  0.5 
 
 ---
 
-### `PQ` / `inj_PQ`: Constant PQ Load
+### PQ (`inj_PQ`): Constant PQ Load
 
 #### Description
 
@@ -263,7 +261,7 @@ INJEC  inj_PQ  LOAD_PQ  BUS3  1.  1.  0.  0.  0.01  ;
 
 ---
 
-### `THEVEQ`: Thévenin Equivalent (built-in)
+### THEVEQ (`inj_theveq`): Thévenin Equivalent
 
 #### Description
 
@@ -312,7 +310,7 @@ INJEC  THEVEQ  EQUIV1  SLACK_BUS  1.  1.  0.  0.  2000.0  ;
 
 ## Induction Machine Models
 
-### `INDMACH1` (`inj_indmach1`): Single-Cage Induction Machine
+### INDMACH1 (`inj_indmach1`): Single-Cage Induction Machine
 
 #### Description
 
@@ -379,7 +377,7 @@ INJEC  INDMACH1  MTR1  BUS_MV  1.  1.  0.  0.  10.0  0.01  0.10  2.50  0.015  0.
 
 ---
 
-### `INDMACH2` (`inj_indmach2`): Double-Cage Induction Machine
+### INDMACH2 (`inj_indmach2`): Double-Cage Induction Machine
 
 #### Description
 
@@ -438,7 +436,7 @@ INJEC  INDMACH2  MTR2  BUS_MV  1.  1.  0.  0.  10.0  0.01  0.08  2.00  0.02  0.0
 
 ---
 
-### `inj_INDM1`: Alternative Induction Machine (INDM1)
+### inj_INDM1: Alternative Induction Machine (not registered)
 
 :::caution
 `inj_INDM1` is documented here for reference but is not callable out of the box in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)). For built-in single-cage motors, use `INDMACH1` instead.
@@ -501,7 +499,7 @@ INJEC  INDM1  MTR3  BUS_MV  1.  1.  0.  0.  10.0  0.01  0.10  2.50  0.015  0.10 
 
 ## Renewable Generation / Inverter-Based Resources
 
-### `IBG` / `inj_IBG`: Inverter-Based Generator (Generic IBR)
+### IBG (`inj_IBG`): Inverter-Based Generator (Generic IBR)
 
 #### Description
 
@@ -592,7 +590,7 @@ INJEC  IBG  IBG1  BUS_GEN  1.  1.  0.  0.  1.2  1.0  0.5  0.02  0.01  0.5  1.0  
 
 ---
 
-### `WT3` (`inj_WT3`): Type 3 Wind Turbine (DFIG)
+### WT3 (`inj_WT3`): Type 3 Wind Turbine (DFIG)
 
 The data-file model name is `WT3` (or `inj_WT3`).
 
@@ -658,7 +656,7 @@ INJEC  WT3  WT3_1  BUS_WIND  1.  1.  0.  0.
 
 ---
 
-### `WT4` (`inj_WT4`): Type 4 Wind Turbine (Full Converter)
+### WT4 (`inj_WT4`): Type 4 Wind Turbine (Full Converter)
 
 The data-file model name is `WT4` (or `inj_WT4`).
 
@@ -702,7 +700,7 @@ INJEC  WT4  WT4_1  BUS_WIND  1.  1.  0.  0.
 
 ---
 
-### `inj_PVG`: Photovoltaic Generator
+### inj_PVG: Photovoltaic Generator (not registered)
 
 :::caution
 `inj_PVG` is documented here for reference but is not callable out of the box in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)). For built-in IBR modelling, use `IBG`, `WT3`, or `WT4`. Note that the subroutine inside `inj_PVG.f90` is named `inj_PV`; both refer to the same single model.
@@ -751,7 +749,7 @@ INJEC  PVG  PV1  BUS_PV  1.  1.  0.  0.  1.2  1.0  0.5  0.02  0.01  0.5  1.0  0.
 
 ---
 
-### `GFOR` / `inj_GFOR`: Grid-Forming Converter (VSM)
+### GFOR (`inj_GFOR`): Grid-Forming Converter (VSM)
 
 The data-file model name is `GFOR` (or `inj_GFOR`).
 
@@ -867,7 +865,7 @@ At operating points where the initial current is below $I_{\mathrm{max}}$, RAMSE
 
 ---
 
-### `GFOL` / `inj_GFOL`: Grid-Following Converter
+### GFOL (`inj_GFOL`): Grid-Following Converter
 
 The data-file model name is `GFOL` (or `inj_GFOL`).
 
@@ -1001,7 +999,7 @@ INJEC  GFOL    HVDC1    A   1.   1.   0.  0.  0.005  0.15   1.02   1200.  0.005 
 
 ## Energy Storage
 
-### `BESS` (`inj_BESS`): Battery Energy Storage System
+### BESS (`inj_BESS`): Battery Energy Storage System
 
 The data-file model name is `BESS` (or `inj_BESS`).
 
@@ -1065,7 +1063,7 @@ INJEC  BESS  BESS1  BUS_ST  1.  1.  0.  0.
 
 ## Reactive Compensation
 
-### `SVC_GENERIC1` (`inj_svc_generic1`): Generic Static Var Compensator
+### SVC_GENERIC1 (`inj_svc_generic1`): Generic Static Var Compensator
 
 The data-file model name is `SVC_GENERIC1`. It takes no prefix.
 
@@ -1125,7 +1123,7 @@ One additional parameter is computed at initialisation:
 
 ## Measurement
 
-### `PMU` (`inj_PMU`): Phasor Measurement Unit
+### PMU (`inj_PMU`): Phasor Measurement Unit
 
 The data-file model name is `PMU` (or `inj_PMU`).
 

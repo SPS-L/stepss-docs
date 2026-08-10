@@ -214,11 +214,22 @@ This means the parameter P0 (resp. Q0) of the injector L\_11 is ramped by +50% (
 time(s) JAC 'name_of_filename'
 ```
 
-Required solver settings:
+Required solver setting:
 ```
 $OMEGA_REF SYN ;
-$SCHEME IN ;
 ```
+
+Under the COI reference frame RAMSES logs a warning and skips the export, because
+the feature has not been validated there.
+
+The number of files written depends on the integration scheme:
+
+| Scheme | Files written |
+|--------|---------------|
+| `$SCHEME IN` (integrated) | `<name>_val.dat`, `<name>_eqs.dat`, `<name>_var.dat` |
+| `$SCHEME DE` (decomposed) | the same three, plus `<name>_struc.dat` |
+
+See [Eigenanalysis](/user-guide/eigenanalysis/) for how to consume these files.
 
 ## Export Load Flow Snapshot
 

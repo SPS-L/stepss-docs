@@ -9,7 +9,7 @@ STEPSS provides three ways to run simulations:
 
 | Interface | Dynamic Simulator (RAMSES) | Power Flow (Helios) | CODEGEN |
 |-----------|:-------------------------:|:----------------------:|:-------:|
-| **Command Line** | `ramses -t cmd.txt` | `helios -t cmd.txt` | `codegen model.txt` |
+| **Command Line** | `ramses -t cmd.txt` | `helios -t cmd.txt` | `codegen -tmodel.txt` |
 | **GUI (Java)** | Via STEPSS GUI | Via STEPSS GUI | Via STEPSS GUI |
 | **Python** | Via PyRAMSES | Via `pyramses.helios` | |
 
@@ -43,6 +43,9 @@ Observable file name [compulsory] :
 Dump continuous simulation trace in file [press enter to skip] :
 Dump discrete simulation trace in file [press enter to skip] :
 ```
+
+The observables prompt is shown only when a trajectory file was given; it is
+labelled compulsory because at that point it is.
 
 **Non-interactive mode** (`-t` flag): The command file provides the same inputs as lines, in order:
 
@@ -194,26 +197,10 @@ helios [-t command_file] [--plain] [--tui]
 
 The run's outcome is reported through the process exit status: `0` converged, `1` input or usage error, `2` solve did not converge. See [Exit Status](/user-guide/power-flow/#exit-status).
 
-### Helios Menu Commands
-
-After loading data and solving, Helios presents these commands:
-
-| Command | Description |
-|---------|-------------|
-| `P` | Take new control parameters from file |
-| `D` | Display output values |
-| `1` | Display outputs on 1-line diagram (SVG) |
-| `M` | Modify system (change loads, generators, topology) |
-| `RI` | Reset system to initial configuration |
-| `CA` | Perform contingency analysis |
-| `CL` | Check operating limits (voltage bounds, branch overloads) |
-| `O` | Change output file |
-| `DF` | Update all records and dump them to a file |
-| `VT` | Generate a file with voltages and adjustable transformer ratios (LFRESV format) |
-| `S` | Save operating point and Y matrix to MATLAB file |
-| `E` | Exit |
-
-The `VT` command produces the LFRESV file needed to initialize RAMSES.
+Helios then presents an interactive menu. `VT` is the command that writes the
+LFRESV file needed to initialize RAMSES; see
+[Interactive Menu Commands](/user-guide/power-flow/#interactive-menu-commands)
+for the full list.
 
 </TabItem>
 <TabItem label="GUI (Java)">
@@ -251,5 +238,5 @@ For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/s
 - [File Formats](/user-guide/file-formats/), Learn about data file syntax
 - [Network Modeling](/user-guide/network/), Define your power system network
 - [Power Flow (Helios)](/user-guide/power-flow/), Power flow data and control parameters
-- [Dynamic Models](/user-guide/dynamic-models/), Add generators, loads, and controllers
+- [Dynamic Data Records](/user-guide/dynamic-models/), Add generators, loads, and controllers
 - [PyRAMSES API](/pyramses/api-reference/), Full Python API documentation

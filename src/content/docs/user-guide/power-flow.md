@@ -312,6 +312,27 @@ LFRESV is the output that initializes RAMSES dynamic simulation.
 The exported operating-point file (the `VT` menu command, `write_voltrat()` in the API) contains one LFRESV record per bus plus one TRANSFO record per in-service LTC transformer, carrying its *solved* ratio. Hand-maintained operating-point files (e.g. `volt_rat_B.dat` of the Nordic test system) often use TRFO records instead. The two styles are interchangeable as RAMSES input: RAMSES ignores the LTC fields of a TRFO record (see the record-sharing table below), and dynamic tap-changer behaviour is defined by the DCTL LTC records of the dynamic data.
 :::
 
+## Interactive Menu Commands
+
+After loading data and solving, Helios presents these commands:
+
+| Command | Description |
+|---------|-------------|
+| `P` | Take new control parameters from file |
+| `D` | Display output values |
+| `1` | Display outputs on 1-line diagram (SVG) |
+| `M` | Modify system (change loads, generators, topology) |
+| `RI` | Reset system to initial configuration |
+| `CA` | Perform contingency analysis |
+| `CL` | Check operating limits (voltage bounds, branch overloads) |
+| `O` | Change output file |
+| `DF` | Update all records and dump them to a file |
+| `VT` | Generate a file with voltages and adjustable transformer ratios (LFRESV format) |
+| `S` | Save operating point and Y matrix to MATLAB file |
+| `E` | Exit |
+
+The `VT` command produces the LFRESV file needed to initialize RAMSES.
+
 ## Computation Control Parameters
 
 The power flow uses Newton-Raphson iterations to solve the power flow equations. Convergence is achieved when both the active and reactive power mismatches fall below specified thresholds, all transformer ratio and phase-shift controls are satisfied, and all generators and SVCs are within their reactive limits.
@@ -408,4 +429,4 @@ Two numerical points are worth knowing when comparing old results with new ones:
 ## Next Steps
 
 - [Reference Frames & Initialization](/user-guide/reference-frames/), Understand how RAMSES initializes from the power flow solution
-- [Dynamic Models](/user-guide/dynamic-models/), Define synchronous machines, injectors, and controllers
+- [Dynamic Data Records](/user-guide/dynamic-models/), Define synchronous machines, injectors, and controllers

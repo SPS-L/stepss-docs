@@ -1,11 +1,60 @@
 ---
-title: Dynamic Models
-description: Synchronous machines, injectors, two-ports, and discrete controllers
+title: Dynamic Data Records
+description: Record syntax for machines, injectors, two-ports, and discrete controllers
 ---
+
+This page is the reference for the **record syntax** of the dynamic data file: which
+records exist, what their fields mean, and how a model name is resolved. The models
+themselves (names, parameters, equations) are documented in the
+[Model Reference](/models/), one page per family.
+
+## Model Names and Prefixes
+
+Every device record names a model. RAMSES adds the family prefix automatically, so
+both forms resolve to the same model:
+
+| Record | Prefix added | Example, equivalent forms |
+|--------|--------------|---------------------------|
+| `EXC` | `exc_` | `AC1A`, `exc_AC1A` |
+| `TOR` | `tor_` | `HYGOV`, `tor_HYGOV` |
+| `INJEC` | `inj_` | `GFOL`, `inj_GFOL` |
+| `TWOP` | `twop_` | `HVDC_LCC`, `twop_HVDC_LCC` |
+| `DCTL` | none | `LTC` |
+
+Model names are **case sensitive**. A name that is compiled into RAMSES but not
+registered in the dispatcher is rejected at load time; see
+[User-Defined Models](/developer/user-models/) for how to register one through
+URAMSES. The [Model Reference index](/models/) marks which models are callable
+out of the box and which are not.
+
+## Common Injection Fields
+
+The `SYNC_MACH`, `INJEC` and `IMPLOAD` records all begin with the same four
+initialization fields, which set the device's share of the bus injection computed
+by the power flow:
+
+| Field | Description | Unit |
+|-------|-------------|------|
+| `FP` | Fraction of the bus active injection taken by this device | - |
+| `FQ` | Fraction of the bus reactive injection taken by this device | - |
+| `P` | Initial active power, used when `FP` is zero | MW |
+| `Q` | Initial reactive power, used when `FQ` is zero | Mvar |
+
+:::caution[Give the fraction or the power, never both]
+For each of the two pairs, exactly one member must be zero. RAMSES stops with
+`either the fraction or the active power picked up must be zero` if both `FP` and
+`P` are non-zero, and with the matching message for `FQ` and `Q`.
+:::
+
+`P` and `Q` are physical powers in MW and Mvar; RAMSES divides them by the system
+base to obtain per unit. See
+[Reference Frames & Initialization](/user-guide/reference-frames/) for how these
+values feed the initialization.
 
 ## Synchronous Machines
 
-A synchronous machine is specified with its excitation controller (EXC) and torque controller (TOR):
+A synchronous machine is specified with its excitation controller (`EXC`) and torque
+controller (`TOR`):
 
 ```
 SYNC_MACH Name BUS_NAME FP FQ P Q Snom Pnom H D ibratio
@@ -16,29 +65,15 @@ EXC EXC_TYPE parameters_passed_to_EXC
 TOR TOR_TYPE parameters_passed_to_TOR ;
 ```
 
-For the complete mathematical model, per unit system, and detailed parameter descriptions, see the [Synchronous Machine Model](/models/synchronous-machine/) page.
+For the complete mathematical model, the per unit system, and the parameter list,
+see the [Synchronous Machine Model](/models/synchronous-machine/) page.
 
-### Available Exciter Models
+The `parameters_passed_to_EXC` and `parameters_passed_to_TOR` fields are the model's
+data parameters, in the order the model declares them. That order is authoritative
+per model:
 
-RAMSES adds the `exc_` prefix to the model name automatically, so both `AC1A` and `exc_AC1A` are accepted.
-
-Uppercase short names (no prefix): `CONSTANT`, `1ST_ORDER`, `GENERIC1`, `GENERIC2`.
-
-Prefixed names (either form): `kundur` / `exc_kundur`, `ENTSOE_simp`, `ST1A`, `SEXS`, `SEXS_IEEEST`, `GENERIC3` / `exc_GENERIC3`, `GENERIC4` / `exc_GENERIC4`, `AC1A`, `AC4A`, `IEEET5`, `ST1A_IEEEST`, `ST1A_PSS4B`, `ST1A_PSS2B`, `EXPIC1_PSS2B`.
-
-All names above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). The additional IEEE variants listed on the [IEEE Exciter Models](/models/ieee-exciters/) page (`AC1A_MAXEX2`, `AC1A_RETRO*`, `AC8B`, `DC3A`, `EXPIC1`, `SEXS_STAB3_lim`, `ST1A_lim` and the rest) are compiled but registered under no name, so they require adding a case to the URAMSES router.
-
-For detailed documentation of each model, see the [Model Reference](/models/ieee-exciters/) section.
-
-### Available Torque Controller Models
-
-Uppercase short names (no prefix): `CONSTANT`, `1ST_ORDER`, `HYDRO_GENERIC1`, `THERMAL_GENERIC1`.
-
-Prefixed names (either form, `tor_` is added automatically): `ENTSOE_simp` / `tor_ENTSOE_simp`, `HYGOV` / `tor_HYGOV`, `GAST` / `tor_GAST`, `TGOV1` / `tor_TGOV1` (internally `tor_TGOV1D`), `DEGOV1` / `tor_DEGOV1`.
-
-All names above are built into every RAMSES distribution. Additional governors listed in the [Custom Governor Models](/models/custom-governors/) page (`tor_gasturbm`, `tor_govclasm`, `tor_govhydr`, `tor_govnuc`) are not callable out of the box and require extending RAMSES through URAMSES.
-
-For detailed documentation of each model, see the [Model Reference](/models/ieee-exciters/) section.
+- [IEEE Exciters](/models/ieee-exciters/) and [Custom Exciters](/models/custom-exciters/)
+- [IEEE Governors](/models/ieee-governors/) and [Custom Governors](/models/custom-governors/)
 
 ## Injectors
 
@@ -48,155 +83,77 @@ An injector is a component connected to a single AC bus:
 INJEC INJ_TYPE NAME BUS_NAME FP FQ P Q parameters_passed_to_INJ ;
 ```
 
-### Available Injector Models
+The trailing fields are the model's data parameters in declaration order. For the
+catalogue of injector models and their parameters, see
+[Injector Models](/models/custom-injectors/).
 
-Uppercase short names take no prefix; the prefixed names accept either `inj_` or no prefix (RAMSES adds it automatically).
+Two injectors are worth noting here because they affect the whole simulation rather
+than one bus:
 
-| Data-file name | Equivalent | Description |
-|----------------|-----------|-------------|
-| `LOAD` | | Generic exponential-recovery load |
-| `RESTLD` | | Restorative load |
-| `INDMACH1`, `INDMACH2` | | Single-cage / double-cage induction machines |
-| `SVC_GENERIC1` | | Generic SVC model |
-| `THEVEQ` | | Thévenin equivalent (infinite bus) |
-| `PQ` | `inj_PQ` | Constant PQ load |
-| `IBG` | `inj_IBG` | Generic inverter-based generator |
-| `WT3` | `inj_WT3` | Type 3 wind turbine |
-| `WT4` | `inj_WT4` | Type 4 wind turbine |
-| `BESS` | `inj_BESS` | Battery energy storage |
-| `GFOL` | `inj_GFOL` | Grid-following converter |
-| `GFOR` | `inj_GFOR` | Grid-forming converter |
-| `vfd_load` | `inj_vfd_load` | Variable-frequency-drive load |
-| `PMU` | `inj_PMU` | Phasor measurement unit, zero-injection frequency/voltage probe |
-| `VFAULT` | `inj_VFAULT` | Internal voltage-fault injector (auto-added by RAMSES) |
-
-All injectors listed in the table above are compiled into every RAMSES build and callable by name. `inj_INDM1` and `inj_PVG`, documented on the [Injector Models](/models/custom-injectors/) page, are compiled but registered under no name and require adding a case to the URAMSES router. `inj_norton` is excluded from the build entirely.
-
-## Thévenin Equivalent (Infinite Bus)
-
-```
-INJEC THEVEQ INJEC_NAME BUS_NAME FP FQ P Q MVA ;
-```
-
-A Thévenin equivalent imposes a constant-frequency voltage source and forces the synchronous reference frame.
-
-| Parameter | Description | Unit |
-|-----------|-------------|------|
-| `FP`, `FQ` | Fractions of bus injection (active, reactive) | |
-| `P`, `Q` | Initial powers (used if fractions are zero) | pu |
-| `MVA` | Apparent power base used for per-unit values of the Thévenin equivalent | MVA |
-
-The FP, FQ, P, Q fields are power participation fractions and initial power values used during initialization. See [Reference Frames & Initialization](/user-guide/reference-frames/) for detailed explanation.
+- **`THEVEQ`** imposes a constant-frequency voltage source and forces the
+  synchronous reference frame. Its single data parameter is the three-phase
+  short-circuit power of the equivalent network, in MVA, which RAMSES converts to
+  the Thévenin reactance at initialization. See
+  [Thévenin Equivalent](/models/custom-injectors/#theveq-inj_theveq-thévenin-equivalent).
+- **`VFAULT`** is added automatically by RAMSES to apply voltage faults; you do not
+  write it yourself.
 
 ## Impedance Loads
+
+`IMPLOAD` is a record in its own right, not an `INJEC` model, and takes no model
+parameters:
 
 ```
 IMPLOAD loadname BUS_NAME FP FQ P Q ;
 ```
 
-Constant-impedance loads maintain the power factor at the initial voltage.
+A constant-impedance load holds its admittance fixed at the value implied by the
+initial voltage, so its power varies with the square of the bus voltage. The record
+has exactly six fields; the `FP`/`FQ`/`P`/`Q` group behaves as described in
+[Common Injection Fields](#common-injection-fields).
 
-| Parameter | Description | Unit |
-|-----------|-------------|------|
-| `FP`, `FQ` | Fractions of bus injection (active, reactive) | |
-| `P`, `Q` | Initial powers (used if fractions are zero) | pu |
-
-The FP, FQ, P, Q fields are power participation fractions and initial power values used during initialization. See [Reference Frames & Initialization](/user-guide/reference-frames/) for detailed explanation.
+Any bus injection left unclaimed after all `INJEC` and `IMPLOAD` records are
+processed is converted into an impedance load automatically, named with an `M_`
+prefix. Only residuals whose current magnitude exceeds `$NETTOL` are converted, so
+a bus that balances exactly gains no extra load.
 
 ## Two-Port Components
 
-Two-port components connect two buses:
-
-### Available Two-Port Models
-
-RAMSES adds the `twop_` prefix to the model name automatically, so both `HVDC_LCC` and `twop_HVDC_LCC` are accepted.
-
-| Data-file name | Equivalent | Description |
-|----------------|-----------|-------------|
-| `HVDC_LCC` | `twop_HVDC_LCC` | Line-commutated converter HVDC |
-| `HVDC_VSC_SC` | `twop_HVDC_VSC_SC` | Self-commutating (grid-forming) VSC-HVDC |
-| `DCL_WCL` | `twop_DCL_WCL` | DC link with wind-converter link (offshore wind HVDC) |
-
-The three models above are built into every RAMSES distribution. `twop_HVDC_VSC`, documented on the [Two-Port Models](/models/two-port-models/) page, is compiled but registered under no name and requires adding a case to the URAMSES router.
-
-For detailed documentation of each model, see the [Model Reference](/models/ieee-exciters/) section.
-
-### Data Format
-
-User-defined two-port models use a `TWOP` record:
+Two-port components connect two buses, and carry an independent injection group for
+each end:
 
 ```
 TWOP MODEL_NAME TWOP_NAME BUS1 BUS2 IND FP1 FQ1 P1 Q1 FP2 FQ2 P2 Q2 DATA1 DATA2 ... ;
 ```
 
-For details on each field, see [User-Defined Models, TWOP Record](/developer/user-models/#twop-record-user-defined-two-ports).
+| Field | Description |
+|-------|-------------|
+| `MODEL_NAME` | Two-port model name, with or without the `twop_` prefix |
+| `TWOP_NAME` | Name of this device |
+| `BUS1`, `BUS2` | Names of the two connected buses |
+| `IND` | Connection indicator |
+| `FP1` … `Q1` | Injection group for end 1, as in [Common Injection Fields](#common-injection-fields) |
+| `FP2` … `Q2` | Injection group for end 2 |
+| `DATA1 DATA2 …` | Model data parameters, in declaration order |
+
+For the available models and their parameters, see
+[Two-Port Models](/models/two-port-models/).
 
 ## Discrete Controllers
+
+Discrete controllers act on the system at discrete instants rather than through
+differential equations:
 
 ```
 DCTL CTRL_TYPE CTLNAME parameters ;
 ```
 
-### Available Discrete Controller Models
-
-The following discrete-controller names are built into every RAMSES distribution (use them uppercase, with no `dctl_` prefix):
-
-| Model | Description |
-|-------|-------------|
-| `LTC`, `LTC2`, `LTCINV` | Load tap changer controllers |
-| `OLTC2` | On-load tap changer |
-| `UVLS` | Under-voltage load shedding |
-| `UVPROT` | Under-voltage protection |
-| `PST` | Phase-shifting transformer controller |
-| `RT` | Real-time synchronizer |
-| `MAIS` | Automatic shunt-reactor switching scheme |
-| `FRT` | Fault ride-through |
-| `SIM_MINMAXVOLT` | Voltage stopping criteria |
-| `SIM_MINMAXSPEED` | Speed stopping criteria |
-| `VOLT_VAR` | Voltage variability monitor |
-| `line_prot` | Line overcurrent protection (`dctl_line_prot` also accepted) |
-
-### Load Tap Changer (LTC)
-
-```
-DCTL LTC CTLNAME TRFONAME BUS_NAME DIR NMIN NMAX NBPOS TOL DELAY1 DELAY2 ;
-```
-
-| Field | Description |
-|-------|-------------|
-| `CTLNAME` | Name of the controller |
-| `TRFONAME` | Name of the controlled transformer |
-| `BUS_NAME` | Name of the controlled bus |
-| `DIR` | Direction of tap change |
-| `NMIN` | Minimum tap ratio (% of nominal, e.g. `85.`) |
-| `NMAX` | Maximum tap ratio (% of nominal, e.g. `115.`) |
-| `NBPOS` | Number of tap positions |
-| `TOL` | Voltage tolerance |
-| `DELAY1` | First delay (initial action) |
-| `DELAY2` | Subsequent delay (between steps) |
-
-### Real-Time Synchronizer
-
-```
-DCTL RT CTLNAME ratio_to_rt ;
-```
-
-Setting `ratio_to_rt = 1.0` synchronizes the simulation with real-time: the simulation is slowed down when it runs faster than real-time, but nothing is done when it is slower. Setting it to `2.0` means twice faster than real-time (if possible).
-
-### Stopping Criteria
-
-**Voltage-based**:
-```
-DCTL SIM_MINMAXVOLT CTRL_Name VMAX(pu) VMIN(pu) DEADTIME(s) Stop_Simulation(T/F) ;
-```
-
-**Speed-based**:
-```
-DCTL SIM_MINMAXSPEED CTRL_Name MAX_SPEED(pu) MIN_SPEED(pu) DEADTIME(s) Stop_Simulation(T/F) ;
-```
+`DCTL` takes no prefix and the names are uppercase. For the catalogue, the field
+lists, and the switching logic of each controller, see
+[Discrete Controller Models](/models/discrete-controllers/).
 
 ## Next Steps
 
+- [Model Reference](/models/), Browse the model catalogue
 - [Disturbances](/user-guide/disturbances/), Define faults, trips, and parameter changes
 - [Solver Settings](/user-guide/solver-settings/), Configure the numerical solver
-- [Model Reference](/models/ieee-exciters/), Browse available exciter, governor, and injector models

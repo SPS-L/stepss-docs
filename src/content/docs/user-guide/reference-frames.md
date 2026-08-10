@@ -147,5 +147,5 @@ Here, `M_3` and `M_4` are negligible (rounding artifacts), while `M_2` suggests 
 
 ## Next Steps
 
-- [Dynamic Models](/user-guide/dynamic-models/), Define SYNC_MACH, INJEC, and TWOP records
+- [Dynamic Data Records](/user-guide/dynamic-models/), Define SYNC_MACH, INJEC, and TWOP records
 - [Disturbances](/user-guide/disturbances/), Define simulation events

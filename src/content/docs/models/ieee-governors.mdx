@@ -19,19 +19,19 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
 
 RAMSES adds the `tor_` prefix to the model name automatically, so both `DEGOV1` and `tor_DEGOV1` resolve to the same model. The IEEE governor names are:
 
-| Data-file name | With explicit prefix | Implemented by |
-|----------------|----------------------|----------------|
-| `DEGOV1` | `tor_DEGOV1` | `tor_DEGOV1` |
-| `ENTSOE_simp` | `tor_ENTSOE_simp` | `tor_ENTSOE_simp` |
-| `GAST` | `tor_GAST` | `tor_GAST` |
-| `TGOV1` | `tor_TGOV1` | `tor_TGOV1D` |
-| `HYGOV` | `tor_HYGOV` | `tor_hygov` |
+| Data-file name | With explicit prefix | Implemented by | Available since |
+|----------------|----------------------|----------------|-----------------|
+| `DEGOV1` | `tor_DEGOV1` | `tor_DEGOV1` | 3.40 |
+| `ENTSOE_simp` | `tor_ENTSOE_simp` | `tor_ENTSOE_simp` | 3.40 |
+| `GAST` | `tor_GAST` | `tor_GAST` | 3.50 |
+| `TGOV1` | `tor_TGOV1` | `tor_TGOV1D` | 3.50 |
+| `HYGOV` | `tor_HYGOV` | `tor_hygov` | 3.50 |
 
 Only the first two columns are valid in a data file. The third column is the name of the Fortran subroutine, which you need only when registering the model in URAMSES.
 :::
 
-:::caution[Requires RAMSES 3.50 or later]
-These five models were introduced after the 3.40 release. Earlier distributions ship only `CONSTANT`, `1ST_ORDER`, `HYDRO_GENERIC1` and `THERMAL_GENERIC1` (see [Custom Governor Models](/models/custom-governors/)), and reject any of the names above with:
+:::caution[`GAST`, `TGOV1` and `HYGOV` require RAMSES 3.50 or later]
+Those three were added after the 3.40 release; `DEGOV1` and `ENTSOE_simp` were already registered in 3.40. A distribution that does not have them rejects the name with:
 
 ```
 STOP CALL FROM tor_TGOV1:

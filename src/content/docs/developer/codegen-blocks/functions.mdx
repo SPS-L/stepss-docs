@@ -1,0 +1,174 @@
+---
+title: Functions Reference
+description: Helper functions available inside every CODEGEN model
+---
+
+These helper functions live in `FUNCTIONS_IN_MODELS.f90` and are available inside
+any CODEGEN model without being declared.
+
+---
+
+The following functions can be used in any mathematical expression within CODEGEN model definitions.
+
+## `equal`
+**Signature:** `double precision function equal(var1, var2)`
+
+**Arguments:** `double precision :: var1, var2`
+
+**Description:** Returns `1.0` if `var1` differs from `var2` by less than $10^{-6}$, and `0.0` otherwise.
+
+**Notes:** General-purpose; available in all model types.
+
+---
+
+## `equalstr`
+**Signature:** `double precision function equalstr(var1, var2)`
+
+**Arguments:** `character :: var1, var2`
+
+**Description:** Returns `1.0` if the non-blank portions of `var1` and `var2` are identical strings, and `0.0` otherwise.
+
+**Notes:** General-purpose; available in all model types.
+
+---
+
+## `ppower`
+**Signature:** `double precision ppower([vx], [vy], [ix], [iy])`
+
+**Description:** Returns the active power injected into the network.
+
+**Model type:** `inj` only.
+
+**Computation:**
+
+$$P = v_x \, i_x + v_y \, i_y$$
+
+---
+
+## `qpower`
+**Signature:** `double precision qpower([vx], [vy], [ix], [iy])`
+
+**Description:** Returns the reactive power injected into the network.
+
+**Model type:** `inj` only.
+
+**Computation:**
+
+$$Q = v_y \, i_x - v_x \, i_y$$
+
+---
+
+## `vrectif`
+**Signature:** `double precision function vrectif([if], [vin], {kc})`
+
+**Arguments:** `double precision :: kc`
+
+**Description:** Models the voltage drop in a rectifier. Returns the output voltage $vrectif$ as a function of output current $if$ and input voltage $vin$. Used in IEEE standard excitation models with $vrectif = f_{ex} \, E_{FD}$.
+
+**Model type:** `exc` only.
+
+**Computation:**
+
+```
+in = kc * if / max(vin, 1e-3)
+
+if in <= 0:
+  vrectif = vin
+else if in <= 0.433:
+  vrectif = vin - 0.577 * kc * if
+else if in <= 0.75:
+  vrectif = sqrt(0.75 * vin^2 - (kc * if)^2)
+else if in <= 1.00:
+  vrectif = 1.732 * (vin - kc * if)
+else:
+  vrectif = 0
+```
+
+---
+
+## `vinrectif`
+**Signature:** `double precision function vinrectif([if], [vrectif], {kc})`
+
+**Arguments:** `double precision :: kc`
+
+**Description:** Inverse of `vrectif`. Given the field current $if$ and rectifier output voltage $vrectif$, returns the rectifier input voltage $vinrectif$. Intended for use at initialization. The computation is iterative because the operating segment of the piecewise characteristic is not known a priori. Does not work when $vrectif = 0$ (indeterminate input).
+
+**Model type:** `exc` only.
+
+**Computation:**
+
+```
+nbtries = 1
+vinest = vrectif + 0.577 * kc * if
+
+loop:
+  in = kc * if / max(vinest, 1e-3)
+
+  if in <= 0:
+    vinrectif = vrectif
+  else if in <= 0.433:
+    vinrectif = vrectif + 0.577 * kc * if
+  else if in <= 0.75:
+    vinrectif = sqrt(vrectif^2 + (kc * if)^2) / 0.75
+  else:
+    vinrectif = (vrectif / 1.732) + kc * if
+
+  if vinrectif == vinest or nbtries > 5:
+    exit loop
+  nbtries = nbtries + 1
+  vinest = vinrectif
+```
+
+---
+
+## `vcomp`
+**Signature:** `double precision function vcomp([v], [p], [q], {Kv}, {Rc}, {Xc})`
+
+**Arguments:** `double precision :: Kv, Rc, Xc`
+
+**Description:** Returns the magnitude of a combination of terminal voltage and current of a synchronous machine. Appears in IEEE standard excitation models.
+
+**Model type:** `exc` only.
+
+**Computation:**
+
+$$
+\begin{aligned}
+V_{comp} &= \left| K_v \bar{V} + (R_c + j X_c) \bar{I} \right| \\
+&= \left| K_v V + (R_c + j X_c)\!\left(\frac{P}{V} - j\frac{Q}{V}\right) \right| \\
+&= \frac{1}{V} \sqrt{\left(K_v V^2 + R_c P + X_c Q\right)^2 + \left(X_c P - R_c Q\right)^2}
+\end{aligned}
+$$
+
+---
+
+## `satur`
+**Signature:** `double precision function satur([ve], {ve1}, {se1}, {ve2}, {se2})`
+
+**Arguments:** `double precision :: ve1, se1, ve2, se2`
+
+**Description:** Returns the increment of field current needed to obtain a given output voltage, accounting for magnetic saturation. Appears in IEEE excitation system models.
+
+**Model type:** `exc` only.
+
+**Computation:**
+
+$$satur = m \, ve^n$$
+
+where:
+
+$$
+\begin{aligned}
+n &= \frac{\log_{10}(se1/se2)}{\log_{10}(ve1/ve2)} \\[4pt]
+m &= \frac{se1}{ve1^n}
+\end{aligned}
+$$
+
+**Exception.** Returns $satur = 0$ if any of the following conditions holds:
+
+$$ve \le 0 \quad \text{or} \quad ve1 \le 0 \quad \text{or} \quad ve2 \le 0 \quad \text{or} \quad ve1 = ve2 \quad \text{or} \quad se1 = 0 \quad \text{or} \quad se2 = 0$$
+
+## See Also
+
+- [Block Index](/developer/codegen-blocks/), all CODEGEN blocks by category
+- [URAMSES](/developer/uramses/), building models against the RAMSES source

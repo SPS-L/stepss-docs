@@ -260,4 +260,4 @@ $FULL_UPDATE F ;
 ## Next Steps
 
 - [PyRAMSES API](/pyramses/api-reference/), Run simulations programmatically from Python
-- [Test Systems](/test-systems/nordic/), Try the Nordic or 5-bus benchmark systems
+- [Test Systems](/test-systems/), Try one of the benchmark systems

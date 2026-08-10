@@ -1,0 +1,115 @@
+---
+title: CODEGEN Blocks
+description: Index of every modeling block available in the CODEGEN DSL, by category
+---
+
+CODEGEN provides a library of reusable modeling blocks for constructing user-defined dynamic models. Each block is specified by a keyword (prefixed with `&`), followed by input/output state names and parameters. Parameters can be literal values, named data enclosed in braces `{T}`, or arithmetic expressions.
+
+:::note[Syntax Conventions]
+- Block keywords are prefixed with `&` (e.g., `& tf1p`)
+- State names (inputs/outputs) are plain identifiers: do **not** enclose them in brackets
+- Parameters (data values) are enclosed in braces: `{T}`, `{Kp}`, `{1/{omegac}}`
+- Square brackets `[v]`, `[p]`, `[q]`, `[if]`, `[vf]` denote **system variables** provided by the simulator (bus voltage, active power, reactive power, field current, field voltage)
+
+For example, a time constant can be specified as: `2.` (a literal value), `{'{'}T{'}'}` (a data name), or `1/{'{'}omegac{'}'}` (a mathematical expression involving data).
+:::
+
+---
+
+## [Algebraic & Mathematical](/developer/codegen-blocks/algebraic/)
+
+Output computed directly from the inputs, with no internal dynamics.
+
+| Block | Description |
+|-------|-------------|
+| [`abs`](/developer/codegen-blocks/algebraic/#abs) | Absolute value of input |
+| [`algeq`](/developer/codegen-blocks/algebraic/#algeq) | Algebraic equation |
+| [`max1v1c`](/developer/codegen-blocks/algebraic/#max1v1c) | Maximum of a state and a constant |
+| [`max2v`](/developer/codegen-blocks/algebraic/#max2v) | Maximum of two states |
+| [`min1v1c`](/developer/codegen-blocks/algebraic/#min1v1c) | Minimum of a state and a constant |
+| [`min2v`](/developer/codegen-blocks/algebraic/#min2v) | Minimum of two states |
+| [`nint`](/developer/codegen-blocks/algebraic/#nint) | Nearest integer |
+| [`pwlin`](/developer/codegen-blocks/algebraic/#pwlin) | Piecewise linear function |
+
+## [Transfer Functions](/developer/codegen-blocks/transfer-functions/)
+
+Linear transfer functions, several with non-windup output or rate limits.
+
+| Block | Description |
+|-------|-------------|
+| [`tf1p`](/developer/codegen-blocks/transfer-functions/#tf1p) | First-order: $G/(1 + sT)$ |
+| [`tf1plim`](/developer/codegen-blocks/transfer-functions/#tf1plim) | First-order with non-windup output limits |
+| [`tf1pvlim`](/developer/codegen-blocks/transfer-functions/#tf1pvlim) | First-order with variable non-windup limits |
+| [`tf1p2lim`](/developer/codegen-blocks/transfer-functions/#tf1p2lim) | First-order with rate limits and output limits |
+| [`tf1p2limr`](/developer/codegen-blocks/transfer-functions/#tf1p2limr) | As `tf1p2lim`, with integrator reset driven by `CHGPRM` |
+| [`tf1p1z`](/developer/codegen-blocks/transfer-functions/#tf1p1z) | One zero, one pole: $G(1 + sT_z)/(1 + sT_p)$ |
+| [`tf2p2z`](/developer/codegen-blocks/transfer-functions/#tf2p2z) | Two zeros, two poles |
+| [`tfder1p`](/developer/codegen-blocks/transfer-functions/#tfder1p) | Derivative (washout): $sT/(1 + sT)$ |
+
+## [Integrators](/developer/codegen-blocks/integrators/)
+
+| Block | Description |
+|-------|-------------|
+| [`int`](/developer/codegen-blocks/integrators/#int) | Integrator with time constant |
+| [`inlim`](/developer/codegen-blocks/integrators/#inlim) | Integrator with non-windup limits |
+| [`invlim`](/developer/codegen-blocks/integrators/#invlim) | Integrator with variable non-windup limits |
+
+## [Controllers](/developer/codegen-blocks/controllers/)
+
+| Block | Description |
+|-------|-------------|
+| [`pictl`](/developer/codegen-blocks/controllers/#pictl) | Proportional-Integral controller |
+| [`pictllim`](/developer/codegen-blocks/controllers/#pictllim) | PI with non-windup limit on integral |
+| [`pictl2lim`](/developer/codegen-blocks/controllers/#pictl2lim) | PI with limits on integral and total output |
+| [`pictlieee`](/developer/codegen-blocks/controllers/#pictlieee) | PI with non-windup limit (IEEE formulation) |
+
+## [Limiters & Switching](/developer/codegen-blocks/limiters/)
+
+Blocks that bound a signal or select between signals. Several carry discrete state.
+
+| Block | Description |
+|-------|-------------|
+| [`lim`](/developer/codegen-blocks/limiters/#lim) | Limiter with constant bounds |
+| [`limvb`](/developer/codegen-blocks/limiters/#limvb) | Limiter with variable bounds |
+| [`db`](/developer/codegen-blocks/limiters/#db) | Deadband |
+| [`hyst`](/developer/codegen-blocks/limiters/#hyst) | Hysteresis |
+| [`switch`](/developer/codegen-blocks/limiters/#switch) | Select one of $n$ inputs |
+| [`swsign`](/developer/codegen-blocks/limiters/#swsign) | Switch based on sign of input |
+
+## [Frequency Estimation](/developer/codegen-blocks/frequency/)
+
+| Block | Description |
+|-------|-------------|
+| [`f_inj`](/developer/codegen-blocks/frequency/#f_inj) | Frequency at bus of injector |
+| [`f_twop_bus1`](/developer/codegen-blocks/frequency/#f_twop_bus1) | Frequency at first bus of two-port |
+| [`f_twop_bus2`](/developer/codegen-blocks/frequency/#f_twop_bus2) | Frequency at second bus of two-port |
+
+## [Automata & Timers](/developer/codegen-blocks/automata/)
+
+| Block | Description |
+|-------|-------------|
+| [`fsa`](/developer/codegen-blocks/automata/#fsa) | Finite State Automaton |
+| [`tsa`](/developer/codegen-blocks/automata/#tsa) | Two-state automaton |
+| [`timer`](/developer/codegen-blocks/automata/#timer) | Timer with piecewise-linear delay |
+| [`timersc`](/developer/codegen-blocks/automata/#timersc) | Timer with staircase delay |
+
+## [Functions Reference](/developer/codegen-blocks/functions/)
+
+Helper functions available inside any model, without declaration.
+
+| Function | Model types | Description |
+|----------|-------------|-------------|
+| [`equal`](/developer/codegen-blocks/functions/#equal) | all | `1.0` if two reals differ by less than $10^{-6}$ |
+| [`equalstr`](/developer/codegen-blocks/functions/#equalstr) | all | `1.0` if two strings match |
+| [`ppower`](/developer/codegen-blocks/functions/#ppower) | `inj` | Active power injected into the network |
+| [`qpower`](/developer/codegen-blocks/functions/#qpower) | `inj` | Reactive power injected into the network |
+| [`vrectif`](/developer/codegen-blocks/functions/#vrectif) | `exc` | Rectifier voltage drop |
+| [`vinrectif`](/developer/codegen-blocks/functions/#vinrectif) | `exc` | Inverse of `vrectif` |
+| [`vcomp`](/developer/codegen-blocks/functions/#vcomp) | `exc` | Load-compensated voltage magnitude |
+| [`satur`](/developer/codegen-blocks/functions/#satur) | `exc` | Exciter saturation characteristic |
+
+## Next Steps
+
+- [CODEGEN Model Examples](/developer/codegen-examples/), complete models built from these blocks
+- [CODEGEN Studio](/developer/cg-studio/), build models visually instead of by hand
+- [User-Defined Models](/developer/user-models/), the DSL file format and the build process

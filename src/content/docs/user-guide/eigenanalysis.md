@@ -116,3 +116,10 @@ After computing eigenvalues, the tool provides an interactive menu to:
 ## Repository
 
 Source code: [SPS-L/stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis)
+
+## See Also
+
+- [`getJac()`](/pyramses/api-reference/#getjac), get the Jacobian directly in Python as SciPy sparse matrices, without going through the `.dat` files
+- [Eigenanalysis Workflow](/pyramses/examples/#eigenanalysis-workflow), the complete export-and-analyse script
+- [Export Jacobian Matrix](/user-guide/disturbances/#export-jacobian-matrix), the `JAC` disturbance and which files each scheme writes
+- [Kundur Two-Area System](/test-systems/kundur/), a benchmark built for inter-area mode analysis

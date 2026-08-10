@@ -5,7 +5,7 @@ description: Visual block diagram editor for building CODEGEN DSL models, creati
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-CODEGEN Studio is a browser-based visual editor for assembling [User-Defined Models](/developer/user-models/) using the [CODEGEN block library](/developer/codegen-library/). Instead of writing DSL files by hand, you drag blocks onto a canvas, connect them, fill in metadata, and export a valid `.txt` file ready for the `codegen` binary.
+CODEGEN Studio is a browser-based visual editor for assembling [User-Defined Models](/developer/user-models/) using the [CODEGEN block library](/developer/codegen-blocks/). Instead of writing DSL files by hand, you drag blocks onto a canvas, connect them, fill in metadata, and export a valid `.txt` file ready for the `codegen` binary.
 
 ## Installation
 
@@ -71,7 +71,7 @@ Use the **Type** dropdown in the topbar to select the model category:
 | **INJ** | Current injector | `ix`, `iy` | Orange |
 | **TWOP** | Two-port device | `ix1`, `iy1`, `ix2`, `iy2` | Purple |
 
-The UI accent colour changes to reflect the active model type. Type the model name (max 32 characters) in the **Name** field next to the dropdown.
+The UI accent colour changes to reflect the active model type. Type the model name (max 20 characters, the limit CODEGEN itself enforces) in the **Name** field next to the dropdown.
 
 :::note[Model type determines available inputs]
 Each model type exposes a different set of RAMSES input variables in the palette's **I/O (`modelType`)** category:
@@ -88,7 +88,7 @@ The `exc` type also reserves `if` as a RAMSES name (usable in DSL expressions su
 
 ### 2. Add Blocks to the Canvas
 
-The left palette lists all available blocks from the [CODEGEN Blocks Library](/developer/codegen-library/), organised by category (Transfer Functions, Limiters, Controllers, etc.).
+The left palette lists all available blocks from the [CODEGEN Blocks](/developer/codegen-blocks/) reference, organised by category (Transfer Functions, Limiters, Controllers, etc.).
 
 1. **Search** by typing in the search box at the top of the palette
 2. **Expand** a category by clicking its header
@@ -385,5 +385,5 @@ Switch to the **%observables** tab and add `vf`.
 ## See Also
 
 - [User-Defined Models](/developer/user-models/), DSL file format and model framework
-- [CODEGEN Blocks Library](/developer/codegen-library/), complete block reference
+- [CODEGEN Blocks](/developer/codegen-blocks/), complete block reference
 - [CODEGEN Model Examples](/developer/codegen-examples/), annotated model files for all four types

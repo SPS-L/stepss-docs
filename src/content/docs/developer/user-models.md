@@ -172,7 +172,7 @@ The header consists of exactly two lines:
 ```
 
 - **Line 1**: model type, must be `exc`, `tor`, `inj`, or `twop`
-- **Line 2**: model name. a string of at most **16 characters**
+- **Line 2**: model name. a string of at most **20 characters** (`mxcharname` in CODEGEN)
 
 The output file will be named `{type}_{name}.f90`. For example, type `exc` and name `simple_avr` produces `exc_simple_avr.f90`. This combined name is also used in the simulation data files to reference the model.
 
@@ -290,7 +290,7 @@ Each block is identified by:
 
 Brackets must **not** be used when specifying the input and/or output states of a block, since CODEGEN expects to find a state name, there is no ambiguity. If brackets are used, they will be treated as part of the state name, likely causing a compilation error.
 
-After the block name, list the states (inputs/outputs of the block) followed by the data, parameters, or expressions required by the block, in the order specified by the block's definition (see [CODEGEN Blocks Library](/developer/codegen-library/)).
+After the block name, list the states (inputs/outputs of the block) followed by the data, parameters, or expressions required by the block, in the order specified by the block's definition (see [CODEGEN Blocks](/developer/codegen-blocks/)).
 
 The model section ends at the end of the file.
 
@@ -440,10 +440,10 @@ After writing a model file, CODEGEN translates it into Fortran 2003 code. The wo
 
 For compilation details, see [URAMSES](/developer/uramses/).
 
-See the [CODEGEN Blocks Library](/developer/codegen-library/) for the available modelling blocks.
+See the [CODEGEN Blocks](/developer/codegen-blocks/) reference for the available modelling blocks.
 
 ## Next Steps
 
-- [CODEGEN Blocks Library](/developer/codegen-library/), Reference for all modeling blocks
+- [CODEGEN Blocks](/developer/codegen-blocks/), Reference for all modeling blocks
 - [CODEGEN Model Examples](/developer/codegen-examples/), Complete model files for each type
 - [URAMSES](/developer/uramses/), Compile and link custom models with RAMSES

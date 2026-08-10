@@ -54,4 +54,5 @@ The test system files are available in the [stepss-5-bus-test-system repository]
 
 ## See Also
 
+- [Test Systems](/test-systems/), the other benchmark networks
 - [PyRAMSES Examples](/pyramses/examples/#5-bus-system-exciter-parameter-change), Complete Python simulation workflow with this test system

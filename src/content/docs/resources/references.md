@@ -1,5 +1,5 @@
 ---
-title: References
+title: Publications
 description: Academic publications and suggested reading
 ---
 

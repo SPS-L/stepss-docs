@@ -38,3 +38,9 @@ The test system files are available in the [stepss-Kundur-Two-Area-System reposi
 If you use this test system in your research, please cite the original source of the system data:
 
 > P. Kundur, *Power System Stability and Control*, McGraw-Hill, 1994 (two-area system, Example 12.6).
+
+## See Also
+
+- [Test Systems](/test-systems/), the other benchmark networks
+- [Eigenanalysis](/user-guide/eigenanalysis/), analyse the inter-area mode this system is built to show
+- [Custom Exciters](/models/custom-exciters/), the `exc_kundur` AVR/PSS used here

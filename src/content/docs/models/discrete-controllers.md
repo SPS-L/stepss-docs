@@ -3,8 +3,6 @@ title: Discrete Controller Models
 description: Protection, tap changer, and discrete control models in RAMSES
 ---
 
-import { Tabs, TabItem } from '@astrojs/starlight/components';
-
 Discrete controllers (DCTL) in RAMSES implement **event-driven logic** rather than continuous differential equations. They fire at specific simulation events (voltage crossing a threshold, a timer expiring, a tap position changing) and execute discrete actions such as tripping a generator, shedding load, or adjusting a transformer tap. They run inside RAMSES' event-driven loop and can call `disp_disc` to log switching actions.
 
 The RAMSES data keyword is `DCTL`:
@@ -38,7 +36,7 @@ All of the above are built into every RAMSES distribution (standalone executable
 The [TRFO record](/user-guide/network/#data-format-combined-model-trfo) combines the transformer model with load tap changer data (tap range, positions, controlled bus, voltage setpoint), but this data is used **only by the power flow** for ratio adjustment. To control a transformer's ratio during dynamic simulation with RAMSES, a DCTL LTC controller (below) must be associated with the transformer, whether it was defined with TRANSFO or TRFO.
 :::
 
-### `LTC` (`dctl_ltc`): Load Tap Changer (Standard)
+### LTC (`dctl_ltc`): Load Tap Changer (Standard)
 
 #### Description
 
@@ -98,7 +96,7 @@ DCTL  LTC  LTC_TR1  TR1-HV-MV  BUS_MV  1  85.  115.  33  0.01  30.0  10.0 ;
 
 ---
 
-### `LTC2` (`dctl_ltc2`): Load Tap Changer (Variant 2)
+### LTC2 (`dctl_ltc2`): Load Tap Changer (Variant 2)
 
 #### Description
 
@@ -135,7 +133,7 @@ DCTL  LTC2  LTC2_TR1  TR1-HV-MV  BUS_MV  -1  88.  120.  33  0.01  1.0  30  8 ;
 
 ---
 
-### `LTCINV` (`dctl_ltcinv`): Inverse-Time Load Tap Changer
+### LTCINV (`dctl_ltcinv`): Inverse-Time Load Tap Changer
 
 #### Description
 
@@ -184,7 +182,7 @@ DCTL  LTCINV  LTCINV_TR1  TR1-HV-MV  BUS_MV  1  85.  115.  33  0.01  1.025  60.0
 
 ---
 
-### `OLTC2` (`dctl_oltc2`): On-Load Tap Changer Type 2
+### OLTC2 (`dctl_oltc2`): On-Load Tap Changer Type 2
 
 #### Description
 
@@ -235,7 +233,7 @@ DCTL  OLTC2  OLTC_TR2  FROM_BUS  TO_BUS  1  1  0.88  1.12  25  0.0075
 
 ## Protection
 
-### `UVPROT` (`dctl_uvprot`): Under-Voltage Protection Relay
+### UVPROT (`dctl_uvprot`): Under-Voltage Protection Relay
 
 #### Description
 
@@ -273,7 +271,7 @@ DCTL  UVPROT  UV_GEN1  BUS_HV  GEN1  0.85  0.5 ;
 
 ---
 
-### `UVLS` (`dctl_uvls`): Under-Voltage Load Shedding
+### UVLS (`dctl_uvls`): Under-Voltage Load Shedding
 
 #### Description
 
@@ -374,7 +372,7 @@ DCTL  FRT  FRT_WTG1  WT1  0.90  0.15  0.70  0.5  0.20  1.0  0.05 ;
 
 ---
 
-### `dctl_injprot`: Injector Protection
+### dctl_injprot: Injector Protection (not registered)
 
 :::caution
 `dctl_injprot` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
@@ -420,7 +418,7 @@ DCTL  injprot  PROT_WTG1  WT1  I  0.0  1.2  0.1 ;   ! Not callable in a standard
 
 ---
 
-### `dctl_losprot`: Loss-of-Synchronism Protection
+### dctl_losprot: Loss-of-Synchronism Protection (not registered)
 
 :::caution
 `dctl_losprot` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
@@ -459,7 +457,7 @@ DCTL  losprot  LOS_GEN2  GEN2  1.05  0.2 ;   ! Not callable in a standard RAMSES
 
 ---
 
-### `line_prot` (`DCTL_line_prot`): Line Overcurrent Protection
+### line_prot (`dctl_line_prot`): Line Overcurrent Protection
 
 The data-file model name is `line_prot` (or `dctl_line_prot`). RAMSES adds the `dctl_` prefix automatically.
 
@@ -633,7 +631,7 @@ DCTL  hvdc_lim  HVDCLIM1  HVDClink     ! Not callable in a standard RAMSES distr
 
 ## Monitoring
 
-### `SIM_MINMAXSPEED` (`dctl_sim_minmaxspeed`): Speed Monitoring (Min/Max)
+### SIM_MINMAXSPEED (`dctl_sim_minmaxspeed`): Speed Monitoring (Min/Max)
 
 #### Description
 
@@ -671,7 +669,7 @@ DCTL  SIM_MINMAXSPEED  SPEEDMON  1.2  0.5  0.5  1 ;
 
 ---
 
-### `SIM_MINMAXVOLT` (`dctl_sim_minmaxvolt`): Voltage Monitoring (Min/Max)
+### SIM_MINMAXVOLT (`dctl_sim_minmaxvolt`): Voltage Monitoring (Min/Max)
 
 #### Description
 
@@ -707,7 +705,7 @@ DCTL  SIM_MINMAXVOLT  VOLTMON  1.15  0.80  1.0  0 ;
 
 ---
 
-### `VOLT_VAR` (`dctl_voltage_variability`): Voltage Variability Monitor
+### VOLT_VAR (`dctl_voltage_variability`): Voltage Variability Monitor
 
 The data-file model name is `VOLT_VAR`.
 

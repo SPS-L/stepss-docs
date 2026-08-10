@@ -182,27 +182,31 @@ A, E = ram.getJac()
 ram.endSim()
 ```
 
-**For the MATLAB [RAMSES Eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) tool**, use the `JAC` disturbance instead, which writes the four files the tool expects (`<name>_val.dat`, `<name>_eqs.dat`, `<name>_var.dat`, `<name>_struc.dat`):
+**For the MATLAB [RAMSES Eigenanalysis](/user-guide/eigenanalysis/) tool**, use the `JAC` disturbance instead:
 
 ```python
 ram.execSim(case, 0.0)
-ram.addDisturb(0.001, "JAC 'jac'")   # writes jac_val.dat, jac_eqs.dat, jac_var.dat, jac_struc.dat
+ram.addDisturb(0.001, "JAC 'jac'")   # writes jac_val.dat, jac_eqs.dat, jac_var.dat
 ram.contSim(0.001)
 ram.endSim()
 ```
 
+Under the integrated scheme (`$SCHEME IN`) this writes three files, and `jac_struc.dat` is not among them, so pass an empty string for that argument:
+
 ```matlab
 % In MATLAB:
-ssa('jac_val.dat', 'jac_eqs.dat', 'jac_var.dat', 'jac_struc.dat', [], [], [])
+ssa('jac_val.dat', 'jac_eqs.dat', 'jac_var.dat', '', [], [], [])
 ```
 
+The decomposed scheme (`$SCHEME DE`) writes `jac_struc.dat` as well; pass its name instead of `''` when you export from a decomposed run.
+
 :::note
-Set `$OMEGA_REF SYN ;` in the solver settings file when exporting Jacobians for eigenanalysis.
+Set `$OMEGA_REF SYN ;` in the solver settings file when exporting Jacobians for eigenanalysis. Under the COI reference frame the export is skipped with a warning.
 :::
 
 ## Test System Examples
 
-The following examples use the ready-to-run test systems. For system descriptions, data files, and disturbance scenarios, see the [Test Systems](/test-systems/nordic/) section.
+The following examples use the ready-to-run test systems. For system descriptions, data files, and disturbance scenarios, see the [Test Systems](/test-systems/) section.
 
 ### Nordic Test System: Generator Trip
 

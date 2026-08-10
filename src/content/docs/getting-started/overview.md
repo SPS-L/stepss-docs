@@ -42,6 +42,10 @@ Helios can optionally adjust transformer ratios to:
 - Bring voltage magnitudes inside specified deadbands (in-phase transformers)
 - Bring active power flows inside specified deadbands (phase-shifting transformers)
 
+Helios succeeds **PFC**, the Fortran power-flow calculator used in earlier
+releases. PFC is no longer shipped; see
+[Historical Note](/user-guide/power-flow/#historical-note-pfc) for what changed.
+
 Helios produces an output file including:
 - The voltage magnitudes and phase angles at all buses of the network
 - The adjustable transformer data with updated values of their ratios
@@ -88,7 +92,7 @@ A fast-to-compute metric is used to classify injectors, which seamlessly switch 
 ### Key References
 
 - D. Fabozzi, A. Chieh, B. Haut, and T. Van Cutsem, "Accelerated and localized Newton schemes for faster dynamic simulation of large power systems," *IEEE Trans. On Power Systems*, Vol. 28, No. 4, pp. 4936-4947, Dec. 2013. Doi: [10.1109/TPWRS.2013.2251915](https://doi.org/10.1109/TPWRS.2013.2251915)
-- P. Aristidou, D. Fabozzi, and T. Van Cutsem, "Dynamic simulation of large-scale power systems using a parallel Schur-complement-based decomposition method," *IEEE Trans. On Parallel and Distributed Systems*, Vol. 25, No. 10, pp. 2561-2570, Sept. 2014. Doi: [10.1109/TPDS.2013.252](https://doi.org/10.1109/TPDS.2013.252)
+- P. Aristidou, D. Fabozzi, and T. Van Cutsem, "Dynamic simulation of large-scale power systems using a parallel Schur-complement-based decomposition method," *IEEE Trans. On Parallel and Distributed Systems*, Vol. 25, No. 10, pp. 2561-2570, Oct. 2014. Doi: [10.1109/TPDS.2013.252](https://doi.org/10.1109/TPDS.2013.252)
 
 ## CODEGEN Module
 
@@ -109,15 +113,9 @@ The user model is **compiled, not interpreted**, resulting in efficient number-c
 
 ## Simulation Interfaces
 
-STEPSS modules can be run through three interfaces:
-
-| Interface | RAMSES (Dynamic) | Helios (Power Flow) | CODEGEN |
-|-----------|:----------------:|:------------:|:-------:|
-| **Command Line** | `ramses -t cmd.txt` | `helios -t cmd.txt` | `codegen model.txt` |
-| **GUI (Java)** | Full support | Full support | Full support |
-| **Python (PyRAMSES)** | Full support | Full support (`pyramses.helios`) | |
-
-See the [Quick Start](/getting-started/quickstart/) for details on each interface.
+STEPSS modules can be driven from the command line, from the Java GUI, or from
+Python through PyRAMSES. The [Quick Start](/getting-started/quickstart/) compares
+the three and gives the invocation for each.
 
 ## Platform Support
 
@@ -133,3 +131,6 @@ See the [Quick Start](/getting-started/quickstart/) for details on each interfac
 
 - [Installation](/getting-started/installation/), Set up STEPSS on your system
 - [Quick Start](/getting-started/quickstart/), Run your first simulation
+- [License](/getting-started/license/), Terms and the free-version limits above
+- [Publications](/resources/references/), Papers describing the methods used here
+- [Repositories](/resources/repositories/), Source for every STEPSS component

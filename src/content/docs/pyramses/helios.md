@@ -1,5 +1,5 @@
 ---
-title: Power Flow with Helios
+title: Helios Power-Flow API
 description: Running AC power flows from Python with pyramses.helios.HeliosSession
 ---
 
@@ -92,7 +92,10 @@ pf.write_diagram('template.svg', 'diagram.svg')
 `volt_rat.dat` is the natural bridge to dynamic simulation: solve a power flow with Helios, export it, and pass it to a RAMSES case via `case.addData('volt_rat.dat')`.
 
 :::note
-`write_voltrat()` emits one `LFRESV` record per bus plus one `TRANSFO` record per in-service LTC transformer, carrying its *solved* ratio. Hand-maintained operating-point files (e.g. `volt_rat_B.dat` of the Nordic test system) often use `TRFO` records instead, which additionally carry the LTC ranges used on the power-flow side. The two styles are interchangeable as RAMSES input: RAMSES ignores the LTC fields of a `TRFO` record, and dynamic tap-changer behaviour is defined by the `DCTL LTC` records of the dynamic data file.
+`write_voltrat()` is the API form of the `VT` menu command, and writes the same
+records. For what those records contain, and how they relate to the hand-written
+`TRFO` style, see
+[Exported Operating Point](/user-guide/power-flow/#bus-voltages-initial-values-and-results-lfresv).
 :::
 
 ## Runnable Examples
