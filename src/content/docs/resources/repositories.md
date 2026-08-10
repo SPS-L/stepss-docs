@@ -18,7 +18,6 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 | stepss-ramses | Core RAMSES simulation engine | Fortran | Private |
 | stepss-test-systems | Curated collection of test cases and network models | RAMSES data | Private |
 | stepss-helios | AC power-flow engine (Newton-Raphson), with a C API shared library wrapped by PyRAMSES (`pyramses.helios`); releases ship CLI and C API binaries for Linux/macOS/Windows | C++ | Private |
-| stepss-pfc | Historical Fortran power-flow calculator, superseded by Helios and no longer distributed | Fortran | Private |
 | stepss-dyngraph | Dynamic graph / topology module | Fortran | Private |
 | stepss-Codegen | DSL-to-Fortran model code generator | Fortran | Private |
 | [stepss-RamsesNN](https://github.com/SPS-L/stepss-RamsesNN) | Physics-informed neural network experiments on RAMSES models | Python | Public |

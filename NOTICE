@@ -5,8 +5,8 @@ Electric Power Systems Simulation), published at https://stepss.sps-lab.org.
 
 It contains two kinds of material, under two different licences.
 
-Documentation content — CC BY 4.0
----------------------------------
+Documentation content: CC BY 4.0
+--------------------------------
 
 The documentation itself is licensed under the Creative Commons Attribution 4.0
 International licence. See LICENSE.
@@ -19,12 +19,12 @@ commercially, provided you give appropriate credit.
                  Cyprus University of Technology
   Authors: Dr. Petros Aristidou, Dr. Thierry Van Cutsem
 
-Website code — MIT
-------------------
+Website code: MIT
+-----------------
 
-The Astro/Starlight machinery that builds the site — astro.config.mjs,
+The Astro/Starlight machinery that builds the site (astro.config.mjs,
 package.json, tsconfig.json, and the components and styles under src/ that are
-not documentation pages — is licensed under the MIT Licence. See LICENSE-CODE.
+not documentation pages) is licensed under the MIT Licence. See LICENSE-CODE.
 
 Not covered by either licence
 -----------------------------
@@ -36,8 +36,8 @@ Not covered by either licence
     licence of that repository; it is NOT placed under CC BY 4.0 by its presence
     here.
 
-The STEPSS software that this website documents — RAMSES, PFC, CODEGEN and the
-other components — is NOT covered by either licence. Documenting the software
+The STEPSS software that this website documents (RAMSES, Helios, CODEGEN and
+the other components) is NOT covered by either licence. Documenting the software
 under CC BY 4.0 grants no rights over the software itself. Each component repository
 states its own terms; several are proprietary or non-commercial. See
 https://stepss.sps-lab.org/getting-started/license/.

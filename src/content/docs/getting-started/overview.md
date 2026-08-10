@@ -46,12 +46,6 @@ Helios produces an output file including:
 - The voltage magnitudes and phase angles at all buses of the network
 - The adjustable transformer data with updated values of their ratios
 
-:::note[Historical note]
-Helios replaces **PFC**, the Fortran power-flow calculator that served this role
-from the beginning of STEPSS. Helios reads the same data files and matches PFC's
-solver defaults, so existing cases run unchanged. PFC is no longer distributed.
-:::
-
 ## RAMSES Module
 
 RAMSES simulates the dynamic response of power system models under the phasor (RMS) approximation. It takes as input:

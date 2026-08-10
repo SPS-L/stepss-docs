@@ -25,6 +25,6 @@ jobs:
 
       - name: Check for broken links (basic)
         run: |
-          echo "Build successful — all pages generated."
+          echo "Build successful, all pages generated."
           ls -la dist/
           find dist -name "*.html" | wc -l

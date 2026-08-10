@@ -20,7 +20,7 @@ pnpm-debug.log*
 # macOS-specific files
 .DS_Store
 
-# local Claude Code / MCP configuration (never commit — a committed .claude
+# local Claude Code / MCP configuration (never commit: a committed .claude
 # gitlink once broke recursive cloning of the umbrella repo)
 .claude/
 .mcp.json

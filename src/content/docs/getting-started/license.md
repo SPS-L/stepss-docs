@@ -59,8 +59,6 @@ For extensions to larger models or execution using more than two cores, contact 
 
 **CODEGEN** (the model generator) is the property of **Dr. Thierry Van Cutsem**. It is distributed under the **Academic Public License for the use of STEPSS** as a compiled executable that is **free to use for non-commercial purposes**; commercial use requires contacting the Authors. It is not open-source: its source code is not included in any of the public STEPSS repositories.
 
-The same terms covered **PFC**, the Fortran power-flow calculator that Helios replaced. PFC is no longer distributed with STEPSS.
-
 ## Authors
 
 STEPSS has been developed by:
