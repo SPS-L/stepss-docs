@@ -9,6 +9,11 @@ import fortranFreeForm from '@shikijs/langs/fortran-free-form';
 export default defineConfig({
 	site: 'https://stepss.sps-lab.org',
 	base: '/',
+	// The power-flow page used to live at /user-guide/pfc/ and is linked from the
+	// stepss-helios and stepss-cg-studio READMEs. Keep that URL working.
+	redirects: {
+		'/user-guide/pfc': '/user-guide/power-flow/',
+	},
 	markdown: {
 		remarkPlugins: [remarkMath],
 		rehypePlugins: [rehypeKatex],
@@ -70,9 +75,9 @@ export default defineConfig({
 							],
 						},
 						{
-							label: 'Power Flow (PFC & Helios)',
+							label: 'Power Flow (Helios)',
 							items: [
-								{ label: 'Power Flow Data & Settings', slug: 'user-guide/pfc' },
+								{ label: 'Power Flow Data & Settings', slug: 'user-guide/power-flow' },
 							],
 						},
 						{

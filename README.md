@@ -28,7 +28,7 @@ npm run preview
 src/content/docs/
 ├── index.mdx                    # Landing page
 ├── getting-started/             # Overview, installation, quick start, license
-├── user-guide/                  # Network, PFC, disturbances, solver, file formats, eigenanalysis
+├── user-guide/                  # Network, power flow, disturbances, solver, file formats, eigenanalysis
 ├── models/                      # Synchronous machine, exciters, governors, injectors, two-ports
 ├── pyramses/                    # PyRAMSES overview, install, API, Helios, examples
 ├── developer/                   # CODEGEN, CG Studio, user models, URAMSES

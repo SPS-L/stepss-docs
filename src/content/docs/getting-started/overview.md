@@ -19,38 +19,44 @@ In the figure above, files shown in blue are provided by the user; those in blac
 
 | Module | Full Name | Description |
 |--------|-----------|-------------|
-| **PFC / Helios** | Power Flow Computation | Determines the initial operating point using the Newton-Raphson method in polar coordinates. Computes bus voltage magnitudes and phase angles, with optional transformer ratio adjustment. Two engines are available: the original Fortran PFC and Helios, a modern C++ reimplementation reading the same data format; Helios is the recommended engine going forward. |
+| **Helios** | AC Power Flow | Determines the initial operating point using the Newton-Raphson method in polar coordinates. Computes bus voltage magnitudes and phase angles, with optional transformer ratio adjustment. |
 | **RAMSES** | RApid Multithreaded Simulation of Electric power Systems | Simulates the dynamic evolution of the power system in response to disturbances. Supports Backward Euler, Trapezoidal, and BDF2 integration methods. Exploits OpenMP parallelism. |
 | **CODEGEN** | CODE GENerator | Translates user-defined models from text descriptions into Fortran 2003 code for compilation and linking with RAMSES. Supports excitation controllers, torque controllers, injectors, and two-port components. |
 
 Each module can be used independently:
 
-- **PFC alone**: Run a power flow computation to inspect the system state and/or save the solution for RAMSES
-- **PFC alone**: Run a sequence of power flow computations until obtaining the desired system state, then save the solution for RAMSES
+- **Helios alone**: Run a power flow computation to inspect the system state and/or save the solution for RAMSES
+- **Helios alone**: Run a sequence of power flow computations until obtaining the desired system state, then save the solution for RAMSES
 - **RAMSES alone**: With a pre-computed power flow solution, run multiple dynamic simulations from the same initial state
 - **CODEGEN alone**: Build and save models for future incorporation into a user-defined version of RAMSES
 
-## PFC Module
+## Helios Module
 
-The power flow computation uses the Newton-Raphson method in polar coordinates. It is available in two implementations — the original Fortran **PFC** and the modern C++ **Helios** — which read the same input data and produce numerically equivalent results; see [Power Flow Data & Settings](/user-guide/pfc/) for the details and the few differences. Input data consists of:
+The power flow computation uses the Newton-Raphson method in polar coordinates; see [Power Flow Data & Settings](/user-guide/power-flow/) for the complete record and parameter reference. Input data consists of:
 
 - Network data (buses, lines, transformers, etc.)
 - Power flow data specified at PV, PQ, and slack buses
-- PFC control parameters (tolerances, reactive power limits, etc.), optional, defaults are used if not provided
+- Control parameters (tolerances, reactive power limits, etc.), optional, defaults are used if not provided
 
-PFC can optionally adjust transformer ratios to:
+Helios can optionally adjust transformer ratios to:
 - Bring voltage magnitudes inside specified deadbands (in-phase transformers)
 - Bring active power flows inside specified deadbands (phase-shifting transformers)
 
-PFC produces an output file including:
+Helios produces an output file including:
 - The voltage magnitudes and phase angles at all buses of the network
 - The adjustable transformer data with updated values of their ratios
+
+:::note[Historical note]
+Helios replaces **PFC**, the Fortran power-flow calculator that served this role
+from the beginning of STEPSS. Helios reads the same data files and matches PFC's
+solver defaults, so existing cases run unchanged. PFC is no longer distributed.
+:::
 
 ## RAMSES Module
 
 RAMSES simulates the dynamic response of power system models under the phasor (RMS) approximation. It takes as input:
 
-- Network data (shared with PFC, with a few exceptions detailed in this documentation)
+- Network data (shared with the power flow, with a few exceptions detailed in this documentation)
 - Dynamic component data
 - Solver control parameters (tolerances, time steps, reference speed, etc.)
 - Sequence of disturbances and actions
@@ -111,11 +117,11 @@ The user model is **compiled, not interpreted**, resulting in efficient number-c
 
 STEPSS modules can be run through three interfaces:
 
-| Interface | RAMSES (Dynamic) | PFC (Static) | CODEGEN |
+| Interface | RAMSES (Dynamic) | Helios (Power Flow) | CODEGEN |
 |-----------|:----------------:|:------------:|:-------:|
-| **Command Line** | `ramses -t cmd.txt` | `pfc -t cmd.txt` or `helios -t cmd.txt` | `codegen model.txt` |
+| **Command Line** | `ramses -t cmd.txt` | `helios -t cmd.txt` | `codegen model.txt` |
 | **GUI (Java)** | Full support | Full support | Full support |
-| **Python (PyRAMSES)** | Full support | Full support (`pyramses.helios`, Helios engine) | |
+| **Python (PyRAMSES)** | Full support | Full support (`pyramses.helios`) | |
 
 See the [Quick Start](/getting-started/quickstart/) for details on each interface.
 
@@ -123,10 +129,10 @@ See the [Quick Start](/getting-started/quickstart/) for details on each interfac
 
 | Feature | Details |
 |---------|---------|
-| **STEPSS GUI** | Windows and Linux, Java 20 |
-| **PyRAMSES** | Windows and Linux, Python 3.x; Helios power flow additionally on macOS |
-| **Command-line executables** | Windows and Linux (ramses, pfc); helios additionally supports macOS |
-| **CODEGEN compilation** | Visual Studio 2022 + Intel oneAPI Fortran |
+| **STEPSS GUI** | Windows, Linux and macOS (Apple Silicon), 64-bit Java 11 or later |
+| **PyRAMSES** | Windows, Linux and macOS (Apple Silicon), Python 3.x |
+| **Command-line executables** | Windows, Linux and macOS (Apple Silicon) for ramses, helios, codegen and dyngraph |
+| **Custom model compilation** | gfortran, GNU make and OpenBLAS (MSYS2 on Windows) |
 | **Free version limits** | 1000 buses max, 2 OpenMP cores |
 
 ## Next Steps

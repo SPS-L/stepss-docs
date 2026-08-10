@@ -16,12 +16,11 @@ description: Licensing information for the STEPSS suite
 | RamsesNN | MIT License | [SPS-L/stepss-RamsesNN](https://github.com/SPS-L/stepss-RamsesNN) |
 | Helios | Academic Public License (free for non-commercial use), with a commercial option | See [Helios License](#helios-license) below |
 | RAMSES | Proprietary, free for non-commercial use | See [RAMSES Solver License](#ramses-solver-license) below |
-| PFC | Proprietary, free executables (Academic Public License) | See [PFC and CODEGEN License](#pfc-and-codegen-license) below |
-| CODEGEN | Proprietary, free executables (Academic Public License) | See [PFC and CODEGEN License](#pfc-and-codegen-license) below |
+| CODEGEN | Proprietary, free executables (Academic Public License) | See [CODEGEN License](#codegen-license) below |
 
 ## Documentation License
 
-The STEPSS **documentation** — this website and the PDF user guide — is licensed
+The STEPSS **documentation**, this website and the PDF user guide, is licensed
 under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
 You may share and adapt it, including for commercial purposes, provided you give
 appropriate credit.
@@ -53,12 +52,14 @@ For extensions to larger models or execution using more than two cores, contact 
 **STEPSS-Helios** (the modern power-flow engine, also bundled as `libhelios_api` in PyRAMSES) is the property of **Dr. Petros Aristidou**, and is distributed under the **STEPSS-Helios Academic Public License**:
 
 - Permission is granted to use Helios **free of charge** for any **non-commercial purpose**, including teaching and research at universities, colleges, and other educational institutions, research at non-profit research institutions, and personal non-profit purposes.
-- For **commercial use**, a commercial license is required — contact **info@sps-lab.org**.
+- For **commercial use**, a commercial license is required: contact **info@sps-lab.org**.
 - Helios is provided **"as is"**, without warranty of any kind.
 
-## PFC and CODEGEN License
+## CODEGEN License
 
-**PFC** (power flow computation) and **CODEGEN** (model generator) are the property of **Dr. Thierry Van Cutsem**. They are distributed under the **Academic Public License for the use of STEPSS** as compiled executables that are **free to use for non-commercial purposes**; commercial use requires contacting the Authors. They are not open-source: their source code is not included in any of the public STEPSS repositories.
+**CODEGEN** (the model generator) is the property of **Dr. Thierry Van Cutsem**. It is distributed under the **Academic Public License for the use of STEPSS** as a compiled executable that is **free to use for non-commercial purposes**; commercial use requires contacting the Authors. It is not open-source: its source code is not included in any of the public STEPSS repositories.
+
+The same terms covered **PFC**, the Fortran power-flow calculator that Helios replaced. PFC is no longer distributed with STEPSS.
 
 ## Authors
 
@@ -70,6 +71,6 @@ For general inquiries, licensing questions, and commercial use, please use the d
 
 ## Intellectual Property Rights
 
-STEPSS is made up of three modules: **PFC** (power flow computations), **RAMSES** (the solver of differential-algebraic equations), and **CODEGEN** (a tool to develop models).
+STEPSS is made up of three modules: **Helios** (power flow computations), **RAMSES** (the solver of differential-algebraic equations), and **CODEGEN** (a tool to develop models).
 
-PFC and CODEGEN are the property of Dr. Thierry Van Cutsem, distributed as compiled executables free to use. RAMSES is the property of the **University of Liège, Belgium**, which has granted to both Authors a personal, royalty-free, limited, non-exclusive, non-transferable and non-assignable license to distribute free of charge an executable version of RAMSES.
+Helios is the property of Dr. Petros Aristidou. CODEGEN is the property of Dr. Thierry Van Cutsem, distributed as a compiled executable free to use. RAMSES is the property of the **University of Liège, Belgium**, which has granted to both Authors a personal, royalty-free, limited, non-exclusive, non-transferable and non-assignable license to distribute free of charge an executable version of RAMSES.

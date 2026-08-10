@@ -5,7 +5,7 @@ description: How to install STEPSS and its dependencies
 
 import { Tabs, TabItem, Steps, Aside, LinkButton } from '@astrojs/starlight/components';
 
-This guide covers the installation of STEPSS, including the Java GUI, Visual Studio, and the Intel Fortran compiler.
+This guide covers the installation of STEPSS: the Java GUI, and the Fortran toolchain needed only if you intend to build your own models.
 
 STEPSS itself (`stepss.jar`) is published as a GitHub release. The button below always fetches the
 latest one; every version ever released is listed on the
@@ -15,7 +15,7 @@ latest one; every version ever released is listed on the
 
 ## Installing Java
 
-STEPSS comes with a Java-based Graphical User Interface (GUI) that requires a **64-bit Java Runtime Environment, version 11 or later**. Any recent JRE or JDK is fine — there is no need to uninstall a Java you already have, as long as it meets that minimum.
+STEPSS comes with a Java-based Graphical User Interface (GUI) that requires a **64-bit Java Runtime Environment, version 11 or later**. Any recent JRE or JDK is fine; there is no need to uninstall a Java you already have, as long as it meets that minimum.
 
 <Steps>
 
@@ -23,7 +23,7 @@ STEPSS comes with a Java-based Graphical User Interface (GUI) that requires a **
    ```bash
    java -version
    ```
-   If this reports a 64-bit Java, you are ready — skip to the next section.
+   If this reports a 64-bit Java, you are ready, so skip to the next section.
 
 2. **Install Java** (only if the command is not recognised):
    - Download a 64-bit JDK from [oracle.com](https://www.oracle.com/java/technologies/downloads/)
@@ -48,47 +48,58 @@ STEPSS comes with a Java-based Graphical User Interface (GUI) that requires a **
 
 When launched, STEPSS creates a temporary working folder and copies all needed executables and libraries. To remove STEPSS, simply delete the archive file. It leaves nothing on your computer.
 
-## Installing Visual Studio
+## Installing a Fortran Toolchain
 
 <Aside type="tip">
-This step can be **skipped** if you do not plan to develop new models for RAMSES using CODEGEN.
+This step can be **skipped** if you do not plan to develop new models for RAMSES using CODEGEN. Everything else in STEPSS works without it.
 </Aside>
 
-The Intel oneAPI compiler requires **Microsoft Visual Studio Community 2019 or later** (2022 recommended). If you already have a version that meets this requirement, there is no need to uninstall it.
+Compiling a custom model produces a simulator built from the bundled URAMSES kit,
+which is a **gfortran** build. You therefore need `gfortran`, GNU `make` and
+OpenBLAS on your machine.
 
-<Steps>
+<Tabs>
+<TabItem label="Windows">
 
-1. Download a Community installer from [visualstudio.microsoft.com](https://visualstudio.microsoft.com/downloads/)
-2. Execute by double-clicking
-3. During installation, under the "Workloads" view, select **"Desktop development with C++"**
+Install [MSYS2](https://www.msys2.org/), then from an MSYS2 shell:
 
-</Steps>
+```bash
+pacman -S mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-openblas make
+```
 
-## Installing the Fortran Compiler
+STEPSS looks for the installation in `C:\msys64`, or wherever the `MSYS2_ROOT`
+environment variable points, so the MinGW `bin` directory does not have to be on
+the system `PATH`.
 
-<Aside type="tip">
-This step can be **skipped** if you do not plan to develop new models for RAMSES.
+</TabItem>
+<TabItem label="Linux">
+
+```bash
+sudo apt install gfortran make libopenblas-dev     # Debian/Ubuntu
+sudo dnf install gcc-gfortran make openblas-devel  # Fedora/RHEL
+```
+
+</TabItem>
+<TabItem label="macOS">
+
+macOS ships no Fortran compiler, so it comes from [Homebrew](https://brew.sh/):
+
+```bash
+brew install gcc openblas
+```
+
+Apple Silicon only; Intel Macs are not supported.
+
+</TabItem>
+</Tabs>
+
+<Aside type="caution" title="The compiler must match the kit">
+Fortran `.mod` files can only be read by the gfortran release that wrote them.
+Each platform's default compiler normally matches its own bundled kit; when it
+does not, STEPSS reports the exact compiler version to install rather than
+failing in the middle of a build. See [URAMSES](/developer/uramses/) for the
+details.
 </Aside>
-
-STEPSS is compiled with **`ifx`**, the Intel oneAPI Fortran compiler. Use a oneAPI release of **version 2024.0 or later**, which provides `ifx`.
-
-<Aside type="caution">
-The older `ifort` ("Fortran Compiler Classic") is deprecated by Intel and is no longer supported. Do not use it.
-</Aside>
-
-Two packages need to be installed **in order**, both free of charge from Intel:
-
-<Steps>
-
-1. Download and install the **Intel oneAPI Base Toolkit**
-
-2. Download and install the **Intel oneAPI HPC Toolkit**, which contains the `ifx` Fortran compiler
-
-   Both are available from [Intel's oneAPI HPC Toolkit download page](https://www.intel.com/content/www/us/en/developer/tools/oneapi/hpc-toolkit-download.html).
-
-3. **Restart your computer**
-
-</Steps>
 
 ## Installing CODEGEN Studio
 

@@ -578,7 +578,11 @@ status = ram.getTrfoSS(1, 3, 2, 'Status')
 
 ### User Model Libraries
 
-Compiled user-defined model libraries (built with URAMSES) can be loaded at runtime.
+Compiled user-defined model libraries can be loaded at runtime.
+
+:::caution
+These three calls exist only in RAMSES builds made on Windows with the Intel Fortran compiler. Every library currently bundled with PyRAMSES is a gfortran build, so they are unavailable there. To use your own models, build a custom `ramses.so`/`ramses.dll` with [URAMSES](/developer/uramses/) and point PyRAMSES at it with `pyramses.sim(custLibDir=...)`.
+:::
 
 #### `load_MDL(MDLName)`
 

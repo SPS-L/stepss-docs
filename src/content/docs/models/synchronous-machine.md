@@ -30,7 +30,7 @@ The second and third combinations yield the same results. Models with fewer roto
 
 ## Park Transformation
 
-The well-known Park transformation is used to replace time-varying inductances and oscillatory stator currents and voltages with constant values. The machine is represented by equivalent windings along the direct ($d$) and quadrature ($q$) axes — a field winding $f$ and damper winding $d1$ on the $d$ axis, and windings $q1$, $q2$ on the $q$ axis:
+The well-known Park transformation is used to replace time-varying inductances and oscillatory stator currents and voltages with constant values. The machine is represented by equivalent windings along the direct ($d$) and quadrature ($q$) axes: a field winding $f$ and damper winding $d1$ on the $d$ axis, and windings $q1$, $q2$ on the $q$ axis:
 
 <p align="center">
 <img src="/images/sync-windings.jpg" alt="Synchronous machine windings" style="width:42%" />
@@ -210,7 +210,7 @@ $$
 2H \frac{d\omega}{dt} = K_m T_m - T_e - D(\omega - \omega_{ref})
 $$
 
-where $H$ is the inertia constant (in s), $T_m$ the mechanical torque produced by the turbine, $K_m$ a coefficient to pass from per unit values of the turbine to per unit values of the machine, and $\omega_{ref}$ the angular speed of the reference axes — $\omega_{coi}$ in the COI reference frame, or 1 pu in the synchronous frame (selected by the `$OMEGA_REF` solver setting).
+where $H$ is the inertia constant (in s), $T_m$ the mechanical torque produced by the turbine, $K_m$ a coefficient to pass from per unit values of the turbine to per unit values of the machine, and $\omega_{ref}$ the angular speed of the reference axes: $\omega_{coi}$ in the COI reference frame, or 1 pu in the synchronous frame (selected by the `$OMEGA_REF` solver setting).
 
 The electromagnetic torque $T_e$ is:
 
@@ -284,14 +284,14 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
 `TYPE_MOD` is a keyword selecting which of two **equivalent parameter formats**
 the 14 machine parameters that follow are given in:
 
-- **`RL`** — the inductances and resistances of the Park model are supplied
+- **`RL`**: the inductances and resistances of the Park model are supplied
   directly:
 
   ```
   RL  Ll Mdu Llf Lld1 Mqu Llq1 Llq2 m n Ra Rf Rd1 Rq1 Rq2
   ```
 
-- **`XT`** — characteristic reactances and open-circuit time constants are
+- **`XT`**: characteristic reactances and open-circuit time constants are
   supplied; RAMSES converts them internally to the Park parameters (see
   [Parameter Conversion](/models/synchronous-machine-param-conversion/)):
 
@@ -316,7 +316,7 @@ the 14 machine parameters that follow are given in:
 | `IBRATIO` | Field current base ratio $I_{fB}^{mac}/I_{fB}^{exc}$ (see above) | pu |
 | `TYPE_MOD` | Parameter format keyword: `RL` or `XT` (case-insensitive) | |
 
-### Machine parameters — `XT` format
+### Machine parameters, `XT` format
 
 | Parameter | Description | Unit |
 |-----------|-------------|------|
@@ -335,7 +335,7 @@ the 14 machine parameters that follow are given in:
 | `T'qo` | q-axis open-circuit transient time constant (`*` if no $q1$ winding) | s |
 | `T"qo` | q-axis open-circuit subtransient time constant (`*` if no $q2$ winding) | s |
 
-### Machine parameters — `RL` format
+### Machine parameters, `RL` format
 
 | Parameter | Description | Unit |
 |-----------|-------------|------|
@@ -357,7 +357,7 @@ the 14 machine parameters that follow are given in:
 ### Omitting rotor circuits
 
 A rotor circuit the machine does not have is skipped by putting `*` in **both**
-of its fields — the inductance/reactance **and** the matching
+of its fields, the inductance/reactance **and** the matching
 resistance/time-constant field (specifying only one is an error):
 
 | Circuit | `RL` fields | `XT` fields | Model switch set to 0 |
@@ -369,7 +369,7 @@ resistance/time-constant field (specifying only one is an error):
 The combination $S_{d1} = 0$ with $S_{q1} = S_{q2} = 1$ (field winding plus
 both q-axis windings but no d-axis damper) is rejected. In the `XT` format,
 if the fitted Park parameters come out negative, RAMSES logs an
-"unrealistic Park inductances or resistances" warning — the supplied
+"unrealistic Park inductances or resistances" warning: the supplied
 reactances and time constants are physically inconsistent.
 
 All reactances, inductances and resistances are in per unit on the machine base
@@ -416,8 +416,8 @@ Here the machine G5, connected to bus 5, is in service (`br = 1`) and injects ab
 
 For a detailed derivation of how STEPSS converts the `XT` standard parameters
 (reactances and open-circuit time constants) to the `RL` Park parameters
-(inductances and resistances) — including the exact algorithm from the source,
+(inductances and resistances), including the exact algorithm from the source,
 known conversion pitfalls when cross-checking against EMT simulators, and a
-reference Python implementation — see:
+reference Python implementation, see:
 
-➜ [Synchronous Machine — Parameter Conversion (XT ↔ RL)](/models/synchronous-machine-param-conversion/)
+➜ [Synchronous Machine Parameter Conversion (XT ↔ RL)](/models/synchronous-machine-param-conversion/)

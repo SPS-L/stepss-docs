@@ -9,7 +9,7 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 
 | Repository | Role | Language | Visibility |
 |------------|------|----------|------------|
-| [stepss-java-ui](https://github.com/SPS-L/stepss-java-ui) | Java-based GUI front-end (v3.40) | Java | Public |
+| [stepss-java-ui](https://github.com/SPS-L/stepss-java-ui) | Java-based GUI front-end, bundling the whole toolchain | Java | Public |
 | [stepss-pyramses](https://github.com/SPS-L/stepss-pyramses) | Python API/wrapper for RAMSES and the Helios power-flow engine | Python | Public |
 | [stepss-userguide](https://github.com/SPS-L/stepss-userguide) | LaTeX user documentation and models reference | LaTeX | Public |
 | [stepss-uramses](https://github.com/SPS-L/stepss-uramses) | User-defined device models framework | Fortran | Public |
@@ -17,10 +17,11 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 | [stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) | Visual block diagram editor for CODEGEN models | Python/JS | Public |
 | stepss-ramses | Core RAMSES simulation engine | Fortran | Private |
 | stepss-test-systems | Curated collection of test cases and network models | RAMSES data | Private |
-| stepss-PFC | Power-flow calculator (Newton-Raphson) | Fortran | Private |
-| stepss-helios | Modern C++ reimplementation of the PFC power-flow calculator, with a C API shared library wrapped by PyRAMSES (`pyramses.helios`); releases ship CLI and C API binaries for Linux/macOS/Windows | C++ | Private |
+| stepss-helios | AC power-flow engine (Newton-Raphson), with a C API shared library wrapped by PyRAMSES (`pyramses.helios`); releases ship CLI and C API binaries for Linux/macOS/Windows | C++ | Private |
+| stepss-pfc | Historical Fortran power-flow calculator, superseded by Helios and no longer distributed | Fortran | Private |
 | stepss-dyngraph | Dynamic graph / topology module | Fortran | Private |
 | stepss-Codegen | DSL-to-Fortran model code generator | Fortran | Private |
+| [stepss-RamsesNN](https://github.com/SPS-L/stepss-RamsesNN) | Physics-informed neural network experiments on RAMSES models | Python | Public |
 | stepss-docs | This documentation website | Astro/Starlight | Public |
 
 ## Public Repositories
@@ -31,8 +32,8 @@ The main graphical user interface for STEPSS, built with Java (Swing/AWT) and th
 
 - **Repository**: [github.com/SPS-L/stepss-java-ui](https://github.com/SPS-L/stepss-java-ui)
 - **License**: Apache License 2.0
-- **Requirements**: Java 20 (64-bit)
-- **Build**: `ant build`
+- **Requirements**: 64-bit Java 11 or later (JRE to run, JDK plus Apache Ant to build)
+- **Build**: `ant jar`
 - **Run**: `java -jar dist/stepss.jar`
 
 ### stepss-pyramses
@@ -42,7 +43,7 @@ Python interface to the RAMSES simulator providing scripting access to simulatio
 - **Repository**: [github.com/SPS-L/stepss-pyramses](https://github.com/SPS-L/stepss-pyramses)
 - **Install**: `pip install pyramses`
 - **Documentation**: [PyRAMSES section](/pyramses/overview/) on this site
-- **Includes**: Nordic test system example; runnable power-flow examples under `examples/helios/`
+- **Includes**: five runnable power-flow examples under `examples/helios/`
 
 ### stepss-userguide
 
@@ -82,7 +83,7 @@ Browser-based visual editor for building CODEGEN user-defined models with drag-a
 - **Documentation**: [CODEGEN Studio guide](/developer/cg-studio/) on this site
 
 :::note
-Test-system data repositories (Nordic, 5-bus, Kundur, GB Network, and others) are not listed here — see the [Test Systems](/test-systems/nordic/) section of this site.
+Test-system data repositories (Nordic, 5-bus, Kundur, GB Network, and others) are not listed here; see the [Test Systems](/test-systems/nordic/) section of this site.
 :::
 
 ## Contributing

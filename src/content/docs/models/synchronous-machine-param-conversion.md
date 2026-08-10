@@ -1,12 +1,12 @@
 ---
-title: "Synchronous Machine — Parameter Conversion (XT ↔ RL)"
+title: "Synchronous Machine Parameter Conversion (XT ↔ RL)"
 description: How STEPSS/RAMSES converts characteristic reactances and open-circuit time constants (XT format) into Park inductances and resistances (RL format), with the exact algorithm, known traps, and a reference Python implementation.
 ---
 
 A `SYNC_MACH` record can be entered using one of two equivalent parameter formats, selected by the `TYPE_MOD` keyword:
 
-- **`RL`** — the Park-model inductances and resistances are supplied directly.
-- **`XT`** — characteristic reactances and open-circuit time constants are supplied; STEPSS/RAMSES converts them internally.
+- **`RL`**: the Park-model inductances and resistances are supplied directly.
+- **`XT`**: characteristic reactances and open-circuit time constants are supplied; STEPSS/RAMSES converts them internally.
 
 Both formats describe the same machine. `XT` is convenient when data comes from manufacturer datasheets or Kundur-style standard parameters. This page documents exactly how that conversion is done, so it can be reproduced by hand or cross-checked against external simulators (e.g. Typhoon HIL EMT).
 
@@ -51,7 +51,7 @@ $$
 M_d^u = X_d - L_\ell, \qquad M_q^u = X_q - L_\ell
 $$
 
-**d axis — two rotor circuits (field + damper, XSD/TSD0 present)**
+**d axis, two rotor circuits (field + damper, XSD/TSD0 present)**
 
 $$
 T'_d = T'_{d0}\frac{X'_d}{X_d}, \qquad T''_d = \frac{X''_d \, T'_{d0} \, T''_{d0}}{X_d \, T'_d}
@@ -79,7 +79,7 @@ $$
 L_{\ell f} = T_f R_f, \qquad L_{\ell d1} = T_{d1} R_{d1}
 $$
 
-**d axis — single rotor circuit (XSD/TSD0 skipped)**
+**d axis, single rotor circuit (XSD/TSD0 skipped)**
 
 $$
 L_{ff} = \frac{(M_d^u)^2}{X_d - X'_d}, \qquad L_{\ell f} = L_{ff} - M_d^u, \qquad R_f = \frac{L_{ff}}{T'_{d0}}
@@ -158,7 +158,7 @@ When cross-checking STEPSS (RMS/phasor) against an EMT tool such as Typhoon HIL:
 
 ## See also
 
-- [Synchronous Machine Model](/models/synchronous-machine/) — equations, per unit system, and `SYNC_MACH` record reference
+- [Synchronous Machine Model](/models/synchronous-machine/), equations, per unit system, and `SYNC_MACH` record reference
 - [Octave reference implementation](https://github.com/SPS-L/Sync_mach_Octave)
 - [Phasor approximation](https://thierryvancutsem.github.io/home/elec0047/phasor_approx.pdf)
 - [Synchronous machine dynamics](https://thierryvancutsem.github.io/home/elec0047/dyn_of_sync_mac.pdf)

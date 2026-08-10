@@ -1,14 +1,18 @@
 ---
-title: Power Flow (PFC & Helios)
-description: Power flow data and settings, common to the PFC and Helios engines
+title: Power Flow (Helios)
+description: Power flow data records and solver settings for the Helios engine
 ---
 
-STEPSS provides two power-flow engines:
+**Helios** is the STEPSS AC power-flow engine. It solves the Newton-Raphson power
+flow in polar coordinates with reactive limit enforcement, transformer tap
+adjustment and SVC modelling, and it produces the operating point that
+initialises a RAMSES dynamic simulation.
 
-- **PFC** — the original Fortran implementation.
-- **Helios** — a modern C++ reimplementation that reads the same data format and produces numerically equivalent results. Helios is the actively developed engine and the recommended choice going forward.
+Helios is available three ways, all reading the same data files:
 
-Everything on this page applies to **both engines** unless marked otherwise; where the text says "PFC", read it as the power-flow computation performed by either engine. The few implementation differences are summarised [at the end of this page](#implementation-differences-pfc-vs-helios).
+- the `helios` command-line executable, bundled with the [STEPSS GUI](/getting-started/installation/) and published on the [Helios releases page](https://github.com/SPS-L/stepss-helios/releases);
+- `pyramses.helios.HeliosSession` from Python, see [Power Flow with Helios](/pyramses/helios/);
+- the C API shared library (`libhelios_api`), for embedding in other tools.
 
 The power flow uses the following network records documented in [Network Modeling](/user-guide/network/): BUS, LINE, SWITCH, TRANSFO, TRFO, NRTP.
 
@@ -31,7 +35,7 @@ BUS NAME VNOM PLOAD QLOAD BSHUNT QSHUNT ;
 | `BSHUNT` | Nominal reactive power of constant-susceptance shunt: the reactive power produced under the nominal voltage of the bus (positive = capacitor, negative = reactor) | Mvar |
 | `QSHUNT` | Reactive power of constant-power shunt (positive = capacitor) | Mvar |
 
-If no load is connected to the bus, set PLOAD and QLOAD to zero. If no shunt is connected, set BSHUNT and QSHUNT to zero.
+If no load is connected to the bus, set PLOAD and QLOAD to zero. If no shunt is connected, set BSHUNT and QSHUNT to zero. `QSHUNT` is optional: a five-field BUS record is accepted and QSHUNT defaults to zero.
 
 The total reactive power $Q$ produced by both shunt components:
 
@@ -77,9 +81,9 @@ GENER NAME BUS P Q VIMP SNOM QMIN QMAX PMIN PMAX PART BR ;
 | `PMAX` | Maximum active power the generator can produce | MW |
 | `PART` | Participation factor used when redistributing an active power imbalance | |
 
-`PMIN`/`PMAX` are not enforced during Newton iterations. They are used to clamp the specified `P` before the computation (the slack generator is exempted; in Helios this exemption can be disabled with `$PLIM 0`), and together with `PART` when generation is redispatched after system modifications or contingencies.
+`PMIN`/`PMAX` are not enforced during Newton iterations. They are used to clamp the specified `P` before the computation (the slack generator is exempted by default; see `$PLIM` below), and together with `PART` when generation is redispatched after system modifications or contingencies.
 
-Both variants also accept an additional bus-name field between `BUS` and `P` (making 10 or 13 fields in total); that field is accepted and ignored by both engines.
+Both variants also accept an additional bus-name field between `BUS` and `P` (making 10 or 13 fields in total); that field is accepted and ignored.
 
 Only one generator is allowed per bus.
 
@@ -105,7 +109,7 @@ SLACK NAME ;
 
 There must be **exactly one** SLACK record in the data.
 
-PFC can handle only one connected network (island). If the graph is disconnected, only the sub-network containing the slack bus is treated; the rest is ignored with a warning.
+Only one connected network (island) is solved. If the graph is disconnected, only the sub-network containing the slack bus is treated; equipment on the discarded buses is disabled and the lost active power is reported so that it can be redispatched.
 
 ## Static Var Compensators (SVC)
 
@@ -152,7 +156,7 @@ All SVCs are memorized, even those which are disconnected. A disconnected SVC ca
 
 ## Transformer Ratio Adjustment for Voltage Control
 
-PFC can adjust the ratio of a designated transformer to bring a controlled voltage inside a deadband $[V_{des} - \epsilon,\; V_{des} + \epsilon]$, where $V_{des}$ is the desired voltage and $\epsilon$ is the tolerance.
+The ratio of a designated transformer can be adjusted to bring a controlled voltage inside a deadband $[V_{des} - \epsilon,\; V_{des} + \epsilon]$, where $V_{des}$ is the desired voltage and $\epsilon$ is the tolerance.
 
 The ratio is changed in **discrete steps** between a minimum and maximum value. During computation, the ratio is changed by one step at a time, after which Newton iterations run until convergence. The process repeats until the controlled voltage falls in the deadband. When multiple transformers are adjusted, some may reach their deadbands before others.
 
@@ -198,9 +202,11 @@ LTC-V NAME CON_BUS NFIRST NLAST NBPOS TOLV VDES ;
 
 A transformer can be controlled by a **single tap changer only**. The LTC-V record can also be associated with a TRFO record, provided that no adjustment is specified in the TRFO record itself.
 
+Only this seven-field linear-ratio form is supported; there is no per-tap reactance variant.
+
 ## Phase-Shifting Transformer Adjustment (PSHIFT-P)
 
-PFC can adjust the phase angle of a transformer to bring the active power flow in a monitored branch inside a deadband $[P_{des} - \epsilon,\; P_{des} + \epsilon]$. The adjustment mechanism is similar to the in-phase ratio adjustment described above.
+The phase angle of a transformer can be adjusted to bring the active power flow in a monitored branch inside a deadband $[P_{des} - \epsilon,\; P_{des} + \epsilon]$. The adjustment mechanism is similar to the in-phase ratio adjustment described above.
 
 ```
 PSHIFT-P CONTRFO MONBRANCH PHAFIRST PHALAST NBPOS SIGN PDES TOLP ;
@@ -225,15 +231,56 @@ $$
 
 The initial phase angle from the `PHI` field of the TRANSFO record is adjusted to the nearest tap position before starting the power flow computation.
 
-PFC performs a sensitivity analysis to determine whether the phase angle should be increased or decreased. If this analysis indicates a direction opposite to SIGN, a warning is issued and SIGN is ignored. On output, PFC sets SIGN to the value from its sensitivity analysis.
+A sensitivity analysis determines whether the phase angle should be increased or decreased. If this analysis indicates a direction opposite to SIGN, a warning is issued and SIGN is ignored. On output, SIGN is set to the value from the sensitivity analysis.
 
 Only one PSHIFT-P record per transformer is allowed. The PSHIFT-P record is intended for use with a TRANSFO record, but can also be used with a TRFO record (in which case the angle is initialized to zero).
 
 A transformer cannot be controlled by both an LTC-V and a PSHIFT-P record.
 
+A detailed form with per-tap data (10 + 4k fields) is also accepted.
+
+:::caution[Records that are not supported]
+Two records of the historical Fortran engine are rejected with a hard error rather than silently ignored:
+
+- **`PSHIFT-I`** (current-controlled phase shifter): never adjusted by the old engine either, so nothing is lost by removing it from the data.
+- **`TURLIM`** (legacy active power limit record): use the 12/13-field GENER variant above, which carries PMIN, PMAX and PART.
+
+Records that are not part of the power-flow format at all (`SYNC_MACH`, `INJEC`, `DCTL`, and the rest of the dynamic data) are skipped with a warning, so a combined data file can be handed to the power flow unchanged.
+:::
+
+## Zone and Cut Aggregation
+
+Two optional records group equipment for reporting. They do not affect the solution.
+
+```
+BUSPART ZONE_NAME BUS_NAME PARTP PARTQ ;
+```
+
+| Field | Description |
+|-------|-------------|
+| `ZONE_NAME` | Zone name; the zone is created on first use |
+| `BUS_NAME` | Bus to include in the zone (max 8 characters) |
+| `PARTP` | Active power participation weight of this bus in the zone |
+| `PARTQ` | Reactive power participation weight of this bus in the zone |
+
+Zones drive the zone-power display and the zone-wide load and generation changes of the modify menu. Buses with unrecognised names are skipped.
+
+```
+BRAPART CUT_NAME BRANCH_NAME BUS_NAME SIGN ;
+```
+
+| Field | Description |
+|-------|-------------|
+| `CUT_NAME` | Cut name; the cut is created on first use |
+| `BRANCH_NAME` | Branch to include in the cut (max 20 characters) |
+| `BUS_NAME` | One endpoint of the branch, fixing the direction of the flow that is summed |
+| `SIGN` | `+1` or `-1`, applied to that branch's contribution |
+
+The cut power is the signed sum of the member branch flows, reported per branch and as a total.
+
 ## Bus Voltages: Initial Values and Results (LFRESV)
 
-On output, PFC produces a file with the computed bus voltage magnitudes and phase angles. These are stored in LFRESV records. The syntax is:
+On output, the power flow produces a file with the computed bus voltage magnitudes and phase angles. These are stored in LFRESV records. The syntax is:
 
 ```
 LFRESV BUS MODV PHASV ;
@@ -254,27 +301,27 @@ Default initialization: PQ buses start at 1 pu magnitude and 0 angle; PV buses s
 :::
 
 :::note
-The output LFRESV records from PFC can be fed back as input. This results in zero Newton iterations (round-trip property). This is an easy way to verify that system data come with their corresponding voltages.
+The output LFRESV records can be fed back as input. This results in zero Newton iterations (round-trip property). This is an easy way to verify that system data come with their corresponding voltages.
 :::
 
 :::note
-LFRESV is the output of PFC that initializes RAMSES dynamic simulation.
+LFRESV is the output that initializes RAMSES dynamic simulation.
 :::
 
 :::note
-The exported operating-point file (the voltage/ratio dump of PFC, `write_voltrat()` in Helios) contains one LFRESV record per bus plus one TRANSFO record per in-service LTC transformer, carrying its *solved* ratio. Hand-maintained operating-point files (e.g. `volt_rat_B.dat` of the Nordic test system) often use TRFO records instead. The two styles are interchangeable as RAMSES input: RAMSES ignores the LTC fields of a TRFO record (see the record-sharing table below), and dynamic tap-changer behaviour is defined by the DCTL LTC records of the dynamic data.
+The exported operating-point file (the `VT` menu command, `write_voltrat()` in the API) contains one LFRESV record per bus plus one TRANSFO record per in-service LTC transformer, carrying its *solved* ratio. Hand-maintained operating-point files (e.g. `volt_rat_B.dat` of the Nordic test system) often use TRFO records instead. The two styles are interchangeable as RAMSES input: RAMSES ignores the LTC fields of a TRFO record (see the record-sharing table below), and dynamic tap-changer behaviour is defined by the DCTL LTC records of the dynamic data.
 :::
 
-## PFC Computation Control Parameters
+## Computation Control Parameters
 
-PFC uses Newton–Raphson iterations to solve the power flow equations. Convergence is achieved when both the active and reactive power mismatches fall below specified thresholds, all transformer ratio and phase-shift controls are satisfied, and all generators and SVCs are within their reactive limits.
+The power flow uses Newton-Raphson iterations to solve the power flow equations. Convergence is achieved when both the active and reactive power mismatches fall below specified thresholds, all transformer ratio and phase-shift controls are satisfied, and all generators and SVCs are within their reactive limits.
 
 Three convergence indices are used:
 - $\epsilon_P$: largest absolute mismatch of the active power equations
 - $\epsilon_Q$: largest absolute mismatch of the reactive power equations
-- $\epsilon_S$: largest apparent power mismatch, used to trigger limit checks (via `$MISQLIM`), Jacobian freezing (via `$MISBLOC`), and transformer adjustments (via `$MISADJ`)
+- $\epsilon_S$: largest apparent power mismatch, used to trigger limit checks (via `$MISQLIM`), factorization reuse (via `$MISBLOC`), and transformer adjustments (via `$MISADJ`)
 
-The following records control the computation. Each record starts with `$` and has a single numeric field.
+The following records control the computation. Each record starts with `$` and has a single numeric field; a known `$` record with any other field count is a hard error, and an unknown `$` key is ignored.
 
 | Parameter | Default | Unit | Description |
 |-----------|---------|------|-------------|
@@ -283,10 +330,10 @@ The following records control the computation. Each record starts with `$` and h
 | `$TOLREAC` | 0.1 | Mvar | Convergence tolerance on reactive power mismatch ($\epsilon_Q$) |
 | `$NBITMA` | 20 | | Maximum number of Newton iterations |
 | `$MISQLIM` | 20 | MVA | Apparent power mismatch threshold below which generator/SVC reactive limits are checked and enforced (set to 0 to skip) |
-| `$MISBLOC` | 10 | MVA | Apparent power mismatch threshold below which the Jacobian is kept constant (see note below for the Helios behaviour) |
+| `$MISBLOC` | 10 | MVA | Apparent power mismatch threshold below which the Jacobian factorization reuses the previous pivot ordering. Jacobian values are recomputed at every iteration regardless |
 | `$MISADJ` | 10 | MVA | Apparent power mismatch threshold below which transformer ratios and phase shifts are adjusted (set to 0 to skip) |
 | `$DIVDET` | 0 | | Set to 1 to activate divergence detection; 0 to skip |
-| `$PLIM` | 1 | | **Helios only.** 1 = the slack generator's PMIN/PMAX are bypassed during initial P clamping (the PFC behaviour); 0 = the slack is clamped like any other generator |
+| `$PLIM` | 1 | | 1 = the slack generator's PMIN/PMAX are bypassed during initial P clamping; 0 = the slack is clamped like any other generator |
 
 :::note
 Divergence is detected when $\varphi(k) > 1.1\,\varphi(k-1)$, where:
@@ -296,29 +343,15 @@ $$\varphi(k) = \sum_i \sqrt{(f_i - P_i^o)^2 + (g_i - Q_i^o)^2}$$
 Under normal convergence, $\varphi$ decreases at each iteration; an increase signals divergence. The test is temporarily suspended following limit adjustments or transformer ratio changes, as these cause increases in $\varphi$ unrelated to divergence.
 :::
 
-## Implementation Differences (PFC vs Helios)
+`$PLIM` only affects 12/13-field GENER records, the only ones that carry real active power limits.
 
-The two engines read the same data format and produce numerically equivalent results. The differences that can matter in practice:
-
-| Aspect | PFC (Fortran) | Helios (C++) |
-|--------|---------------|--------------|
-| Sparse linear solver | MA37 (HSL) | KLU (SuiteSparse) |
-| `$MISBLOC` | Jacobian values and factorization frozen below the threshold | Jacobian recomputed every iteration; the threshold only controls whether the factorization reuses the previous pivot ordering. Iteration counts can therefore differ slightly |
-| `$PLIM` | Not available (slack P limits always bypassed) | Available; default 1 reproduces the PFC behaviour |
-| BUS record | 6 fields required | `QSHUNT` optional (5 fields accepted, defaults to 0) |
-| `PSHIFT-I` (current-controlled phase shifter) | Accepted (stored, not adjusted) | Not supported — hard error |
-| `TURLIM` (legacy P-limit record) | Accepted for compatibility | Not supported — hard error; use the extended GENER variant |
-| Unknown records | Handled or error | Warned and skipped |
-| Numerical output | Reference | May differ in the last displayed decimal, due to the different linear solvers |
-| Process exit status | Always 0 | 0 converged, 1 input or usage error, 2 did not converge (see below) |
-
-### Exit Status (Helios)
+## Exit Status
 
 In non-interactive use (`-t` command file mode and pipe mode), Helios reports the outcome of the run through its process exit status:
 
 | Exit | Meaning |
 |------|---------|
-| `0` | Converged — the results are usable |
+| `0` | Converged, the results are usable |
 | `1` | Input or usage error: bad command file, unreadable data file, parse failure, unknown command |
 | `2` | The solve ran but did not converge: maximum iterations, divergence, or a singular Jacobian. Results may still have been written, but they are **not** a valid power-flow solution |
 
@@ -334,22 +367,22 @@ helios: status: NOT_CONVERGED (singular)
 helios: status: NOT_RUN
 ```
 
-`NOT_RUN` means no solve was requested (for example `$NBITMA 0`), which exits `0`. Text on stdout is unchanged and remains compatible with PFC; scripts should use the exit status and this line rather than parsing stdout.
+`NOT_RUN` means no solve was requested (for example `$NBITMA 0`), which exits `0`. Scripts should use the exit status and this line rather than parsing stdout.
 
 These values are shared with the Helios C API, where `HELIOS_OK` is `0` and `HELIOS_NOT_CONVERGED` is `2` (`1` is reserved and never returned by the API). `HELIOS_NOT_CONVERGED` is `2` from Helios 1.4.1 onward; in 1.3.0 and earlier it was `1`. The `pyramses.helios.HeliosSession` wrapper exposes convergence as the boolean `pf.converged` and the `pf.solver_status` enum, neither of which is affected by the numbering.
 
-## Record Sharing Between PFC and RAMSES
+## Record Sharing Between Power Flow and RAMSES
 
-The following table summarises which records are used by PFC and RAMSES respectively.
+The following table summarises which records are used by the power flow and by RAMSES respectively.
 
-| Record | PFC | RAMSES |
+| Record | Power flow | RAMSES |
 |--------|-----|--------|
-| BUS | All 6 fields | First 2 fields (NAME, VNOM) |
+| BUS | All 6 fields (QSHUNT optional) | First 2 fields (NAME, VNOM) |
 | LINE | All fields | All fields |
 | SWITCH | All fields | All fields |
 | NRTP | All fields | All fields |
 | TRANSFO | All fields | All fields |
-| TRFO | All fields | Fields 1–9 and 15 only |
+| TRFO | All fields | Fields 1 to 9 and 15 only |
 | SHUNT | Ignored | All fields |
 | GENER | All fields | Ignored |
 | SVC | All fields | Ignored |
@@ -357,8 +390,22 @@ The following table summarises which records are used by PFC and RAMSES respecti
 | LFRESV | Input: initial values; Output: solution | Input: initial values for RAMSES |
 | LTC-V | Used | Ignored |
 | PSHIFT-P | Used | Ignored |
+| BUSPART, BRAPART | Used for reporting | Ignored |
+
+## Historical Note: PFC
+
+Helios succeeds **PFC**, the Fortran power-flow calculator written by Dr. Thierry
+Van Cutsem that was the STEPSS power flow from the beginning. Helios reimplements
+its Newton-Raphson formulation in C++20, reads the same input files, and matches
+its solver defaults, so data prepared for PFC runs unchanged. PFC is no longer
+shipped with STEPSS or with PyRAMSES; nothing on this page requires it.
+
+Two numerical points are worth knowing when comparing old results with new ones:
+
+- The two engines use different sparse linear solvers, so the last displayed decimal can differ.
+- Helios recomputes the Jacobian values at every iteration, a true Newton method, where PFC froze them below `$MISBLOC`. Iteration counts can therefore differ slightly.
 
 ## Next Steps
 
-- [Reference Frames & Initialization](/user-guide/reference-frames/), Understand how RAMSES initializes from the PFC solution
+- [Reference Frames & Initialization](/user-guide/reference-frames/), Understand how RAMSES initializes from the power flow solution
 - [Dynamic Models](/user-guide/dynamic-models/), Define synchronous machines, injectors, and controllers

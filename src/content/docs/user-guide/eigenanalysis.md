@@ -11,7 +11,7 @@ The tool analyzes small-signal stability by computing eigenvalues of the system 
 
 ## Features
 
-- **Multiple analysis methods**: QZ (standard), ARPACK (sparse), Arnoldi (iterative), JDQR (targeted)
+- **Two selectable analysis methods**: QZ (dense, via `eig()`) and ARP (sparse descriptor, via `eigs()`). Arnoldi and JDQR implementations are present in `scripts/` but are not reachable through the `method` argument
 - **Interactive analysis**: dominant eigenvalue identification, mode shape analysis, participation factors, damping ratios
 - **Automatic Jacobian extraction** from RAMSES simulation data
 
@@ -51,8 +51,11 @@ And the solver settings include:
 
 ```
 $OMEGA_REF SYN ;
-$SCHEME IN ;
 ```
+
+:::note
+The integrated scheme (`$SCHEME IN`) writes `jac_val.dat`, `jac_eqs.dat` and `jac_var.dat`. `jac_struc.dat` is produced only by the decomposed scheme (`$SCHEME DE`), so pass an empty `''` for that argument when you export from an integrated run.
+:::
 
 ### 2. Run Eigenanalysis in MATLAB
 
@@ -74,7 +77,7 @@ ssa('jac_val.dat', 'jac_eqs.dat', 'jac_var.dat', 'jac_struc.dat', ...
 | `jac_val.dat` | Matrix values in coordinate format | |
 | `jac_eqs.dat` | Equation descriptions (differential/algebraic) | |
 | `jac_var.dat` | Variable descriptions (differential/algebraic) | |
-| `jac_struc.dat` | Decomposed power system structure (optional) | |
+| `jac_struc.dat` | Decomposed power system structure, written only by the decomposed scheme (optional) | |
 | `real_limit` | Real part threshold for dominant eigenvalues | $-\infty$ |
 | `damp_ratio` | Damping ratio threshold | 1.0 |
 | `method` | Analysis method: `'QZ'` or `'ARP'` | `'QZ'` |
@@ -98,6 +101,7 @@ ssa('jac_val.dat', 'jac_eqs.dat', 'jac_var.dat', 'jac_struc.dat', ...
 
 - Jacobi-Davidson QR method for targeted eigenvalue computation
 - Useful for finding specific eigenvalues (e.g., poorly damped modes)
+- Implemented in `scripts/jdqr.m`, but `ssa()` accepts only `'QZ'` and `'ARP'` for `method`; call the script directly to use it
 
 ## Interactive Analysis
 

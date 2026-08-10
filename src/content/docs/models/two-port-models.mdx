@@ -22,12 +22,12 @@ The record fields, in order, are:
 - `model_name`: two-port model type (e.g., `HVDC_LCC`, `DCL_WCL`, `HVDC_VSC_SC`). The `twop_` prefix is added automatically if omitted, so both `HVDC_LCC` and `twop_HVDC_LCC` are accepted.
 - `twop_name`: unique instance name.
 - `bus_orig`, `bus_extr`: origin and extremity bus names.
-- `S_or_A`: `S` (series-branch insertion) or `A` (shunt-style anchor) flag.
+- `S_or_A`: synchronizing mode. `S` keeps the two buses in the same electrical island, appropriate for an AC link; `A` makes the link asynchronous, so island detection stops at it and the two ends can run at different frequencies, as an HVDC link must. Any other value is a hard error.
 - `FP_ORIG`/`FQ_ORIG`/`P_ORIG`/`Q_ORIG`: initial active/reactive power injection at the origin bus. Either the fraction (`FP_ORIG`/`FQ_ORIG`, of the load at that bus) or the absolute power (`P_ORIG`/`Q_ORIG`, in MW/Mvar) must be zero.
 - `FP_EXTR`/`FQ_EXTR`/`P_EXTR`/`Q_EXTR`: same pattern for the extremity bus.
 - Remaining fields are the model-specific parameter list.
 
-Three two-port models are available in every RAMSES distribution (both the standalone executable and the shared library used by PyRAMSES): `HVDC_LCC` / `twop_HVDC_LCC`, `DCL_WCL` / `twop_DCL_WCL`, and `HVDC_VSC_SC` / `twop_HVDC_VSC_SC`. Other two-port models documented below (`twop_HVDC_VSC`, the Hydro-Québec family `twop_CSVGN5`, `twop_CHENIER`, etc.) are not callable out of the box. They can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
+Three two-port models are available in every RAMSES distribution (both the standalone executable and the shared library used by PyRAMSES): `HVDC_LCC` / `twop_HVDC_LCC`, `DCL_WCL` / `twop_DCL_WCL`, and `HVDC_VSC_SC` / `twop_HVDC_VSC_SC`. `twop_HVDC_VSC`, also documented below, is compiled into the library but registered under no name; it becomes callable by adding one case to the URAMSES router (see the [URAMSES guide](/developer/uramses/)).
 :::
 
 ---

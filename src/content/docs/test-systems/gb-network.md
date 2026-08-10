@@ -30,7 +30,7 @@ sim = pyramses.sim()
 sim.execSim(case)
 ```
 
-The disturbance file contains ready-made (commented) templates for line and machine trips, bus faults, and HVDC parameter changes — uncomment and adapt them as needed. Alternatively, run the RAMSES executable directly with the included `cmd.txt`.
+The disturbance file contains ready-made (commented) templates for line and machine trips, bus faults, and HVDC parameter changes; uncomment and adapt them as needed. Alternatively, run the RAMSES executable directly with the included `cmd.txt`.
 
 ---
 

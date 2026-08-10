@@ -11,7 +11,9 @@ After importing the package, the following attributes are available:
 
 | Attribute | Description |
 |-----------|-------------|
-| `pyramses.__version__` | Current version string (e.g., `'0.1.0'`) |
+| `pyramses.__version__` | Current version string |
+| `pyramses.__ramses_version__` | Version of the bundled RAMSES library |
+| `pyramses.__helios_version__` | Version of the bundled Helios library |
 | `pyramses.__url__` | Documentation URL |
 | `pyramses.__runTimeObs__` | `True` if Gnuplot was found in PATH at import time; runtime observables will be active |
 

@@ -25,7 +25,7 @@ BUS NAME VNOM ;
 Only one BUS record per bus is allowed. All buses must be declared before being referenced.
 
 :::note
-For power flow computations with PFC, an extended version of the BUS record with six fields is used (see [PFC Data](/user-guide/pfc/)). When RAMSES encounters the extended format, only the first two fields are read.
+For power flow computations, an extended version of the BUS record with six fields is used (see [Power Flow Data & Settings](/user-guide/power-flow/)). When RAMSES encounters the extended format, only the first two fields are read.
 :::
 
 ## Lines and Cables
@@ -172,28 +172,28 @@ To connect a transformer through a single end, add a bus at the open end and set
 TRFO NAME FROMBUS TOBUS CONBUS R X B N SNOM NFIRST NLAST NBPOS TOLV VDES BR ;
 ```
 
-This simplified model has $B_2 = 0$ and $\phi = 0$, and **combines the transformer model with load tap changer (LTC) data for PFC** in a single record. The LTC fields (`CONBUS`, `NFIRST`, `NLAST`, `NBPOS`, `TOLV`, `VDES`) provide PFC with the information needed to adjust the transformer ratio during power flow computation. These fields are not used by RAMSES during dynamic simulation. It cannot be used for phase-shifting transformers.
+This simplified model has $B_2 = 0$ and $\phi = 0$, and **combines the transformer model with load tap changer (LTC) data for the power flow** in a single record. The LTC fields (`CONBUS`, `NFIRST`, `NLAST`, `NBPOS`, `TOLV`, `VDES`) carry the information needed to adjust the transformer ratio during power flow computation. These fields are not used by RAMSES during dynamic simulation. It cannot be used for phase-shifting transformers.
 
-To control the transformer ratio during dynamic simulation, associate a [DCTL LTC](/models/discrete-controllers/#dctl_ltc--load-tap-changer-standard) controller with the transformer.
+To control the transformer ratio during dynamic simulation, associate a [DCTL LTC](/models/discrete-controllers/#ltc-dctl_ltc-load-tap-changer-standard) controller with the transformer.
 
-See [PFC Data](/user-guide/pfc/) for details on ratio adjustment.
+See [Power Flow Data & Settings](/user-guide/power-flow/) for details on ratio adjustment.
 
 | Field | Description | Unit |
 |-------|-------------|------|
 | `NAME` | Transformer name (max 20 characters) | |
 | `FROMBUS` | "From" bus name (max 8 characters) | |
 | `TOBUS` | "To" bus name (max 8 characters) | |
-| `CONBUS` | Controlled bus for PFC ratio adjustment (max 8 characters). Not used by RAMSES, but a dummy name must be provided | |
+| `CONBUS` | Controlled bus for power flow ratio adjustment (max 8 characters). Not used by RAMSES, but a dummy name must be provided | |
 | `R` | Series resistance | % |
 | `X` | Leakage reactance | % |
 | `B` | Shunt susceptance (from side; $B_2 = 0$) | % |
 | `N` | Transformer ratio magnitude | % |
 | `SNOM` | Nominal apparent power (must not be zero) | MVA |
-| `NFIRST` | Ratio at first tap position (lower bound), used by PFC for ratio adjustment | % |
-| `NLAST` | Ratio at last tap position (upper bound), used by PFC for ratio adjustment | % |
-| `NBPOS` | Number of tap positions (including first and last), used by PFC for ratio adjustment | |
-| `TOLV` | Voltage tolerance for tap adjustment, used by PFC | pu |
-| `VDES` | Desired controlled bus voltage, used by PFC | pu |
+| `NFIRST` | Ratio at first tap position (lower bound), used by the power flow for ratio adjustment | % |
+| `NLAST` | Ratio at last tap position (upper bound), used by the power flow for ratio adjustment | % |
+| `NBPOS` | Number of tap positions (including first and last), used by the power flow for ratio adjustment | |
+| `TOLV` | Voltage tolerance for tap adjustment, used by the power flow | pu |
+| `VDES` | Desired controlled bus voltage, used by the power flow | pu |
 | `BR` | Breaker status (0 = open/out of service, other = closed/in service) | |
 
 ## Non-Reciprocal Two-Ports
@@ -280,10 +280,10 @@ Only one SHUNT record per named shunt is allowed. **Multiple shunts at the same 
 All shunts are memorized, even those which are disconnected. A disconnected shunt has zero power flow but can be put into service during dynamic simulation.
 
 :::caution
-The SHUNT record is used by RAMSES. For PFC, shunt data is specified in the extended BUS record (see [PFC Data](/user-guide/pfc/)).
+The SHUNT record is used by RAMSES. For the power flow, shunt data is specified in the extended BUS record (see [Power Flow Data & Settings](/user-guide/power-flow/)).
 :::
 
 ## Next Steps
 
-- [Power Flow (PFC)](/user-guide/pfc/), Configure generators, loads, and compute the initial operating point
+- [Power Flow (Helios)](/user-guide/power-flow/), Configure generators, loads, and compute the initial operating point
 - [Dynamic Models](/user-guide/dynamic-models/), Add synchronous machines and controllers

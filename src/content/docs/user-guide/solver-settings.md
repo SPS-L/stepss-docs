@@ -61,17 +61,6 @@ $OBS_BUFFER_SIZE size(GB) ;
 
 Default: 8 GB. Set this to less than half of your available RAM for large simulations.
 
-### Sparse Solver
-
-Selects the sparse linear solver used for Jacobian factorization:
-
-```
-$SPARSE_SOLVER name ;
-```
-
-- `KLU`: SuiteSparse KLU solver (default)
-- `ma41`: HSL MA41 solver
-
 ## System Parameters
 
 ### Base Power
@@ -222,11 +211,15 @@ $OMP STA/DYN/GUI chunk ;
 
 ### User Model Library
 
-Load a compiled user-model library (MDL file) at startup, making its models available to the simulation (Windows/Intel builds only):
+Load a compiled user-model library (MDL file) at startup, making its models available to the simulation:
 
 ```
 $BASE_MDL filename ;
 ```
+
+:::caution
+This record is compiled in only for Windows builds made with the Intel Fortran compiler. Every RAMSES binary currently distributed (Windows, Linux and macOS) is a gfortran build, so `$BASE_MDL` has no effect on them. Link your models into a custom simulator with [URAMSES](/developer/uramses/) instead.
+:::
 
 ### License
 

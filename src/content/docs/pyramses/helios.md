@@ -3,7 +3,7 @@ title: Power Flow with Helios
 description: Running AC power flows from Python with pyramses.helios.HeliosSession
 ---
 
-The `pyramses.helios` module wraps [Helios](/user-guide/pfc/), the STEPSS AC power-flow engine (successor of the Fortran PFC). Pre-compiled libraries are bundled with the package for Windows, Linux, and macOS — no separate installation is required.
+The `pyramses.helios` module wraps [Helios](/user-guide/power-flow/), the STEPSS AC power-flow engine. Pre-compiled libraries are bundled with the package for Windows, Linux, and macOS, so no separate installation is required.
 
 Unlike the RAMSES classes (which follow the historical camelCase conventions), this module uses PEP 8 snake_case naming. Errors are raised as `pyramses.HeliosError`, carrying the engine's diagnostic message.
 
@@ -39,7 +39,7 @@ pf.solve()
 
 ## Vectorized Results
 
-Bulk getters return NumPy arrays indexed like the corresponding `*_names()` lists — no text parsing needed:
+Bulk getters return NumPy arrays indexed like the corresponding `*_names()` lists, with no text parsing needed:
 
 ```python
 v_pu, angle_rad = pf.get_bus_voltages()
@@ -84,7 +84,7 @@ results = pf.run_contingencies(file='contingencies.txt')
 
 ```python
 pf.write_dump('solved_case.dat')      # re-loadable data file
-pf.write_voltrat('volt_rat.dat')      # LFRESV + TRANSFO records — RAMSES initial conditions
+pf.write_voltrat('volt_rat.dat')      # LFRESV + TRANSFO records, RAMSES initial conditions
 pf.write_matlab('system.m')           # operating point + Y-bus script
 pf.write_diagram('template.svg', 'diagram.svg')
 ```
@@ -92,7 +92,7 @@ pf.write_diagram('template.svg', 'diagram.svg')
 `volt_rat.dat` is the natural bridge to dynamic simulation: solve a power flow with Helios, export it, and pass it to a RAMSES case via `case.addData('volt_rat.dat')`.
 
 :::note
-`write_voltrat()` emits one `LFRESV` record per bus plus one `TRANSFO` record per in-service LTC transformer, carrying its *solved* ratio — the same output as the Fortran PFC. Hand-maintained operating-point files (e.g. `volt_rat_B.dat` of the Nordic test system) often use `TRFO` records instead, which additionally carry the LTC ranges used on the power-flow side. The two styles are interchangeable as RAMSES input: RAMSES ignores the LTC fields of a `TRFO` record, and dynamic tap-changer behaviour is defined by the `DCTL LTC` records of the dynamic data file.
+`write_voltrat()` emits one `LFRESV` record per bus plus one `TRANSFO` record per in-service LTC transformer, carrying its *solved* ratio. Hand-maintained operating-point files (e.g. `volt_rat_B.dat` of the Nordic test system) often use `TRFO` records instead, which additionally carry the LTC ranges used on the power-flow side. The two styles are interchangeable as RAMSES input: RAMSES ignores the LTC fields of a `TRFO` record, and dynamic tap-changer behaviour is defined by the `DCTL LTC` records of the dynamic data file.
 :::
 
 ## Runnable Examples
@@ -101,5 +101,5 @@ Five self-contained scripts ship in the repository under [`examples/helios/`](ht
 
 ## Further Reading
 
-- [Power Flow user guide (PFC & Helios)](/user-guide/pfc/) — data format, solver parameters, engine details
-- Full method-level documentation: [PyRAMSES Sphinx docs](https://stepss.sps-lab.org/pyramses/)
+- [Power Flow user guide](/user-guide/power-flow/), data format, solver parameters, engine details
+- Full method-level documentation: the docstrings on `HeliosSession`, e.g. `help(pyramses.HeliosSession)`

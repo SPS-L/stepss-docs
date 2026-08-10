@@ -11,12 +11,11 @@ description: Academic publications and suggested reading
 
 3. D. Fabozzi, A. Chieh, B. Haut, and T. Van Cutsem, "Accelerated and localized Newton schemes for faster dynamic simulation of large power systems," *IEEE Transactions on Power Systems*, vol. 28, no. 4, pp. 4936–4947, Dec. 2013. Doi: [10.1109/TPWRS.2013.2251915](https://doi.org/10.1109/TPWRS.2013.2251915)
 
-
-5. P. Aristidou and T. Van Cutsem, "A parallel processing approach to dynamic simulations of combined transmission and distribution systems," *International Journal of Electrical Power & Energy Systems*, vol. 72, pp. 58–65, Nov. 2015. Doi: [10.1016/j.ijepes.2015.02.011](https://doi.org/10.1016/j.ijepes.2015.02.011)
+4. P. Aristidou and T. Van Cutsem, "A parallel processing approach to dynamic simulations of combined transmission and distribution systems," *International Journal of Electrical Power & Energy Systems*, vol. 72, pp. 58–65, Nov. 2015. Doi: [10.1016/j.ijepes.2015.02.011](https://doi.org/10.1016/j.ijepes.2015.02.011)
 
 ## Reference Frame and Solver
 
-6. D. Fabozzi and T. Van Cutsem, "On angle references in long-term time-domain simulations," *IEEE Transactions on Power Systems*, vol. 26, no. 1, pp. 483–484, Feb. 2011.
+5. D. Fabozzi and T. Van Cutsem, "On angle references in long-term time-domain simulations," *IEEE Transactions on Power Systems*, vol. 26, no. 1, pp. 483–484, Feb. 2011.
 
 ## Project Pages
 

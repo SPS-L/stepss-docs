@@ -7,11 +7,11 @@ import { Tabs, TabItem, Steps } from '@astrojs/starlight/components';
 
 STEPSS provides three ways to run simulations:
 
-| Interface | Dynamic Simulator (RAMSES) | Static Simulator (PFC) | CODEGEN |
+| Interface | Dynamic Simulator (RAMSES) | Power Flow (Helios) | CODEGEN |
 |-----------|:-------------------------:|:----------------------:|:-------:|
-| **Command Line** | `ramses -t cmd.txt` | `pfc -t cmd.txt` | `codegen model.txt` |
+| **Command Line** | `ramses -t cmd.txt` | `helios -t cmd.txt` | `codegen model.txt` |
 | **GUI (Java)** | Via STEPSS GUI | Via STEPSS GUI | Via STEPSS GUI |
-| **Python** | Via PyRAMSES | | |
+| **Python** | Via PyRAMSES | Via `pyramses.helios` | |
 
 ---
 
@@ -90,14 +90,14 @@ Lines starting with `#` in the command file are treated as comments and skipped.
 
 1. **Launch STEPSS** by double-clicking `stepss.jar`
 2. **Load a test case**: Use File → Open to load your data files
-3. **Run Power Flow**: Execute PFC to compute the initial operating point
+3. **Run Power Flow**: Execute Helios to compute the initial operating point
 4. **Configure Simulation**: Set solver parameters and define disturbances
 5. **Run Dynamic Simulation**: Execute RAMSES and observe results
 6. **Analyze Results**: Use the built-in plotting tools to visualize voltage, frequency, and power traces
 
 </Steps>
 
-The GUI coordinates PFC and RAMSES through lock files (`.lock_RAMSES`, `.kill_RAMSES`) for graceful process management.
+The GUI coordinates the power flow and RAMSES through lock files (`.lock_RAMSES`, `.kill_RAMSES`) for graceful process management.
 
 For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/stepss/).
 
@@ -136,7 +136,7 @@ For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/s
    ext.getBus('1041').mag.plot()
 
    # Plot synchronous machine speed
-   ext.getSync('g1').speed.plot()
+   ext.getSync('g1').S.plot()
    ```
 
 </Steps>
@@ -148,38 +148,37 @@ See the [PyRAMSES API Reference](/pyramses/api-reference/) for the complete inte
 
 ---
 
-## Static Simulation (PFC)
+## Power Flow (Helios)
 
 <Tabs>
 <TabItem label="Command Line">
 
-### PFC Command-Line Interface
+### Helios Command-Line Interface
 
-The PFC executable accepts the following arguments:
+The Helios executable accepts the following arguments:
 
 ```bash
-pfc.exe [-t command_file] [-o output_file] [-c trigger_file] [-v verbosity]
+helios [-t command_file] [--plain] [--tui]
 ```
 
 | Flag | Description |
 |------|-------------|
 | `-t command_file` | Read inputs from a command file (non-interactive mode) |
-| `-o output_file` | Redirect output to a file instead of the console |
-| `-c trigger_file` | Cycle mode, wait for trigger file to start/proceed |
-| `-v N` | Verbosity level (0 = silent, 1 = normal) |
+| `--plain` | Force plain-text output instead of the interactive terminal UI |
+| `--tui` | Force the interactive terminal UI |
 
-**Interactive mode** (no `-t` flag): PFC prompts for data files, then presents a command menu.
+**Interactive mode** (no `-t` flag): Helios prompts for data files, then presents a command menu. On a TTY it uses a colour-coded terminal UI; when stdin is a pipe it falls back to plain text automatically.
 
-**Non-interactive mode** (`-t` flag): The command file provides data file names (one per line, blank line to end), followed by menu commands.
+**Non-interactive mode** (`-t` flag): The command file provides data file names (one per line, blank line to end), followed by menu commands. Results go to stdout and errors to stderr with line numbers. Paths resolve relative to the working directory, so `cd` into the data directory first.
 
 <Steps>
 
-1. **Prepare data files**: Network data, PFC-specific data (generators, loads, SVC, LTC-V, PSHIFT-P)
+1. **Prepare data files**: Network data and power flow data (generators, loads, SVC, LTC-V, PSHIFT-P)
 
-2. **Create a command file** (`pfc_cmd.txt`):
+2. **Create a command file** (`pf_cmd.txt`):
    ```
    network.dat
-   pfc_data.dat
+   powerflow.dat
 
    VT
    volt_rat.dat
@@ -188,14 +187,16 @@ pfc.exe [-t command_file] [-o output_file] [-c trigger_file] [-v verbosity]
 
 3. **Run the power flow**:
    ```bash
-   pfc.exe -tpfc_cmd.txt -ooutput.txt
+   helios -t pf_cmd.txt > output.txt
    ```
 
 </Steps>
 
-### PFC Menu Commands
+The run's outcome is reported through the process exit status: `0` converged, `1` input or usage error, `2` solve did not converge. See [Exit Status](/user-guide/power-flow/#exit-status).
 
-After loading data and solving, PFC presents these commands:
+### Helios Menu Commands
+
+After loading data and solving, Helios presents these commands:
 
 | Command | Description |
 |---------|-------------|
@@ -220,8 +221,8 @@ The `VT` command produces the LFRESV file needed to initialize RAMSES.
 <Steps>
 
 1. **Launch STEPSS** by double-clicking `stepss.jar`
-2. **Load data files**: Use File → Open to load network and PFC data files
-3. **Run Power Flow**: Click the PFC button to compute the power flow
+2. **Load data files**: Use File → Open to load network and power flow data files
+3. **Run Power Flow**: Click the Helios button to compute the power flow
 4. **Inspect results**: View bus voltages, branch flows, generator outputs, and reactive power limits
 5. **Export LFRESV**: Save the power flow solution for use with RAMSES
 
@@ -238,7 +239,7 @@ For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/s
 
 1. **Define the network**: Specify buses, lines, transformers, and shunts
 2. **Set up power flow data**: Define generators, loads, and the slack bus
-3. **Run PFC**: Compute the initial operating point and export LFRESV
+3. **Run the power flow**: Compute the initial operating point and export LFRESV
 4. **Add dynamic models**: Specify synchronous machines, excitation systems, speed governors, loads, and controllers
 5. **Configure solver**: Set integration method, time steps, and tolerances
 6. **Define disturbances**: Specify faults, line trips, parameter changes, etc.
@@ -249,6 +250,6 @@ For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/s
 
 - [File Formats](/user-guide/file-formats/), Learn about data file syntax
 - [Network Modeling](/user-guide/network/), Define your power system network
-- [Power Flow (PFC)](/user-guide/pfc/), PFC data and control parameters
+- [Power Flow (Helios)](/user-guide/power-flow/), Power flow data and control parameters
 - [Dynamic Models](/user-guide/dynamic-models/), Add generators, loads, and controllers
 - [PyRAMSES API](/pyramses/api-reference/), Full Python API documentation

@@ -435,8 +435,8 @@ After writing a model file, CODEGEN translates it into Fortran 2003 code. The wo
 
 1. Write the model description file
 2. Run CODEGEN (via GUI or command line) to generate Fortran source
-3. Compile with Intel Fortran compiler
-4. Link with RAMSES to create a custom executable or DLL
+3. Compile the generated Fortran with gfortran
+4. Link against the pre-compiled RAMSES library to create a custom executable or shared library
 
 For compilation details, see [URAMSES](/developer/uramses/).
 

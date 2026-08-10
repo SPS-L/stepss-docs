@@ -26,7 +26,7 @@ Uppercase short names (no prefix): `CONSTANT`, `1ST_ORDER`, `GENERIC1`, `GENERIC
 
 Prefixed names (either form): `kundur` / `exc_kundur`, `ENTSOE_simp`, `ST1A`, `SEXS`, `SEXS_IEEEST`, `GENERIC3` / `exc_GENERIC3`, `GENERIC4` / `exc_GENERIC4`, `AC1A`, `AC4A`, `IEEET5`, `ST1A_IEEEST`, `ST1A_PSS4B`, `ST1A_PSS2B`, `EXPIC1_PSS2B`.
 
-All names above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). Additional IEEE variants listed in the [IEEE Exciter Models](/models/ieee-exciters/) page (`AC1A_MAXEX2`, `AC1A_RETRO*`, `AC8B*`, `DC3A`, `EXPIC1`, `SEXS_STAB3_lim`, `ST1A_lim`, etc., and the `EXHQSC*` family) are not callable out of the box and require extending RAMSES through URAMSES.
+All names above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). The additional IEEE variants listed on the [IEEE Exciter Models](/models/ieee-exciters/) page (`AC1A_MAXEX2`, `AC1A_RETRO*`, `AC8B`, `DC3A`, `EXPIC1`, `SEXS_STAB3_lim`, `ST1A_lim` and the rest) are compiled but registered under no name, so they require adding a case to the URAMSES router.
 
 For detailed documentation of each model, see the [Model Reference](/models/ieee-exciters/) section.
 
@@ -67,9 +67,10 @@ Uppercase short names take no prefix; the prefixed names accept either `inj_` or
 | `GFOL` | `inj_GFOL` | Grid-following converter |
 | `GFOR` | `inj_GFOR` | Grid-forming converter |
 | `vfd_load` | `inj_vfd_load` | Variable-frequency-drive load |
+| `PMU` | `inj_PMU` | Phasor measurement unit, zero-injection frequency/voltage probe |
 | `VFAULT` | `inj_VFAULT` | Internal voltage-fault injector (auto-added by RAMSES) |
 
-All injectors listed in the table above are compiled into every RAMSES build. Additional injector variants documented in the [Injector Models](/models/custom-injectors/) page (`inj_INDM1`, `inj_norton`, `inj_PVG`) are not callable out of the box and require extending RAMSES through URAMSES.
+All injectors listed in the table above are compiled into every RAMSES build and callable by name. `inj_INDM1` and `inj_PVG`, documented on the [Injector Models](/models/custom-injectors/) page, are compiled but registered under no name and require adding a case to the URAMSES router. `inj_norton` is excluded from the build entirely.
 
 ## Thévenin Equivalent (Infinite Bus)
 
@@ -116,7 +117,7 @@ RAMSES adds the `twop_` prefix to the model name automatically, so both `HVDC_LC
 | `HVDC_VSC_SC` | `twop_HVDC_VSC_SC` | Self-commutating (grid-forming) VSC-HVDC |
 | `DCL_WCL` | `twop_DCL_WCL` | DC link with wind-converter link (offshore wind HVDC) |
 
-The three models above are built into every RAMSES distribution. Other two-port models documented in the [Two-Port Models](/models/two-port-models/) page (`twop_HVDC_VSC` and the Hydro-Québec family `twop_CHENIER`, `twop_CSVGN5`, `twop_HQSVC`, `twop_DC_BHPM`, `twop_DC_CHAAUT`, `twop_DC_CHTFWX`, `twop_DC_LVCL_1`) are not callable out of the box and require extending RAMSES through URAMSES.
+The three models above are built into every RAMSES distribution. `twop_HVDC_VSC`, documented on the [Two-Port Models](/models/two-port-models/) page, is compiled but registered under no name and requires adding a case to the URAMSES router.
 
 For detailed documentation of each model, see the [Model Reference](/models/ieee-exciters/) section.
 
@@ -148,7 +149,7 @@ The following discrete-controller names are built into every RAMSES distribution
 | `UVPROT` | Under-voltage protection |
 | `PST` | Phase-shifting transformer controller |
 | `RT` | Real-time synchronizer |
-| `MAIS` | Multi-area islanding scheme |
+| `MAIS` | Automatic shunt-reactor switching scheme |
 | `FRT` | Fault ride-through |
 | `SIM_MINMAXVOLT` | Voltage stopping criteria |
 | `SIM_MINMAXSPEED` | Speed stopping criteria |

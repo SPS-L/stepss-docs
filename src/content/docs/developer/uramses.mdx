@@ -38,7 +38,7 @@ sudo pacman -S gcc-fortran openblas
 brew install gcc openblas
 ```
 
-Apple Silicon only — the pre-compiled `modules_m/` kit is arm64.
+Apple Silicon only: the pre-compiled `modules_m/` kit is arm64.
 
 </TabItem>
 <TabItem label="Windows (MinGW)">
@@ -129,7 +129,7 @@ Each platform links its own pre-compiled RAMSES kit, published with the matching
 RAMSES release as `uramses-modules_{l,m,wg}-<version>.zip`.
 
 <Aside type="note">
-The Makefiles live in `build/` but are always run **from the repository root** —
+The Makefiles live in `build/` but are always run **from the repository root**,
 `make -f build/Makefile.linux`. `-f` does not change make's working directory,
 so every path inside them stays root-relative. Do not `cd build`.
 </Aside>
@@ -279,12 +279,26 @@ or copy those DLLs next to `ramses.dll`, when loading it from Python.
 
 ### Example: Registering an Exciter Model
 
-In `src/usr_exc_models.f90`, add a case for your model:
+In `src/usr_exc_models.f90`, declare the subroutine and point the model pointer at
+it. The case label carries the `exc_` prefix, because the router has already
+added it to whatever name the data file used:
 
-```txt
-case ('MY_EXCITER')
-    call exc_MY_EXCITER(...)
+```fortran-free-form
+   external :: exc_MY_EXCITER
+   ...
+   select case (modelname4)
+      case('exc_MY_EXCITER')
+         exc_ptr=>exc_MY_EXCITER
 ```
+
+The other four routers follow the same shape, with `tor_`, `inj_`, `twop_` and
+`dctl_` prefixes and their own pointer names. A data file then refers to the
+model as either `MY_EXCITER` or `exc_MY_EXCITER`.
+
+This is also how you reach a model that RAMSES already compiles but registers
+under no name, such as `exc_AC8B` or `twop_HVDC_VSC`: add the case, leave
+`custom_models/` empty, and relink. The subroutine is already in `libramses`, so
+no `external` declaration or source file of your own is needed.
 
 ### Included Example Models
 
@@ -296,8 +310,8 @@ The repository includes these example models:
 | `inj_AIR_COND1_mod.f90` | Air conditioning load injector |
 
 <Aside type="caution" title="Do not duplicate library models">
-Models that the linked RAMSES library already provides — such as `exc_ST1A`,
-`exc_GENERIC3`, `exc_GENERIC4` and `tor_ENTSOE_simp` — must not be copied into
+Models that the linked RAMSES library already provides, such as `exc_ST1A`,
+`exc_GENERIC3`, `exc_GENERIC4` and `tor_ENTSOE_simp`, must not be copied into
 `custom_models/`. Defining a subroutine that the library also exports produces a
 duplicate-symbol link error. Register those by name in the `usr_*_models.f90`
 routers instead.
@@ -321,7 +335,13 @@ PyRAMSES loads `ramses.so` on Linux and macOS, and `ramses.dll` on Windows.
 
 ### With STEPSS GUI
 
-Replace the default RAMSES DLL/executable with your custom-built version.
+The **Codegen** tab does this for you: it runs CODEGEN on your model
+description, then drives these same Makefiles against the bundled URAMSES kit to
+produce a custom `dynsim`, which it uses for subsequent simulations. You need
+`gfortran`, GNU `make` and OpenBLAS installed; see
+[Installation](/getting-started/installation/). Building by hand and replacing
+the simulator manually is only necessary for models the Codegen tab cannot
+generate.
 
 ## Helper Functions
 

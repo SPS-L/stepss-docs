@@ -19,9 +19,9 @@ Where `model_name` is the model identifier, `inj_name` is a unique instance name
 Recognised injector model names (case-sensitive):
 
 - **Uppercase short names** (no prefix): `LOAD`, `RESTLD`, `THEVEQ`, `INDMACH1`, `INDMACH2`, `SVC_GENERIC1`.
-- **Prefixed names**: RAMSES adds the `inj_` prefix automatically: `VFAULT`/`inj_VFAULT`, `vfd_load`/`inj_vfd_load`, `PQ`/`inj_PQ`, `IBG`/`inj_IBG`, `WT3`/`inj_WT3`, `WT4`/`inj_WT4`, `BESS`/`inj_BESS`, `GFOL`/`inj_GFOL`, `GFOR`/`inj_GFOR`.
+- **Prefixed names**: RAMSES adds the `inj_` prefix automatically: `VFAULT`/`inj_VFAULT`, `vfd_load`/`inj_vfd_load`, `PQ`/`inj_PQ`, `IBG`/`inj_IBG`, `WT3`/`inj_WT3`, `WT4`/`inj_WT4`, `BESS`/`inj_BESS`, `GFOL`/`inj_GFOL`, `GFOR`/`inj_GFOR`, `PMU`/`inj_PMU`.
 
-All of the above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). Additional variants documented below but not in this list (`inj_INDM1`, `inj_norton`, `inj_PVG`) are not callable out of the box. They can be enabled by extending RAMSES through URAMSES (see the [URAMSES guide](/developer/uramses/)).
+All of the above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). `inj_INDM1` and `inj_PVG`, documented below, are compiled into the library but registered under no name; each becomes callable by adding one case to the URAMSES router (see the [URAMSES guide](/developer/uramses/)). `inj_norton` is excluded from the build entirely and is not available.
 
 > **Note on case sensitivity.** Match the case used above exactly. The uppercase short names must be uppercase. For the prefixed family, `vfd_load` and `VFAULT` use those exact cases. Most others follow the convention `inj_<UPPERCASE>` (e.g. `inj_PQ`, `inj_GFOR`).
 :::
@@ -592,7 +592,7 @@ INJEC  IBG  IBG1  BUS_GEN  1.  1.  0.  0.  1.2  1.0  0.5  0.02  0.01  0.5  1.0  
 
 ---
 
-### `WT3` (`inj_WT3WithChanges`): Type 3 Wind Turbine (DFIG)
+### `WT3` (`inj_WT3`): Type 3 Wind Turbine (DFIG)
 
 The data-file model name is `WT3` (or `inj_WT3`).
 
@@ -658,7 +658,7 @@ INJEC  WT3  WT3_1  BUS_WIND  1.  1.  0.  0.
 
 ---
 
-### `WT4` (`inj_WT4WithChanges`): Type 4 Wind Turbine (Full Converter)
+### `WT4` (`inj_WT4`): Type 4 Wind Turbine (Full Converter)
 
 The data-file model name is `WT4` (or `inj_WT4`).
 
@@ -913,7 +913,7 @@ The measured active power is filtered with time constant $T_{\mathrm{lpf}}$ and 
 
 $$I_d^{\max,\mathrm{stat}} = \sqrt{\max\left(I_{\mathrm{max}}^2 - i_q^2,\; 0\right)}$$
 
-and $I_d^{\max}$ tracks this static value through a first-order lag ($T_{\mathrm{rlim}}$, typically 0.002 s) with rate limits `dPdt_min`/`dPdt_max` — limiting, in particular, the rate of recovery of the active current after it has been decreased by an increase of $i_q$.
+and $I_d^{\max}$ tracks this static value through a first-order lag ($T_{\mathrm{rlim}}$, typically 0.002 s) with rate limits `dPdt_min`/`dPdt_max`, limiting in particular the rate of recovery of the active current after it has been decreased by an increase of $i_q$.
 
 **Voltage / reactive power control.**
 
@@ -1001,7 +1001,7 @@ INJEC  GFOL    HVDC1    A   1.   1.   0.  0.  0.005  0.15   1.02   1200.  0.005 
 
 ## Energy Storage
 
-### `BESS` (`inj_BESSWithChanges`): Battery Energy Storage System
+### `BESS` (`inj_BESS`): Battery Energy Storage System
 
 The data-file model name is `BESS` (or `inj_BESS`).
 
@@ -1052,7 +1052,7 @@ The BESS model uses over 40 internal states reflecting the three sub-models. Key
 #### Usage Example
 
 ```
-INJEC  BESSWithChanges  BESS1  BUS_ST  1.  1.  0.  0.
+INJEC  BESS  BESS1  BUS_ST  1.  1.  0.  0.
     100.0  0.0  0.02  0  0.0  0.05  0  0.0  0.3  -0.3  2.0  0.4
     0.3  -0.3  0.0  0.15  0.9  0.05  0.0  -0.06  0.06  -0.05  0.05
     0.05  -0.05  2.0  1.0  1.0  -1.0  0.02  0  0
@@ -1063,3 +1063,115 @@ INJEC  BESSWithChanges  BESS1  BUS_ST  1.  1.  0.  0.
 
 ---
 
+## Reactive Compensation
+
+### `SVC_GENERIC1` (`inj_svc_generic1`): Generic Static Var Compensator
+
+The data-file model name is `SVC_GENERIC1`. It takes no prefix.
+
+#### Description
+
+A dynamic SVC injecting a purely reactive current at its bus. A PI voltage
+regulator with droop drives a susceptance $B_{svc}$ between `Bmin` and `Bmax`,
+and two lead-lag stabiliser channels can add a supplementary signal to the
+voltage reference. This is the dynamic counterpart of the static
+[SVC record](/user-guide/power-flow/#static-var-compensators-svc) used by the
+power flow: the static record fixes the operating point, this model governs how
+the device behaves during the simulation.
+
+The voltage reference is initialised from the power flow solution, so that the
+model starts in equilibrium:
+
+$$V_{ref} = V_0 + B_p \cdot B_{svc,0}$$
+
+where $B_p$ is the droop and $B_{svc,0}$ the initial susceptance implied by the
+reactive current at the bus.
+
+#### Parameters
+
+The record carries 17 data parameters, in order:
+
+| # | Name | Description |
+|---|------|-------------|
+| 1 | `G1` | Gain of the first stabiliser channel |
+| 2 | `T1` | Time constant of the first stabiliser channel (s) |
+| 3 | `a` | Lead-lag coefficient of the first channel |
+| 4 | `K1` | Output gain of the first channel |
+| 5 | `L1` | Output limit of the first channel (pu) |
+| 6 | `G2` | Gain of the second stabiliser channel |
+| 7 | `T2` | Time constant of the second stabiliser channel (s) |
+| 8 | `b` | Lead-lag coefficient of the second channel |
+| 9 | `K2` | Output gain of the second channel |
+| 10 | `L2` | Output limit of the second channel (pu) |
+| 11 | `Ltot` | Limit on the summed stabiliser output (pu) |
+| 12 | `Kp` | Proportional gain of the voltage regulator |
+| 13 | `Ki` | Integral gain of the voltage regulator |
+| 14 | `Bp` | Droop, in pu on the SVC base |
+| 15 | `Bmax` | Maximum susceptance (Mvar at 1 pu voltage) |
+| 16 | `Bmin` | Minimum susceptance (Mvar at 1 pu voltage) |
+| 17 | `Bnom` | Susceptance base used for the per-unit conversion (Mvar) |
+
+One additional parameter is computed at initialisation:
+
+| # | Name | Description |
+|---|------|-------------|
+| 18 | `Vref` | Voltage reference, set from the power flow solution |
+
+#### Observables
+
+`Q`, `dvpss`, `Bsvc`, `Vref`, `Vb`
+
+---
+
+## Measurement
+
+### `PMU` (`inj_PMU`): Phasor Measurement Unit
+
+The data-file model name is `PMU` (or `inj_PMU`).
+
+#### Description
+
+A measurement-only injector: it injects **zero current** at its bus and exists
+purely to expose bus quantities as observables. It reports a filtered local
+frequency estimate computed the same way as the `f_inj` block, together with the
+bus voltage magnitude and angle and the speed and angle of the moving DQ
+reference frame. Attach one to any bus whose frequency you want to record
+without perturbing the solution.
+
+The frequency estimate is a first-order filter on the bus voltage phasor. The
+measurement time constant is clamped to a floor of 0.05 s, so values below that
+have no effect.
+
+#### Parameters
+
+| # | Name | Description | Unit |
+|---|------|-------------|------|
+| 1 | `Tf` | Frequency measurement time constant, recommended 0.05 to 0.10; values below 0.05 are clamped | s |
+
+Three additional parameters are set at initialisation: `wnom` (nominal angular
+frequency), `vm0` and `va0` (the initial bus voltage magnitude and angle).
+
+#### Observables
+
+| Name | Description | Unit |
+|------|-------------|------|
+| `f` | Estimated bus frequency | pu of $f_{nom}$ |
+| `vm` | Bus voltage magnitude | pu |
+| `va` | Bus voltage phase angle in the moving DQ frame, wrapping at $\pm\pi$ | rad |
+| `thref` | Accumulated angle of the DQ reference frame with respect to the nominally rotating frame, zero at $t = 0$ | rad |
+| `dwref` | Speed deviation of the DQ reference frame from nominal | rad/s |
+
+:::caution
+`dwref` and `thref` are only meaningful under `$OMEGA_REF COI`. With
+`$OMEGA_REF SYN` the reference frame rotates at nominal speed by construction,
+so both stay at zero.
+:::
+
+#### Usage Example
+
+```
+INJEC  PMU  PMU_1041  1041  0.  0.  0.  0.  0.05 ;
+```
+
+All four participation and power fields are zero: the model neither consumes nor
+produces power.

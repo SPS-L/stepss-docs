@@ -12,10 +12,10 @@ Documentation site for STEPSS (Static and Transient Electric Power Systems Simul
 |---------|---------|
 | `npm install` | Install dependencies (required after clone or dependency changes) |
 | `npm run dev` | Start dev server (http://localhost:4321) |
-| `npm run build` | Build static site to `dist/` — **this is the only validation step** |
+| `npm run build` | Build static site to `dist/`, **the only validation step** |
 | `npm run preview` | Preview production build locally |
 
-There are no tests or linters configured. **Always run `npm run build` after changes** — it catches broken links, bad frontmatter, MDX syntax errors, and missing imports.
+There are no tests or linters configured. **Always run `npm run build` after changes**: it catches broken links, bad frontmatter, MDX syntax errors, and missing imports.
 
 ## Architecture
 
@@ -24,9 +24,36 @@ There are no tests or linters configured. **Always run `npm run build` after cha
 - **Styling**: Custom theme overrides in `src/styles/custom.css` (blue accent, Inter/JetBrains Mono fonts).
 - **Math**: KaTeX via `remark-math` + `rehype-katex` + `starlight-katex`. Use `$...$` inline and `$$...$$` display.
 - **Images**: Diagrams (SVGs) go in `public/images/` and are referenced as absolute paths (`/images/foo.svg`). Use `<img src="/images/..." alt="..." style="width:60%" />` for sizing control. Logos/icons are in `src/assets/`.
-- **Static files**: PDF user guide, CNAME, and favicon in `public/`. `public/stepss_docs.pdf` is a copy of the compiled `stepss_doc.pdf` from the `stepss-userguide` repo — refresh it whenever the user guide is rebuilt.
+- **Static files**: PDF user guide, CNAME, and favicon in `public/`. `public/stepss_docs.pdf` is a copy of the compiled `stepss_doc.pdf` from the `stepss-userguide` repo; refresh it whenever the user guide is rebuilt.
 
 ## Content Conventions
+
+### No em-dashes
+
+Use ordinary punctuation (comma, colon, semicolon, parentheses, or a new
+sentence) instead of an em-dash (U+2014). This is house style across every
+`stepss-*` repo. Check with:
+
+```sh
+grep -rnP '\x{2014}' src CLAUDE.md README.md astro.config.mjs
+```
+
+It must come back empty. En-dashes (U+2013) are fine
+where they belong: numeric ranges (`g1–g20`), and compound names such as
+Newton–Raphson and lead–lag.
+
+### Helios is the power flow; PFC is history
+
+The power-flow engine is **Helios**. PFC, the Fortran predecessor, is no longer
+shipped in any release (`versions.properties` in stepss-java-ui pins ramses,
+helios, dyngraph, codegen and uramses, and PyRAMSES bundles ramses plus helios).
+It survives on this site only as a short historical note on
+`user-guide/power-flow.md` and `getting-started/overview.md`. Do not reintroduce
+it as a live alternative, and do not describe a `pfc` executable.
+
+That page used to live at `/user-guide/pfc/`, which the stepss-helios and
+stepss-cg-studio READMEs link to; `redirects` in `astro.config.mjs` keeps the old
+URL alive. Keep the entry if you move the page again.
 
 ### Frontmatter
 Every page requires YAML frontmatter with `title` and `description`. The landing page (`index.mdx`) additionally uses `template: splash` with a `hero` block.
@@ -43,7 +70,7 @@ Every page requires YAML frontmatter with `title` and `description`. The landing
 ### Model pages follow the RAMSES code
 
 This site documents an engine it does not contain. **`stepss-ramses` is the
-authority for every factual claim on a model page** — never write one from a
+authority for every factual claim on a model page**. Never write one from a
 paper, from another simulator's manual, or from an older revision of this site.
 Check it against the source before publishing:
 
@@ -53,6 +80,7 @@ Check it against the source before publishing:
 | Parameter names and their **order** | the `parname(...)` assignments under `case (define_var_and_par)` in the model's `.f90` |
 | Number of data vs additional parameters | `nbdata` / `nbaddpar` in the same block |
 | Observables | `obsname(...)` under `case (define_obs)` |
+| Whether a model is compiled at all | `MODEL_DIRS` in `build/Makefile.gfortran`. `models/*/hq/` is excluded, so the Hydro-Québec families are neither built nor shipped: never tell a reader they can enable one through URAMSES |
 
 Three traps this has produced before:
 
@@ -67,10 +95,10 @@ Three traps this has produced before:
   `.f90` is what runs, so document that; but a disagreement is usually a bug in
   the `.f90`, so report it rather than just writing it down. `tor_ENTSOE_simp`
   reported its additional parameter as `Tm0` where the `.txt` said `C`, and the
-  same block was missing `parname(1..6)` altogether — fixed in RAMSES rather
+  same block was missing `parname(1..6)` altogether, fixed in RAMSES rather
   than documented around.
 
-State a version floor whenever a model is not in every release — the IEEE
+State a version floor whenever a model is not in every release: the IEEE
 governors do not exist before 3.50, and a user on an older build otherwise
 reads a page describing models their binary cannot load. `git ls-tree <tag>`
 and `git show <tag>:<file>` in `stepss-ramses` date a model precisely.

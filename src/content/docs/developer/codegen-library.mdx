@@ -1614,7 +1614,7 @@ The time constant $T$ can be zero. In this case $x_1 = 0$ throughout the simulat
 
 ### `tf1p2limr`
 
-**As [`tf1p2lim`](#tf1p2lim) — one time constant, rate limits and non-windup output limits — with the addition of an integrator reset.**
+**As [`tf1p2lim`](#tf1p2lim), with one time constant, rate limits and non-windup output limits, plus an integrator reset.**
 
 The block behaves exactly like `tf1p2lim` until the reset condition is met. When the parameter $p_{reset}$ becomes equal to the flag $f_{reset}$, the internal state is driven to zero and the block passes its input straight through ($x_j = x_i$) until the condition clears. The flag is intended to be set during the simulation with a `CHGPRM` disturbance, which makes the reset controllable from the disturbance file.
 
@@ -1953,7 +1953,7 @@ else:  z ← 1
 
 ### `timer`
 
-**Timer with varying delay. The delay is a piecewise linear function of the monitored variable. Separate blocks exist for $n = 1, 2, 3, 4$ and $5$ characteristic points.**
+**Timer with varying delay. The delay is a piecewise linear function of the monitored variable. Separate blocks exist for $n = 1, 2, 3, 4, 5$ and $11$ characteristic points, named `timer1` to `timer5` and `timer11`.**
 
 <img src="/images/codegen/timer.svg" alt="timer block diagram" style="width:60%" />
 
@@ -1969,7 +1969,7 @@ data/parameter/expression for v_1
 data/parameter/expression for T_1
 ```
 
-For `timer2`–`timer5`, append additional $(v_k, T_k)$ pairs up to the required $n$.
+For `timer2` to `timer5`, append additional $(v_k, T_k)$ pairs up to the required $n$. `timer11` takes 11 pairs (22 parameters).
 
 #### Internal States
 
