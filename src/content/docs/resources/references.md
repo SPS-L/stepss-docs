@@ -20,7 +20,6 @@ description: Academic publications and suggested reading
 ## Project Pages
 
 - [STEPSS, SPS-Lab](https://sps-lab.org/project/stepss/), Main project page with overview and downloads
-- [PyRAMSES, SPS-Lab](https://sps-lab.org/project/stepss/), Python interface project page
 - [Thierry Van Cutsem, Software](https://thierryvancutsem.github.io/home/software.html), Co-author's software page
 
 ## External Resources
