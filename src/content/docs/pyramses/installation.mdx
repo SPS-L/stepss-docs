@@ -25,6 +25,32 @@ For a minimal installation (no plotting or notebook support):
 pip install pyramses
 ```
 
+### Version numbers
+
+From `3.58` on, a PyRAMSES version names the RAMSES engine bundled in the
+wheel: `pyramses 3.58` carries RAMSES 3.58. A fourth component appears when
+PyRAMSES is released without a new RAMSES behind it, so `3.58.1` and `3.58.2`
+also bundle RAMSES 3.58.
+
+To pin an engine version, pin the matching PyRAMSES:
+
+```bash
+pip install "pyramses~=3.58.0"    # any 3.58.x, all bundling RAMSES 3.58
+```
+
+Check what an installed copy carries:
+
+```python
+import pyramses
+print(pyramses.__version__, pyramses.__ramses_version__, pyramses.__helios_version__)
+```
+
+:::note[Releases before 3.58]
+Versions up to `0.3.5` used an unrelated numbering (`0.3.4`, `0.3.5`, ...) that
+said nothing about the bundled engine. `0.3.5` is the last of those; it bundles
+RAMSES 3.57.
+:::
+
 ## Linux System Prerequisites
 
 On Linux, the following system libraries must be installed before running PyRAMSES:
