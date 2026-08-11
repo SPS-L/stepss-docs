@@ -17,7 +17,7 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
               TOR model_name  param1  param2  ... ;
 ```
 
-This page documents the exciters that are not IEEE-standard models: `CONSTANT`, `1ST_ORDER`, `GENERIC1` and `GENERIC2` (built in, uppercase, no prefix), plus `kundur`, `GENERIC3` and `GENERIC4` (registered, and RAMSES adds the `exc_` prefix automatically).
+This page documents the exciters that are not IEEE-standard models: `CONSTANT`, `1ST_ORDER`, `GENERIC1` and `GENERIC2` (built in, uppercase, no prefix), plus `kundur` and `GENERIC` (registered, and RAMSES adds the `exc_` prefix automatically).
 
 The IEEE-standard exciters are on the [IEEE Exciter Models](/models/ieee-exciters/) page. For the whole catalogue at a glance, including which models are compiled but not callable by name, see the [Model Reference index](/models/).
 :::
@@ -400,13 +400,24 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
 
 ---
 
-## GENERIC3 (`exc_GENERIC3`)
+## GENERIC (`exc_GENERIC`)
 
-The data-file model name is `exc_GENERIC3` (or `GENERIC3`. The `exc_` prefix is added automatically).
+The data-file model name is `exc_GENERIC` (or `GENERIC`. The `exc_` prefix is added automatically).
+
+:::caution[Renamed in RAMSES 3.57]
+This model was called `exc_GENERIC3` up to and including 3.56, and a second
+registered name, `exc_GENERIC4`, resolved to a byte-for-byte copy of it. Both
+names were removed in 3.57 in favour of the single name `exc_GENERIC`.
+
+On 3.57 and later, a record naming `exc_GENERIC3` or `exc_GENERIC4` stops with
+`Excitation model not found in definition`. Change it to `exc_GENERIC`; the 20
+data parameters and their order are unchanged, so nothing else in the record
+moves.
+:::
 
 ### Scientific Description
 
-The `exc_GENERIC3` model (note capital letters) is a **generic AVR with integrated PSS and OEL**, defined via the CODEGEN `.txt` description. It provides a clean, modular three-block structure: AVR, PSS, and OEL.
+The `exc_GENERIC` model (note capital letters) is a **generic AVR with integrated PSS and OEL**, defined via the CODEGEN `.txt` description. It provides a clean, modular three-block structure: AVR, PSS, and OEL.
 
 **AVR (transient gain reduction + exciter):**
 
@@ -497,7 +508,7 @@ The CODEGEN block structure from the `.txt` file:
 ```
 SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
                     XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
-              EXC exc_GENERIC3  200.0  0.05  10.0  0.04  0.0  5.0
+              EXC exc_GENERIC  200.0  0.05  10.0  0.04  0.0  5.0
                             ! G     Ta    Tb    Te    vfmin vfmax
                             9.5  1.40  0.154  0.033  0.154  0.033  0.10
                             ! Kpss Tw   T1     T2     T3     T4     C
@@ -508,86 +519,8 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
 </TabItem>
 </Tabs>
 
----
+## See Also
 
-## GENERIC4 (`exc_GENERIC4`)
-
-The data-file model name is `exc_GENERIC4` (or `GENERIC4`. The `exc_` prefix is added automatically).
-
-### Scientific Description
-
-`exc_GENERIC4` is a **second name for the same model as `exc_GENERIC3`**. Both are
-CODEGEN-generated from the same description, and in the RAMSES source
-`exc_GENERIC4.f90` is identical to `exc_GENERIC3.f90` apart from the subroutine
-name. They are registered as separate cases in the exciter dispatcher, so both
-names load, and they behave identically.
-
-:::caution[There is no reason to prefer one over the other]
-Earlier revisions of this page described `exc_GENERIC4` as a faster compiled
-replacement for an interpreted `exc_GENERIC3`. That is not the case: CODEGEN
-generates Fortran, which is compiled like any other model, and the two files are
-byte-identical in their generated bodies. Expect no performance difference.
-:::
-
-The mathematical structure is therefore exactly that of `exc_GENERIC3`:
-
-$$
-V_f(s) = \frac{1}{1 + s T_e} \cdot G \cdot \frac{1 + s T_a}{1 + s T_b} \cdot \left(V_0 - V + V_{PSS} - V_{OEL}\right)
-$$
-
-$$
-V_{PSS}(s) = K_{PSS} \cdot \frac{s T_W}{1 + s T_W} \cdot \frac{1 + s T_1}{1 + s T_2} \cdot \frac{1 + s T_3}{1 + s T_4} \cdot \omega(s)
-$$
-
-The OEL integrates the overcurrent error $(I_f - if_{1lim})$, capped at $if_{2lim}$, then multiplies by $K_{oel}$ to produce $V_{OEL}$.
-
-**Implementation details (from Fortran source):**
-- `nbdata = 20`, `nbaddpar = 1` (Vo computed at init), `nbxvar = 16`, `nbzvar = 5`
-
-### Parameters
-
-| Parameter | Description |
-|-----------|-------------|
-| `G` | AVR gain |
-| `Ta` | Lead time constant (s) |
-| `Tb` | Lag time constant (s) |
-| `Te` | Exciter time constant (s) |
-| `vfmin` | Field voltage lower limit (pu) |
-| `vfmax` | Field voltage upper limit (pu) |
-| `Kpss` | PSS gain |
-| `Tw` | PSS washout time constant (s) |
-| `T1` | PSS lead–lag 1 zero (s) |
-| `T2` | PSS lead–lag 1 pole (s) |
-| `T3` | PSS lead–lag 2 zero (s) |
-| `T4` | PSS lead–lag 2 pole (s) |
-| `C` | PSS output symmetric limit (pu) |
-| `if1lim` | OEL threshold (pu) |
-| `if2lim` | OEL max overcurrent (pu) |
-| `Toel` | OEL time constant (s) |
-| `Koel` | OEL gain |
-| `L1` | OEL lower limit |
-| `L2` | OEL upper limit |
-| `L3` | OEL output limit (pu) |
-
-### Usage Example
-
-<Tabs>
-<TabItem label="RAMSES Data File">
-```
-SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
-                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
-              EXC exc_GENERIC4  200.0  0.05  10.0  0.04  0.0  5.0
-                            ! G     Ta    Tb    Te    vfmin vfmax
-                            9.5  1.40  0.154  0.033  0.154  0.033  0.10
-                            ! Kpss Tw   T1     T2     T3     T4     C
-                            1.05  0.30  30.0  1.0  0.0  1.0  2.0
-                            ! if1lim if2lim Toel Koel L1  L2  L3
-              TOR CONSTANT ;
-```
-</TabItem>
-<TabItem label="Notes">
-- `exc_GENERIC4` and `exc_GENERIC3` are the same model under two names; pick either.
-- Parameter order and meaning are identical to `exc_GENERIC3`.
-- The model name in the data file is `exc_GENERIC4` (or `GENERIC4`. The `exc_` prefix is added automatically).
-</TabItem>
-</Tabs>
+- [Model Reference](/models/), the full model catalogue
+- [IEEE Exciters](/models/ieee-exciters/), the IEEE-standard excitation models
+- [Dynamic Data Records](/user-guide/dynamic-models/), the `SYNC_MACH` record these models sit in

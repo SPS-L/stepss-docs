@@ -396,7 +396,7 @@ machine              at bus                 V            P           Q        de
                      excit model          vf(pu)   torque model               Tm(pu)
 
 G5                   5                    1.0000    450.00186     68.49769    70.99   1.0000       1    1
-                     exc_GENERIC3         2.3680   THERMAL_GENERIC1          0.97826
+                     exc_GENERIC          2.3680   THERMAL_GENERIC1          0.97826
 ```
 
 Here the machine G5, connected to bus 5, is in service (`br = 1`) and injects about 450 MW and 68 Mvar into the grid under a bus voltage of 1 pu.

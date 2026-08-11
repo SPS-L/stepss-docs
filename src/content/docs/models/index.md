@@ -36,7 +36,7 @@ cannot be enabled through URAMSES either.
 |----------------|-------|---------------|
 | `CONSTANT`, `1ST_ORDER` | Built in | [Custom Exciters](/models/custom-exciters/) |
 | `GENERIC1`, `GENERIC2` | Built in | [Custom Exciters](/models/custom-exciters/) |
-| `GENERIC3`, `GENERIC4` | Registered | [Custom Exciters](/models/custom-exciters/) |
+| `GENERIC` | Registered, since 3.57 | [Custom Exciters](/models/custom-exciters/) |
 | `kundur` | Registered | [Custom Exciters](/models/custom-exciters/) |
 | `AC1A`, `AC4A`, `IEEET5` | Registered | [IEEE Exciters](/models/ieee-exciters/) |
 | `ST1A`, `ST1A_IEEEST`, `ST1A_PSS2B`, `ST1A_PSS4B` | Registered | [IEEE Exciters](/models/ieee-exciters/) |
