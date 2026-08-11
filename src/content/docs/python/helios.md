@@ -1,18 +1,18 @@
 ---
 title: Helios Power-Flow API
-description: Running AC power flows from Python with pyramses.helios.HeliosSession
+description: Running AC power flows from Python with stepss.helios.HeliosSession
 ---
 
-The `pyramses.helios` module wraps [Helios](/user-guide/power-flow/), the STEPSS AC power-flow engine. Pre-compiled libraries are bundled with the package for Windows, Linux, and macOS, so no separate installation is required.
+The `stepss.helios` module wraps [Helios](/user-guide/power-flow/), the STEPSS AC power-flow engine. Pre-compiled libraries are bundled with the package for Windows, Linux, and macOS, so no separate installation is required.
 
-Unlike the RAMSES classes (which follow the historical camelCase conventions), this module uses PEP 8 snake_case naming. Errors are raised as `pyramses.HeliosError`, carrying the engine's diagnostic message.
+Unlike the RAMSES classes (which follow the historical camelCase conventions), this module uses PEP 8 snake_case naming. Errors are raised as `stepss.HeliosError`, carrying the engine's diagnostic message.
 
 ## Basic Workflow
 
 `HeliosSession` follows a load → (modify) → solve → query lifecycle and works as a context manager:
 
 ```python
-from pyramses.helios import HeliosSession
+from stepss.helios import HeliosSession
 
 with HeliosSession() as pf:
     pf.load_file('network.dat')
@@ -29,7 +29,7 @@ Solve diagnostics are available after `solve()`: `pf.converged`, `pf.solver_stat
 Options map to the `$PARAM` records of the data file and can be overridden after loading (loading overwrites them with the file's values, so set options *after* `load_file`):
 
 ```python
-from pyramses.helios import Option
+from stepss.helios import Option
 
 pf.load_file('network.dat')
 pf.set_option(Option.TOLAC, 0.001)     # MW
@@ -100,9 +100,9 @@ records. For what those records contain, and how they relate to the hand-written
 
 ## Runnable Examples
 
-Five self-contained scripts ship in the repository under [`examples/helios/`](https://github.com/SPS-L/stepss-pyramses/tree/master/examples/helios): basic solve, options and arrays, modify and re-solve, contingency screening, and exports.
+Five self-contained scripts ship in the repository under [`examples/helios/`](https://github.com/SPS-L/stepss-python-ui/tree/master/examples/helios): basic solve, options and arrays, modify and re-solve, contingency screening, and exports.
 
 ## Further Reading
 
 - [Power Flow user guide](/user-guide/power-flow/), data format, solver parameters, engine details
-- Full method-level documentation: the docstrings on `HeliosSession`, e.g. `help(pyramses.HeliosSession)`
+- Full method-level documentation: the docstrings on `HeliosSession`, e.g. `help(stepss.HeliosSession)`

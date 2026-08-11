@@ -11,7 +11,7 @@ initialises a RAMSES dynamic simulation.
 Helios is available three ways, all reading the same data files:
 
 - the `helios` command-line executable, bundled with the [STEPSS GUI](/getting-started/installation/) and published on the [Helios releases page](https://github.com/SPS-L/stepss-helios/releases);
-- `pyramses.helios.HeliosSession` from Python, see [Power Flow with Helios](/pyramses/helios/);
+- `stepss.helios.HeliosSession` from Python, see [Power Flow with Helios](/python/helios/);
 - the C API shared library (`libhelios_api`), for embedding in other tools.
 
 The power flow uses the following network records documented in [Network Modeling](/user-guide/network/): BUS, LINE, SWITCH, TRANSFO, TRFO, NRTP.
@@ -390,7 +390,7 @@ helios: status: NOT_RUN
 
 `NOT_RUN` means no solve was requested (for example `$NBITMA 0`), which exits `0`. Scripts should use the exit status and this line rather than parsing stdout.
 
-These values are shared with the Helios C API, where `HELIOS_OK` is `0` and `HELIOS_NOT_CONVERGED` is `2` (`1` is reserved and never returned by the API). `HELIOS_NOT_CONVERGED` is `2` from Helios 1.4.1 onward; in 1.3.0 and earlier it was `1`. The `pyramses.helios.HeliosSession` wrapper exposes convergence as the boolean `pf.converged` and the `pf.solver_status` enum, neither of which is affected by the numbering.
+These values are shared with the Helios C API, where `HELIOS_OK` is `0` and `HELIOS_NOT_CONVERGED` is `2` (`1` is reserved and never returned by the API). `HELIOS_NOT_CONVERGED` is `2` from Helios 1.4.1 onward; in 1.3.0 and earlier it was `1`. The `stepss.helios.HeliosSession` wrapper exposes convergence as the boolean `pf.converged` and the `pf.solver_status` enum, neither of which is affected by the numbering.
 
 ## Record Sharing Between Power Flow and RAMSES
 
@@ -419,7 +419,7 @@ Helios succeeds **PFC**, the Fortran power-flow calculator written by Dr. Thierr
 Van Cutsem that was the STEPSS power flow from the beginning. Helios reimplements
 its Newton-Raphson formulation in C++20, reads the same input files, and matches
 its solver defaults, so data prepared for PFC runs unchanged. PFC is no longer
-shipped with STEPSS or with PyRAMSES; nothing on this page requires it.
+shipped with STEPSS or with stepss; nothing on this page requires it.
 
 Two numerical points are worth knowing when comparing old results with new ones:
 

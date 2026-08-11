@@ -55,14 +55,18 @@ Newton–Raphson and lead–lag.
 
 The power-flow engine is **Helios**. PFC, the Fortran predecessor, is no longer
 shipped in any release (`versions.properties` in stepss-java-ui pins ramses,
-helios, dyngraph, codegen and uramses, and PyRAMSES bundles ramses plus helios).
-It survives on this site only as a short historical note on
+helios, dyngraph, codegen and uramses, and the `stepss` package bundles ramses
+plus helios). It survives on this site only as a short historical note on
 `user-guide/power-flow.md` and `getting-started/overview.md`. Do not reintroduce
 it as a live alternative, and do not describe a `pfc` executable.
 
 That page used to live at `/user-guide/pfc/`, which the stepss-helios and
 stepss-cg-studio READMEs link to; `redirects` in `astro.config.mjs` keeps the old
-URL alive. Keep the entry if you move the page again.
+URL alive. Keep the entry if you move the page again. The five `/pyramses/*`
+URLs in the same block are kept alive for the same reason: the Python API pages
+moved to `/python/` when the package was renamed from `pyramses` to `stepss`
+(repository `stepss-python-ui`), and the stepss-helios and stepss-cg-studio
+READMEs, plus the PyPI project page, still link to the old paths.
 
 ### Frontmatter
 Every page requires YAML frontmatter with `title` and `description`. The landing page (`index.mdx`) additionally uses `template: splash` with a `hero` block.
@@ -96,7 +100,7 @@ The division that holds today:
 | Which model names exist and their state | `models/index.md` |
 | A model's parameters, equations, examples | its family page under `models/` |
 | Power-flow records, settings, menu, exit status | `user-guide/power-flow.md` |
-| The Python API for any of the above | the matching `pyramses/` page |
+| The Python API for any of the above | the matching `python/` page |
 
 Before adding a table or explanation, check whether its owner already has one. If
 you find the same fact in two places, delete one and link instead. A tutorial page

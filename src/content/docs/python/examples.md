@@ -1,6 +1,6 @@
 ---
 title: Examples
-description: Practical examples using PyRAMSES
+description: Practical examples using stepss
 ---
 
 All examples assume the working directory contains the relevant data and disturbance files.
@@ -10,9 +10,9 @@ All examples assume the working directory contains the relevant data and disturb
 Define the test case, run the simulation, and extract results:
 
 ```python
-import pyramses
+import stepss
 
-case = pyramses.cfg()
+case = stepss.cfg()
 case.addData('dyn_A.dat')        # dynamic models
 case.addData('volt_rat_A.dat')   # power-flow initialisation
 case.addData('settings1.dat')    # solver settings
@@ -26,10 +26,10 @@ case.addRunObs('BV 4044')        # live voltage display (requires Gnuplot)
 case.addRunObs('BV 1041')
 case.writeCmdFile('cmd.txt')     # save for future reuse
 
-ram = pyramses.sim()
+ram = stepss.sim()
 ram.execSim(case)                # run to completion
 
-ext = pyramses.extractor(case.getTrj())
+ext = stepss.extractor(case.getTrj())
 ext.getBus('1041').mag.plot()    # voltage magnitude at bus 1041
 ```
 
@@ -42,7 +42,7 @@ Set `$NB_THREADS 0 ;` in the solver settings file to use all available CPU cores
 Pause the simulation at intermediate time points to inspect state or add disturbances:
 
 ```python
-ram = pyramses.sim()
+ram = stepss.sim()
 ram.execSim(case, 0.0)                        # initialise, paused at t=0
 ram.contSim(10.0)                             # simulate to t=10 s
 ram.contSim(ram.getSimTime() + 60.0)          # advance 60 s from current time
@@ -110,8 +110,8 @@ For full disturbance syntax, see the [Disturbances reference](/user-guide/distur
 Extract and plot time-series results after the simulation:
 
 ```python
-import pyramses
-ext = pyramses.extractor('output.trj')
+import stepss
+ext = stepss.extractor('output.trj')
 
 # Single curve
 ext.getSync('g5').S.plot()       # rotor speed of generator g5
@@ -119,7 +119,7 @@ ext.getBus('4044').mag.plot()    # voltage magnitude at bus 4044
 
 # Multiple curves on the same plot
 curves = [ext.getSync(f'g{i}').S for i in range(1, 5)]
-pyramses.curplot(curves)
+stepss.curplot(curves)
 
 # Exciter and governor outputs
 ext.getExc('g1').vf.plot()       # field voltage
@@ -140,23 +140,23 @@ ext.getTwop('hvdc1').P1.plot()
 Run multiple simulations with varying parameters and collect results:
 
 ```python
-import pyramses
+import stepss
 import numpy as np
 
 results = {}
 for disturbance_time in [5.0, 10.0, 20.0]:
-    case = pyramses.cfg('cmd.txt')
+    case = stepss.cfg('cmd.txt')
     trj_file = f'output_{disturbance_time:.0f}.trj'
     case.addTrj(trj_file)
     case.addObs('obs.dat')
 
-    ram = pyramses.sim()
+    ram = stepss.sim()
     ram.execSim(case, 0.0)
     ram.addDisturb(disturbance_time, 'BREAKER SYNC_MACH g7 0')
     ram.contSim(ram.getInfTime())
     ram.endSim()
 
-    ext = pyramses.extractor(trj_file)
+    ext = stepss.extractor(trj_file)
     min_freq = np.min(ext.getSync('g5').S.value)
     results[disturbance_time] = min_freq
     print(f't_dist={disturbance_time:5.1f}s  min_speed={min_freq:.5f} pu')
@@ -169,10 +169,10 @@ Export the system Jacobian for small-signal stability analysis. There are two ro
 **In Python**, `getJac()` returns the descriptor-form pair directly as SciPy sparse matrices (it also writes the intermediate files `py_val.dat` and `py_eqs.dat` to the working directory):
 
 ```python
-import pyramses
+import stepss
 
-case = pyramses.cfg('cmd.txt')
-ram = pyramses.sim()
+case = stepss.cfg('cmd.txt')
+ram = stepss.sim()
 
 # Pause at steady-state operating point
 ram.execSim(case, 0.0)
@@ -213,10 +213,10 @@ The following examples use the ready-to-run test systems. For system description
 Trips generator g7 at $t = 10$ s on the heavily-stressed Operating Point B and observes the voltage collapse dynamics over 150 seconds. See the [Nordic Test System](/test-systems/nordic/) page for full system details and file descriptions.
 
 ```python
-import pyramses
+import stepss
 import os
 
-case = pyramses.cfg()
+case = stepss.cfg()
 case.addData('dyn_B.dat')
 case.addData('volt_rat_B.dat')
 case.addData('settings1.dat')
@@ -228,13 +228,13 @@ for f in os.listdir('.'):
     if f.endswith('.trj') or f.endswith('.trace'):
         os.remove(f)
 
-ram = pyramses.sim()
+ram = stepss.sim()
 ram.execSim(case, 0.0)
 ram.addDisturb(10.0, 'BREAKER SYNC_MACH g7 0')
 ram.contSim(150.0)
 ram.endSim()
 
-ext = pyramses.extractor(case.getTrj())
+ext = stepss.extractor(case.getTrj())
 ext.getSync('g7').S.plot()    # rotor speed
 ext.getBus('1041').mag.plot()  # voltage at central bus
 ```
@@ -244,10 +244,10 @@ ext.getBus('1041').mag.plot()  # voltage at central bus
 Applies a step change to the exciter voltage setpoint at $t = 1$ s and plots the generator response. See the [5-Bus Test System](/test-systems/5bus/) page for details.
 
 ```python
-import pyramses
+import stepss
 import os
 
-case = pyramses.cfg()
+case = stepss.cfg()
 case.addData('dyn.dat')
 case.addData('lf1solv.dat')
 case.addData('solveroptions.dat')
@@ -259,13 +259,13 @@ for f in os.listdir('.'):
     if f.endswith('.trj') or f.endswith('.trace'):
         os.remove(f)
 
-ram = pyramses.sim()
+ram = stepss.sim()
 ram.execSim(case, 0.0)
 ram.addDisturb(1.0, 'CHGPRM EXC G Vo 0.05 2')
 ram.contSim(60.0)
 ram.endSim()
 
-ext = pyramses.extractor(case.getTrj())
+ext = stepss.extractor(case.getTrj())
 ext.getSync('G').P.plot()
 ext.getSync('G').Q.plot()
 ```

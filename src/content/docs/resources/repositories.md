@@ -10,14 +10,14 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 | Repository | Role | Language | Visibility |
 |------------|------|----------|------------|
 | [stepss-java-ui](https://github.com/SPS-L/stepss-java-ui) | Java-based GUI front-end, bundling the whole toolchain | Java | Public |
-| [stepss-pyramses](https://github.com/SPS-L/stepss-pyramses) | Python API/wrapper for RAMSES and the Helios power-flow engine | Python | Public |
+| [stepss-python-ui](https://github.com/SPS-L/stepss-python-ui) | Python API/wrapper for RAMSES and the Helios power-flow engine | Python | Public |
 | [stepss-userguide](https://github.com/SPS-L/stepss-userguide) | LaTeX user documentation and models reference | LaTeX | Public |
 | [stepss-uramses](https://github.com/SPS-L/stepss-uramses) | User-defined device models framework | Fortran | Public |
 | [stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) | Small-signal / eigenvalue analysis tools | MATLAB | Public |
 | [stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) | Visual block diagram editor for CODEGEN models | Python/JS | Public |
 | stepss-ramses | Core RAMSES simulation engine | Fortran | Private |
 | stepss-test-systems | Curated collection of test cases and network models | RAMSES data | Private |
-| stepss-helios | AC power-flow engine (Newton-Raphson), with a C API shared library wrapped by PyRAMSES (`pyramses.helios`); releases ship CLI and C API binaries for Linux/macOS/Windows | C++ | Private |
+| stepss-helios | AC power-flow engine (Newton-Raphson), with a C API shared library wrapped by stepss (`stepss.helios`); releases ship CLI and C API binaries for Linux/macOS/Windows | C++ | Private |
 | stepss-dyngraph | Dynamic graph / topology module | Fortran | Private |
 | stepss-Codegen | DSL-to-Fortran model code generator | Fortran | Private |
 | [stepss-RamsesNN](https://github.com/SPS-L/stepss-RamsesNN) | Physics-informed neural network experiments on RAMSES models | Python | Public |
@@ -35,13 +35,13 @@ The main graphical user interface for STEPSS, built with Java (Swing/AWT) and th
 - **Build**: `ant jar`
 - **Run**: `java -jar dist/stepss.jar`
 
-### stepss-pyramses
+### stepss-python-ui
 
-Python interface to the RAMSES simulator providing scripting access to simulations, plus the `pyramses.helios` module for AC power flows with the bundled Helios engine (Windows, Linux, and macOS).
+Python interface to the RAMSES simulator providing scripting access to simulations, plus the `stepss.helios` module for AC power flows with the bundled Helios engine (Windows, Linux, and macOS).
 
-- **Repository**: [github.com/SPS-L/stepss-pyramses](https://github.com/SPS-L/stepss-pyramses)
-- **Install**: `pip install pyramses`
-- **Documentation**: [PyRAMSES section](/pyramses/overview/) on this site
+- **Repository**: [github.com/SPS-L/stepss-python-ui](https://github.com/SPS-L/stepss-python-ui)
+- **Install**: `pip install stepss`
+- **Documentation**: [Python API section](/python/overview/) on this site
 - **Includes**: five runnable power-flow examples under `examples/helios/`
 
 ### stepss-userguide
@@ -68,7 +68,7 @@ Framework for compiling and linking custom Fortran models with RAMSES.
 MATLAB-based tool for small-signal stability analysis using eigenvalues extracted from RAMSES.
 
 - **Repository**: [github.com/SPS-L/stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis)
-- **Requirements**: MATLAB R2016a+, PyRAMSES
+- **Requirements**: MATLAB R2016a+, stepss
 - **Methods**: QZ, ARPACK, JDQR
 
 ### stepss-cg-studio (CODEGEN Studio)

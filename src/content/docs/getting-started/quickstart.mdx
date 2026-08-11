@@ -11,7 +11,7 @@ STEPSS provides three ways to run simulations:
 |-----------|:-------------------------:|:----------------------:|:-------:|
 | **Command Line** | `ramses -t cmd.txt` | `helios -t cmd.txt` | `codegen -tmodel.txt` |
 | **GUI (Java)** | Via STEPSS GUI | Via STEPSS GUI | Via STEPSS GUI |
-| **Python** | Via PyRAMSES | Via `pyramses.helios` | |
+| **Python** | Via stepss | Via `stepss.helios` | |
 
 ---
 
@@ -78,7 +78,7 @@ labelled compulsory because at that point it is.
    ramses.exe -tcmd.txt
    ```
 
-4. **Process results**: Use PyRAMSES extractor, MATLAB, or other tools to read the trajectory file
+4. **Process results**: Use the stepss extractor, MATLAB, or other tools to read the trajectory file
 
 </Steps>
 
@@ -105,21 +105,21 @@ The GUI coordinates the power flow and RAMSES through lock files (`.lock_RAMSES`
 For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/stepss/).
 
 </TabItem>
-<TabItem label="Python (PyRAMSES)">
+<TabItem label="Python (stepss)">
 
 <Steps>
 
-1. **Install PyRAMSES**:
+1. **Install stepss**:
    ```bash
-   pip install pyramses
+   pip install stepss
    ```
 
 2. **Run a simulation**:
    ```python
-   import pyramses
+   import stepss
 
    # Configure the case
-   case = pyramses.cfg()
+   case = stepss.cfg()
    case.addData("data.dat")
    case.addData("volt_rat.dat")
    case.addData("settings.dat")
@@ -127,13 +127,13 @@ For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/s
    case.addDst("disturbance.dst")
 
    # Run
-   ram = pyramses.sim()
+   ram = stepss.sim()
    ram.execSim(case, 150.0)
    ```
 
 3. **Extract and plot results**:
    ```python
-   ext = pyramses.extractor(case.getTrj())
+   ext = stepss.extractor(case.getTrj())
 
    # Plot bus voltage magnitude
    ext.getBus('1041').mag.plot()
@@ -144,7 +144,7 @@ For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/s
 
 </Steps>
 
-See the [PyRAMSES API Reference](/pyramses/api-reference/) for the complete interface.
+See the [Python API Reference](/python/api-reference/) for the complete interface.
 
 </TabItem>
 </Tabs>
@@ -239,4 +239,4 @@ For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/s
 - [Network Modeling](/user-guide/network/), Define your power system network
 - [Power Flow (Helios)](/user-guide/power-flow/), Power flow data and control parameters
 - [Dynamic Data Records](/user-guide/dynamic-models/), Add generators, loads, and controllers
-- [PyRAMSES API](/pyramses/api-reference/), Full Python API documentation
+- [Python API](/python/api-reference/), Full Python API documentation

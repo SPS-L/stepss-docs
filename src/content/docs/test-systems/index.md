@@ -33,29 +33,29 @@ order in which they are worth meeting.
 
 ## Running Any of Them
 
-All four follow the same pattern: clone the repository, then point a PyRAMSES
+All four follow the same pattern: clone the repository, then point a stepss
 `cfg` at its data files.
 
 ```python
-import pyramses
+import stepss
 
-case = pyramses.cfg()
+case = stepss.cfg()
 case.addData('dyn.dat')            # dynamic data
 case.addData('lf.dat')             # power-flow solution
 case.addData('solveroptions.dat')  # solver settings
 case.addDst('disturb.dst')         # disturbance scenario
 case.addObs('obs.dat')             # observables to record
 
-sim = pyramses.sim()
+sim = stepss.sim()
 sim.execSim(case)
 ```
 
 The exact file names differ per system; each page lists them. See
-[PyRAMSES Examples](/pyramses/examples/) for complete worked scripts, and
-[Installation](/pyramses/installation/) if PyRAMSES is not set up yet.
+[Python API Examples](/python/examples/) for complete worked scripts, and
+[Installation](/python/installation/) if stepss is not set up yet.
 
 ## Next Steps
 
-- [PyRAMSES Examples](/pyramses/examples/), full simulation workflows
+- [Python API Examples](/python/examples/), full simulation workflows
 - [Disturbances](/user-guide/disturbances/), write your own scenarios
 - [Model Reference](/models/), the models these systems use

@@ -114,7 +114,7 @@ The user model is **compiled, not interpreted**, resulting in efficient number-c
 ## Simulation Interfaces
 
 STEPSS modules can be driven from the command line, from the Java GUI, or from
-Python through PyRAMSES. The [Quick Start](/getting-started/quickstart/) compares
+Python through stepss. The [Quick Start](/getting-started/quickstart/) compares
 the three and gives the invocation for each.
 
 ## Platform Support
@@ -122,7 +122,7 @@ the three and gives the invocation for each.
 | Feature | Details |
 |---------|---------|
 | **STEPSS GUI** | Windows, Linux and macOS (Apple Silicon), 64-bit Java 11 or later |
-| **PyRAMSES** | Windows, Linux and macOS (Apple Silicon), Python 3.x |
+| **stepss** | Windows, Linux and macOS (Apple Silicon), Python 3.x |
 | **Command-line executables** | Windows, Linux and macOS (Apple Silicon) for ramses, helios, codegen and dyngraph |
 | **Custom model compilation** | gfortran, GNU make and OpenBLAS (MSYS2 on Windows) |
 | **Free version limits** | 1000 buses max, 2 OpenMP cores |

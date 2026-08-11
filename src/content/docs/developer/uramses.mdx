@@ -5,7 +5,7 @@ description: Compiling and linking user-defined Fortran models with RAMSES
 
 import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
 
-[URAMSES](https://github.com/SPS-L/stepss-uramses) provides the framework and tools needed to compile and link custom Fortran models with PyRAMSES and STEPSS.
+[URAMSES](https://github.com/SPS-L/stepss-uramses) provides the framework and tools needed to compile and link custom Fortran models with stepss and the STEPSS GUI.
 
 ## Prerequisites
 
@@ -14,7 +14,7 @@ import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
 
 - **gfortran** (GNU Fortran compiler)
 - **OpenBLAS** (optimized BLAS library)
-- **PyRAMSES**
+- **stepss**
 
 ```bash
 # Ubuntu/Debian
@@ -32,7 +32,7 @@ sudo pacman -S gcc-fortran openblas
 
 - **gfortran** from Homebrew (macOS ships no Fortran compiler)
 - **OpenBLAS**, or Apple's Accelerate framework
-- **PyRAMSES**
+- **stepss**
 
 ```bash
 brew install gcc openblas
@@ -45,7 +45,7 @@ Apple Silicon only: the pre-compiled `modules_m/` kit is arm64.
 
 - **MSYS2** with the MinGW-w64 toolchain
 - **OpenBLAS**
-- **PyRAMSES**
+- **stepss**
 
 ```bash
 pacman -S mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-openblas
@@ -61,7 +61,7 @@ the `msys-2.0` runtime and produces a DLL that CPython cannot load.
 - **Intel oneAPI Fortran Compiler**, installed from Intel's own distribution;
   the [Installation](/getting-started/installation/) page covers the gfortran
   toolchains only
-- **PyRAMSES** or **STEPSS**
+- **stepss** or **STEPSS**
 
 </TabItem>
 </Tabs>
@@ -157,7 +157,7 @@ Run from the repository root:
 # Build shared library + executable
 make -f build/Makefile.linux all
 
-# Build only the shared library (for PyRAMSES)
+# Build only the shared library (for stepss)
 make -f build/Makefile.linux dll
 
 # Build only the executable
@@ -181,7 +181,7 @@ Run from the repository root:
 # Build shared library + executable
 make -f build/Makefile.macos all
 
-# Build only the shared library (for PyRAMSES)
+# Build only the shared library (for stepss)
 make -f build/Makefile.macos dll
 
 # Build only the executable
@@ -201,7 +201,7 @@ Link against Apple's Accelerate framework instead of OpenBLAS with
 compiler with `FC=gfortran-15`.
 
 <Aside type="note">
-The macOS library is named `ramses.so`, not `ramses.dylib`. PyRAMSES separates
+The macOS library is named `ramses.so`, not `ramses.dylib`. stepss separates
 platforms using the `libs/lin`, `libs/mac` and `libs/win` folders rather than by
 filename, so Linux and macOS share the same name.
 </Aside>
@@ -215,7 +215,7 @@ From the **MSYS2 MinGW 64-bit** shell, at the repository root:
 # Build shared library + executable
 make -f build/Makefile.windows all
 
-# Build only the shared library (for PyRAMSES)
+# Build only the shared library (for stepss)
 make -f build/Makefile.windows dll
 
 # Build only the executable
@@ -253,7 +253,7 @@ or copy those DLLs next to `ramses.dll`, when loading it from Python.
 
 1. Open `build/msvs/URAMSES.sln` in Visual Studio
 2. Select the desired project:
-   - `dllramses`: builds `ramses.dll` (for PyRAMSES)
+   - `dllramses`: builds `ramses.dll` (for stepss)
    - `exeramses`: builds `dynsim.exe` (standalone)
 3. Build the solution (Release x64 configuration)
 4. Output will be in `Release_wi/`
@@ -321,19 +321,19 @@ routers instead.
 
 ## Using Custom Models
 
-### With PyRAMSES
+### With stepss
 
-Point PyRAMSES to your custom library:
+Point stepss to your custom library:
 
 ```python
-import pyramses
-ram = pyramses.sim(custLibDir="path/to/Release_l")     # Linux
-# ram = pyramses.sim(custLibDir="path/to/Release_m")   # macOS
-# ram = pyramses.sim(custLibDir=r"path\to\Release_wg") # Windows (MinGW)
-# ram = pyramses.sim(custLibDir=r"path\to\Release_wi") # Windows (Intel)
+import stepss
+ram = stepss.sim(custLibDir="path/to/Release_l")     # Linux
+# ram = stepss.sim(custLibDir="path/to/Release_m")   # macOS
+# ram = stepss.sim(custLibDir=r"path\to\Release_wg") # Windows (MinGW)
+# ram = stepss.sim(custLibDir=r"path\to\Release_wi") # Windows (Intel)
 ```
 
-PyRAMSES loads `ramses.so` on Linux and macOS, and `ramses.dll` on Windows.
+stepss loads `ramses.so` on Linux and macOS, and `ramses.dll` on Windows.
 
 ### With STEPSS GUI
 

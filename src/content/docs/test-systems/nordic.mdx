@@ -115,10 +115,10 @@ The `jupyterhub-tutorial/` folder contains its own variants of these scenarios (
 
 ### Prerequisites
 
-- Python 3 with [PyRAMSES](/pyramses/installation/) installed
+- Python 3 with [stepss](/python/installation/) installed
 - JupyterLab (recommended) or any Python environment
 
-Install PyRAMSES following the [installation guide](/pyramses/installation/).
+Install stepss following the [installation guide](/python/installation/).
 
 ### Running a Simulation
 
@@ -134,20 +134,20 @@ Install PyRAMSES following the [installation guide](/pyramses/installation/).
 <Tabs>
 <TabItem label="Python Script">
 ```python
-import pyramses
+import stepss
 
-case = pyramses.cfg()
+case = stepss.cfg()
 case.addData("dyn_B.dat")
 case.addData("volt_rat_B.dat")
 case.addData("settings1.dat")
 case.addObs("obs.dat")
 case.addDst("trip_gen.dst")
 
-ram = pyramses.sim()
+ram = stepss.sim()
 ram.execSim(case, 150.0)
 
 # Extract and plot results
-ext = pyramses.extractor(case.getTrj())
+ext = stepss.extractor(case.getTrj())
 ```
 </TabItem>
 <TabItem label="Jupyter Notebook">
@@ -183,5 +183,5 @@ The [stepss-IEEE-Nordic-Test-system](https://github.com/SPS-L/stepss-IEEE-Nordic
 
 ## See Also
 
-- [PyRAMSES Examples](/pyramses/examples/#nordic-test-system-generator-trip), Complete Python simulation workflow with this test system
-- [PyRAMSES API Reference](/pyramses/api-reference/), Full API documentation for scripting simulations
+- [Python API Examples](/python/examples/#nordic-test-system-generator-trip), Complete Python simulation workflow with this test system
+- [Python API Reference](/python/api-reference/), Full API documentation for scripting simulations

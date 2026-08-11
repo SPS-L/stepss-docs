@@ -8,7 +8,7 @@ description: Licensing information for the STEPSS suite
 | Component | License | Repository |
 |-----------|---------|------------|
 | STEPSS GUI | Apache License 2.0 | [SPS-L/stepss-java-ui](https://github.com/SPS-L/stepss-java-ui) |
-| PyRAMSES | Apache License 2.0 | [SPS-L/stepss-pyramses](https://github.com/SPS-L/stepss-pyramses) |
+| stepss | Apache License 2.0 | [SPS-L/stepss-python-ui](https://github.com/SPS-L/stepss-python-ui) |
 | URAMSES | Apache License 2.0 | [SPS-L/stepss-uramses](https://github.com/SPS-L/stepss-uramses) |
 | stepss-eigenanalysis | Apache License 2.0 | [SPS-L/stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) |
 | CODEGEN Studio | Apache License 2.0 | [SPS-L/stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) |
@@ -49,7 +49,7 @@ For extensions to larger models or execution using more than two cores, contact 
 
 ## Helios License
 
-**STEPSS-Helios** (the modern power-flow engine, also bundled as `libhelios_api` in PyRAMSES) is the property of **Dr. Petros Aristidou**, and is distributed under the **STEPSS-Helios Academic Public License**:
+**STEPSS-Helios** (the modern power-flow engine, also bundled as `libhelios_api` in stepss) is the property of **Dr. Petros Aristidou**, and is distributed under the **STEPSS-Helios Academic Public License**:
 
 - Permission is granted to use Helios **free of charge** for any **non-commercial purpose**, including teaching and research at universities, colleges, and other educational institutions, research at non-profit research institutions, and personal non-profit purposes.
 - For **commercial use**, a commercial license is required: contact **info@sps-lab.org**.

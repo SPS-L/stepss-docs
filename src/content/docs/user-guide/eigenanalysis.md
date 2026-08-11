@@ -18,7 +18,7 @@ The tool analyzes small-signal stability by computing eigenvalues of the system 
 ## Prerequisites
 
 - **MATLAB** R2016a or later
-- **PyRAMSES** for Jacobian matrix extraction
+- **stepss** for Jacobian matrix extraction
 
 ## Installation
 
@@ -31,13 +31,13 @@ addpath('path/to/stepss-eigenanalysis/scripts')
 
 ### 1. Extract Jacobian from RAMSES
 
-Use PyRAMSES to run a simulation and export the Jacobian:
+Use stepss to run a simulation and export the Jacobian:
 
 ```python
-import pyramses
+import stepss
 
-ram = pyramses.sim()
-case = pyramses.cfg('cmd.txt')
+ram = stepss.sim()
+case = stepss.cfg('cmd.txt')
 ram.execSim(case)
 ```
 
@@ -119,7 +119,7 @@ Source code: [SPS-L/stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigena
 
 ## See Also
 
-- [`getJac()`](/pyramses/api-reference/#getjac), get the Jacobian directly in Python as SciPy sparse matrices, without going through the `.dat` files
-- [Eigenanalysis Workflow](/pyramses/examples/#eigenanalysis-workflow), the complete export-and-analyse script
+- [`getJac()`](/python/api-reference/#getjac), get the Jacobian directly in Python as SciPy sparse matrices, without going through the `.dat` files
+- [Eigenanalysis Workflow](/python/examples/#eigenanalysis-workflow), the complete export-and-analyse script
 - [Export Jacobian Matrix](/user-guide/disturbances/#export-jacobian-matrix), the `JAC` disturbance and which files each scheme writes
 - [Kundur Two-Area System](/test-systems/kundur/), a benchmark built for inter-area mode analysis

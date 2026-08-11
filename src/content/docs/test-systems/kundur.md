@@ -12,16 +12,16 @@ The Kundur two-area system is the standard benchmark for inter-area oscillation 
 ## Quick Start
 
 ```python
-import pyramses
+import stepss
 
-case = pyramses.cfg()
+case = stepss.cfg()
 case.addData('lf.dat')            # power-flow data
 case.addData('dyn.dat')           # dynamic data (use dyn_noPSS.dat for the no-PSS variant)
 case.addData('solveroptions.dat') # solver settings
 case.addDst('disturb.dst')        # +0.5 pu load step on L9 at t = 1 s, 60 s horizon
 case.addObs('obs.dat')            # observables to record
 
-sim = pyramses.sim()
+sim = stepss.sim()
 sim.execSim(case)
 ```
 

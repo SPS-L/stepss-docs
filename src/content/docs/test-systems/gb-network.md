@@ -16,9 +16,9 @@ The GB Network is a 50 Hz reduced-order representation of the Great Britain tran
 ## Quick Start
 
 ```python
-import pyramses
+import stepss
 
-case = pyramses.cfg()
+case = stepss.cfg()
 case.addData('GBdyn.dat')      # dynamic data: machines, exciters/PSS, governors, loads
 case.addData('GBhvdc.txt')     # HVDC interconnection two-port models
 case.addData('GBvoltrat.dat')  # power-flow solution
@@ -26,7 +26,7 @@ case.addData('settings.dat')   # solver settings
 case.addDst('disturb.dst')     # 180 s run with commented disturbance templates
 case.addObs('obs.dat')         # observables to record
 
-sim = pyramses.sim()
+sim = stepss.sim()
 sim.execSim(case)
 ```
 

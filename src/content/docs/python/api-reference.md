@@ -1,11 +1,11 @@
 ---
 title: API Reference
-description: PyRAMSES Python API, complete reference for pyramses.cfg, pyramses.sim, and pyramses.extractor
+description: stepss Python API, complete reference for stepss.cfg, stepss.sim, and stepss.extractor
 ---
 
-## `pyramses.cfg`: Test Case Configuration
+## `stepss.cfg`: Test Case Configuration
 
-The `pyramses.cfg` class defines a simulation scenario: data files, disturbance file, output files, observables, and runtime options.
+The `stepss.cfg` class defines a simulation scenario: data files, disturbance file, output files, observables, and runtime options.
 
 ---
 
@@ -14,20 +14,20 @@ The `pyramses.cfg` class defines a simulation scenario: data files, disturbance 
 Create an empty configuration or load one from a previously saved command file:
 
 ```python
-import pyramses
+import stepss
 
-case = pyramses.cfg()             # empty configuration
-case = pyramses.cfg("cmd.txt")    # load from command file
+case = stepss.cfg()             # empty configuration
+case = stepss.cfg("cmd.txt")    # load from command file
 ```
 
 Load multiple cases in a loop:
 
 ```python
-import pyramses
+import stepss
 
 list_of_cases = []
 for i in range(12):
-    list_of_cases.append(pyramses.cfg('cmd' + str(i) + '.txt'))
+    list_of_cases.append(stepss.cfg('cmd' + str(i) + '.txt'))
 ```
 
 #### `writeCmdFile(filename=None)`
@@ -148,7 +148,7 @@ A disturbance file must be provided, otherwise the simulator will raise an excep
 
 ### Trajectory File
 
-Specifies the file where time-series simulation results (trajectories) are saved for post-processing. This file is used by `pyramses.extractor` to access results after the simulation completes.
+Specifies the file where time-series simulation results (trajectories) are saved for post-processing. This file is used by `stepss.extractor` to access results after the simulation completes.
 
 #### `addTrj(filename)`
 
@@ -165,7 +165,7 @@ path = case.getTrj()
 ```
 
 :::note
-This is optional. If omitted, no trajectory file is written and result extraction via `pyramses.extractor` will not be possible.
+This is optional. If omitted, no trajectory file is written and result extraction via `stepss.extractor` will not be possible.
 :::
 
 ---
@@ -319,19 +319,19 @@ Gnuplot must be installed and available in the system PATH for runtime observabl
 
 ---
 
-## `pyramses.sim`: Simulation Control
+## `stepss.sim`: Simulation Control
 
-The `pyramses.sim` class runs simulations. It wraps the RAMSES dynamic library and supports start/pause/continue, runtime queries, and disturbance injection.
+The `stepss.sim` class runs simulations. It wraps the RAMSES dynamic library and supports start/pause/continue, runtime queries, and disturbance injection.
 
 ---
 
 ### Initializing
 
 ```python
-import pyramses
+import stepss
 
-ram = pyramses.sim()                        # use bundled RAMSES libraries
-ram = pyramses.sim(custLibDir='/path/to/')  # use custom library directory
+ram = stepss.sim()                        # use bundled RAMSES libraries
+ram = stepss.sim(custLibDir='/path/to/')  # use custom library directory
 ```
 
 | Parameter | Type | Description |
@@ -342,7 +342,7 @@ ram = pyramses.sim(custLibDir='/path/to/')  # use custom library directory
 
 ### Running Simulations
 
-A properly configured `pyramses.cfg` test case is required before running a simulation.
+A properly configured `stepss.cfg` test case is required before running a simulation.
 
 #### `execSim(case)`: run to completion
 
@@ -581,7 +581,7 @@ status = ram.getTrfoSS(1, 3, 2, 'Status')
 Compiled user-defined model libraries can be loaded at runtime.
 
 :::caution
-These three calls exist only in RAMSES builds made on Windows with the Intel Fortran compiler. Every library currently bundled with PyRAMSES is a gfortran build, so they are unavailable there. To use your own models, build a custom `ramses.so`/`ramses.dll` with [URAMSES](/developer/uramses/) and point PyRAMSES at it with `pyramses.sim(custLibDir=...)`.
+These three calls exist only in RAMSES builds made on Windows with the Intel Fortran compiler. Every library currently bundled with stepss is a gfortran build, so they are unavailable there. To use your own models, build a custom `ramses.so`/`ramses.dll` with [URAMSES](/developer/uramses/) and point stepss at it with `stepss.sim(custLibDir=...)`.
 :::
 
 #### `load_MDL(MDLName)`
@@ -663,9 +663,9 @@ Set `$OMEGA_REF SYN ;` in the solver settings data file when exporting the Jacob
 
 ---
 
-## `pyramses.extractor`: Result Extraction
+## `stepss.extractor`: Result Extraction
 
-The `pyramses.extractor` class extracts and visualises time-series results from a trajectory file produced during simulation.
+The `stepss.extractor` class extracts and visualises time-series results from a trajectory file produced during simulation.
 
 ---
 
@@ -674,24 +674,24 @@ The `pyramses.extractor` class extracts and visualises time-series results from 
 Pass the trajectory file path to the extractor:
 
 ```python
-import pyramses
+import stepss
 
-case = pyramses.cfg('cmd.txt')
+case = stepss.cfg('cmd.txt')
 # ... run simulation ...
-ext = pyramses.extractor(case.getTrj())
+ext = stepss.extractor(case.getTrj())
 ```
 
 Or provide the file path directly:
 
 ```python
-ext = pyramses.extractor('output.trj')
+ext = stepss.extractor('output.trj')
 ```
 
 ---
 
 ### Curve Objects
 
-All extraction methods return objects whose attributes are **curve objects** (`pyramses.cur` named tuples). Every curve object has:
+All extraction methods return objects whose attributes are **curve objects** (`stepss.cur` named tuples). Every curve object has:
 
 | Attribute | Type | Description |
 |-----------|------|-------------|
@@ -910,21 +910,21 @@ ext.getLoad('L_1').P.plot()
 
 ### Multi-Curve Plotting
 
-#### `pyramses.curplot(curves)`
+#### `stepss.curplot(curves)`
 
 Display multiple curve objects on the same axes. Each curve's `msg` field is used as the legend label.
 
 ```python
-import pyramses
+import stepss
 
-ext = pyramses.extractor(case.getTrj())
+ext = stepss.extractor(case.getTrj())
 
 curves = [
     ext.getSync('g1').S,
     ext.getSync('g2').S,
     ext.getSync('g3').S,
 ]
-pyramses.curplot(curves)
+stepss.curplot(curves)
 ```
 
 ---
@@ -932,10 +932,10 @@ pyramses.curplot(curves)
 ## Complete Example
 
 ```python
-import pyramses
+import stepss
 
 # --- Build test case ---
-case = pyramses.cfg()
+case = stepss.cfg()
 case.addData('dyn_A.dat')
 case.addData('settings1.dat')
 case.addInit('init.trace')
@@ -955,7 +955,7 @@ case.addRunObs('RT RT')
 case.writeCmdFile('cmd.txt')
 
 # --- Run simulation ---
-ram = pyramses.sim()
+ram = stepss.sim()
 
 # Start and pause at t = 80 s
 ram.execSim(case, 80.0)
@@ -971,7 +971,7 @@ A, E = ram.getJac()
 ram.contSim(ram.getInfTime())
 
 # --- Extract results ---
-ext = pyramses.extractor(case.getTrj())
+ext = stepss.extractor(case.getTrj())
 
 # Bus voltages
 ext.getBus('4044').mag.plot()
@@ -985,7 +985,7 @@ gen.A.plot()    # rotor angle
 ext.getBranch('1041-01').PF.plot()
 
 # Plot multiple rotor speeds together
-pyramses.curplot([
+stepss.curplot([
     ext.getSync('g1').S,
     ext.getSync('g2').S,
     ext.getSync('g3').S,
@@ -994,5 +994,5 @@ pyramses.curplot([
 
 ## Next Steps
 
-- [Examples](/pyramses/examples/), Practical simulation examples and workflows
+- [Examples](/python/examples/), Practical simulation examples and workflows
 - [Test Systems](/test-systems/), Ready-to-run benchmark systems

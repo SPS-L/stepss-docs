@@ -25,7 +25,7 @@ Recognised discrete-controller model names (case-sensitive):
 - **Uppercase short names** (no prefix): `PST`, `LTC`, `LTC2`, `OLTC2`, `LTCINV`, `MAIS`, `UVLS`, `RT`, `UVPROT`, `FRT`, `VOLT_VAR`, `SIM_MINMAXVOLT`, `SIM_MINMAXSPEED`.
 - **Prefixed name**: RAMSES adds the `dctl_` prefix automatically, so both `line_prot` and `dctl_line_prot` resolve to the line-protection model.
 
-All of the above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). `MAIS` is an automatic shunt-reactor switching scheme (*Manoeuvre Automatique d'Inductances Shunt*) that switches susceptance at a monitored bus on under-voltage, voltage-drop and over-voltage thresholds; it does not have a dedicated documentation section below. `dctl_hvdc_lim`, `dctl_injprot` and `dctl_losprot`, documented below, are compiled into the library but registered under no name; each becomes callable by adding one case to the URAMSES router (see the [URAMSES guide](/developer/uramses/)).
+All of the above are built into every RAMSES distribution (standalone executable and shared library used by stepss). `MAIS` is an automatic shunt-reactor switching scheme (*Manoeuvre Automatique d'Inductances Shunt*) that switches susceptance at a monitored bus on under-voltage, voltage-drop and over-voltage thresholds; it does not have a dedicated documentation section below. `dctl_hvdc_lim`, `dctl_injprot` and `dctl_losprot`, documented below, are compiled into the library but registered under no name; each becomes callable by adding one case to the URAMSES router (see the [URAMSES guide](/developer/uramses/)).
 :::
 
 ---

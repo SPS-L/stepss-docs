@@ -30,7 +30,7 @@ src/content/docs/
 ├── getting-started/             # Overview, installation, quick start, license
 ├── user-guide/                  # Network, power flow, disturbances, solver, file formats, eigenanalysis
 ├── models/                      # Synchronous machine, exciters, governors, injectors, two-ports
-├── pyramses/                    # PyRAMSES overview, install, API, Helios, examples
+├── python/                       # Python API overview, install, API, Helios, examples
 ├── developer/                   # CODEGEN, CG Studio, user models, URAMSES
 ├── test-systems/                # Nordic and 5-bus test systems
 └── resources/                   # References, repositories
@@ -94,7 +94,7 @@ Trigger a manual deployment from the GitHub Actions tab → "Deploy to GitHub Pa
 | Repository | Description |
 |------------|-------------|
 | [stepss-java-ui](https://github.com/SPS-L/stepss-java-ui) | Java GUI |
-| [stepss-pyramses](https://github.com/SPS-L/stepss-pyramses) | Python API (RAMSES + Helios power flow) |
+| [stepss-python-ui](https://github.com/SPS-L/stepss-python-ui) | Python API (RAMSES + Helios power flow) |
 | [stepss-userguide](https://github.com/SPS-L/stepss-userguide) | LaTeX source docs |
 | [stepss-uramses](https://github.com/SPS-L/stepss-uramses) | User-defined models |
 | [stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) | Eigenvalue analysis |

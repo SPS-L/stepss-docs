@@ -19,7 +19,7 @@ Recognised injector model names (case-sensitive):
 - **Uppercase short names** (no prefix): `LOAD`, `RESTLD`, `THEVEQ`, `INDMACH1`, `INDMACH2`, `SVC_GENERIC1`.
 - **Prefixed names**: RAMSES adds the `inj_` prefix automatically: `VFAULT`/`inj_VFAULT`, `vfd_load`/`inj_vfd_load`, `PQ`/`inj_PQ`, `IBG`/`inj_IBG`, `WT3`/`inj_WT3`, `WT4`/`inj_WT4`, `BESS`/`inj_BESS`, `GFOL`/`inj_GFOL`, `GFOR`/`inj_GFOR`, `PMU`/`inj_PMU`.
 
-All of the above are built into every RAMSES distribution (standalone executable and shared library used by PyRAMSES). `inj_INDM1` and `inj_PVG`, documented below, are compiled into the library but registered under no name; each becomes callable by adding one case to the URAMSES router (see the [URAMSES guide](/developer/uramses/)). `inj_norton` is excluded from the build entirely and is not available.
+All of the above are built into every RAMSES distribution (standalone executable and shared library used by stepss). `inj_INDM1` and `inj_PVG`, documented below, are compiled into the library but registered under no name; each becomes callable by adding one case to the URAMSES router (see the [URAMSES guide](/developer/uramses/)). `inj_norton` is excluded from the build entirely and is not available.
 
 **Note on case sensitivity.** Match the case used above exactly. The uppercase short names must be uppercase. For the prefixed family, `vfd_load` and `VFAULT` use those exact cases. Most others follow the convention `inj_<UPPERCASE>` (e.g. `inj_PQ`, `inj_GFOR`).
 :::

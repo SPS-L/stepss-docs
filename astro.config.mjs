@@ -16,6 +16,14 @@ export default defineConfig({
 	redirects: {
 		'/user-guide/pfc': '/user-guide/power-flow/',
 		'/developer/codegen-library': '/developer/codegen-blocks/',
+		// The Python API pages moved when the package was renamed from
+		// pyramses to stepss. The stepss-helios and stepss-cg-studio READMEs
+		// and the PyPI project page link to the old paths.
+		'/pyramses/overview': '/python/overview/',
+		'/pyramses/installation': '/python/installation/',
+		'/pyramses/examples': '/python/examples/',
+		'/pyramses/api-reference': '/python/api-reference/',
+		'/pyramses/helios': '/python/helios/',
 	},
 	markdown: {
 		remarkPlugins: [remarkMath],
@@ -54,7 +62,7 @@ export default defineConfig({
 					tag: 'meta',
 					attrs: {
 						name: 'keywords',
-						content: 'power systems, simulation, RAMSES, PyRAMSES, dynamic simulation, STEPSS',
+						content: 'power systems, simulation, RAMSES, stepss, dynamic simulation, STEPSS',
 					},
 				},
 			],
@@ -84,15 +92,15 @@ export default defineConfig({
 					],
 				},
 				{
-					label: 'PyRAMSES',
+					label: 'Python API',
 					items: [
-						{ label: 'Overview',      slug: 'pyramses/overview' },
-						{ label: 'Installation',  slug: 'pyramses/installation' },
-						{ label: 'Examples',      slug: 'pyramses/examples' },
-						{ label: 'API Reference', slug: 'pyramses/api-reference' },
+						{ label: 'Overview',      slug: 'python/overview' },
+						{ label: 'Installation',  slug: 'python/installation' },
+						{ label: 'Examples',      slug: 'python/examples' },
+						{ label: 'API Reference', slug: 'python/api-reference' },
 						// Not "Power Flow (Helios)": that label belongs to the engine
 						// reference under Simulation Guide. This page is the Python API.
-						{ label: 'Helios Power-Flow API', slug: 'pyramses/helios' },
+						{ label: 'Helios Power-Flow API', slug: 'python/helios' },
 					],
 				},
 				{
