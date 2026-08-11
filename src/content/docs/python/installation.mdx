@@ -5,7 +5,7 @@ description: Installing stepss and its dependencies
 
 import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
 
-stepss is a time-domain dynamic simulator for electric power systems. It provides a Python interface to the RAMSES simulation engine, enabling users to define test cases, run simulations, extract results, and perform post-processing, all within Python scripts or Jupyter notebooks.
+stepss is a Python interface to the RAMSES dynamic simulator and the Helios AC power-flow engine, enabling users to define test cases, run simulations, extract results, and perform post-processing, all within Python scripts or Jupyter notebooks.
 
 stepss supports Windows, Linux, and macOS, for both dynamic simulation and the bundled [Helios power-flow engine](/python/helios/), and integrates with standard scientific Python libraries (NumPy, SciPy, Matplotlib).
 
@@ -27,10 +27,12 @@ pip install stepss
 
 ### Version numbers
 
-From `3.58` on, a stepss version names the RAMSES engine bundled in the
-wheel: version `3.58` (published as `pyramses` up to that point) carries
-RAMSES 3.58. A fourth component appears when stepss is released without a
-new RAMSES behind it, so `3.58.1` and `3.58.2` also bundle RAMSES 3.58.
+From `3.58` on, a stepss version is the bundled RAMSES version, optionally
+followed by a counter: version `3.58` (published as `pyramses` up to that
+point) carries RAMSES 3.58. A counter is appended when stepss is released
+without a new RAMSES behind it, so `3.58.1` and `3.58.2` also bundle
+RAMSES 3.58. A new RAMSES release restarts the sequence with a bare
+version, such as `3.59`.
 
 To pin an engine version, pin the matching stepss release:
 

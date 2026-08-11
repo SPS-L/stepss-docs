@@ -62,11 +62,12 @@ it as a live alternative, and do not describe a `pfc` executable.
 
 That page used to live at `/user-guide/pfc/`, which the stepss-helios and
 stepss-cg-studio READMEs link to; `redirects` in `astro.config.mjs` keeps the old
-URL alive. Keep the entry if you move the page again. The five `/pyramses/*`
-URLs in the same block are kept alive for the same reason: the Python API pages
-moved to `/python/` when the package was renamed from `pyramses` to `stepss`
-(repository `stepss-python-ui`), and the stepss-helios and stepss-cg-studio
-READMEs, plus the PyPI project page, still link to the old paths.
+URL alive. Keep the entry if you move the page again. The `/pyramses` and
+`/pyramses/*` URLs in the same block are kept alive for a different reason:
+the Python API pages moved to `/python/` when the package was renamed from
+`pyramses` to `stepss` (repository `stepss-python-ui`), and these were the
+site's published Python API URLs before the rename, so external links and
+search results still point at them.
 
 ### Frontmatter
 Every page requires YAML frontmatter with `title` and `description`. The landing page (`index.mdx`) additionally uses `template: splash` with a `hero` block.
