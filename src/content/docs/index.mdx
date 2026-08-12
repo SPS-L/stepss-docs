@@ -22,7 +22,24 @@ hero:
 
 import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
+## Two Editions
+
+STEPSS names the platform, not any one program. It reaches you in two editions
+that drive the same engines and read the same data files, so a case built in one
+runs unchanged in the other.
+
+<CardGrid>
+  <Card title="STEPSS for Java" icon="seti:java">
+    A desktop application in a single `stepss.jar`. Load a network, run static and dynamic simulations, plot live curves, and build your own models, without touching a command line. [Install it](/getting-started/installation/).
+  </Card>
+  <Card title="STEPSS for Python" icon="seti:python">
+    `pip install stepss`. Script simulations, sweep parameters, and work directly with NumPy, SciPy and Jupyter. [Install it](/python/installation/).
+  </Card>
+</CardGrid>
+
 ## Core Modules
+
+Both editions are front ends onto these engines.
 
 <CardGrid stagger>
   <Card title="Helios, Power Flow" icon="document">
@@ -32,10 +49,7 @@ import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
     Time-domain simulation of power system dynamics under the phasor approximation. Supports Backward Euler, Trapezoidal, and BDF2 integration with OpenMP parallelism.
   </Card>
   <Card title="CODEGEN, Model Generator" icon="pencil">
-    Translates user-defined models into Fortran 2003 code for compilation and linking with RAMSES. Build models visually with [CODEGEN Studio](/developer/cg-studio/).
-  </Card>
-  <Card title="stepss, Python Interface" icon="seti:python">
-    Python API for scripting simulations, extracting results, running Helios power flows, and integrating with the scientific Python ecosystem.
+    Translates user-defined models into Fortran 2003 code for compilation and linking with RAMSES. Build models visually with [CODEGEN Studio](/developer/cg-studio/). Carried by the Java edition.
   </Card>
 </CardGrid>
 

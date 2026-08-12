@@ -5,9 +5,19 @@ description: How to install STEPSS and its dependencies
 
 import { Tabs, TabItem, Steps, Aside, LinkButton } from '@astrojs/starlight/components';
 
-This guide covers the installation of STEPSS: the Java GUI, and the Fortran toolchain needed only if you intend to build your own models.
+STEPSS comes in [two editions](/getting-started/overview/#two-editions). This page covers **STEPSS for Java**, the desktop application, and the Fortran toolchain needed only if you intend to build your own models.
 
-STEPSS itself (`stepss.jar`) is published as a GitHub release. The button below always fetches the
+:::tip[Working from Python instead?]
+**STEPSS for Python** installs with a single command and needs no Java:
+
+```bash
+pip install stepss
+```
+
+It bundles the same RAMSES and Helios engines. See [Python API Installation](/python/installation/) for the full instructions, including the system libraries Linux and macOS need.
+:::
+
+The Java edition is distributed as a single `stepss.jar`, published as a GitHub release. The button below always fetches the
 latest one; every version ever released is listed on the
 [releases page](https://github.com/SPS-L/stepss-java-ui/releases).
 
@@ -15,7 +25,7 @@ latest one; every version ever released is listed on the
 
 ## Installing Java
 
-STEPSS comes with a Java-based Graphical User Interface (GUI) that requires a **64-bit Java Runtime Environment, version 11 or later**. Any recent JRE or JDK is fine; there is no need to uninstall a Java you already have, as long as it meets that minimum.
+The Java edition requires a **64-bit Java Runtime Environment, version 11 or later**. Any recent JRE or JDK is fine; there is no need to uninstall a Java you already have, as long as it meets that minimum.
 
 <Steps>
 
@@ -35,7 +45,7 @@ STEPSS comes with a Java-based Graphical User Interface (GUI) that requires a **
 
 </Steps>
 
-## Installing STEPSS
+## Installing STEPSS for Java
 
 <Steps>
 
@@ -46,7 +56,7 @@ STEPSS comes with a Java-based Graphical User Interface (GUI) that requires a **
 
 </Steps>
 
-When launched, STEPSS creates a temporary working folder and copies all needed executables and libraries. To remove STEPSS, simply delete the archive file. It leaves nothing on your computer.
+When launched, it creates a temporary working folder and copies all needed executables and libraries. To remove it, simply delete the archive file. It leaves nothing on your computer.
 
 ## Installing a Fortran Toolchain
 
@@ -105,6 +115,6 @@ details.
 
 For the browser-based visual model editor, see the [CODEGEN Studio installation section](/developer/cg-studio/#installation).
 
-## Installing stepss
+## Installing STEPSS for Python
 
-For the Python interface to RAMSES, see the [Python API Installation Guide](/python/installation/).
+`pip install stepss`. See the [Python API Installation Guide](/python/installation/) for the system libraries Linux and macOS need, and [Two Editions](/getting-started/overview/#two-editions) for what each edition carries.

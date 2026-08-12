@@ -3,10 +3,16 @@ title: Python API
 description: stepss, the Python package that scripts RAMSES and Helios from Python
 ---
 
-**stepss** is the Python package for STEPSS. It is not a simulator itself: it
-is a scriptable interface to the RAMSES dynamic simulation engine and the
-Helios AC power-flow engine, bundling both engines' pre-compiled binaries so
-no separate installation is required.
+**STEPSS for Python** is one of the platform's [two editions](/getting-started/overview/#two-editions),
+distributed as the `stepss` package on PyPI. The other is STEPSS for Java, a
+desktop application; both drive the same engines and read the same data files,
+so a case built in one runs unchanged in the other.
+
+This edition is not a simulator itself. It is a scriptable interface to the
+RAMSES dynamic simulation engine and the Helios AC power-flow engine, bundling
+both engines' pre-compiled binaries so no separate installation is required.
+CODEGEN and the DYNGRAPH viewer are carried by the Java edition rather than
+this one.
 
 | Page | Covers |
 |------|--------|

@@ -3,7 +3,7 @@ title: Python API Overview
 description: Python interface to the RAMSES dynamic simulator and Helios power-flow engine
 ---
 
-**stepss** is a Python module that provides an interface to the RAMSES dynamic simulator and the Helios AC power-flow engine. It covers the full workflow: defining test cases, launching simulations, querying system states at runtime, extracting and plotting results, and running power flows. The package embeds pre-compiled RAMSES and Helios power-flow libraries for Windows, Linux, and macOS and exposes them through a clean Python API.
+**stepss** is the package that delivers [STEPSS for Python](/getting-started/overview/#two-editions), one of the platform's two editions. It provides an interface to the RAMSES dynamic simulator and the Helios AC power-flow engine, covering the full workflow: defining test cases, launching simulations, querying system states at runtime, extracting and plotting results, and running power flows. The package embeds pre-compiled RAMSES and Helios libraries for Windows, Linux, and macOS and exposes them through a clean Python API.
 
 ## Package-Level Attributes
 

@@ -30,6 +30,27 @@ Each module can be used independently:
 - **RAMSES alone**: With a pre-computed power flow solution, run multiple dynamic simulations from the same initial state
 - **CODEGEN alone**: Build and save models for future incorporation into a user-defined version of RAMSES
 
+## Two Editions
+
+STEPSS is the name of the platform, not of any one program. It reaches users in
+two editions, which drive the same engines and read the same data files:
+
+| Edition | Distributed as | Use it for |
+|---|---|---|
+| **STEPSS for Java** | `stepss.jar`, a desktop application | Interactive work: load a network, run it, plot curves, build models |
+| **STEPSS for Python** | the `stepss` package, `pip install stepss` | Scripting, parameter sweeps, and the scientific Python stack |
+
+Neither edition wraps the other. Both are front ends onto the same Fortran
+engines, so a case built in one runs unchanged in the other.
+
+They do not carry identical toolchains. The Java edition bundles all three
+modules plus the DYNGRAPH trajectory viewer and gnuplot. The Python edition
+bundles RAMSES and Helios only: writing your own models with CODEGEN needs the
+Java edition or the [CODEGEN toolchain](/developer/user-models/) directly, and
+trajectories are read into NumPy rather than viewed in DYNGRAPH.
+
+Install either from [Installation](/getting-started/installation/).
+
 ## Helios Module
 
 The power flow computation uses the Newton-Raphson method in polar coordinates; see [Power Flow Data & Settings](/user-guide/power-flow/) for the complete record and parameter reference. Input data consists of:
