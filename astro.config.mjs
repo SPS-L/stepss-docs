@@ -16,16 +16,6 @@ export default defineConfig({
 	redirects: {
 		'/user-guide/pfc': '/user-guide/power-flow/',
 		'/developer/codegen-library': '/developer/codegen-blocks/',
-		// The Python API pages moved when the package was renamed from
-		// pyramses to stepss. These were the site's published Python API URLs
-		// before the rename, and external links and search results still
-		// point at them.
-		'/pyramses': '/python/',
-		'/pyramses/overview': '/python/overview/',
-		'/pyramses/installation': '/python/installation/',
-		'/pyramses/examples': '/python/examples/',
-		'/pyramses/api-reference': '/python/api-reference/',
-		'/pyramses/helios': '/python/helios/',
 	},
 	markdown: {
 		remarkPlugins: [remarkMath],

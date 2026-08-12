@@ -39,9 +39,3 @@ stepss supports Windows, Linux, and macOS for both dynamic simulation and power 
 ## Repository
 
 Source code: [SPS-L/stepss-python-ui](https://github.com/SPS-L/stepss-python-ui)
-
-:::note[Renamed from PyRAMSES]
-This package was published as `pyramses` up to version 3.58. Existing code
-keeps working: `pip install pyramses` installs a shim that forwards to
-`stepss`. New code should use `import stepss`.
-:::

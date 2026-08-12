@@ -55,7 +55,7 @@ reproduces the 3.51 baseline bit-identically).
 First release with native macOS support.
 
   * gfortran builds for Apple Silicon (arm64): the standalone executable,
-    ramses.so for PyRAMSES, and a modules_mac kit for URAMSES.
+    ramses.so for the Python package, and a modules_mac kit for URAMSES.
   * macOS builds are gated by the same Nordic voltage-collapse regression test
     as Linux and Windows; arm64 agrees with the x86_64 baseline to ~5e-10.
   * build/Makefile.gfortran handles Homebrew's keg-only OpenBLAS.

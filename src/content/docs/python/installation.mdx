@@ -27,17 +27,18 @@ pip install stepss
 
 ### Version numbers
 
-From `3.58` on, a stepss version is the bundled RAMSES version, optionally
-followed by a counter: version `3.58` (published as `pyramses` up to that
-point) carries RAMSES 3.58. A counter is appended when stepss is released
-without a new RAMSES behind it, so `3.58.1` and `3.58.2` also bundle
-RAMSES 3.58. A new RAMSES release restarts the sequence with a bare
-version, such as `3.59`.
+A stepss version is the bundled RAMSES version, optionally followed by a
+counter: version `3.59` carries RAMSES 3.59. The counter is appended when
+stepss is released without a new RAMSES behind it, so a `3.59.1` would bundle
+RAMSES 3.59 as well. A new RAMSES release restarts the sequence with a bare
+version.
+
+`stepss` on PyPI starts at `3.59`; nothing below that can be installed.
 
 To pin an engine version, pin the matching stepss release:
 
 ```bash
-pip install "stepss~=3.58.0"    # any 3.58.x, all bundling RAMSES 3.58
+pip install "stepss~=3.59.0"    # any 3.59.x, all bundling RAMSES 3.59
 ```
 
 Check what an installed copy carries:
@@ -47,11 +48,6 @@ import stepss
 print(stepss.__version__, stepss.__ramses_version__, stepss.__helios_version__)
 ```
 
-:::note[Releases before 3.58]
-Versions up to `0.3.5` used an unrelated numbering (`0.3.4`, `0.3.5`, ...) that
-said nothing about the bundled engine. `0.3.5` is the last of those; it bundles
-RAMSES 3.57.
-:::
 
 ## Linux System Prerequisites
 
