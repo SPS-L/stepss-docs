@@ -11,8 +11,9 @@ so a case built in one runs unchanged in the other.
 This edition is not a simulator itself. It is a scriptable interface to the
 RAMSES dynamic simulation engine and the Helios AC power-flow engine, bundling
 both engines' pre-compiled binaries so no separate installation is required.
-CODEGEN and the DYNGRAPH viewer are carried by the Java edition rather than
-this one.
+Trajectory plotting is built in, implemented in Python on top of Matplotlib
+rather than by launching the DYNGRAPH viewer the Java edition uses. CODEGEN is
+the one capability carried only by that edition.
 
 | Page | Covers |
 |------|--------|

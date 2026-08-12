@@ -45,9 +45,16 @@ engines, so a case built in one runs unchanged in the other.
 
 They do not carry identical toolchains. The Java edition bundles all three
 modules plus the DYNGRAPH trajectory viewer and gnuplot. The Python edition
-bundles RAMSES and Helios only: writing your own models with CODEGEN needs the
-Java edition or the [CODEGEN toolchain](/developer/user-models/) directly, and
-trajectories are read into NumPy rather than viewed in DYNGRAPH.
+bundles RAMSES and Helios, so **CODEGEN is the one capability it lacks**:
+writing your own models needs the Java edition, or the
+[CODEGEN toolchain](/developer/user-models/) directly.
+
+Trajectory viewing exists in both, by different means. The Java edition launches
+DYNGRAPH, a separate viewer executable. The Python edition carries its own
+equivalent, written in Python on top of Matplotlib: `extractor` reads a `.trj`
+file into NumPy arrays and `curplot`, or a curve's own `.plot()`, draws them.
+The curves stay in the process as ordinary arrays, so they can be sliced,
+compared across runs, or passed to any other Python library.
 
 Install either from [Installation](/getting-started/installation/).
 
