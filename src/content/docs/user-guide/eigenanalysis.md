@@ -18,10 +18,12 @@ components name the bundled RAMSES, so `stepss.__version__` tells you directly.
 
 The linearised model is a set of differential-algebraic equations,
 
-$$\begin{aligned}
+$$
+\begin{aligned}
 \Delta\dot{x} &= f_x\,\Delta x + f_y\,\Delta y \\
 0 &= g_x\,\Delta x + g_y\,\Delta y
-\end{aligned}$$
+\end{aligned}
+$$
 
 with states $x$ and algebraic variables $y$. Eliminating $\Delta y$ gives the
 state matrix
