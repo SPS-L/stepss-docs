@@ -1,125 +1,194 @@
 ---
 title: Eigenanalysis
-description: Small-signal stability analysis with the RAMSES Eigenanalysis tool
+description: Small-signal stability analysis in RAMSES, computed by the engine itself
 ---
 
-The [RAMSES Eigenanalysis tool](https://github.com/SPS-L/stepss-eigenanalysis) is a MATLAB-based tool for computing eigenvalues and eigenvectors of power system models in descriptor form, extracted from RAMSES simulations.
+RAMSES computes small-signal stability analysis internally. It reduces the
+linearised differential-algebraic model to a state matrix, solves the dense
+eigenproblem, and writes eigenvalues, damping ratios, participation factors and
+mode shapes to file. No external tool is involved.
 
-## Overview
+:::note[Requires a RAMSES newer than v3.60]
+The `EIG` disturbance was added after the v3.60 release. On an older engine it is
+accepted and no results files appear. The `stepss` package version's leading
+components name the bundled RAMSES, so `stepss.__version__` tells you directly.
+:::
 
-The tool analyzes small-signal stability by computing eigenvalues of the system Jacobian matrix. It supports both differential-algebraic equation (DAE) systems and provides multiple computational methods.
+## What is computed
 
-## Features
+The linearised model is a set of differential-algebraic equations,
 
-- **Two selectable analysis methods**: QZ (dense, via `eig()`) and ARP (sparse descriptor, via `eigs()`). Arnoldi and JDQR implementations are present in `scripts/` but are not reachable through the `method` argument
-- **Interactive analysis**: dominant eigenvalue identification, mode shape analysis, participation factors, damping ratios
-- **Automatic Jacobian extraction** from RAMSES simulation data
+$$\begin{aligned}
+\Delta\dot{x} &= f_x\,\Delta x + f_y\,\Delta y \\
+0 &= g_x\,\Delta x + g_y\,\Delta y
+\end{aligned}$$
 
-## Prerequisites
+with states $x$ and algebraic variables $y$. Eliminating $\Delta y$ gives the
+state matrix
 
-- **MATLAB** R2016a or later
-- **stepss** for Jacobian matrix extraction
+$$A_{sys} = f_x - f_y\,g_y^{-1}\,g_x$$
 
-## Installation
+whose eigenvalues are the system modes. RAMSES assembles the unreduced Jacobian,
+factorises $g_y$ once with KLU, forms $A_{sys}$, and solves it with LAPACK.
+The elimination exists only if $g_y$ is nonsingular, which is what makes the
+model index-1; a singular $g_y$ is reported rather than worked around.
 
-```matlab
-addpath('path/to/stepss-eigenanalysis')
-addpath('path/to/stepss-eigenanalysis/scripts')
+For each eigenvalue $\lambda = \sigma \pm j\omega$:
+
+| Quantity | Definition |
+|---|---|
+| Frequency | $f = \lvert\omega\rvert / 2\pi$ in Hz |
+| Damping ratio | $\zeta = -\sigma / \lvert\lambda\rvert$ |
+
+A mode with $\zeta < 0$ grows rather than decays: the operating point is
+small-signal unstable.
+
+## Running an analysis
+
+Add an `EIG` event to the disturbance file:
+
+```
+1.000 EIG 'ssa'
 ```
 
-## Workflow
-
-### 1. Extract Jacobian from RAMSES
-
-Use stepss to run a simulation and export the Jacobian:
+or inject it from Python:
 
 ```python
 import stepss
 
+case = stepss.cfg()
+case.addData('lf.dat')
+case.addData('dyn.dat')
+case.addData('solveroptions.dat')
+case.addDst('nothing.dst')
+case.addObs('obs.dat')
+case.addTrj('out.trj')
+
 ram = stepss.sim()
-case = stepss.cfg('cmd.txt')
-ram.execSim(case)
+ram.execSim(case, 0.0)               # pause at the operating point
+ram.addDisturb(0.001, "EIG 'ssa'")   # schedule the analysis
+ram.contSim(0.01)                    # advance past it so the event fires
+ram.endSim()
 ```
 
-Ensure the disturbance file includes the Jacobian export command:
+Results are computed at the instant the event fires, so where you pause
+determines what you get. Small-signal results are only meaningful at an
+operating point: pausing mid-swing linearises about a non-equilibrium.
 
-```
-time(s) JAC 'jac'
-```
+### Required settings
 
-And the solver settings include:
+| Setting | Why |
+|---|---|
+| `$OMEGA_REF SYN` | Under the centre-of-inertia frame the COI equations are computed by finite differences and never enter the assembled Jacobian, so reducing under COI would silently hold COI speed constant and produce a plausible, wrong spectrum |
+| `$SCHEME DE` | Under the integrated scheme the pure differential-algebraic values exist only briefly inside the Newton loop |
 
-```
-$OMEGA_REF SYN ;
-```
+Both are refused rather than approximated. See [Refusals](#refusals) below.
 
-:::note
-The integrated scheme (`$SCHEME IN`) writes `jac_val.dat`, `jac_eqs.dat` and `jac_var.dat`. `jac_struc.dat` is produced only by the decomposed scheme (`$SCHEME DE`), so pass an empty `''` for that argument when you export from an integrated run.
-:::
+## Output files
 
-### 2. Run Eigenanalysis in MATLAB
+Three files per analysis, named from the basename given to `EIG`. All are plain
+whitespace-separated text with `#` comment headers, so `numpy.loadtxt` reads
+them directly. Names are left-justified and contain no spaces, so splitting on
+whitespace is safe.
 
-```matlab
-ssa('jac_val.dat', 'jac_eqs.dat', 'jac_var.dat', 'jac_struc.dat')
-```
+### `<name>_modes.dat`
 
-With custom parameters:
+One line per mode, every mode written.
 
-```matlab
-ssa('jac_val.dat', 'jac_eqs.dat', 'jac_var.dat', 'jac_struc.dat', ...
-    real_limit, damp_ratio, method)
-```
+| Column | Meaning |
+|---|---|
+| `index` | Mode number, 1-based |
+| `re`, `im` | Real and imaginary parts of $\lambda$ |
+| `zeta` | Damping ratio |
+| `freq_hz` | Frequency in Hz |
+| `dom` | 1 if $\mathrm{Re}(\lambda)$ exceeded the `real_limit` filter |
+| `smp` | 1 if the eigenvalue is simple, 0 if degenerate |
 
-### Parameters
+The header records `nstates`, `nalg`, the time, and the `real_limit`,
+`pf_threshold` and `gap_tol` values used.
 
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `jac_val.dat` | Matrix values in coordinate format | |
-| `jac_eqs.dat` | Equation descriptions (differential/algebraic) | |
-| `jac_var.dat` | Variable descriptions (differential/algebraic) | |
-| `jac_struc.dat` | Decomposed power system structure, written only by the decomposed scheme (optional) | |
-| `real_limit` | Real part threshold for dominant eigenvalues | $-\infty$ |
-| `damp_ratio` | Damping ratio threshold | 1.0 |
-| `method` | Analysis method: `'QZ'` or `'ARP'` | `'QZ'` |
+### `<name>_pf.dat`
 
-## Analysis Methods
+Participation factors, one line per mode and state:
+`mode`, `state`, `pf`, `family`, `device`, `variable`.
 
-### QZ Method (Default)
+The participation of state $k$ in mode $i$ is $p_{ki} = \lvert w_{ki}\,v_{ki}\rvert$,
+built from the left and right eigenvectors and normalised so each mode's largest
+entry is 1. Written only for dominant modes, and only for entries above
+`pf_threshold`, so a state that is absent is below the threshold rather than
+exactly zero.
 
-- Uses MATLAB's `eig()` function with algebraic variable elimination
-- Suitable for **small to medium systems** (< 50,000 states)
-- Provides the complete eigenvalue spectrum
-- Supports mode shape and participation factor analysis
+### `<name>_ms.dat`
 
-### ARPACK Method
+Mode shapes, one line per mode and machine:
+`mode`, `state`, `magnitude`, `angle_deg`, `device`.
 
-- Sparse descriptor approach using Krylov-Schur algorithm via MATLAB's `eigs()`
-- Suitable for **large systems**
-- Computes a subset of eigenvalues near a specified target
+Rotor-speed components, normalised so the largest magnitude in each mode is 1,
+with **angles relative to that largest entry**, because an eigenvector's absolute
+phase is arbitrary.
 
-### JDQR Method
+## Degenerate modes, and why the `smp` column matters
 
-- Jacobi-Davidson QR method for targeted eigenvalue computation
-- Useful for finding specific eigenvalues (e.g., poorly damped modes)
-- Implemented in `scripts/jdqr.m`, but `ssa()` accepts only `'QZ'` and `'ARP'` for `method`; call the script directly to use it
+Identical machine models with identical parameters produce identical poles, so
+power system spectra are heavily degenerate. In the Kundur two-area system, 20
+of 70 modes share an eigenvalue with another mode.
 
-## Interactive Analysis
+**In a degenerate eigenspace the individual eigenvectors are not unique.** The
+participation factors and mode shape of such a mode are therefore
+basis-dependent: real numbers that carry no physical meaning and that would come
+out differently on another LAPACK build.
 
-After computing eigenvalues, the tool provides an interactive menu to:
+The `smp` column is 1 when the gap from this eigenvalue to every other exceeds
+`gap_tol` (default `1e-6`, recorded in the header), and 0 otherwise. **Do not
+interpret participation factors or mode shapes for a mode flagged 0.**
 
-1. View dominant eigenvalues
-2. Analyze mode shapes
-3. Calculate participation factors
-4. Examine damping ratios
-5. Explore system structure
+## Refusals
 
-## Repository
+The analysis refuses rather than returning a result it cannot justify. Every
+refusal writes no results files, states the reason in the log and through
+[`getLastErr()`](/python/api-reference/), and exits with code **78**.
 
-Source code: [SPS-L/stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis)
+| Condition | Reason |
+|---|---|
+| `$OMEGA_REF COI` | The assembled Jacobian does not carry the COI equations |
+| `$SCHEME IN` | The pure DAE values are not available at that point |
+| States above `$EIG_MAX_STATES` | The dense solve is not practical at that size |
+| Singular $g_y$ | The model is not index-1 |
+
+A run that produced nothing and exited **0** is a different problem, most likely
+an engine older than v3.60.
+
+The size ceiling is
+[`$EIG_MAX_STATES`](/user-guide/solver-settings/#small-signal-analysis-size-limit),
+default 5000. Systems beyond it need sparse shift-invert methods, which
+`scipy.sparse.linalg.eigs` can drive from the descriptor matrices
+[`getJac()`](/python/api-reference/#getjac) returns.
+
+## Worked example
+
+The [Kundur two-area system](/test-systems/kundur/) is the standard inter-area
+oscillation benchmark, and the `stepss` package ships an annotated notebook for
+it under `examples/eigenanalysis/`. Analysed with and without its power system
+stabilisers:
+
+| | inter-area | area 1 local | area 2 local |
+|---|---|---|---|
+| **without PSS** | 0.625 Hz, $\zeta$ = **-0.0233** | 1.085 Hz, $\zeta$ = 0.099 | 1.116 Hz, $\zeta$ = 0.097 |
+| **with PSS** | 0.624 Hz, $\zeta$ = **+0.1087** | 1.242 Hz, $\zeta$ = 0.288 | 1.295 Hz, $\zeta$ = 0.287 |
+
+The inter-area damping ratio flips sign with the stabilisers: without them the
+0.62 Hz oscillation between the two areas grows and the operating point is
+small-signal unstable. This reproduces Kundur, *Power System Stability and
+Control*, Example 12.6.
+
+Participation factors separate the two local modes without any prior knowledge
+of the topology: the 1.085 Hz mode lists only G1 and G2, the 1.116 Hz mode only
+G3 and G4, and the inter-area mode lists all four.
 
 ## See Also
 
-- [`getJac()`](/python/api-reference/#getjac), get the Jacobian directly in Python as SciPy sparse matrices, without going through the `.dat` files
-- [Eigenanalysis Workflow](/python/examples/#eigenanalysis-workflow), the complete export-and-analyse script
-- [Export Jacobian Matrix](/user-guide/disturbances/#export-jacobian-matrix), the `JAC` disturbance and which files each scheme writes
-- [Kundur Two-Area System](/test-systems/kundur/), a benchmark built for inter-area mode analysis
+- [Export Jacobian Matrix](/user-guide/disturbances/#export-jacobian-matrix), the
+  `JAC` disturbance, for exporting the matrices instead of analysing them
+- [`getJac()`](/python/api-reference/#getjac), the descriptor matrices as SciPy
+  sparse objects, for driving your own solver
+- [Kundur Two-Area System](/test-systems/kundur/)

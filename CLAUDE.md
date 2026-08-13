@@ -64,6 +64,26 @@ That page used to live at `/user-guide/pfc/`, which the stepss-helios and
 stepss-cg-studio READMEs link to; `redirects` in `astro.config.mjs` keeps the old
 URL alive. Keep the entry if you move the page again.
 
+### Eigenanalysis is in the engine; the MATLAB tool is retired
+
+Small-signal analysis is performed by RAMSES itself, triggered by the `EIG`
+disturbance or the `run_ssa` C entry, and documented on
+`user-guide/eigenanalysis.md`. The MATLAB tool that used to do it is **retired**
+and must not reappear anywhere on this site: no `ssa(...)` call, no `matlab`
+code fence, no "requires MATLAB R2016a" prerequisite, no QZ/ARPACK/JDQR method
+menu. `stepss-eigenanalysis` is now the reference-data and validation-suite
+repository, not a tool a reader installs.
+
+The `JAC` disturbance stays documented. It exports the raw matrices and is a
+different feature from `EIG`, which analyses them.
+
+Two MATLAB mentions on this site are **not** about the retired tool and should
+be left alone: `developer/user-models.md` explains that the exponent operator is
+`**` and not `^` as in MATLAB, which is a genuine syntax warning for people
+arriving from there; and Helios really does export a `.m` file
+(`python/helios.md`, `user-guide/power-flow.md`), which is a file format, not a
+dependency.
+
 ### The Python package is `stepss`, and has no other name here
 
 The Python API lives under `/python/` and the PyPI distribution is `stepss`,

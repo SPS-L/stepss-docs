@@ -149,6 +149,18 @@ $SCHEME DE/IN ;
 - `DE`: Decomposed scheme
 - `IN`: Integrated scheme
 
+### Small-Signal Analysis Size Limit
+
+Largest state count accepted by [small-signal analysis](/user-guide/eigenanalysis/):
+
+```
+$EIG_MAX_STATES Number ;
+```
+
+Default: `5000`. The reduced state matrix is solved densely, so the peak
+workspace is roughly $9N_x^2$ doubles, about 1.8 GB at the default. Above the
+limit the analysis refuses and exits 78 rather than attempting the allocation.
+
 ### Latency Settings
 
 ```

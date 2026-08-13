@@ -13,7 +13,7 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 | [stepss-python-ui](https://github.com/SPS-L/stepss-python-ui) | Python API/wrapper for RAMSES and the Helios power-flow engine | Python | Public |
 | [stepss-userguide](https://github.com/SPS-L/stepss-userguide) | LaTeX user documentation and models reference | LaTeX | Public |
 | [stepss-uramses](https://github.com/SPS-L/stepss-uramses) | User-defined device models framework | Fortran | Public |
-| [stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) | Small-signal / eigenvalue analysis tools | MATLAB | Public |
+| [stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) | Reference data and validation suite for small-signal analysis | Python | Public |
 | [stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) | Visual block diagram editor for CODEGEN models | Python/JS | Public |
 | stepss-ramses | Core RAMSES simulation engine | Fortran | Private |
 | stepss-test-systems | Curated collection of test cases and network models | RAMSES data | Private |
@@ -65,11 +65,14 @@ Framework for compiling and linking custom Fortran models with RAMSES.
 
 ### stepss-eigenanalysis
 
-MATLAB-based tool for small-signal stability analysis using eigenvalues extracted from RAMSES.
+Reference spectra and the validation suite for RAMSES's built-in small-signal
+analysis. The analysis itself runs in the engine, documented under
+[Eigenanalysis](/user-guide/eigenanalysis/); this repository holds the
+independently captured reference data the engine is checked against, so its
+tests need neither a RAMSES licence nor the engine itself.
 
 - **Repository**: [github.com/SPS-L/stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis)
-- **Requirements**: MATLAB R2016a+, stepss
-- **Methods**: QZ, ARPACK, JDQR
+- **Requirements**: Python with numpy and pytest
 
 ### stepss-cg-studio (CODEGEN Studio)
 

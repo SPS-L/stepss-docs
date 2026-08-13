@@ -229,7 +229,29 @@ The number of files written depends on the integration scheme:
 | `$SCHEME IN` (integrated) | `<name>_val.dat`, `<name>_eqs.dat`, `<name>_var.dat` |
 | `$SCHEME DE` (decomposed) | the same three, plus `<name>_struc.dat` |
 
-See [Eigenanalysis](/user-guide/eigenanalysis/) for how to consume these files.
+These files are the raw matrices. To have RAMSES analyse them instead, use `EIG`
+below.
+
+## Run Small-Signal Analysis
+
+```
+time(s) EIG 'name_of_filename'
+```
+
+Reduces the linearised model to a state matrix, solves the eigenproblem, and
+writes `<name>_modes.dat`, `<name>_pf.dat` and `<name>_ms.dat`.
+
+Required solver settings:
+```
+$OMEGA_REF SYN ;
+$SCHEME DE ;
+```
+
+Unlike `JAC`, which skips with a warning, `EIG` **refuses** when it cannot
+produce a result it can justify: it writes nothing, states the reason in the
+log, and exits with code 78. See
+[Eigenanalysis](/user-guide/eigenanalysis/) for the output format, the
+`$EIG_MAX_STATES` limit and the full list of refusal conditions.
 
 ## Export Load Flow Snapshot
 

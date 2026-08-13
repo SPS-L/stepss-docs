@@ -164,9 +164,8 @@ for disturbance_time in [5.0, 10.0, 20.0]:
 
 ## Eigenanalysis Workflow
 
-Export the system Jacobian for small-signal stability analysis. There are two routes.
-
-**In Python**, `getJac()` returns the descriptor-form pair directly as SciPy sparse matrices (it also writes the intermediate files `py_val.dat` and `py_eqs.dat` to the working directory):
+RAMSES performs the small-signal analysis itself. Schedule an `EIG` event at the
+operating point and it writes the modes, participation factors and mode shapes:
 
 ```python
 import stepss
@@ -174,34 +173,43 @@ import stepss
 case = stepss.cfg('cmd.txt')
 ram = stepss.sim()
 
-# Pause at steady-state operating point
-ram.execSim(case, 0.0)
-
-# A: Jacobian values, E: structural incidence matrix (scipy.sparse.csc_matrix)
-A, E = ram.getJac()
+ram.execSim(case, 0.0)               # pause at the steady-state operating point
+ram.addDisturb(0.001, "EIG 'ssa'")   # writes ssa_modes.dat, ssa_pf.dat, ssa_ms.dat
+ram.contSim(0.01)                    # advance past the event so it fires
 ram.endSim()
 ```
 
-**For the MATLAB [RAMSES Eigenanalysis](/user-guide/eigenanalysis/) tool**, use the `JAC` disturbance instead:
+Reading the result needs nothing beyond numpy:
+
+```python
+import numpy as np
+
+m = np.loadtxt('ssa_modes.dat', comments='#')
+freq, zeta = m[:, 4], m[:, 3]
+
+interarea = m[(freq > 0.4) & (freq < 0.9) & (m[:, 2] > 0)]
+print('inter-area mode: %.4f Hz, zeta = %+.4f' % (interarea[0, 4], interarea[0, 3]))
+```
+
+A complete annotated walkthrough ships with the package under
+`examples/eigenanalysis/`.
+
+**To drive your own solver instead**, `getJac()` returns the descriptor-form pair
+as SciPy sparse matrices. This is the route for systems above `$EIG_MAX_STATES`,
+where the engine's dense solve is not practical and sparse shift-invert methods
+are needed:
 
 ```python
 ram.execSim(case, 0.0)
-ram.addDisturb(0.001, "JAC 'jac'")   # writes jac_val.dat, jac_eqs.dat, jac_var.dat
-ram.contSim(0.001)
+A, E = ram.getJac()   # scipy.sparse.csc_matrix
 ram.endSim()
 ```
 
-Under the integrated scheme (`$SCHEME IN`) this writes three files, and `jac_struc.dat` is not among them, so pass an empty string for that argument:
-
-```matlab
-% In MATLAB:
-ssa('jac_val.dat', 'jac_eqs.dat', 'jac_var.dat', '', [], [], [])
-```
-
-The decomposed scheme (`$SCHEME DE`) writes `jac_struc.dat` as well; pass its name instead of `''` when you export from a decomposed run.
-
 :::note
-Set `$OMEGA_REF SYN ;` in the solver settings file when exporting Jacobians for eigenanalysis. Under the COI reference frame the export is skipped with a warning.
+Both routes need `$OMEGA_REF SYN ;` and `$SCHEME DE ;` in the solver settings.
+`EIG` refuses without them, exiting 78 with the reason in the log; the `JAC`
+export skips with a warning under COI. See
+[Eigenanalysis](/user-guide/eigenanalysis/).
 :::
 
 ## Test System Examples
