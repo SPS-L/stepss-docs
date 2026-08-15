@@ -31,9 +31,9 @@ The main graphical user interface for STEPSS, built with Java (Swing/AWT) and th
 
 - **Repository**: [github.com/SPS-L/stepss-java-ui](https://github.com/SPS-L/stepss-java-ui)
 - **License**: Apache License 2.0
-- **Requirements**: 64-bit Java 11 or later (JRE to run, JDK plus Apache Ant to build)
+- **Requirements**: 64-bit Java 11 or later to run the jar, none at all to run an installer, JDK plus Apache Ant to build
 - **Build**: `ant jar`
-- **Run**: `java -jar dist/stepss.jar`
+- **Run**: `java -jar dist/stepss.jar`, or `ant bundle` for a native installer
 
 ### stepss-python-ui
 

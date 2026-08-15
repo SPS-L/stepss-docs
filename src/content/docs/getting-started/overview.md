@@ -37,7 +37,7 @@ two editions, which drive the same engines and read the same data files:
 
 | Edition | Distributed as | Use it for |
 |---|---|---|
-| **STEPSS for Java** | `stepss.jar`, a desktop application | Interactive work: load a network, run it, plot curves, build models |
+| **STEPSS for Java** | a desktop application: an installer for Windows, macOS or Linux, or `stepss.jar` | Interactive work: load a network, run it, plot curves, build models |
 | **STEPSS for Python** | the `stepss` package, `pip install stepss` | Scripting, parameter sweeps, and the scientific Python stack |
 
 Neither edition wraps the other. Both are front ends onto the same Fortran
