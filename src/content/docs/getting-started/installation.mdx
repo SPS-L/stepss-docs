@@ -17,46 +17,59 @@ pip install stepss
 It bundles the same RAMSES and Helios engines. See [Python API Installation](/python/installation/) for the full instructions, including the system libraries Linux and macOS need.
 :::
 
-The Java edition is distributed as a single `stepss.jar`, published as a GitHub release. The button below always fetches the
-latest one; every version ever released is listed on the
-[releases page](https://github.com/SPS-L/stepss-java-ui/releases).
-
-<LinkButton href="https://github.com/SPS-L/stepss-java-ui/releases/latest/download/stepss.jar" icon="cloud-download">Download stepss.jar</LinkButton>
-
-## Installing Java
-
-The Java edition requires a **64-bit Java Runtime Environment, version 11 or later**. Any recent JRE or JDK is fine; there is no need to uninstall a Java you already have, as long as it meets that minimum.
-
-<Steps>
-
-1. **Check existing installation**: Open a Windows Command prompt and enter:
-   ```bash
-   java -version
-   ```
-   If this reports a 64-bit Java, you are ready, so skip to the next section.
-
-2. **Install Java** (only if the command is not recognised):
-   - Download a 64-bit JDK from [oracle.com](https://www.oracle.com/java/technologies/downloads/)
-   - Double-click to install and follow the instructions
-
-3. **Associate STEPSS with Java**:
-   - Right-click on `stepss.jar`
-   - Select "Open with" → "Always use this application"
-
-</Steps>
+The Java edition comes two ways: an **installer**, which carries its own Java and is what most people want, or the **`stepss.jar`** on its own, which needs a Java you already have. Both are on every [release](https://github.com/SPS-L/stepss-java-ui/releases).
 
 ## Installing STEPSS for Java
 
+<Tabs>
+<TabItem label="Installer (recommended)">
+
+The installers bundle a Java runtime, so **nothing else needs installing** and an existing Java on the machine is neither required nor disturbed.
+
+<LinkButton href="https://github.com/SPS-L/stepss-java-ui/releases/latest" icon="cloud-download">Go to the latest release</LinkButton>
+
 <Steps>
 
-1. Download [`stepss.jar`](https://github.com/SPS-L/stepss-java-ui/releases/latest/download/stepss.jar)
-2. Place it in any convenient location (e.g., your Desktop)
-3. **Do not uncompress the archive**
-4. Launch by double-clicking `stepss.jar`
+1. Download the one for your system from the release's assets:
+   - **Windows**: `STEPSS-<version>.msi`
+   - **macOS** (Apple Silicon): `STEPSS-<version>.dmg`
+   - **Linux** (Debian, Ubuntu): `stepss_<version>_amd64.deb`
+2. Open it and follow the installer.
+3. Launch **STEPSS** from the Start menu, Applications, or your desktop's application list.
 
 </Steps>
 
-When launched, it creates a temporary working folder and copies all needed executables and libraries. To remove it, simply delete the archive file. It leaves nothing on your computer.
+Uninstall the way you would any other application on your system: Add or Remove Programs on Windows, dragging it to the Trash on macOS, `sudo apt remove stepss` on Debian and Ubuntu.
+
+</TabItem>
+<TabItem label="Just the jar">
+
+The jar is a single file that leaves nothing behind: it unpacks what it needs into a temporary folder at launch, and deleting the file removes STEPSS entirely. It needs a **64-bit Java Runtime Environment, version 11 or later** already on the machine. Any recent JRE or JDK will do, and there is no need to remove a Java you already have as long as it meets that minimum.
+
+<LinkButton href="https://github.com/SPS-L/stepss-java-ui/releases/latest/download/stepss.jar" icon="cloud-download">Download stepss.jar</LinkButton>
+
+<Steps>
+
+1. **Check for Java**. At a command prompt:
+   ```bash
+   java -version
+   ```
+   If that reports a 64-bit Java 11 or later, skip the next step.
+
+2. **Install Java** if it did not: a 64-bit JDK from [Adoptium](https://adoptium.net/) or [oracle.com](https://www.oracle.com/java/technologies/downloads/).
+
+3. **Put the jar** wherever is convenient. Do not uncompress it.
+
+4. **Launch it**, by double-clicking or with:
+   ```bash
+   java -jar stepss.jar
+   ```
+   On Windows, if a double-click does nothing, right-click the jar, choose "Open with", and point it at Java.
+
+</Steps>
+
+</TabItem>
+</Tabs>
 
 ## Installing a Fortran Toolchain
 
