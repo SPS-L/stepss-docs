@@ -15,7 +15,7 @@ The last two sections, the Fortran toolchain and CODEGEN Studio, are for writing
 
 ## Installing STEPSS GUI
 
-STEPSS GUI comes two ways: an **installer**, which carries its own Java and is what most people want, or the **`stepss.jar`** on its own, which needs a Java you already have. Both are on every [release](https://github.com/SPS-L/stepss-java-ui/releases). On Debian and Ubuntu there is a third way, an **APT repository**, which is the same installer delivered so that `apt upgrade` keeps it current.
+STEPSS GUI comes two ways: an **installer**, which carries its own Java and is what most people want, or the **`stepss.jar`** on its own, which needs a Java you already have. Both are on every [release](https://github.com/SPS-L/stepss-java-ui/releases). There is also a package manager on each of the two platforms that has one, delivering the same application so that later releases arrive on their own: an **APT repository** on Debian and Ubuntu, and a **Scoop bucket** on Windows.
 
 :::note[Which Linux]
 **Debian and Ubuntu are the Linux distributions STEPSS is packaged for**, from Ubuntu 24.04 and its Debian contemporary onwards, on x86-64. That is what the `.deb` and the APT repository are built and tested against, and no package is produced for any other distribution or architecture.
@@ -33,7 +33,7 @@ The installers bundle a Java runtime, so **nothing else needs installing** and a
 <Steps>
 
 1. Download the one for your system from the release's assets:
-   - **Windows**: `STEPSS-<version>.msi`
+   - **Windows**: `STEPSS-<version>.msi`, though the **Windows (Scoop)** tab is the better route if you can use it: same application, later releases arrive on their own, and it needs no administrator rights.
    - **macOS** (Apple Silicon): `STEPSS-<version>.dmg`
    - **Linux** (Debian, Ubuntu): `stepss_<version>_amd64.deb`, though the **Debian and Ubuntu (apt)** tab is the better route if you can use it: same package, and later releases arrive on their own.
 2. Open it and follow the installer.
@@ -91,6 +91,42 @@ It should print fingerprint `125ABE6917ED2F2965D6545B3600A756077AD061` for `SPS-
 - **The current release only.** The repository serves one version. To install a specific older build, take its `.deb` from the [releases page](https://github.com/SPS-L/stepss-java-ui/releases).
 - **`non-free` is accurate, not boilerplate.** STEPSS is not free software taken as a whole: RAMSES is proprietary and free for non-commercial use only, and Helios and CODEGEN are under Academic Public Licences. Installing through apt agrees to nothing, since the licence appears the first time you launch STEPSS. Read [Licensing](/getting-started/license/) before you run it, and please do not mirror the repository: the licence granted for RAMSES is non-transferable.
 - **This is not an official Ubuntu or Debian repository**, and nothing in it has been through Canonical's or Debian's review.
+</Aside>
+
+</TabItem>
+<TabItem label="Windows (Scoop)">
+
+STEPSS has a [Scoop](https://scoop.sh/) bucket, so it installs from the command line and every later release arrives through `scoop update` instead of being downloaded by hand. It is the same application as the `.msi`, delivered as a portable build.
+
+**It needs no administrator rights.** Scoop installs into your own profile, so this is the route that works on a managed or locked-down machine where an installer cannot be run at all.
+
+If you do not have Scoop yet, install it in a normal (not elevated) PowerShell:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+```
+
+Then add the bucket once and install:
+
+```powershell
+scoop bucket add sps-l https://github.com/SPS-L/stepss-scoop
+scoop install stepss
+```
+
+From that point on, upgrade with the rest of your Scoop applications:
+
+```powershell
+scoop update stepss
+```
+
+You get STEPSS on the Start menu under **Scoop Apps**, an icon on your **desktop**, and a `stepss` command on your `PATH`. Remove it with `scoop uninstall stepss`, which takes both shortcuts with it.
+
+<Aside type="caution" title="What this route requires and what it is not">
+- **Windows on x86-64.** There is no Windows arm64 build of the engines.
+- **The current release only.** The bucket serves one version. To install a specific older build, take its `.msi` from the [releases page](https://github.com/SPS-L/stepss-java-ui/releases).
+- **STEPSS is not Apache 2.0 taken as a whole**, whatever the interface's own repository says. RAMSES is proprietary and free for non-commercial use only, and Helios and CODEGEN are under Academic Public Licences. Installing through Scoop agrees to nothing, since the licence appears the first time you launch STEPSS. Read [Licensing](/getting-started/license/) before you run it, and please do not mirror the bucket's release assets: the licence granted for RAMSES is non-transferable.
+- **This is not an official Scoop bucket**, and nothing in it has been through the Scoop maintainers' review. `scoop bucket add` takes the URL above precisely because the bucket is ours rather than theirs.
 </Aside>
 
 </TabItem>
@@ -170,15 +206,27 @@ CODEGEN's job and ships only with the GUI.
 <Tabs>
 <TabItem label="Windows">
 
-Install [MSYS2](https://www.msys2.org/), then from an MSYS2 shell:
+Install [MSYS2](https://www.msys2.org/), or, if you installed STEPSS with Scoop
+and would rather not run a second installer, `scoop install msys2`. Then, from an
+MSYS2 shell:
 
 ```bash
 pacman -S mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-openblas make
 ```
 
-STEPSS looks for the installation in `C:\msys64`, or wherever the `MSYS2_ROOT`
-environment variable points, so the MinGW `bin` directory does not have to be on
-the system `PATH`.
+STEPSS looks for the installation in `C:\msys64`, in Scoop's applications
+directory, or wherever the `MSYS2_ROOT` environment variable points, so the MinGW
+`bin` directory does not have to be on the system `PATH` and there is nothing to
+configure by hand on either route. It searches every one of those that exists
+rather than stopping at the first, because `scoop install msys2` leaves an MSYS2
+already at `C:\msys64` alone and only one of the two is likely to be the one you
+ran `pacman` in.
+
+Note that the Scoop bucket **suggests** MSYS2 rather than depending on it, so
+`scoop install stepss` does not pull it in. That is deliberate: it is a large
+download, nothing else in STEPSS needs it, and `.mod` files are readable only by
+the gfortran release that wrote them, so installing whatever MSYS2's rolling
+repository holds on a given day would not guarantee a matching toolchain anyway.
 
 </TabItem>
 <TabItem label="Linux (Debian, Ubuntu)">
