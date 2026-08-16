@@ -80,6 +80,16 @@ sudo apt install stepss
 
 Run it with `stepss`, or from the Science section of the applications menu. Remove it with `sudo apt remove stepss`.
 
+:::caution[If `apt update` says `NO_PUBKEY 3600A756077AD061`]
+That is apt naming the key it wanted and could not find, and it means one of three things, which look identical from apt: the keyring file is **not there**, because the download failed and `curl` correctly writes nothing when it does; the `Signed-By` line is missing from your `.sources` file; or the file holds some other key.
+
+```bash
+gpg --show-keys /etc/apt/keyrings/sps-l-archive-keyring.asc
+```
+
+It should print fingerprint `125ABE6917ED2F2965D6545B3600A756077AD061` for `SPS-L Packaging <stepss@sps-lab.org>`. If it reports no such file, run the `curl` command again. A different complaint mentioning `add_keyblock_resource` means the file exists but is empty, and has the same remedy.
+:::
+
 <Aside type="caution" title="What this route requires and what it is not">
 - **Ubuntu 24.04 or newer**, or a Debian of the same vintage or later, on **x86-64**. The package is built on 24.04 and names its dependencies as that release names them, so 22.04 and Debian 12 cannot install it. There is no Linux arm64 build of the engines, which is why `Architectures: amd64` is in the snippet: without that line, apt on an arm64 machine looks for an index that does not exist and errors on every `apt update`.
 - **The current release only.** The repository serves one version. To install a specific older build, take its `.deb` from the [releases page](https://github.com/SPS-L/stepss-java-ui/releases).
