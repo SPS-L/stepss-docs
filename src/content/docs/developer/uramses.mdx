@@ -10,22 +10,21 @@ import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
 ## Prerequisites
 
 <Tabs>
-<TabItem label="Linux">
+<TabItem label="Linux (Debian, Ubuntu)">
 
 - **gfortran** (GNU Fortran compiler)
 - **OpenBLAS** (optimized BLAS library)
 - **stepss**
 
 ```bash
-# Ubuntu/Debian
 sudo apt install gfortran make libopenblas-dev
-
-# Fedora/RHEL
-sudo dnf install gcc-gfortran make openblas-devel
-
-# Arch Linux
-sudo pacman -S gcc-fortran openblas
 ```
+
+Debian and Ubuntu are the Linux distributions STEPSS is built and tested on; see
+[Installation](/getting-started/installation/). The kit itself needs only
+gfortran, GNU make and OpenBLAS, so it will build wherever those exist, but the
+compiler has to match the ABI of the bundled `.mod` files and that is checked
+against the distributions above.
 
 </TabItem>
 <TabItem label="macOS">
