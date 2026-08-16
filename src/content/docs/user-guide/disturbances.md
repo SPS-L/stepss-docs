@@ -134,10 +134,6 @@ time(s) CLEAR BUS name_of_bus
 10.100 CLEAR BUS 1044
 ```
 
-:::note
-Supported from version 3.13 onwards.
-:::
-
 ## Change Parameters (CHGPRM)
 
 Modify model parameters during the simulation.

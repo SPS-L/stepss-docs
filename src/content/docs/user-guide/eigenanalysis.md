@@ -9,9 +9,9 @@ eigenproblem, and writes eigenvalues, damping ratios, participation factors and
 mode shapes to file. No external tool is involved.
 
 :::note[Requires a RAMSES newer than v3.60]
-The `EIG` disturbance was added after the v3.60 release. On an older engine it is
-accepted and no results files appear. The `stepss` package version's leading
-components name the bundled RAMSES, so `stepss.__version__` tells you directly.
+An older engine accepts the `EIG` disturbance and writes no results files. The
+`stepss` package version's leading components name the bundled RAMSES, so
+`stepss.__version__` tells you directly.
 :::
 
 ## What is computed
@@ -162,11 +162,6 @@ Both formats are ordinary archives that `unzip` and `tar xzf` read, and
 everything sits under one directory named for the run. A directory of results
 that arrived some other way, from a run made at a terminal for instance, opens
 with **View results...**, which takes a directory rather than a file.
-
-:::note[Added in STEPSS for Java v3.74.13]
-Earlier releases copy the four Jacobian files into a directory of your choosing
-and cannot read them back.
-:::
 
 ## Degenerate modes, and why the `smp` column matters
 
