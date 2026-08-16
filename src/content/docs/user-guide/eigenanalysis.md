@@ -129,6 +129,45 @@ Rotor-speed components, normalised so the largest magnitude in each mode is 1,
 with **angles relative to that largest entry**, because an eigenvector's absolute
 phase is arbitrary.
 
+## Saving a run as one archive
+
+The three files above are only useful together, and a spectrum is only worth
+much beside the matrix it was reduced from. **STEPSS for Java** writes all of
+them, plus the Jacobian that the [`JAC`
+disturbance](/user-guide/disturbances/#export-jacobian-matrix) dumped at the
+same instant, into a single `.zip` or `.tar.gz`: **Save dynamic Jacobian...** on
+the Analysis tab, with the format chosen in the dialog. **Load dynamic
+Jacobian...** beside it opens one back into the same results window.
+
+| In the archive | |
+|---|---|
+| `stepss-ssa.txt` | The manifest: the basename, the engine version, `t`, `real_limit` and `pf_threshold` |
+| `<name>_modes.dat`, `<name>_pf.dat`, `<name>_ms.dat` | The results above |
+| `<name>_eqs.dat`, `<name>_var.dat`, `<name>_val.dat`, `<name>_struc.dat` | The unreduced Jacobian |
+
+**An archive is a record of a result, not an input that reproduces one.** The
+data files, the solver settings and the disturbance that produced the run are
+not in it. It is something to hand to a colleague, attach to an issue, or come
+back to in a year and still be able to read; re-running the analysis needs the
+case, which is a separate thing to keep.
+
+The manifest is what makes it readable that much later. None of the results
+files records which engine wrote them, so an archive analysed by an older build
+is otherwise indistinguishable from one made today: STEPSS names the recorded
+version when it opens one, and says so when it differs from the engine now in
+use. An archive carrying no manifest is refused with a reason rather than opened
+into an empty window.
+
+Both formats are ordinary archives that `unzip` and `tar xzf` read, and
+everything sits under one directory named for the run. A directory of results
+that arrived some other way, from a run made at a terminal for instance, opens
+with **View results...**, which takes a directory rather than a file.
+
+:::note[Added in STEPSS for Java v3.74.13]
+Earlier releases copy the four Jacobian files into a directory of your choosing
+and cannot read them back.
+:::
+
 ## Degenerate modes, and why the `smp` column matters
 
 Identical machine models with identical parameters produce identical poles, so

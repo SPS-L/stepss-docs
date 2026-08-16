@@ -230,7 +230,8 @@ The number of files written depends on the integration scheme:
 | `$SCHEME DE` (decomposed) | the same three, plus `<name>_struc.dat` |
 
 These files are the raw matrices. To have RAMSES analyse them instead, use `EIG`
-below.
+below. A run that does both keeps the matrices and the analysis together if you
+[save it as one archive](/user-guide/eigenanalysis/#saving-a-run-as-one-archive).
 
 ## Run Small-Signal Analysis
 
