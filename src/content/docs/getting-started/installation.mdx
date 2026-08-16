@@ -19,6 +19,12 @@ It bundles the same RAMSES and Helios engines. See [Python API Installation](/py
 
 The Java edition comes two ways: an **installer**, which carries its own Java and is what most people want, or the **`stepss.jar`** on its own, which needs a Java you already have. Both are on every [release](https://github.com/SPS-L/stepss-java-ui/releases). On Debian and Ubuntu there is a third way, an **APT repository**, which is the same installer delivered so that `apt upgrade` keeps it current.
 
+:::note[Which Linux]
+**Debian and Ubuntu are the Linux distributions STEPSS is packaged for**, from Ubuntu 24.04 and its Debian contemporary onwards, on x86-64. That is what the `.deb` and the APT repository are built and tested against, and no package is produced for any other distribution or architecture.
+
+On anything else, including older Debian and Ubuntu releases, use **`stepss.jar`**. It needs a 64-bit Java 11 or later and gnuplot from your own package manager, and it carries the same engines. It is not tested there, but nothing in it is Debian-specific.
+:::
+
 ## Installing STEPSS for Java
 
 <Tabs>
@@ -137,12 +143,15 @@ environment variable points, so the MinGW `bin` directory does not have to be on
 the system `PATH`.
 
 </TabItem>
-<TabItem label="Linux">
+<TabItem label="Linux (Debian, Ubuntu)">
 
 ```bash
-sudo apt install gfortran make libopenblas-dev     # Debian/Ubuntu
-sudo dnf install gcc-gfortran make openblas-devel  # Fedora/RHEL
+sudo apt install gfortran make libopenblas-dev
 ```
+
+Installing STEPSS through [apt](#installing-stepss-for-java) offers these three
+as recommended packages, so on that route they are already there unless you
+declined them.
 
 </TabItem>
 <TabItem label="macOS">
