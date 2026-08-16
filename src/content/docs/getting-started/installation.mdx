@@ -17,7 +17,7 @@ pip install stepss
 It bundles the same RAMSES and Helios engines. See [Python API Installation](/python/installation/) for the full instructions, including the system libraries Linux and macOS need.
 :::
 
-The Java edition comes two ways: an **installer**, which carries its own Java and is what most people want, or the **`stepss.jar`** on its own, which needs a Java you already have. Both are on every [release](https://github.com/SPS-L/stepss-java-ui/releases).
+The Java edition comes two ways: an **installer**, which carries its own Java and is what most people want, or the **`stepss.jar`** on its own, which needs a Java you already have. Both are on every [release](https://github.com/SPS-L/stepss-java-ui/releases). On Debian and Ubuntu there is a third way, an **APT repository**, which is the same installer delivered so that `apt upgrade` keeps it current.
 
 ## Installing STEPSS for Java
 
@@ -33,13 +33,53 @@ The installers bundle a Java runtime, so **nothing else needs installing** and a
 1. Download the one for your system from the release's assets:
    - **Windows**: `STEPSS-<version>.msi`
    - **macOS** (Apple Silicon): `STEPSS-<version>.dmg`
-   - **Linux** (Debian, Ubuntu): `stepss_<version>_amd64.deb`
+   - **Linux** (Debian, Ubuntu): `stepss_<version>_amd64.deb`, though the **Debian and Ubuntu (apt)** tab is the better route if you can use it: same package, and later releases arrive on their own.
 2. Open it and follow the installer.
 3. Launch **STEPSS** from the Start menu, Applications, or your desktop's application list.
 
 </Steps>
 
+On Linux, install the `.deb` with `sudo apt install ./stepss_<version>_amd64.deb` rather than `dpkg -i`, so that the packages it needs, gnuplot among them, are pulled in with it. It requires **Ubuntu 24.04 or newer**, or a Debian of the same vintage or later; on an older release, use the jar.
+
 Uninstall the way you would any other application on your system: Add or Remove Programs on Windows, dragging it to the Trash on macOS, `sudo apt remove stepss` on Debian and Ubuntu.
+
+</TabItem>
+<TabItem label="Debian and Ubuntu (apt)">
+
+STEPSS has an APT repository, so it installs like any other package and every later release arrives through `apt upgrade` instead of being downloaded by hand. It is the same `.deb` as the Installer tab, served from **[apt.sps-lab.org](https://apt.sps-lab.org/)**.
+
+Set it up once:
+
+```bash
+sudo install -d -m 0755 /etc/apt/keyrings
+sudo curl -fsSL https://apt.sps-lab.org/sps-l-archive-keyring.asc \
+  -o /etc/apt/keyrings/sps-l-archive-keyring.asc
+
+sudo tee /etc/apt/sources.list.d/sps-l.sources >/dev/null <<'EOF'
+Types: deb
+URIs: https://apt.sps-lab.org
+Suites: stable
+Components: non-free
+Architectures: amd64
+Signed-By: /etc/apt/keyrings/sps-l-archive-keyring.asc
+EOF
+```
+
+Then install, and from that point on upgrade with the rest of the system:
+
+```bash
+sudo apt update
+sudo apt install stepss
+```
+
+Run it with `stepss`, or from the Science section of the applications menu. Remove it with `sudo apt remove stepss`.
+
+<Aside type="caution" title="What this route requires and what it is not">
+- **Ubuntu 24.04 or newer**, or a Debian of the same vintage or later, on **x86-64**. The package is built on 24.04 and names its dependencies as that release names them, so 22.04 and Debian 12 cannot install it. There is no Linux arm64 build of the engines, which is why `Architectures: amd64` is in the snippet: without that line, apt on an arm64 machine looks for an index that does not exist and errors on every `apt update`.
+- **The current release only.** The repository serves one version. To install a specific older build, take its `.deb` from the [releases page](https://github.com/SPS-L/stepss-java-ui/releases).
+- **`non-free` is accurate, not boilerplate.** STEPSS is not free software taken as a whole: RAMSES is proprietary and free for non-commercial use only, and Helios and CODEGEN are under Academic Public Licences. Installing through apt agrees to nothing, since the licence appears the first time you launch STEPSS. Read [Licensing](/getting-started/license/) before you run it, and please do not mirror the repository: the licence granted for RAMSES is non-transferable.
+- **This is not an official Ubuntu or Debian repository**, and nothing in it has been through Canonical's or Debian's review.
+</Aside>
 
 </TabItem>
 <TabItem label="Just the jar">
@@ -67,6 +107,8 @@ The jar is a single file that leaves nothing behind: it unpacks what it needs in
    On Windows, if a double-click does nothing, right-click the jar, choose "Open with", and point it at Java.
 
 </Steps>
+
+The jar is the one route that installs nothing alongside itself, so real-time plotting needs gnuplot put there by hand. On Linux that is `sudo apt install gnuplot-x11` (not plain `gnuplot`, which can resolve to a build with no interactive terminal), on macOS `brew install gnuplot`; Windows carries its own copy inside the jar and needs nothing.
 
 </TabItem>
 </Tabs>
