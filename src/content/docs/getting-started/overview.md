@@ -37,20 +37,19 @@ two editions, which drive the same engines and read the same data files:
 
 | Edition | Distributed as | Use it for |
 |---|---|---|
-| **STEPSS for Java** | a desktop application: an installer for Windows, macOS or Linux, or `stepss.jar` | Interactive work: load a network, run it, plot curves, build models |
-| **STEPSS for Python** | the `stepss` package, `pip install stepss` | Scripting, parameter sweeps, and the scientific Python stack |
+| **STEPSS GUI** | a desktop application: an installer for Windows, macOS or Linux, or `stepss.jar` | Interactive work: load a network, run it, plot curves, build models |
+| **STEPSS in Python** | the `stepss` package, `pip install stepss` | Scripting, parameter sweeps, and the scientific Python stack |
 
 Neither edition wraps the other. Both are front ends onto the same Fortran
 engines, so a case built in one runs unchanged in the other.
 
-They do not carry identical toolchains. The Java edition bundles all three
-modules plus the DYNGRAPH trajectory viewer and gnuplot. The Python edition
-bundles RAMSES and Helios, so **CODEGEN is the one capability it lacks**:
-writing your own models needs the Java edition, or the
-[CODEGEN toolchain](/developer/user-models/) directly.
+They do not carry identical toolchains. The GUI bundles all three modules plus
+the DYNGRAPH trajectory viewer and gnuplot. `stepss` bundles RAMSES and Helios,
+so **CODEGEN is the one capability it lacks**: writing your own models needs the
+GUI, or the [CODEGEN toolchain](/developer/user-models/) directly.
 
-Trajectory viewing exists in both, by different means. The Java edition launches
-DYNGRAPH, a separate viewer executable. The Python edition carries its own
+Trajectory viewing exists in both, by different means. The GUI launches
+DYNGRAPH, a separate viewer executable. STEPSS in Python carries its own
 equivalent, written in Python on top of Matplotlib: `extractor` reads a `.trj`
 file into NumPy arrays and `curplot`, or a curve's own `.plot()`, draws them.
 The curves stay in the process as ordinary arrays, so they can be sliced,
@@ -141,7 +140,7 @@ The user model is **compiled, not interpreted**, resulting in efficient number-c
 
 ## Simulation Interfaces
 
-STEPSS modules can be driven from the command line, from the Java GUI, or from
+STEPSS modules can be driven from the command line, from STEPSS GUI, or from
 Python through stepss. The [Quick Start](/getting-started/quickstart/) compares
 the three and gives the invocation for each.
 

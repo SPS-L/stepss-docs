@@ -132,7 +132,7 @@ phase is arbitrary.
 ## Saving a run as one archive
 
 The three files above are only useful together, and a spectrum is only worth
-much beside the matrix it was reduced from. **STEPSS for Java** writes all of
+much beside the matrix it was reduced from. **STEPSS GUI** writes all of
 them, plus the Jacobian that the [`JAC`
 disturbance](/user-guide/disturbances/#export-jacobian-matrix) dumped at the
 same instant, into a single `.zip` or `.tar.gz`: **Save dynamic Jacobian...** on

@@ -5,15 +5,17 @@ description: How to install STEPSS and its dependencies
 
 import { Tabs, TabItem, Steps, Aside, LinkButton } from '@astrojs/starlight/components';
 
-STEPSS comes in [two editions](/getting-started/overview/#two-editions) and this page installs either: **STEPSS for Java**, the desktop application, and **STEPSS for Python**, the `stepss` package. It also covers the Fortran toolchain, which is needed only if you intend to build your own models.
+STEPSS comes in [two editions](/getting-started/overview/#two-editions), and this page installs either. **STEPSS GUI** is the desktop application: install it once, then work from windows and menus. **STEPSS in Python** is the `stepss` package: `pip install` it and drive the same engines from a script or a notebook. Both read the same data files, so a case built in one runs unchanged in the other, and installing one does not commit you to it.
 
-:::tip[Working from Python instead?]
-It installs with a single command and needs no Java. Skip to [Installing STEPSS in Python](#installing-stepss-in-python).
+The last two sections, the Fortran toolchain and CODEGEN Studio, are for writing your own models. Skip them unless you intend to.
+
+:::tip[Only want the Python package?]
+`pip install stepss` is the whole installation and it needs no Java. Skip to [Installing STEPSS in Python](#installing-stepss-in-python).
 :::
 
 ## Installing STEPSS GUI
 
-The Java edition comes two ways: an **installer**, which carries its own Java and is what most people want, or the **`stepss.jar`** on its own, which needs a Java you already have. Both are on every [release](https://github.com/SPS-L/stepss-java-ui/releases). On Debian and Ubuntu there is a third way, an **APT repository**, which is the same installer delivered so that `apt upgrade` keeps it current.
+STEPSS GUI comes two ways: an **installer**, which carries its own Java and is what most people want, or the **`stepss.jar`** on its own, which needs a Java you already have. Both are on every [release](https://github.com/SPS-L/stepss-java-ui/releases). On Debian and Ubuntu there is a third way, an **APT repository**, which is the same installer delivered so that `apt upgrade` keeps it current.
 
 :::note[Which Linux]
 **Debian and Ubuntu are the Linux distributions STEPSS is packaged for**, from Ubuntu 24.04 and its Debian contemporary onwards, on x86-64. That is what the `.deb` and the APT repository are built and tested against, and no package is produced for any other distribution or architecture.
@@ -125,23 +127,34 @@ The jar is the one route that installs nothing alongside itself, so real-time pl
 
 ## Installing STEPSS in Python
 
-**STEPSS for Python** installs with a single command and needs no Java:
+**STEPSS in Python** is the `stepss` package on PyPI. It needs Python 3 and no Java at all:
 
 ```bash
 pip install stepss
 ```
 
-It bundles the same RAMSES and Helios engines as the desktop application. See the [Python API Installation Guide](/python/installation/) for the full instructions, including the system libraries Linux and macOS need, and [Two Editions](/getting-started/overview/#two-editions) for what each edition carries.
+That one command brings the engines with it: the package carries pre-compiled RAMSES and Helios binaries for Windows, Linux and macOS, so there is nothing to install alongside it and nothing to point it at. Trajectory plotting is built in, on top of Matplotlib, in place of the DYNGRAPH viewer the GUI launches.
+
+Two things it does not do for you, both covered by the [Python API Installation Guide](/python/installation/): on Linux and macOS the bundled binaries link against system runtime libraries (OpenBLAS, the gfortran and OpenMP runtimes) that your machine may not already have, and real-time plotting during a simulation wants gnuplot on your `PATH`. That page also covers version pinning, which is how you fix the engine version a script runs against.
+
+:::note[CODEGEN is not in this edition]
+`stepss` bundles RAMSES and Helios, not CODEGEN, so **writing your own models needs STEPSS GUI** or the toolchain below. Running a model someone else compiled works from either edition. [Two Editions](/getting-started/overview/#two-editions) sets out what each one carries.
+:::
 
 ## Installing a Fortran Toolchain
 
 <Aside type="tip">
-This step can be **skipped** if you do not plan to develop new models for RAMSES using CODEGEN. Everything else in STEPSS works without it.
+This step can be **skipped** unless you intend to compile your own models. Both editions run their bundled engines, and every model already in them, without it.
 </Aside>
 
 Compiling a custom model produces a simulator built from the bundled URAMSES kit,
 which is a **gfortran** build. You therefore need `gfortran`, GNU `make` and
 OpenBLAS on your machine.
+
+This applies to **either edition**: [URAMSES](/developer/uramses/) links custom
+models into `stepss` and into STEPSS GUI alike. It is the compiling that needs a
+toolchain, and it is separate from writing the model in the first place, which is
+CODEGEN's job and ships only with the GUI.
 
 <Tabs>
 <TabItem label="Windows">
@@ -191,4 +204,29 @@ details.
 
 ## Installing CODEGEN Studio
 
-For the browser-based visual model editor, see the [CODEGEN Studio installation section](/developer/cg-studio/#installation).
+[CODEGEN Studio](/developer/cg-studio/) is the browser-based visual editor for
+building models: drag blocks onto a canvas, connect them, and export a DSL file
+instead of writing one by hand. It is its own Python package, tied to neither
+edition, and needs **Python 3.10 or newer**:
+
+```bash
+pip install stepss-cg-studio
+cg-studio
+```
+
+`cg-studio` starts a local server and opens the editor at
+`http://localhost:8765`. If the script is not on your `PATH`,
+`python -m cg_studio` does the same thing. Browser-based here means the
+interface is a web page, not that anything leaves your machine: the server is
+local and so is every file it reads.
+
+<Aside type="note" title="The editor is not the compiler">
+The wheel carries the editor alone, so the **Run Codegen** button needs a
+`codegen` executable of your own: build or obtain one, then put it on your
+`PATH` or point Settings (the gear icon) at it. Exporting the DSL file works
+without it, and that file is what [CODEGEN](/developer/user-models/) turns into
+Fortran.
+</Aside>
+
+See [CODEGEN Studio](/developer/cg-studio/) for the command-line options, a
+source install, and how to drive the editor itself.
