@@ -10,7 +10,7 @@ initialises a RAMSES dynamic simulation.
 
 Helios is available three ways, all reading the same data files:
 
-- the `helios` command-line executable, bundled with the [STEPSS GUI](/getting-started/installation/) and published on the [Helios releases page](https://github.com/SPS-L/stepss-helios/releases);
+- the `helios` command-line executable, which reaches you inside [STEPSS GUI](/getting-started/installation/#installing-stepss-gui) rather than as a download of its own;
 - `stepss.helios.HeliosSession` from Python, see [Power Flow with Helios](/python/helios/);
 - the C API shared library (`libhelios_api`), for embedding in other tools.
 

@@ -125,6 +125,17 @@ The jar is the one route that installs nothing alongside itself, so real-time pl
 </TabItem>
 </Tabs>
 
+:::note[There is no separate command-line install]
+The [Quick Start](/getting-started/quickstart/) shows `ramses`, `helios` and
+`codegen` being driven from a shell, and those executables reach you through an
+edition rather than on their own. STEPSS GUI carries all four, `dyngraph`
+included, and unpacks them into a temporary folder it clears again on exit, so
+they are not left behind on your `PATH`. `stepss` embeds RAMSES and Helios as
+libraries it calls in-process, so there is nothing to invoke from a shell there
+either. Installing either edition gets you everything those commands do,
+through that edition's own interface.
+:::
+
 ## Installing STEPSS in Python
 
 **STEPSS in Python** is the `stepss` package on PyPI. It needs Python 3 and no Java at all:
@@ -222,10 +233,10 @@ local and so is every file it reads.
 
 <Aside type="note" title="The editor is not the compiler">
 The wheel carries the editor alone, so the **Run Codegen** button needs a
-`codegen` executable of your own: build or obtain one, then put it on your
-`PATH` or point Settings (the gear icon) at it. Exporting the DSL file works
-without it, and that file is what [CODEGEN](/developer/user-models/) turns into
-Fortran.
+`codegen` executable you point Settings (the gear icon) at. Leaving it unset
+costs you nothing much: exporting the DSL file is what the editor is for, and
+STEPSS GUI runs CODEGEN over that file without any of this. See
+[User-Defined Models](/developer/user-models/) for what happens to it next.
 </Aside>
 
 See [CODEGEN Studio](/developer/cg-studio/) for the command-line options, a

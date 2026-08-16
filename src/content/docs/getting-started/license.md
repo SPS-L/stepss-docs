@@ -12,7 +12,7 @@ description: Licensing information for the STEPSS suite
 | URAMSES | Apache License 2.0 | [SPS-L/stepss-uramses](https://github.com/SPS-L/stepss-uramses) |
 | stepss-eigenanalysis | Apache License 2.0 | [SPS-L/stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) |
 | CODEGEN Studio | Apache License 2.0 | [SPS-L/stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) |
-| stepss-dyngraph | Apache License 2.0 | [SPS-L/stepss-dyngraph](https://github.com/SPS-L/stepss-dyngraph) |
+| stepss-dyngraph | Apache License 2.0 | SPS-L/stepss-dyngraph (private) |
 | RamsesNN | MIT License | [SPS-L/stepss-RamsesNN](https://github.com/SPS-L/stepss-RamsesNN) |
 | Helios | Academic Public License (free for non-commercial use), with a commercial option | See [Helios License](#helios-license) below |
 | RAMSES | Proprietary, free for non-commercial use | See [RAMSES Solver License](#ramses-solver-license) below |
