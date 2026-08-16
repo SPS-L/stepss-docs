@@ -5,17 +5,13 @@ description: How to install STEPSS and its dependencies
 
 import { Tabs, TabItem, Steps, Aside, LinkButton } from '@astrojs/starlight/components';
 
-STEPSS comes in [two editions](/getting-started/overview/#two-editions). This page covers **STEPSS for Java**, the desktop application, and the Fortran toolchain needed only if you intend to build your own models.
+STEPSS comes in [two editions](/getting-started/overview/#two-editions) and this page installs either: **STEPSS for Java**, the desktop application, and **STEPSS for Python**, the `stepss` package. It also covers the Fortran toolchain, which is needed only if you intend to build your own models.
 
 :::tip[Working from Python instead?]
-**STEPSS for Python** installs with a single command and needs no Java:
-
-```bash
-pip install stepss
-```
-
-It bundles the same RAMSES and Helios engines. See [Python API Installation](/python/installation/) for the full instructions, including the system libraries Linux and macOS need.
+It installs with a single command and needs no Java. Skip to [Installing STEPSS in Python](#installing-stepss-in-python).
 :::
+
+## Installing STEPSS GUI
 
 The Java edition comes two ways: an **installer**, which carries its own Java and is what most people want, or the **`stepss.jar`** on its own, which needs a Java you already have. Both are on every [release](https://github.com/SPS-L/stepss-java-ui/releases). On Debian and Ubuntu there is a third way, an **APT repository**, which is the same installer delivered so that `apt upgrade` keeps it current.
 
@@ -24,8 +20,6 @@ The Java edition comes two ways: an **installer**, which carries its own Java an
 
 On anything else, including older Debian and Ubuntu releases, use **`stepss.jar`**. It needs a 64-bit Java 11 or later and gnuplot from your own package manager, and it carries the same engines. It is not tested there, but nothing in it is Debian-specific.
 :::
-
-## Installing STEPSS for Java
 
 <Tabs>
 <TabItem label="Installer (recommended)">
@@ -129,6 +123,16 @@ The jar is the one route that installs nothing alongside itself, so real-time pl
 </TabItem>
 </Tabs>
 
+## Installing STEPSS in Python
+
+**STEPSS for Python** installs with a single command and needs no Java:
+
+```bash
+pip install stepss
+```
+
+It bundles the same RAMSES and Helios engines as the desktop application. See the [Python API Installation Guide](/python/installation/) for the full instructions, including the system libraries Linux and macOS need, and [Two Editions](/getting-started/overview/#two-editions) for what each edition carries.
+
 ## Installing a Fortran Toolchain
 
 <Aside type="tip">
@@ -159,7 +163,7 @@ the system `PATH`.
 sudo apt install gfortran make libopenblas-dev
 ```
 
-Installing STEPSS through [apt](#installing-stepss-for-java) offers these three
+Installing STEPSS through [apt](#installing-stepss-gui) offers these three
 as recommended packages, so on that route they are already there unless you
 declined them.
 
@@ -188,7 +192,3 @@ details.
 ## Installing CODEGEN Studio
 
 For the browser-based visual model editor, see the [CODEGEN Studio installation section](/developer/cg-studio/#installation).
-
-## Installing STEPSS for Python
-
-`pip install stepss`. See the [Python API Installation Guide](/python/installation/) for the system libraries Linux and macOS need, and [Two Editions](/getting-started/overview/#two-editions) for what each edition carries.
