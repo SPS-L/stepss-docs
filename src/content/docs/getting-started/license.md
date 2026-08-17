@@ -59,6 +59,34 @@ For extensions to larger models or execution using more than two cores, contact 
 
 **CODEGEN** (the model generator) is the property of **Dr. Thierry Van Cutsem**. It is distributed under the **Academic Public License for the use of STEPSS** as a compiled executable that is **free to use for non-commercial purposes**; commercial use requires contacting the Authors. It is not open-source: its source code is not included in any of the public STEPSS repositories.
 
+## Requesting a Commercial License
+
+The free terms above cover teaching, academic research and personal non-profit
+use. Anything commercial needs a license, including consulting work, designing
+commercial hardware or software, and a commercial entity taking part in a research
+project.
+
+Which license, and from whom, depends on **which components you use**. They have
+different owners, as the table at the top of this page sets out: RAMSES belongs to
+the University of Liège, Helios to Dr. Petros Aristidou, and CODEGEN to Dr. Thierry
+Van Cutsem. A use that involves only one of them is a narrower question than one
+that involves all three.
+
+Write to **stepss@sps-lab.org**. A first message that covers the following can be
+answered without a round of questions first:
+
+- **Which components** the work needs, from the table above. If you are unsure,
+  describe what you want to do and let the answer come back.
+- **What the use is**: consulting for a client, a product you sell, an internal
+  tool, or a funded project with a commercial partner.
+- **How large the systems are.** The free version of RAMSES is capped at 1000
+  buses, so the size you need is usually the reason for the request.
+- **How many cores** you need to run on. The free version is capped at two.
+- **Your timeframe**, so the reply can be useful rather than merely accurate.
+
+Identify the organisation the license would be granted to, which is not always the
+one asking.
+
 ## Authors
 
 STEPSS has been developed by:

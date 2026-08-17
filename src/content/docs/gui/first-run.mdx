@@ -1,0 +1,120 @@
+---
+title: First Run
+description: What happens the first time you open STEPSS GUI, and the fastest route to a case that runs
+---
+
+import { Steps } from '@astrojs/starlight/components';
+
+STEPSS GUI is the desktop edition: the one an installer puts on your machine, and
+the one that carries every engine plus CODEGEN. This page covers the first launch
+and gets you to a working simulation without you supplying any data of your own.
+
+If it is not installed yet, start at
+[Installing STEPSS GUI](/getting-started/installation/#installing-stepss-gui).
+
+## Accepting the licence
+
+The first launch shows a licence and will not continue until you accept it.
+
+The licence on that screen is **RAMSES's**, not the interface's. The two user
+interfaces are Apache 2.0, while the dynamic simulator is the property of the
+University of Liège and free for non-commercial use only, so the dialog names the
+component rather than the application. The free version is also capped, in ways
+worth knowing before you build a large case.
+
+[License](/getting-started/license/) is the one page that states the terms, the
+caps and which component each applies to. Read it there rather than inferring
+them from the dialog.
+
+You accept once. Later launches go straight to the window.
+
+## Start from a bundled example
+
+The fastest way to see STEPSS work is not to load anything of your own. The
+application ships three complete test systems, and opening one copies it to disk
+and fills in every file slot, so **Run** works immediately.
+
+<Steps>
+
+1. Open the **File** menu.
+
+2. Choose **Open Examples**.
+
+3. Pick a system from the list. The panel beside it describes the case, its size
+   and what the shipped disturbance does.
+
+4. Click **Open example**.
+
+</Steps>
+
+<img src="/images/screenshots/gui-open-examples-light.png"
+     alt="The Open Examples dialog. A list on the left offers Kundur two-area, IEEE Nordic and the 5-bus tutorial; the panel on the right describes the selected Kundur case, its 11 buses and 4 machines, and the load step its disturbance applies. Buttons below offer Open example and Documentation."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-open-examples-dark.png"
+     alt="The Open Examples dialog. A list on the left offers Kundur two-area, IEEE Nordic and the 5-bus tutorial; the panel on the right describes the selected Kundur case, its 11 buses and 4 machines, and the load step its disturbance applies. Buttons below offer Open example and Documentation."
+     class="light:sl-hidden" />
+
+A banner across the top of the window then reports where the copy landed, with an
+**Open folder** button to reveal it.
+
+The dialog appears on startup by default. Clear **Show this at startup** to stop
+that, and reach it from **File, Open Examples** whenever you want it back.
+
+## The three bundled systems
+
+| System | Size | What it is for |
+|---|---|---|
+| [5-bus tutorial](/test-systems/5bus/) | 5 buses, 1 machine | The teaching case from EEN452 at the Cyprus University of Technology, and the one to open first. One generator with detailed machine, governor and AVR models, a composite load, and an external grid, small enough to read end to end. Its disturbance file is deliberately empty, ready for you to add the records of the study you want. |
+| [Kundur two-area](/test-systems/kundur/) | 11 buses, 4 machines, 60 Hz | The standard benchmark for inter-area oscillations. Two symmetric areas joined by a weak tie. The shipped disturbance steps a load and the resulting inter-area mode is the object of the study. A second dynamic file with the stabiliser disabled ships beside the first, so the same run can be repeated with the PSS out and the damping compared. |
+| [IEEE Nordic](/test-systems/nordic/) | 74 buses, 20 machines, 400/220/130 kV | The reference system for long-term voltage stability, from IEEE PES technical report PES-TR19. It opens on the tripped-branch case it is best known for, with further disturbances, a second operating point and a set of load-increase variants shipped alongside. |
+
+Each links to its own page here, which carries the network, the models and the
+studies the system is used for. **Documentation** in the dialog opens the same
+system's source repository.
+
+## Where the files go
+
+Two directories are remembered separately, and the distinction matters once you
+open more than one example.
+
+- The **examples directory** is where copies are unpacked. Opening a second
+  example puts it beside the first rather than inside it.
+- The **working directory** is where a run reads and writes. Opening an example
+  moves it into that example.
+
+Set either from the **Tools** menu, which also offers **Open working folder** and
+**Open terminal in working folder** for getting at the files directly.
+
+An example is copied rather than run in place, so editing it is safe and the
+copy survives quitting. That is the point of copying: work on it freely.
+
+## Real-time plotting needs gnuplot
+
+STEPSS GUI can plot curves while a simulation runs, which is covered on
+[The Interface](/gui/interface/). It draws them with gnuplot, and if gnuplot is
+not found the window says so on startup and real-time plotting is disabled. The
+rest of the application is unaffected, and trajectories can still be plotted
+after a run.
+
+Windows carries its own copy and needs nothing. On Linux and macOS, see
+[the note on the installation page](/getting-started/installation/#installing-stepss-gui),
+which gives the package to install and explains why the plain `gnuplot` package
+is the wrong one on Linux.
+
+:::caution[Could not prepare the simulation toolchain]
+The engines ship inside the application and are unpacked to a temporary
+directory each time it starts. A **Toolchain error** on launch means that
+unpacking failed, almost always because the temporary directory is not
+writable. Fix that and start again.
+:::
+
+## Choosing a theme
+
+**Tools**, then **Dark theme**. The choice is remembered between sessions, along
+with the window's size and position.
+
+## Next steps
+
+- [The Interface](/gui/interface/), what each tab is for
+- [Running a Simulation](/gui/running/), a complete run on the Kundur case
+- [File Formats](/user-guide/file-formats/), what goes in the files you loaded

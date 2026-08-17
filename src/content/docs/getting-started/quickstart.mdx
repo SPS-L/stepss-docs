@@ -5,27 +5,106 @@ description: Run your first STEPSS simulation
 
 import { Tabs, TabItem, Steps } from '@astrojs/starlight/components';
 
-STEPSS provides three ways to run simulations:
+You drive STEPSS one of two ways, and both are covered here.
 
-| Interface | Dynamic Simulator (RAMSES) | Power Flow (Helios) | CODEGEN |
-|-----------|:-------------------------:|:----------------------:|:-------:|
-| **Command Line** | `ramses -t cmd.txt` | `helios -t cmd.txt` | `codegen -tmodel.txt` |
-| **STEPSS GUI** | Via STEPSS GUI | Via STEPSS GUI | Via STEPSS GUI |
-| **STEPSS in Python** | Via stepss | Via `stepss.helios` | |
+| Edition | Dynamic Simulator (RAMSES) | Power Flow (Helios) | CODEGEN | Use it for |
+|---|:---:|:---:|:---:|---|
+| **STEPSS GUI** | yes | yes | yes | Interactive work: load a case, run it, watch curves, build models |
+| **STEPSS in Python** | yes | yes | | Scripting, parameter sweeps, and the scientific Python stack |
 
-The two editions are what you install; see
-[Installation](/getting-started/installation/). The command line is not a third
-thing to install, and the executables in that first row are not published on
-their own: they ship inside STEPSS GUI, which unpacks them while it runs.
+Those two are what you install; see
+[Installation](/getting-started/installation/). Pick the GUI if you want to see
+the system respond, Python if you want to automate. Neither wraps the other, so a
+case built in one runs unchanged in the other.
+
+New to STEPSS? [First Run](/gui/first-run/) opens a bundled test system and
+simulates it without your having to prepare any data.
+
+The engines can also be invoked directly from a shell, which is what the
+**Command line** tab on each section below documents. It is not a third thing to
+install and most readers will not need it: the executables are not published
+separately, they ship inside STEPSS GUI, which unpacks them while it runs. It
+matters when you are wiring STEPSS into a job scheduler or another program.
 
 ---
 
 ## Dynamic Simulation (RAMSES)
 
 <Tabs>
+<TabItem label="STEPSS GUI">
+
+The window is six tabs, used left to right:
+
+<Steps>
+
+1. **Launch STEPSS**, from your applications if you used an installer, or by double-clicking `stepss.jar`
+
+2. **Get a case.** **File**, then **Open Examples** ships three complete test
+   systems and fills in every file slot. Otherwise load your own on the **System
+   Data** tab, which takes the system data files and the disturbance file
+
+3. On **Observables**, tick what to record, and optionally set a quantity to plot
+   live while the run proceeds
+
+4. On **Initialization**, **Run power flow** to get the operating point
+
+5. On **Dynamic Simulation**, **Run dynamic simulation**
+
+6. On **Analysis**, **Extract curves** to plot the result
+
+</Steps>
+
+The GUI coordinates the power flow and RAMSES through lock files (`.lock_RAMSES`, `.kill_RAMSES`) for graceful process management.
+
+For the full walkthrough on a real case, see
+[Running a Simulation](/gui/running/).
+
+</TabItem>
+<TabItem label="STEPSS in Python">
+
+<Steps>
+
+1. **Install stepss**:
+   ```bash
+   pip install stepss
+   ```
+
+2. **Run a simulation**:
+   ```python
+   import stepss
+
+   # Configure the case
+   case = stepss.cfg()
+   case.addData("data.dat")
+   case.addData("volt_rat.dat")
+   case.addData("settings.dat")
+   case.addObs("obs.obs")
+   case.addDst("disturbance.dst")
+
+   # Run
+   ram = stepss.sim()
+   ram.execSim(case, 150.0)
+   ```
+
+3. **Extract and plot results**:
+   ```python
+   ext = stepss.extractor(case.getTrj())
+
+   # Plot bus voltage magnitude
+   ext.getBus('1041').mag.plot()
+
+   # Plot synchronous machine speed
+   ext.getSync('g1').S.plot()
+   ```
+
+</Steps>
+
+See the [Python API Reference](/python/api-reference/) for the complete interface.
+
+</TabItem>
 <TabItem label="Command Line">
 
-### RAMSES Command-Line Interface
+**The RAMSES command-line interface**
 
 The RAMSES executable accepts the following arguments:
 
@@ -92,66 +171,6 @@ Lines starting with `#` in the command file are treated as comments and skipped.
 :::
 
 </TabItem>
-<TabItem label="GUI (Java)">
-
-<Steps>
-
-1. **Launch STEPSS**, from your applications if you used an installer, or by double-clicking `stepss.jar`
-2. **Load a test case**: Use File → Open to load your data files
-3. **Run Power Flow**: Execute Helios to compute the initial operating point
-4. **Configure Simulation**: Set solver parameters and define disturbances
-5. **Run Dynamic Simulation**: Execute RAMSES and observe results
-6. **Analyze Results**: Use the built-in plotting tools to visualize voltage, frequency, and power traces
-
-</Steps>
-
-The GUI coordinates the power flow and RAMSES through lock files (`.lock_RAMSES`, `.kill_RAMSES`) for graceful process management.
-
-For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/stepss/).
-
-</TabItem>
-<TabItem label="Python (stepss)">
-
-<Steps>
-
-1. **Install stepss**:
-   ```bash
-   pip install stepss
-   ```
-
-2. **Run a simulation**:
-   ```python
-   import stepss
-
-   # Configure the case
-   case = stepss.cfg()
-   case.addData("data.dat")
-   case.addData("volt_rat.dat")
-   case.addData("settings.dat")
-   case.addObs("obs.obs")
-   case.addDst("disturbance.dst")
-
-   # Run
-   ram = stepss.sim()
-   ram.execSim(case, 150.0)
-   ```
-
-3. **Extract and plot results**:
-   ```python
-   ext = stepss.extractor(case.getTrj())
-
-   # Plot bus voltage magnitude
-   ext.getBus('1041').mag.plot()
-
-   # Plot synchronous machine speed
-   ext.getSync('g1').S.plot()
-   ```
-
-</Steps>
-
-See the [Python API Reference](/python/api-reference/) for the complete interface.
-
-</TabItem>
 </Tabs>
 
 ---
@@ -159,9 +178,32 @@ See the [Python API Reference](/python/api-reference/) for the complete interfac
 ## Power Flow (Helios)
 
 <Tabs>
+<TabItem label="STEPSS GUI">
+
+<Steps>
+
+1. **Launch STEPSS** and load the network and power-flow data files on the
+   **System Data** tab
+
+2. Go to **Initialization** and click **Run power flow**. The pane reports bus
+   voltages and angles, the generator table with its limits, and the system power
+   balance
+
+3. Inspect the result through **Bus overview**, **Generators & SVCs**,
+   **Adjustable transformers** and **Global power balance**, which enable once the
+   run succeeds
+
+4. **Add Helios results to data** feeds the solution back into the loaded case,
+   ready for the dynamic simulation
+
+</Steps>
+
+See [The Interface](/gui/interface/#initialization) for what each control does.
+
+</TabItem>
 <TabItem label="Command Line">
 
-### Helios Command-Line Interface
+**The Helios command-line interface**
 
 The Helios executable accepts the following arguments:
 
@@ -208,21 +250,6 @@ LFRESV file needed to initialize RAMSES; see
 for the full list.
 
 </TabItem>
-<TabItem label="GUI (Java)">
-
-<Steps>
-
-1. **Launch STEPSS**, from your applications if you used an installer, or by double-clicking `stepss.jar`
-2. **Load data files**: Use File → Open to load network and power flow data files
-3. **Run Power Flow**: Click the Helios button to compute the power flow
-4. **Inspect results**: View bus voltages, branch flows, generator outputs, and reactive power limits
-5. **Export LFRESV**: Save the power flow solution for use with RAMSES
-
-</Steps>
-
-For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/stepss/).
-
-</TabItem>
 </Tabs>
 
 ---
@@ -240,8 +267,10 @@ For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/s
 
 ## Next Steps
 
+- [First Run](/gui/first-run/), Open a bundled test system in STEPSS GUI
+- [Running a Simulation](/gui/running/), A complete run, start to finish
+- [Python Examples](/python/examples/), The same ground in a script
 - [File Formats](/user-guide/file-formats/), Learn about data file syntax
 - [Network Modeling](/user-guide/network/), Define your power system network
 - [Power Flow (Helios)](/user-guide/power-flow/), Power flow data and control parameters
 - [Dynamic Data Records](/user-guide/dynamic-models/), Add generators, loads, and controllers
-- [Python API](/python/api-reference/), Full Python API documentation

@@ -9,12 +9,9 @@ import fortranFreeForm from '@shikijs/langs/fortran-free-form';
 export default defineConfig({
 	site: 'https://stepss.sps-lab.org',
 	base: '/',
-	// The power-flow page used to live at /user-guide/pfc/ and is linked from the
-	// stepss-helios and stepss-cg-studio READMEs. Keep that URL working.
 	// The block library used to be one 2300-line page at /developer/codegen-library/;
 	// it is now one page per block category under /developer/codegen-blocks/.
 	redirects: {
-		'/user-guide/pfc': '/user-guide/power-flow/',
 		'/developer/codegen-library': '/developer/codegen-blocks/',
 	},
 	markdown: {
@@ -66,6 +63,19 @@ export default defineConfig({
 						{ label: 'Installation', slug: 'getting-started/installation' },
 						{ label: 'Quick Start',  slug: 'getting-started/quickstart' },
 						{ label: 'License',      slug: 'getting-started/license' },
+					],
+				},
+				{
+					// The edition an installer delivers, and the first thing a new
+					// reader opens. Ahead of the Simulation Guide because nobody
+					// should have to read File Formats before pressing Run. The
+					// Python API stays below the guide: scripting users are further
+					// along.
+					label: 'STEPSS GUI',
+					items: [
+						{ label: 'First Run',            slug: 'gui/first-run' },
+						{ label: 'The Interface',        slug: 'gui/interface' },
+						{ label: 'Running a Simulation', slug: 'gui/running' },
 					],
 				},
 				{
@@ -149,6 +159,7 @@ export default defineConfig({
 					label: 'Resources',
 					items: [
 						{ label: 'Repositories',  slug: 'resources/repositories' },
+						{ label: 'Releases',      slug: 'resources/releases' },
 						{ label: 'Publications',  slug: 'resources/references' },
 					],
 				},

@@ -51,38 +51,69 @@ It must come back empty. En-dashes (U+2013) are fine
 where they belong: numeric ranges (`g1–g20`), and compound names such as
 Newton–Raphson and lead–lag.
 
-### Helios is the power flow; PFC is history
+### Helios is the power flow, and the Python package is `stepss`
 
-The power-flow engine is **Helios**. PFC, the Fortran predecessor, is no longer
-shipped in any release (`versions.properties` in stepss-java-ui pins ramses,
-helios, dyngraph, codegen and uramses, and the `stepss` package bundles ramses
-plus helios). It survives on this site only as a short historical note on
-`user-guide/power-flow.md` and `getting-started/overview.md`. Do not reintroduce
-it as a live alternative, and do not describe a `pfc` executable.
+The power-flow engine is **Helios**. The Python distribution is **`stepss`**.
 
-That page used to live at `/user-guide/pfc/`, which the stepss-helios and
-stepss-cg-studio READMEs link to; `redirects` in `astro.config.mjs` keeps the old
-URL alive. Keep the entry if you move the page again.
+**Two names are banned outright from this site: PFC and PyRAMSES.** Not as a live
+alternative, not as a deprecated one, not as a `pfc` executable, not as a
+migration note, not as a historical aside, and not as a redirect. Write as though
+neither ever existed. This is a hard rule from the project owner, and it is
+stricter than what this file said before: a "Historical Note: PFC" section on
+`user-guide/power-flow.md`, a succession paragraph on
+`getting-started/overview.md`, and a `/user-guide/pfc` redirect were all removed
+to satisfy it.
 
-### Eigenanalysis is in the engine; the MATLAB tool is retired
+A reader arriving with a case built for the old power flow is served by the
+current [Power Flow](/user-guide/power-flow/) reference, which documents the
+format that is read today. A reader arriving with old Python code is served by
+the retired distribution's own PyPI page, not by this site.
+
+Check with:
+
+```sh
+grep -rniE 'pfc|pyramses' src astro.config.mjs README.md
+```
+
+It must come back empty. When removing a URL that other repos link to, repoint
+the links in those repos first: dropping the `/user-guide/pfc` redirect required
+fixing three references in stepss-helios (`README.md` twice,
+`docs/architecture.md` once) so they would not 404.
+
+### Eigenanalysis is in the engine, and MATLAB is not part of STEPSS
 
 Small-signal analysis is performed by RAMSES itself, triggered by the `EIG`
 disturbance or the `run_ssa` C entry, and documented on
-`user-guide/eigenanalysis.md`. The MATLAB tool that used to do it is **retired**
-and must not reappear anywhere on this site: no `ssa(...)` call, no `matlab`
-code fence, no "requires MATLAB R2016a" prerequisite, no QZ/ARPACK/JDQR method
-menu. `stepss-eigenanalysis` is now the reference-data and validation-suite
-repository, not a tool a reader installs.
+`user-guide/eigenanalysis.md`. In STEPSS GUI it is the **Small-signal stability
+analysis** half of the Analysis tab.
+
+**MATLAB support for small-signal analysis was removed, and no reference to it is
+to be kept.** No `ssa(...)` call, no `matlab` code fence, no MATLAB version
+prerequisite, no QZ/ARPACK/JDQR method menu, and no note explaining that such a
+tool used to exist. `stepss-eigenanalysis` holds reference data and a validation
+suite; it is not a tool a reader installs, and its tests need neither MATLAB nor a
+RAMSES licence.
+
+The ban is on **that tool**, not on the word. MATLAB mentions unrelated to it are
+fine and two are load-bearing: Helios exports a `.m` file
+(`python/helios.md`, `user-guide/power-flow.md`), which is an output format rather
+than a dependency and needs no section or caveat of its own; and
+`developer/user-models.md` notes that the exponent operator is `**` and not `^` as
+in MATLAB, which is a genuine syntax warning for readers arriving from there.
+`models/synchronous-machine-param-conversion.md` linking `Sync_mach_Octave`, a
+parameter-conversion reference implementation, is likewise unrelated.
 
 The `JAC` disturbance stays documented. It exports the raw matrices and is a
 different feature from `EIG`, which analyses them.
 
-Two MATLAB mentions on this site are **not** about the retired tool and should
-be left alone: `developer/user-models.md` explains that the exponent operator is
-`**` and not `^` as in MATLAB, which is a genuine syntax warning for people
-arriving from there; and Helios really does export a `.m` file
-(`python/helios.md`, `user-guide/power-flow.md`), which is a file format, not a
-dependency.
+Check with:
+
+```sh
+grep -rniE 'ssa\(|requires matlab|R20[0-9][0-9][ab]|QZ|ARPACK|JDQR' src
+```
+
+It must come back empty. A bare `grep -rni matlab src` is **not** the test: it has
+legitimate hits.
 
 ### The Python package is `stepss`, and has no other name here
 
