@@ -85,7 +85,7 @@ export default defineConfig({
 					items: [
 						{ label: 'File Formats',        slug: 'user-guide/file-formats' },
 						{ label: 'Network Modeling',    slug: 'user-guide/network' },
-						{ label: 'Power Flow (Helios)', slug: 'user-guide/power-flow' },
+						{ label: 'Power Flow',          slug: 'user-guide/power-flow' },
 						{ label: 'Reference Frames & Initialization', slug: 'user-guide/reference-frames' },
 						{ label: 'Dynamic Data Records', slug: 'user-guide/dynamic-models' },
 						{ label: 'Disturbances',        slug: 'user-guide/disturbances' },

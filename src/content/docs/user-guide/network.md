@@ -25,7 +25,7 @@ BUS NAME VNOM ;
 Only one BUS record per bus is allowed. All buses must be declared before being referenced.
 
 :::note
-For power flow computations, an extended version of the BUS record with six fields is used (see [Power Flow Data & Settings](/user-guide/power-flow/)). When RAMSES encounters the extended format, only the first two fields are read.
+For power flow computations, an extended version of the BUS record with six fields is used (see [Power Flow](/user-guide/power-flow/)). When RAMSES encounters the extended format, only the first two fields are read.
 :::
 
 ## Lines and Cables
@@ -176,7 +176,7 @@ This simplified model has $B_2 = 0$ and $\phi = 0$, and **combines the transform
 
 To control the transformer ratio during dynamic simulation, associate a [DCTL LTC](/models/discrete-controllers/#ltc-dctl_ltc-load-tap-changer-standard) controller with the transformer.
 
-See [Power Flow Data & Settings](/user-guide/power-flow/) for details on ratio adjustment.
+See [Power Flow](/user-guide/power-flow/) for details on ratio adjustment.
 
 | Field | Description | Unit |
 |-------|-------------|------|
@@ -280,10 +280,10 @@ Only one SHUNT record per named shunt is allowed. **Multiple shunts at the same 
 All shunts are memorized, even those which are disconnected. A disconnected shunt has zero power flow but can be put into service during dynamic simulation.
 
 :::caution
-The SHUNT record is used by RAMSES. For the power flow, shunt data is specified in the extended BUS record (see [Power Flow Data & Settings](/user-guide/power-flow/)).
+The SHUNT record is used by RAMSES. For the power flow, shunt data is specified in the extended BUS record (see [Power Flow](/user-guide/power-flow/)).
 :::
 
 ## Next Steps
 
-- [Power Flow (Helios)](/user-guide/power-flow/), Configure generators, loads, and compute the initial operating point
+- [Power Flow](/user-guide/power-flow/), Configure generators, loads, and compute the initial operating point
 - [Dynamic Data Records](/user-guide/dynamic-models/), Add synchronous machines and controllers

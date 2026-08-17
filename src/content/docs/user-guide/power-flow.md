@@ -1,5 +1,5 @@
 ---
-title: Power Flow (Helios)
+title: Power Flow
 description: Power flow data records and solver settings for the Helios engine
 ---
 
