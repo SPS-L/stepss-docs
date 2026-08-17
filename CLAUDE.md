@@ -80,25 +80,38 @@ the links in those repos first: dropping the `/user-guide/pfc` redirect required
 fixing three references in stepss-helios (`README.md` twice,
 `docs/architecture.md` once) so they would not 404.
 
-### Eigenanalysis is in the engine; the MATLAB tool is retired
+### Eigenanalysis is in the engine, and MATLAB is not part of STEPSS
 
 Small-signal analysis is performed by RAMSES itself, triggered by the `EIG`
 disturbance or the `run_ssa` C entry, and documented on
-`user-guide/eigenanalysis.md`. The MATLAB tool that used to do it is **retired**
-and must not reappear anywhere on this site: no `ssa(...)` call, no `matlab`
-code fence, no "requires MATLAB R2016a" prerequisite, no QZ/ARPACK/JDQR method
-menu. `stepss-eigenanalysis` is now the reference-data and validation-suite
-repository, not a tool a reader installs.
+`user-guide/eigenanalysis.md`. In STEPSS GUI it is the **Small-signal stability
+analysis** half of the Analysis tab.
+
+**MATLAB support for small-signal analysis was removed, and no reference to it is
+to be kept.** No `ssa(...)` call, no `matlab` code fence, no MATLAB version
+prerequisite, no method menu, and no note explaining that it used to exist.
+`stepss-eigenanalysis` holds reference data and a validation suite; it is not a
+tool a reader installs, and its tests need neither MATLAB nor a RAMSES licence.
+
+**The one permitted mention of MATLAB is Helios exporting a `.m` file**
+(`python/helios.md`, `user-guide/power-flow.md`), which is an output format. It
+needs no special documentation, no section of its own and no caveat: name the
+format where the feature is listed and move on. This is a hard rule from the
+project owner and it is stricter than what this file said before, which also
+blessed a "not `^` as in MATLAB" syntax aside on `developer/user-models.md`. That
+aside has been removed; the exponent rule now reads "`**`, not `^`", which is the
+Fortran fact without the comparison.
 
 The `JAC` disturbance stays documented. It exports the raw matrices and is a
 different feature from `EIG`, which analyses them.
 
-Two MATLAB mentions on this site are **not** about the retired tool and should
-be left alone: `developer/user-models.md` explains that the exponent operator is
-`**` and not `^` as in MATLAB, which is a genuine syntax warning for people
-arriving from there; and Helios really does export a `.m` file
-(`python/helios.md`, `user-guide/power-flow.md`), which is a file format, not a
-dependency.
+Check with:
+
+```sh
+grep -rni 'matlab' src
+```
+
+Every hit must be the Helios `.m` export. Anything else is a regression.
 
 ### The Python package is `stepss`, and has no other name here
 
