@@ -92,25 +92,36 @@ Lines starting with `#` in the command file are treated as comments and skipped.
 :::
 
 </TabItem>
-<TabItem label="GUI (Java)">
+<TabItem label="STEPSS GUI">
+
+The window is six tabs, used left to right:
 
 <Steps>
 
 1. **Launch STEPSS**, from your applications if you used an installer, or by double-clicking `stepss.jar`
-2. **Load a test case**: Use File → Open to load your data files
-3. **Run Power Flow**: Execute Helios to compute the initial operating point
-4. **Configure Simulation**: Set solver parameters and define disturbances
-5. **Run Dynamic Simulation**: Execute RAMSES and observe results
-6. **Analyze Results**: Use the built-in plotting tools to visualize voltage, frequency, and power traces
+
+2. **Get a case.** **File**, then **Open Examples** ships three complete test
+   systems and fills in every file slot. Otherwise load your own on the **System
+   Data** tab, which takes the system data files and the disturbance file
+
+3. On **Observables**, tick what to record, and optionally set a quantity to plot
+   live while the run proceeds
+
+4. On **Initialization**, **Run power flow** to get the operating point
+
+5. On **Dynamic Simulation**, **Run dynamic simulation**
+
+6. On **Analysis**, **Extract curves** to plot the result
 
 </Steps>
 
 The GUI coordinates the power flow and RAMSES through lock files (`.lock_RAMSES`, `.kill_RAMSES`) for graceful process management.
 
-For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/stepss/).
+For the full walkthrough on a real case, see
+[Running a Simulation](/gui/running/).
 
 </TabItem>
-<TabItem label="Python (stepss)">
+<TabItem label="STEPSS in Python">
 
 <Steps>
 
@@ -208,19 +219,27 @@ LFRESV file needed to initialize RAMSES; see
 for the full list.
 
 </TabItem>
-<TabItem label="GUI (Java)">
+<TabItem label="STEPSS GUI">
 
 <Steps>
 
-1. **Launch STEPSS**, from your applications if you used an installer, or by double-clicking `stepss.jar`
-2. **Load data files**: Use File → Open to load network and power flow data files
-3. **Run Power Flow**: Click the Helios button to compute the power flow
-4. **Inspect results**: View bus voltages, branch flows, generator outputs, and reactive power limits
-5. **Export LFRESV**: Save the power flow solution for use with RAMSES
+1. **Launch STEPSS** and load the network and power-flow data files on the
+   **System Data** tab
+
+2. Go to **Initialization** and click **Run power flow**. The pane reports bus
+   voltages and angles, the generator table with its limits, and the system power
+   balance
+
+3. Inspect the result through **Bus overview**, **Generators & SVCs**,
+   **Adjustable transformers** and **Global power balance**, which enable once the
+   run succeeds
+
+4. **Add Helios results to data** feeds the solution back into the loaded case,
+   ready for the dynamic simulation
 
 </Steps>
 
-For detailed GUI usage, visit the [STEPSS website](https://sps-lab.org/project/stepss/).
+See [The Interface](/gui/interface/#initialization) for what each control does.
 
 </TabItem>
 </Tabs>

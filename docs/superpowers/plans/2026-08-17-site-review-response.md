@@ -727,10 +727,16 @@ Same treatment. Replace the closing line with a link to `/gui/interface/`.
 Run: `grep -n "sps-lab.org/project/stepss" src/content/docs/getting-started/quickstart.mdx`
 Expected: no output.
 
-The remaining three references elsewhere are legitimate and stay: `overview.md:10` and `references.md:22` cite it as a project page, which it is, and `nordic.mdx:181` cites the lab. Confirm they are untouched:
+**Revised during execution: expect two remaining, not three.** `references.md:22`
+cites it as a project page and `nordic.mdx:181` cites the lab; both are legitimate
+resource listings and stay. The third, `overview.md:10`, was a "for more
+information, visit" pointer, and Task 7 removed it: a page that calls eigenanalysis
+a MATLAB tool and uses two retired product names should not be where this
+documentation sends a reader for detail. Citing it as a project page is fine;
+recommending it as further reading is not.
 
 Run: `grep -rn "sps-lab.org/project/stepss" src/content/docs/`
-Expected: exactly three hits, in `overview.md`, `references.md` and `nordic.mdx`.
+Expected: exactly two hits, in `references.md` and `nordic.mdx`.
 
 - [ ] **Step 4: Verify**
 
