@@ -187,8 +187,24 @@ instead of by hand.
 
 ## The menus
 
-**File** holds **Save configuration** and **Load configuration**, which store the
-whole set of file choices as one file, plus **Open Examples** and **Exit**.
+**File** holds **Save configuration** and **Load configuration**, plus **Open
+Examples** and **Exit**.
+
+**Save configuration** writes a `.cfg` holding everything a run is made of: the
+ten system data rows, the disturbance and observables files, the three runtime
+observable rows, and the four recording checkboxes. **Load configuration** puts
+them back, so a case set up once can be reopened and run in two clicks. A path
+inside the `.cfg`'s own folder is stored relative to it, which means the folder
+can be moved, copied or sent to a colleague whole; anything outside that folder
+is stored as an absolute path and stays tied to the machine that saved it.
+
+Two things the file does not carry. The observable dialog's five picker lists
+are not saved, so a configuration saved with **Show observable dialog** ticked
+says so when it loads and the lists need filling in again. And `.cfg` files
+written by STEPSS releases before this format are refused rather than loaded:
+they hold absolute paths belonging to whoever last saved them, so what they
+name almost never exists on the machine opening them. Set the case up and save
+it again.
 
 **Tools** holds the working-directory controls (**Select working directory**,
 **Open working folder**, **Open terminal in working folder**), **Open in editor**,
