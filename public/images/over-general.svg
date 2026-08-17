@@ -294,11 +294,7 @@
 <path fill="none" stroke-width="0.4" stroke-linecap="butt" stroke-linejoin="round" stroke="rgb(0%, 0%, 100%)" stroke-opacity="1" stroke-miterlimit="10" d="M 128.001093 613.051585 C 129.10469 624.099292 112.985134 633.053296 92.001144 633.053296 C 71.01324 633.053296 53.105232 624.099292 52.001636 613.051585 C 50.894125 602.007792 67.013681 593.053788 88.001585 593.053788 C 108.985575 593.053788 126.893583 602.007792 128.001093 613.051585 " transform="matrix(0.998157, 0, 0, -0.998157, -50.937036, 783.253637)"/>
 </g>
 <g fill="rgb(0%, 0%, 0%)" fill-opacity="1">
-<use xlink:href="#glyph-1-0" x="124.73856" y="120.477525"/>
-<use xlink:href="#glyph-1-1" x="135.743293" y="120.477525"/>
-</g>
-<g fill="rgb(0%, 0%, 0%)" fill-opacity="1">
-<use xlink:href="#glyph-1-2" x="145.426313" y="120.477525"/>
+<text x="140.3" y="120.477525" text-anchor="middle" font-family="serif" font-weight="bold" font-size="13">Helios</text>
 </g>
 <path fill="none" stroke-width="1.2" stroke-linecap="butt" stroke-linejoin="round" stroke="rgb(0%, 0%, 0%)" stroke-opacity="1" stroke-miterlimit="10" d="M 168.000602 687.998321 L 168.000602 647.998813 L 215.999229 647.998813 L 215.999229 687.998321 Z M 168.000602 687.998321 " transform="matrix(0.998157, 0, 0, -0.998157, -50.937036, 783.253637)"/>
 <g fill="rgb(0%, 0%, 0%)" fill-opacity="1">
@@ -548,7 +544,7 @@
 <use xlink:href="#glyph-2-4" x="405.313938" y="205.623294"/>
 </g>
 <g fill="rgb(17.999268%, 54.499817%, 34.098816%)" fill-opacity="1">
-<use xlink:href="#glyph-3-0" x="413.380551" y="201.29329"/>
+<text x="413.380551" y="201.29329" font-family="serif" font-size="6.5">©</text>
 </g>
 <g fill="rgb(17.999268%, 54.499817%, 34.098816%)" fill-opacity="1">
 <use xlink:href="#glyph-2-5" x="366.716721" y="219.545585"/>
