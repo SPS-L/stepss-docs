@@ -137,7 +137,9 @@ them, plus the Jacobian that the [`JAC`
 disturbance](/user-guide/disturbances/#export-jacobian-matrix) dumped at the
 same instant, into a single `.zip` or `.tar.gz`: **Save dynamic Jacobian...** on
 the Analysis tab, with the format chosen in the dialog. **Load dynamic
-Jacobian...** beside it opens one back into the same results window.
+Jacobian...** beside it opens one back into a results window of its own, leaving
+any window already up alone, so an archived run and a fresh one can be read side
+by side.
 
 | In the archive | |
 |---|---|
@@ -159,9 +161,10 @@ use. An archive carrying no manifest is refused with a reason rather than opened
 into an empty window.
 
 Both formats are ordinary archives that `unzip` and `tar xzf` read, and
-everything sits under one directory named for the run. A directory of results
-that arrived some other way, from a run made at a terminal for instance, opens
-with **View results...**, which takes a directory rather than a file.
+everything sits under one directory named for the run. The archive is also the
+only way back into the interface: results sitting loose in a directory, from a
+run made at a terminal for instance, are read by the Python API rather than by
+STEPSS GUI, which opens a run either by producing it or by loading one of these.
 
 ## Degenerate modes, and why the `smp` column matters
 
@@ -221,8 +224,9 @@ Participation factors separate the two local modes without any prior knowledge
 of the topology: the 1.085 Hz mode lists only G1 and G2, the 1.116 Hz mode only
 G3 and G4, and the inter-area mode lists all four.
 
-In STEPSS GUI the same run is read from the small-signal results window, opened
-with **View results** on the [Analysis tab](/gui/interface/#analysis):
+In STEPSS GUI the same run is read from the small-signal results window, which
+**Run small-signal stability analysis** on the
+[Analysis tab](/gui/interface/#analysis) opens on the run it just made:
 
 <img src="/images/screenshots/gui-ssa-results-light.png"
      alt="The small-signal results window for the Kundur case with stabilisers. A table lists the seven electromechanical modes with frequency, damping ratio and real and imaginary parts; the 0.6237 Hz inter-area mode at a damping ratio of 0.1087 is selected. An s-plane plot on the right places every mode against a stability boundary at the imaginary axis. Below, the Participation panel lists the selected mode's largest contributions, all four machines' speed and angle states, and a polar mode-shape plot shows G1 and G2 pointing opposite to G3 and G4."
