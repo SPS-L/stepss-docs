@@ -219,21 +219,7 @@ $OMP STA/DYN/GUI chunk ;
 
 `chunk` is the number of consecutive injectors assigned to each thread.
 
-## Miscellaneous
-
-### User Model Library
-
-Load a compiled user-model library (MDL file) at startup, making its models available to the simulation:
-
-```
-$BASE_MDL filename ;
-```
-
-:::caution
-This record is compiled in only for Windows builds made with the Intel Fortran compiler. Every RAMSES binary currently distributed (Windows, Linux and macOS) is a gfortran build, so `$BASE_MDL` has no effect on them. Link your models into a custom simulator with [URAMSES](/developer/uramses/) instead.
-:::
-
-### License
+## License
 
 Provide the licensee e-mail and the 64-character license key. A valid key unlocks the full version, removing the free-tier limit of 1000 buses:
 

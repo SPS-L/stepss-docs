@@ -576,40 +576,6 @@ status = ram.getTrfoSS(1, 3, 2, 'Status')
 
 ---
 
-### User Model Libraries
-
-Compiled user-defined model libraries can be loaded at runtime.
-
-:::caution
-These three calls exist only in RAMSES builds made on Windows with the Intel Fortran compiler. Every library currently bundled with stepss is a gfortran build, so they are unavailable there. To use your own models, build a custom `ramses.so`/`ramses.dll` with [URAMSES](/developer/uramses/) and point stepss at it with `stepss.sim(custLibDir=...)`.
-:::
-
-#### `load_MDL(MDLName)`
-
-Load a shared library of user-defined models (`.dll` on Windows, `.so` on Linux). The models stay available for the lifetime of the `sim` instance.
-
-```python
-ram.load_MDL('MDLs.dll')
-```
-
-#### `unload_MDL(MDLName)`
-
-Unload a previously loaded user-model library.
-
-```python
-ram.unload_MDL('MDLs.dll')
-```
-
-#### `get_MDL_no()`
-
-Return the number of user-model libraries currently loaded.
-
-```python
-n = ram.get_MDL_no()
-```
-
----
-
 ### Runtime Disturbances
 
 Disturbances can be added dynamically while the simulation is paused, enabling interactive scenario analysis.

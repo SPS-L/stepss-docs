@@ -7,6 +7,11 @@ import { Tabs, TabItem, Steps, Aside } from '@astrojs/starlight/components';
 
 [URAMSES](https://github.com/SPS-L/stepss-uramses) provides the framework and tools needed to compile and link custom Fortran models with stepss and the STEPSS GUI.
 
+This is the route for user models. RAMSES resolves a model name against the
+models compiled into it, so your own models are linked into the engine and
+reach it the same way the built-in ones do. There is no way to load a model
+library while a simulation is running.
+
 ## Prerequisites
 
 <Tabs>
