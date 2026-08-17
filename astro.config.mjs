@@ -159,6 +159,7 @@ export default defineConfig({
 					label: 'Resources',
 					items: [
 						{ label: 'Repositories',  slug: 'resources/repositories' },
+						{ label: 'Releases',      slug: 'resources/releases' },
 						{ label: 'Publications',  slug: 'resources/references' },
 					],
 				},
