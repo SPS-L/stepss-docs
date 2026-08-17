@@ -413,19 +413,6 @@ The following table summarises which records are used by the power flow and by R
 | PSHIFT-P | Used | Ignored |
 | BUSPART, BRAPART | Used for reporting | Ignored |
 
-## Historical Note: PFC
-
-Helios succeeds **PFC**, the Fortran power-flow calculator written by Dr. Thierry
-Van Cutsem that was the STEPSS power flow from the beginning. Helios reimplements
-its Newton-Raphson formulation in C++20, reads the same input files, and matches
-its solver defaults, so data prepared for PFC runs unchanged. PFC is no longer
-shipped with STEPSS or with stepss; nothing on this page requires it.
-
-Two numerical points are worth knowing when comparing old results with new ones:
-
-- The two engines use different sparse linear solvers, so the last displayed decimal can differ.
-- Helios recomputes the Jacobian values at every iteration, a true Newton method, where PFC froze them below `$MISBLOC`. Iteration counts can therefore differ slightly.
-
 ## Next Steps
 
 - [Reference Frames & Initialization](/user-guide/reference-frames/), Understand how RAMSES initializes from the power flow solution

@@ -69,10 +69,6 @@ Helios can optionally adjust transformer ratios to:
 - Bring voltage magnitudes inside specified deadbands (in-phase transformers)
 - Bring active power flows inside specified deadbands (phase-shifting transformers)
 
-Helios succeeds **PFC**, the Fortran power-flow calculator used in earlier
-releases. PFC is no longer shipped; see
-[Historical Note](/user-guide/power-flow/#historical-note-pfc) for what changed.
-
 Helios produces an output file including:
 - The voltage magnitudes and phase angles at all buses of the network
 - The adjustable transformer data with updated values of their ratios

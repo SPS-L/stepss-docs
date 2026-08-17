@@ -9,12 +9,9 @@ import fortranFreeForm from '@shikijs/langs/fortran-free-form';
 export default defineConfig({
 	site: 'https://stepss.sps-lab.org',
 	base: '/',
-	// The power-flow page used to live at /user-guide/pfc/ and is linked from the
-	// stepss-helios and stepss-cg-studio READMEs. Keep that URL working.
 	// The block library used to be one 2300-line page at /developer/codegen-library/;
 	// it is now one page per block category under /developer/codegen-blocks/.
 	redirects: {
-		'/user-guide/pfc': '/user-guide/power-flow/',
 		'/developer/codegen-library': '/developer/codegen-blocks/',
 	},
 	markdown: {

@@ -51,18 +51,34 @@ It must come back empty. En-dashes (U+2013) are fine
 where they belong: numeric ranges (`g1–g20`), and compound names such as
 Newton–Raphson and lead–lag.
 
-### Helios is the power flow; PFC is history
+### Helios is the power flow, and the Python package is `stepss`
 
-The power-flow engine is **Helios**. PFC, the Fortran predecessor, is no longer
-shipped in any release (`versions.properties` in stepss-java-ui pins ramses,
-helios, dyngraph, codegen and uramses, and the `stepss` package bundles ramses
-plus helios). It survives on this site only as a short historical note on
-`user-guide/power-flow.md` and `getting-started/overview.md`. Do not reintroduce
-it as a live alternative, and do not describe a `pfc` executable.
+The power-flow engine is **Helios**. The Python distribution is **`stepss`**.
 
-That page used to live at `/user-guide/pfc/`, which the stepss-helios and
-stepss-cg-studio READMEs link to; `redirects` in `astro.config.mjs` keeps the old
-URL alive. Keep the entry if you move the page again.
+**Two names are banned outright from this site: PFC and PyRAMSES.** Not as a live
+alternative, not as a deprecated one, not as a `pfc` executable, not as a
+migration note, not as a historical aside, and not as a redirect. Write as though
+neither ever existed. This is a hard rule from the project owner, and it is
+stricter than what this file said before: a "Historical Note: PFC" section on
+`user-guide/power-flow.md`, a succession paragraph on
+`getting-started/overview.md`, and a `/user-guide/pfc` redirect were all removed
+to satisfy it.
+
+A reader arriving with a case built for the old power flow is served by the
+current [Power Flow](/user-guide/power-flow/) reference, which documents the
+format that is read today. A reader arriving with old Python code is served by
+the retired distribution's own PyPI page, not by this site.
+
+Check with:
+
+```sh
+grep -rniE 'pfc|pyramses' src astro.config.mjs README.md
+```
+
+It must come back empty. When removing a URL that other repos link to, repoint
+the links in those repos first: dropping the `/user-guide/pfc` redirect required
+fixing three references in stepss-helios (`README.md` twice,
+`docs/architecture.md` once) so they would not 404.
 
 ### Eigenanalysis is in the engine; the MATLAB tool is retired
 
