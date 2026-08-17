@@ -90,6 +90,13 @@ Five buttons enable once a run succeeds:
 | **Adjustable transformers** | Transformer ratios, including any Helios adjusted |
 | **Global power balance** | Generation, load, shunts and network losses |
 
+<img src="/images/screenshots/gui-initialization-light.png"
+     alt="The Initialization tab after a successful power flow on the Kundur case. The pane reports bus voltages, a generator table listing G1 to G4 as PV buses, and a power balance of 2734 MW of load against 2819 MW of generation with 85.1 MW of losses. The five inspection buttons below are now enabled and the status bar reads Power flow finished."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-initialization-dark.png"
+     alt="The Initialization tab after a successful power flow on the Kundur case. The pane reports bus voltages, a generator table listing G1 to G4 as PV buses, and a power balance of 2734 MW of load against 2819 MW of generation with 85.1 MW of losses. The five inspection buttons below are now enabled and the status bar reads Power flow finished."
+     class="light:sl-hidden" />
+
 ## Dynamic Simulation
 
 Where the case is run. **Run dynamic simulation** starts
@@ -104,6 +111,13 @@ injectors. Those counts are how you tell a cheap run from an expensive one.
 The load buttons beside them read back a previous run's output, continuous trace,
 discrete trace or initialization data, so a result can be examined without
 re-running it. **Search** finds text in the pane.
+
+<img src="/images/screenshots/gui-dynamic-simulation-light.png"
+     alt="The Dynamic Simulation tab after a completed run. The pane lists the solver settings in force, then reports 0.5043 seconds of elapsed time over 6004 time steps at an average step of 0.01 seconds, with Jacobian, solution and evaluation counts for the network and the injectors, ending in Simulation finished."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-dynamic-simulation-dark.png"
+     alt="The Dynamic Simulation tab after a completed run. The pane lists the solver settings in force, then reports 0.5043 seconds of elapsed time over 6004 time steps at an average step of 0.01 seconds, with Jacobian, solution and evaluation counts for the network and the injectors, ending in Simulation finished."
+     class="light:sl-hidden" />
 
 ## Analysis
 
@@ -125,13 +139,45 @@ This is performed by RAMSES itself.
 [Eigenanalysis](/user-guide/eigenanalysis/) explains the method, the settings and
 what the results mean.
 
+<img src="/images/screenshots/gui-analysis-light.png"
+     alt="The Analysis tab with a completed run available. A Time-domain analysis row offers Extract curves, Preview curve, the save buttons, Load trajectory and Clear all gnuplot instances. Below it a Small-signal stability analysis section holds a results directory, a basename of ssa, an analysis time of 0.001 seconds, a real part limit of -1.0 and a participation-factor threshold of 0.05, with buttons to run the analysis, view results, and save or load the dynamic Jacobian."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-analysis-dark.png"
+     alt="The Analysis tab with a completed run available. A Time-domain analysis row offers Extract curves, Preview curve, the save buttons, Load trajectory and Clear all gnuplot instances. Below it a Small-signal stability analysis section holds a results directory, a basename of ssa, an analysis time of 0.001 seconds, a real part limit of -1.0 and a participation-factor threshold of 0.05, with buttons to run the analysis, view results, and save or load the dynamic Jacobian."
+     class="light:sl-hidden" />
+
+The unlabelled field beside **Select results directory** is where results are
+written, and it defaults to the working directory. The picker that **Extract
+curves** opens, and the results window that **View results** opens, are both shown
+on the pages linked above.
+
 ## Codegen
 
-Where a model of your own becomes part of the simulator. **Load files for
-Codegen** takes model descriptions, **Display loaded files** shows them, **Save
-converted files** writes the generated Fortran, and **Save executable** keeps the
-custom simulator that results. Simulations then run on that simulator rather than
-the bundled engine.
+Where a model of your own becomes part of the simulator, in the order the buttons
+run:
+
+| Button | What it does |
+|---|---|
+| **Load files for Codegen** | Takes one or more model descriptions in the [CODEGEN language](/developer/user-models/) |
+| **Run Codegen** | Translates them into Fortran, reporting each block with its equation and state counts |
+| **Display loaded files** | Shows the descriptions that were read |
+| **Save converted files** | Writes the generated `.f90` out |
+| **Compile** | Builds and links it against the engine, giving a custom simulator |
+| **Save executable** | Keeps that simulator, rather than rebuilding it next time |
+
+Each enables as the previous step makes it meaningful. Once a custom simulator
+exists, simulations run on it rather than on the bundled engine.
+
+<img src="/images/screenshots/gui-codegen-light.png"
+     alt="The Codegen tab after running CODEGEN on an IEEE AC1A exciter description. The pane logs each translated block in turn, an LV gate, a limiter, algebraic equations, the exciter integrator and a derivative feedback, each with its running count of differential-algebraic equations, states and discrete states, then reports merging the temporary files and Done. Save converted files and Compile are now enabled."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-codegen-dark.png"
+     alt="The Codegen tab after running CODEGEN on an IEEE AC1A exciter description. The pane logs each translated block in turn, an LV gate, a limiter, algebraic equations, the exciter integrator and a derivative feedback, each with its running count of differential-algebraic equations, states and discrete states, then reports merging the temporary files and Done. Save converted files and Compile are now enabled."
+     class="light:sl-hidden" />
+
+Compiling needs a Fortran toolchain on the machine, which is
+[its own installation step](/getting-started/installation/#installing-a-fortran-toolchain);
+translating a model does not.
 
 [User-Defined Models](/developer/user-models/) is the reference for the model
 language, and [CODEGEN Studio](/developer/cg-studio/) assembles models visually
