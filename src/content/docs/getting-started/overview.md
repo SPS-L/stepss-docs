@@ -5,9 +5,38 @@ description: An overview of the STEPSS simulation suite
 
 **STEPSS** (*Static and Transient Electric Power Systems Simulation*) is a power system simulation tool for dynamic studies of electrical grids. It performs power flow computations and simulates the dynamic response of power systems to disturbances under the phasor approximation.
 
-STEPSS has been developed by [Dr. Petros Aristidou](https://sps-lab.org) (Cyprus University of Technology) and Dr. Thierry Van Cutsem (University of Liège).
+## The People Behind STEPSS
 
-For more information, visit the [STEPSS project page](https://sps-lab.org/project/stepss/) and [Thierry Van Cutsem's software page](https://thierryvancutsem.github.io/home/software.html).
+STEPSS is the work of two people, and each of its engines belongs to one of them.
+
+[**Dr. Petros Aristidou**](https://sps-lab.org/author/petros-aristidou/)
+contributed the parallel algorithms that let STEPSS simulate large systems in
+usable time. His doctorate, at the University of Liège in 2015, was on domain
+decomposition methods for real-time dynamic security assessment, and the
+Schur-complement decomposition that RAMSES solves with came directly out of that
+work, later extended to a two-level form. Before Liège he took his diploma at the
+National Technical University of Athens; afterwards he was a postdoctoral
+researcher at the Power Systems Laboratory of ETH Zurich, then a Lecturer at the
+University of Leeds leading its Smart Grids Lab. Since January 2020 he has been
+Assistant Professor in Sustainable Power Systems at the Cyprus University of
+Technology. **Helios** is his.
+
+[**Dr. Thierry Van Cutsem**](https://thierryvancutsem.github.io/home/)
+contributed the simulation core: the accelerated and localized Newton schemes the
+solver runs on, and the treatment of angle references that makes long-term runs
+well posed. He has spent 42 years on the dynamics of large power systems, their
+modelling, stability, security and control, much of it in collaboration with
+transmission and distribution system operators. He was Research Director at
+Belgium's Fund for Scientific Research (FNRS) and Adjunct Professor at the
+Montefiore Institute of the University of Liège, and now consults for
+transmission system operators and advises on research projects. **CODEGEN** is
+his.
+
+The work behind those contributions is published, and
+[Publications](/resources/references/) lists the papers, each with a DOI, so the
+attribution above can be checked rather than taken on trust. RAMSES itself is the
+property of the University of Liège; see [License](/getting-started/license/) for
+who owns what.
 
 ## The Three Modules
 
