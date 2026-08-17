@@ -69,6 +69,19 @@ export default defineConfig({
 					],
 				},
 				{
+					// The edition an installer delivers, and the first thing a new
+					// reader opens. Ahead of the Simulation Guide because nobody
+					// should have to read File Formats before pressing Run. The
+					// Python API stays below the guide: scripting users are further
+					// along.
+					label: 'STEPSS GUI',
+					items: [
+						{ label: 'First Run',            slug: 'gui/first-run' },
+						{ label: 'The Interface',        slug: 'gui/interface' },
+						{ label: 'Running a Simulation', slug: 'gui/running' },
+					],
+				},
+				{
 					// Flat, in workflow order: describe the network, solve the power
 					// flow, then set up and run the dynamic simulation, then analyse it.
 					label: 'Simulation Guide',
