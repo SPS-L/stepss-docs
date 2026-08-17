@@ -242,9 +242,11 @@ states, most of them fast controller and network dynamics that no rotor
 participates in.
 
 :::note
-This window is light in both site themes. Its two plot panels do not yet follow
-the application's dark theme, tracked as
-[stepss-java-ui#11](https://github.com/SPS-L/stepss-java-ui/issues/11).
+This screenshot is light in both site themes. The window itself follows the
+application's theme from v3.74.20, plot panels included; before that release the
+s-plane and the mode shape stayed white under the dark theme. A plot saved with
+**Save plot...** is drawn on white whatever theme is in use, since it is meant
+for a report rather than the screen.
 :::
 
 ## See Also
