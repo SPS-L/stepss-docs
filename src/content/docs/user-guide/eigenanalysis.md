@@ -221,6 +221,32 @@ Participation factors separate the two local modes without any prior knowledge
 of the topology: the 1.085 Hz mode lists only G1 and G2, the 1.116 Hz mode only
 G3 and G4, and the inter-area mode lists all four.
 
+In STEPSS GUI the same run is read from the small-signal results window, opened
+with **View results** on the [Analysis tab](/gui/interface/#analysis):
+
+<img src="/images/screenshots/gui-ssa-results-light.png"
+     alt="The small-signal results window for the Kundur case with stabilisers. A table lists the seven electromechanical modes with frequency, damping ratio and real and imaginary parts; the 0.6237 Hz inter-area mode at a damping ratio of 0.1087 is selected. An s-plane plot on the right places every mode against a stability boundary at the imaginary axis. Below, the Participation panel lists the selected mode's largest contributions, all four machines' speed and angle states, and a polar mode-shape plot shows G1 and G2 pointing opposite to G3 and G4."
+     class="shot-single" />
+
+Reading that window across is the whole method in one view. The table gives the
+frequency and damping of each mode; the s-plane shows how much margin each one
+has, with the boundary drawn at the imaginary axis, so a mode crossing it is the
+instability. The **Participation** panel answers which machines make up the
+selected mode, and the mode shape answers how they move relative to each other:
+here G1 and G2 swing against G3 and G4, which is what makes 0.62 Hz the
+inter-area mode rather than a local one.
+
+Ticking **electromechanical only** restricts the table to the 0.1 to 2.5 Hz band,
+which is where rotor-angle modes live. The full spectrum for this case is 70
+states, most of them fast controller and network dynamics that no rotor
+participates in.
+
+:::note
+This window is light in both site themes. Its two plot panels do not yet follow
+the application's dark theme, tracked as
+[stepss-java-ui#11](https://github.com/SPS-L/stepss-java-ui/issues/11).
+:::
+
 ## See Also
 
 - [Export Jacobian Matrix](/user-guide/disturbances/#export-jacobian-matrix), the
