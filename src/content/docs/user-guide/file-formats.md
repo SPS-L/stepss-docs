@@ -87,4 +87,4 @@ These files can be listed in any order in the command file. The second and third
 ## Next Steps
 
 - [Network Modeling](/user-guide/network/), Define buses, lines, transformers, and shunts
-- [Power Flow (Helios)](/user-guide/power-flow/), Set up and run power flow computations
+- [Power Flow](/user-guide/power-flow/), Set up and run power flow computations

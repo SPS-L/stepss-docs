@@ -88,7 +88,7 @@ Install either from [Installation](/getting-started/installation/).
 
 ## Helios Module
 
-The power flow computation uses the Newton-Raphson method in polar coordinates; see [Power Flow Data & Settings](/user-guide/power-flow/) for the complete record and parameter reference. Input data consists of:
+The power flow computation uses the Newton-Raphson method in polar coordinates; see [Power Flow](/user-guide/power-flow/) for the complete record and parameter reference. Input data consists of:
 
 - Network data (buses, lines, transformers, etc.)
 - Power flow data specified at PV, PQ, and slack buses
