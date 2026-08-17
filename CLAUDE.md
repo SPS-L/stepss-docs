@@ -89,18 +89,19 @@ analysis** half of the Analysis tab.
 
 **MATLAB support for small-signal analysis was removed, and no reference to it is
 to be kept.** No `ssa(...)` call, no `matlab` code fence, no MATLAB version
-prerequisite, no method menu, and no note explaining that it used to exist.
-`stepss-eigenanalysis` holds reference data and a validation suite; it is not a
-tool a reader installs, and its tests need neither MATLAB nor a RAMSES licence.
+prerequisite, no QZ/ARPACK/JDQR method menu, and no note explaining that such a
+tool used to exist. `stepss-eigenanalysis` holds reference data and a validation
+suite; it is not a tool a reader installs, and its tests need neither MATLAB nor a
+RAMSES licence.
 
-**The one permitted mention of MATLAB is Helios exporting a `.m` file**
-(`python/helios.md`, `user-guide/power-flow.md`), which is an output format. It
-needs no special documentation, no section of its own and no caveat: name the
-format where the feature is listed and move on. This is a hard rule from the
-project owner and it is stricter than what this file said before, which also
-blessed a "not `^` as in MATLAB" syntax aside on `developer/user-models.md`. That
-aside has been removed; the exponent rule now reads "`**`, not `^`", which is the
-Fortran fact without the comparison.
+The ban is on **that tool**, not on the word. MATLAB mentions unrelated to it are
+fine and two are load-bearing: Helios exports a `.m` file
+(`python/helios.md`, `user-guide/power-flow.md`), which is an output format rather
+than a dependency and needs no section or caveat of its own; and
+`developer/user-models.md` notes that the exponent operator is `**` and not `^` as
+in MATLAB, which is a genuine syntax warning for readers arriving from there.
+`models/synchronous-machine-param-conversion.md` linking `Sync_mach_Octave`, a
+parameter-conversion reference implementation, is likewise unrelated.
 
 The `JAC` disturbance stays documented. It exports the raw matrices and is a
 different feature from `EIG`, which analyses them.
@@ -108,10 +109,11 @@ different feature from `EIG`, which analyses them.
 Check with:
 
 ```sh
-grep -rni 'matlab' src
+grep -rniE 'ssa\(|requires matlab|R20[0-9][0-9][ab]|QZ|ARPACK|JDQR' src
 ```
 
-Every hit must be the Helios `.m` export. Anything else is a regression.
+It must come back empty. A bare `grep -rni matlab src` is **not** the test: it has
+legitimate hits.
 
 ### The Python package is `stepss`, and has no other name here
 

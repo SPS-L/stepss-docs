@@ -215,7 +215,7 @@ Rules:
 - A data and a parameter **cannot share the same name**
 - Expressions may involve data names (in `{}`) or previously defined parameter names (in `{}`)
 - Mathematical expressions use **FORTRAN syntax**:
-  - Exponent: `**`, not `^`
+  - Exponent: `**` (not `^` as in MATLAB)
   - Boolean operators: `.lt.` (less than), `.le.` (less or equal), `.gt.` (greater than), `.ge.` (greater or equal), `.eq.` (equal), `.ne.` (not equal)
   - Standard math functions (`cos`, `sqrt`, `abs`, etc.) follow Intel Fortran syntax
 
