@@ -53,3 +53,18 @@ th {
 .sl-markdown-content :is(aside) {
 	border-radius: 0.5rem;
 }
+
+/*
+ * Screenshots that exist in one theme only. CODEGEN Studio is dark-only:
+ * :root in its style.css hard-codes --bg: #0f1117 with no light variant
+ * (SPS-L/stepss-cg-studio#1). A dark image reads fine on the light page, but
+ * on the dark theme its edges dissolve into the background, so give it a
+ * border to sit in. Every other screenshot on this site ships as a
+ * light/dark pair and uses Starlight's own light:sl-hidden and
+ * dark:sl-hidden instead, which needs no CSS at all. Delete this once
+ * CODEGEN Studio gains a light theme and its shots become a pair.
+ */
+.sl-markdown-content img.shot-dark-only {
+	border: 1px solid var(--sl-color-gray-5);
+	border-radius: 0.5rem;
+}

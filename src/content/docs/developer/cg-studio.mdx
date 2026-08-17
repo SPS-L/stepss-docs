@@ -33,6 +33,10 @@ cg-studio
 
 ## Interface Overview
 
+<img src="/images/screenshots/cg-studio-editor.png"
+     alt="The CODEGEN Studio editor with the vfd_load injector loaded: the searchable block palette on the left, a canvas of 14 blocks joined by 24 wires in the centre with a first-order transfer function selected, the block inspector and a syntax-highlighted DSL preview on the right, and the %data metadata table along the bottom."
+     class="shot-dark-only" />
+
 The interface has three columns:
 
 | Area | Location | Purpose |
@@ -93,7 +97,17 @@ Click and drag from an **output port** (right side) of one block to an **input p
 - The status bar below the canvas toolbar shows the current block and wire count
 
 :::caution[Cycle detection]
-If your connections form a cycle, the status bar shows **"Cycle detected"** in red and DSL export is blocked. Feedback loops in control systems are valid in RAMSES, but the loop must be broken by declaring the fed-back signal as a `%state` with an explicit initial value. See [User-Defined Models, States](/developer/user-models/) for details.
+If your connections form a cycle, the status bar shows **"Cycle detected"** in red
+in place of the block and wire count. Feedback loops in control systems are valid
+in RAMSES, but the loop must be broken by declaring the fed-back signal as a
+`%state` with an explicit initial value. See
+[User-Defined Models, States](/developer/user-models/) for details.
+
+The warning is advisory: it does not stop you exporting or running the model. It
+also does not yet account for a loop that a `%state` already breaks, so a valid
+model with feedback can show it. Two of the editor's own example models do,
+`exc_AC1A` among them. Read it as a prompt to check your states rather than as a
+verdict.
 :::
 
 ### 4. Edit Block Properties
@@ -234,7 +248,11 @@ This lets you visually inspect and edit any existing CODEGEN model, including th
 
 Click **"Export DSL"** to download the generated `.txt` file.
 
-Before export, the editor validates that all **mandatory output states** for the selected model type are produced by at least one block on the canvas. If any are missing, a warning dialog lists them:
+Export runs two checks, in order. Each raises a dialog you can override with
+**"Export Anyway"** or abandon with **"Cancel"**.
+
+**Mandatory outputs.** That every mandatory output state for the selected model
+type is produced by at least one block on the canvas:
 
 > **Missing Mandatory Outputs**
 >
@@ -242,12 +260,35 @@ Before export, the editor validates that all **mandatory output states** for the
 >
 > The codegen binary will reject this model.
 
-You can click **"Export Anyway"** to override the warning, or **"Cancel"** to go back and fix the model.
+**Floating state connectors.** That no state is referenced by several blocks
+without a wire joining them. A state literal sitting on one block's port while the
+same name appears elsewhere in the project usually means a connection was left
+undrawn on the canvas:
+
+> **Floating State Connectors**
+>
+> The following states are referenced by multiple blocks but the connections are
+> not wired on the canvas:
+>
+> - `Vc` referenced by 2 blocks without a shared wire
+>
+> The emitted DSL may not compile. Wire the connectors up before exporting.
+
+Note that **Run Codegen** applies only the first of the two. A model that exports
+with a floating-state warning will be sent to the codegen binary without one.
 
 The exported file follows the [strict DSL section order](/developer/user-models/): model type, model name, `%data`, `%parameters`, `%states`, `%observables`, `%models`. Blocks are emitted in topologically-sorted order (dependencies before dependents).
 
 :::note[Round-trip fidelity]
-You can import an exported DSL file back into the editor. Unknown block types (not in the catalogue) are preserved through `rawArgLines` and re-emitted verbatim, ensuring lossless round-trip even for custom or future blocks.
+You can import an exported DSL file back into the editor. Unknown block types (not
+in the catalogue) are preserved through `rawArgLines` and re-emitted verbatim, so
+the structure survives a round trip even for custom or future blocks.
+
+One exception, in **comments**: the parser keeps the leading `!` as part of the
+comment text and the emitter adds another, so `! gain` comes back as `! ! gain`,
+and a further marker accrues on each pass. It is cosmetic, and `codegen` ignores
+comments, but strip the extra markers before keeping a re-exported file as the
+master copy.
 :::
 
 ---
@@ -298,6 +339,11 @@ Shortcuts are disabled while typing in text fields.
 ## Settings
 
 Click the **gear icon** in the topbar to configure:
+
+<img src="/images/screenshots/cg-studio-settings.png"
+     alt="The Settings dialog over the editor, with three fields: codegen binary path set to codegen, server host set to 127.0.0.1, and server port set to 8765. Each carries a line of help text, and Save and Cancel buttons sit at the foot."
+     class="shot-dark-only" />
+
 
 | Setting | Default | Description |
 |---------|---------|-------------|
