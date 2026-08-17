@@ -771,7 +771,7 @@ with the analogous transformation for the converter-side currents $i_{xt} = k\, 
 
 $$v_{md} = \frac{v_d}{r} + R\, i_d - \omega_m L\, i_q, \qquad v_{mq} = \frac{v_q}{r} + R\, i_q + \omega_m L\, i_d$$
 
-**PLL.** The PLL only serves to estimate the grid angular frequency $\tilde{\omega}_g$ for the damping term. It is the same model as in the grid-following converter (see the [PLL diagram there](#gfol--inj_gfol-grid-following-converter)), with PI gains derived from the time constant $T_{\mathrm{pll}}$:
+**PLL.** The PLL only serves to estimate the grid angular frequency $\tilde{\omega}_g$ for the damping term. It is the same model as in the grid-following converter (see the [PLL diagram there](#gfol-inj_gfol-grid-following-converter)), with PI gains derived from the time constant $T_{\mathrm{pll}}$:
 
 $$K_{p\omega} = \frac{10}{\omega_N T_{\mathrm{pll}}}, \qquad K_{i\omega} = \frac{25}{\omega_N T_{\mathrm{pll}}^2}, \qquad \omega_N = 2\pi f_N$$
 
