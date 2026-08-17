@@ -15,7 +15,7 @@ The last two sections, the Fortran toolchain and CODEGEN Studio, are for writing
 
 ## Installing STEPSS GUI
 
-STEPSS GUI comes two ways: an **installer**, which carries its own Java and is what most people want, or the **`stepss.jar`** on its own, which needs a Java you already have. Both are on every [release](https://github.com/SPS-L/stepss-java-ui/releases). There is also a package manager on each of the two platforms that has one, delivering the same application so that later releases arrive on their own: an **APT repository** on Debian and Ubuntu, and a **Scoop bucket** on Windows.
+STEPSS GUI comes two ways: an **installer**, which needs nothing else on the machine, or the **`stepss.jar`** on its own, which needs a Java runtime you already have. Both are on every [release](https://github.com/SPS-L/stepss-java-ui/releases). There is also a package manager on each of the two platforms that has one, delivering the same application so that later releases arrive on their own: an **APT repository** on Debian and Ubuntu, and a **Scoop bucket** on Windows.
 
 :::note[Which Linux]
 **Debian and Ubuntu are the Linux distributions STEPSS is packaged for**, from Ubuntu 24.04 and its Debian contemporary onwards, on x86-64. That is what the `.deb` and the APT repository are built and tested against, and no package is produced for any other distribution or architecture.
@@ -24,7 +24,7 @@ On anything else, including older Debian and Ubuntu releases, use **`stepss.jar`
 :::
 
 <Tabs>
-<TabItem label="Installer (recommended)">
+<TabItem label="Installer">
 
 The installers bundle a Java runtime, so **nothing else needs installing** and an existing Java on the machine is neither required nor disturbed.
 
@@ -160,17 +160,6 @@ The jar is the one route that installs nothing alongside itself, so real-time pl
 
 </TabItem>
 </Tabs>
-
-:::note[There is no separate command-line install]
-The [Quick Start](/getting-started/quickstart/) shows `ramses`, `helios` and
-`codegen` being driven from a shell, and those executables reach you through an
-edition rather than on their own. STEPSS GUI carries all four, `dyngraph`
-included, and unpacks them into a temporary folder it clears again on exit, so
-they are not left behind on your `PATH`. `stepss` embeds RAMSES and Helios as
-libraries it calls in-process, so there is nothing to invoke from a shell there
-either. Installing either edition gets you everything those commands do,
-through that edition's own interface.
-:::
 
 ## Installing STEPSS in Python
 
