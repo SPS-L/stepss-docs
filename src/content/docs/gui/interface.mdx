@@ -1,0 +1,163 @@
+---
+title: The Interface
+description: What each tab of STEPSS GUI is for, the menus around them, and what the status bar reports
+---
+
+The window is six tabs, and you use them roughly left to right: name the files,
+choose what to record, solve the initial operating point, run the simulation,
+then analyse the result. The sixth builds your own models.
+
+This page says what each tab is for. It does not describe the file formats
+themselves; [File Formats](/user-guide/file-formats/) and
+[Dynamic Data Records](/user-guide/dynamic-models/) own those.
+
+## System Data
+
+Where the case is named. Nine numbered rows take the **system data files**, and a
+separate row below takes the **disturbance file**. Both groups are required.
+
+Each row has a **Load file** button and a pencil that opens the file in an
+editor. **Clear files** empties the tab.
+
+<img src="/images/screenshots/gui-system-data-light.png"
+     alt="The System Data tab with the Kundur two-area case loaded. Rows one to three hold the load flow, dynamic data and solver options files; rows four to ten are empty. A separate disturbance file row below holds disturb.dst."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-system-data-dark.png"
+     alt="The System Data tab with the Kundur two-area case loaded. Rows one to three hold the load flow, dynamic data and solver options files; rows four to ten are empty. A separate disturbance file row below holds disturb.dst."
+     class="light:sl-hidden" />
+
+Order does not matter and the rows need not be filled contiguously. Which files a
+case needs depends on the study: a network description, dynamic component data
+and solver settings are the usual three.
+
+## Observables
+
+Two separate jobs share this tab: what you watch **while** the simulation runs,
+and what gets written to disk for afterwards.
+
+### Runtime observables
+
+Three rows, each pairing a quantity with the name of the equipment to watch, plus
+a **plot refresh interval** in seconds. Fill any of them in and STEPSS plots those
+quantities live as the simulation advances, redrawing at that interval.
+
+The quantities on offer are bus voltage, machine speed, omega-delta and active
+power-delta of a machine, centre of inertia, wall time, latency, branch active and
+reactive power at either end, and an injector observable. The name beside it is the
+equipment's own: a bus name for a bus voltage, a synchronous machine name for a
+speed or a centre of inertia, and `RT` for wall time, which plots wall clock
+against simulation time.
+
+<img src="/images/screenshots/gui-observables-light.png"
+     alt="The Observables tab. Runtime observables are set to machine speed of G1 and the voltage of bus 9, with a one second plot refresh interval. Below, Save output trajectory and Save discrete trace are checked, and the observables file obs.dat is loaded."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-observables-dark.png"
+     alt="The Observables tab. Runtime observables are set to machine speed of G1 and the voltage of bus 9, with a one second plot refresh interval. Below, Save output trajectory and Save discrete trace are checked, and the observables file obs.dat is loaded."
+     class="light:sl-hidden" />
+
+A quantity may be followed by extra gnuplot commands, separated by `/`, to
+fine-tune its plot. `set yrange[0.9:1.1]` after a bus name is the common case.
+
+Live plotting needs gnuplot on the machine; see
+[First Run](/gui/first-run/#real-time-plotting-needs-gnuplot).
+
+### Recording to file
+
+Four independent choices: save the **output trajectory**, the **continuous
+trace**, the **discrete trace**, and the **settings, comments and initialization
+data**.
+
+The **observables file** below them is required whenever a trajectory is saved,
+because it is what says which quantities the trajectory should contain. **Show
+observable dialog** builds one interactively instead of writing it by hand.
+
+## Initialization
+
+Where the power flow is solved, giving the operating point the dynamic simulation
+starts from.
+
+**Run power flow** calls [Helios](/user-guide/power-flow/) and reports into the
+pane above: bus voltages and angles, the generator table with its limits, the
+system power balance, and the files it exported.
+
+Five buttons enable once a run succeeds:
+
+| Button | What it does |
+|---|---|
+| **Add Helios results to data** | Feeds the solution back into the loaded case |
+| **Bus overview** | Bus voltages and angles |
+| **Generators & SVCs** | Generator and SVC output, against their limits |
+| **Adjustable transformers** | Transformer ratios, including any Helios adjusted |
+| **Global power balance** | Generation, load, shunts and network losses |
+
+## Dynamic Simulation
+
+Where the case is run. **Run dynamic simulation** starts
+[RAMSES](/getting-started/overview/#ramses-module) and **Stop simulation** ends it
+early.
+
+The pane reports the settings in force, the integration method and tolerances,
+whether parallelism is active, and on completion the elapsed time, the number of
+time steps, and Jacobian, solution and evaluation counts for the network and the
+injectors. Those counts are how you tell a cheap run from an expensive one.
+
+The load buttons beside them read back a previous run's output, continuous trace,
+discrete trace or initialization data, so a result can be examined without
+re-running it. **Search** finds text in the pane.
+
+## Analysis
+
+Two kinds of analysis, on the same solved case.
+
+**Time-domain analysis** turns a saved trajectory into curves. **Extract curves**
+opens a picker, **Preview curve** draws one, and the save buttons write out a
+curve or the whole trajectory. **Load trajectory** reads a trajectory from an
+earlier run. **Clear all gnuplot instances** closes any plot windows left open.
+[Running a Simulation](/gui/running/) walks through this.
+
+**Small-signal stability analysis** runs the engine's eigenanalysis at a chosen
+instant. Point it at a results directory, set a basename, the analysis time, a
+real-part limit and a participation-factor threshold, then **Run small-signal
+stability analysis** and **View results**. The dynamic Jacobian can be saved and
+reloaded separately.
+
+This is performed by RAMSES itself.
+[Eigenanalysis](/user-guide/eigenanalysis/) explains the method, the settings and
+what the results mean.
+
+## Codegen
+
+Where a model of your own becomes part of the simulator. **Load files for
+Codegen** takes model descriptions, **Display loaded files** shows them, **Save
+converted files** writes the generated Fortran, and **Save executable** keeps the
+custom simulator that results. Simulations then run on that simulator rather than
+the bundled engine.
+
+[User-Defined Models](/developer/user-models/) is the reference for the model
+language, and [CODEGEN Studio](/developer/cg-studio/) assembles models visually
+instead of by hand.
+
+## The menus
+
+**File** holds **Save configuration** and **Load configuration**, which store the
+whole set of file choices as one file, plus **Open Examples** and **Exit**.
+
+**Tools** holds the working-directory controls (**Select working directory**,
+**Open working folder**, **Open terminal in working folder**), **Open in editor**,
+**Select external simulator**, **Save command file** and **Save observables
+file**, which write out the files a command-line run needs, then **Clear all
+gnuplot instances**, the **Dark theme** toggle and **Check for updates at
+startup**.
+
+The command file that **Save command file** writes is the same one
+`ramses -t` reads, so a case set up here can be handed to the command line
+unchanged. [Quick Start](/getting-started/quickstart/) compares the three ways to
+drive the engines.
+
+## The status bar
+
+The working directory on the left; on the right the engine version and what the
+application is doing. That last field runs from **Idle** through **Solving power
+flow** to **Power flow finished** and **Simulation finished**, each with the
+elapsed time, which is the quickest confirmation that a run actually did
+something.
