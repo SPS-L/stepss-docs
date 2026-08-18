@@ -17,7 +17,7 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
               TOR model_name  param1  param2  ... ;
 ```
 
-This page documents the four governors built into every RAMSES distribution, `CONSTANT`, `1ST_ORDER`, `HYDRO_GENERIC1` and `THERMAL_GENERIC1`, which take no prefix and are written in uppercase.
+This page documents the four governors built into every RAMSES distribution, `CONSTANT`, `1ST_ORDER`, `HYDRO_GENERIC1` and `THERMAL_GENERIC1`, which take no prefix and are written in uppercase, together with `HYDRO_DG`, registered since 3.76.
 
 It also documents `tor_gasturbm`, `tor_govclasm`, `tor_govhydr` and `tor_govnuc`, which are compiled but **registered under no name**, so RAMSES rejects them in a data file. Enabling one means adding a case to the URAMSES router (see the [URAMSES guide](/developer/uramses/)).
 
@@ -278,7 +278,7 @@ The gate is rate-limited by $LIM_{\dot{z}}$ and position-limited by $[0, 1]$, wi
 The flow $Q$ and head $H$ are related by the water-starting time $T_W$:
 
 $$
-T_W \cdot \frac{dQ}{dt} = H - 1
+T_W \cdot \frac{dQ}{dt} = 1 - H
 $$
 
 The head is:
@@ -335,6 +335,97 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 - Increase `KP` / `KI` carefully: large values can cause governor instability with high `TW`.
 - `Qv = 0` assumes no no-load losses.
 - Parameters follow the order in `dyn_A.txt`: `SIGMA TP Qv KP KI TSM LIMZDOT TW`.
+</TabItem>
+</Tabs>
+
+---
+
+## HYDRO_DG (`tor_HYDRO_DG`)
+
+The data-file model name is `HYDRO_DG`. Registered since 3.76.
+
+### Scientific Description
+
+A hydraulic turbine governor for a **dispersed generation unit that holds an active-power
+setpoint and does not provide primary frequency response**.
+
+The penstock and turbine are exactly those of [`HYDRO_GENERIC1`](#hydro_generic1-tor_hydro_generic1).
+What differs is the governor control law, and the difference is the point of the model.
+`HYDRO_GENERIC1` is a **speed governor**: its error signal carries an unconditional frequency
+term, so the unit responds to system frequency whether or not that is wanted. `HYDRO_DG`
+regulates power alone.
+
+**PI power regulator:**
+
+The error is the deviation from the setpoint captured at initialisation, with no droop term
+and no speed term:
+
+$$
+e = P^{*} - P
+$$
+
+$$
+\dot{x}_{I} = K_i \cdot e, \qquad z_{demand} = K_p \cdot e + x_{I}
+$$
+
+There is no measurement lag on $P$, so the regulator acts on the instantaneous electrical
+power. The gate follows through a servo of time constant $T_{sm}$, rate-limited to
+$\pm LIM_{\dot{z}}$ and position-limited to $[0, 1]$.
+
+**Water column and turbine**, identical to `HYDRO_GENERIC1`:
+
+$$
+T_W \cdot \frac{dQ}{dt} = 1 - H, \qquad H = \left(\frac{Q}{z}\right)^{2}
+$$
+
+$$
+T_m \cdot \omega = \frac{(Q - Q_v) \, H}{1 - Q_v}
+$$
+
+**Parameters:**
+
+| Parameter | Index | Description |
+|-----------|-------|-------------|
+| `Qv` | 1 | No-load water flow fraction (pu) |
+| `Kp` | 2 | PI proportional gain |
+| `Ki` | 3 | PI integral gain |
+| `TSM` | 4 | Gate servo time constant (s) |
+| `LIMZDOT` | 5 | Gate velocity limit (pu/s) |
+| `TW` | 6 | Water starting time (s) |
+
+These are exactly parameters 3 to 8 of `HYDRO_GENERIC1`, in the same order. `HYDRO_GENERIC1`
+precedes them with `SIGMA` (droop) and `Tmes` (speed measurement lag), and those two are what
+`HYDRO_DG` does not have. Setting `SIGMA` to zero in `HYDRO_GENERIC1` does **not** reproduce
+`HYDRO_DG`, because the frequency term survives.
+
+**Implementation details:**
+- `nbxvar = 5`, `nbzvar = 2`, `nbdata = 6`, `nbaddpar = 1`
+- Additional: `prm(7) = Pset`, the initial electrical power, captured at initialisation
+- Observables: `z`, `Q`, `H`, `Pm`, `Pset`
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+SYNC_MACH G4  N4 1. 1.  0.  0. 5 4.5 3. 0. 1.9333
+              XT  0.0937  2.027  0.210  0.173  2.027  *  0.173  0.1  6  0.00  3.1  0.0387  *  0.0387
+              EXC AVR_DG  2.865 -0.1  0.  1.  100. -1. -20  10  50  4  20  0.1  0  5
+                          1  0.  5.  1.  1.  1.  1.  0.  0.
+                          0.04  0.06  -0.2  0.33
+              TOR HYDRO_DG  0.0  0.1  0.4  0.2  0.1  1.0 ;
+              !             Qv   Kp   Ki   TSM LIMZDOT TW
+```
+</TabItem>
+<TabItem label="Notes">
+- The setpoint is **not** a parameter. `Pset` is captured from the power-flow solution at
+  initialisation, so the unit holds whatever it was dispatched to.
+- Because there is no frequency term, a system built only of these units has no primary
+  frequency control. That is deliberate for dispersed generation studies, and it is worth
+  being explicit about when interpreting a frequency response.
+- `Qv = 0` assumes no no-load losses.
+- The head relation divides by the gate position, which is floored at 1e-3 in the
+  implementation so a fully closed gate cannot produce a division by zero.
 </TabItem>
 </Tabs>
 

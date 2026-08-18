@@ -17,7 +17,7 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
               TOR model_name  param1  param2  ... ;
 ```
 
-This page documents the exciters that are not IEEE-standard models: `CONSTANT`, `1ST_ORDER`, `GENERIC1` and `GENERIC2` (built in, uppercase, no prefix), plus `kundur` and `GENERIC` (registered, and RAMSES adds the `exc_` prefix automatically).
+This page documents the exciters that are not IEEE-standard models: `CONSTANT`, `1ST_ORDER`, `GENERIC1` and `GENERIC2` (built in, uppercase, no prefix), plus `kundur`, `GENERIC` and `AVR_DG` (registered, and RAMSES adds the `exc_` prefix automatically).
 
 The IEEE-standard exciters are on the [IEEE Exciter Models](/models/ieee-exciters/) page. For the whole catalogue at a glance, including which models are compiled but not callable by name, see the [Model Reference index](/models/).
 :::
@@ -293,6 +293,85 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
                             ! SPEEDIN KPSS  Tw    T1    T2    T3    T4    DVMIN  DVMAX
               TOR CONSTANT ;
 ```
+</TabItem>
+</Tabs>
+
+---
+
+## AVR_DG (`exc_AVR_DG`)
+
+The data-file model name is `AVR_DG`. Registered since 3.76.
+
+### Scientific Description
+
+An AVR for **dispersed generation**: the [`GENERIC1`](#generic1-exc_generic1) excitation
+system, OEL and PSS, plus a **reactive-power PI controller** that trims the voltage
+reference so the unit holds a reactive-power setpoint.
+
+Parameters 1 to 23 are those of `GENERIC1`, in the same positions and with the same
+meanings, and the AVR, PSS and OEL behave identically. Only the summing junction changes,
+gaining a third contribution:
+
+$$
+e = V_{ref} - V + \Delta V_{PSS} + \Delta V_{Q}
+$$
+
+**Reactive-power regulator:**
+
+The error is the deviation from the setpoint captured at initialisation:
+
+$$
+\dot{x}_{Q} = K_{QI} \left(Q^{*} - Q\right), \qquad
+\Delta V_{Q} = K_{QP} \left(Q^{*} - Q\right) + x_{Q}
+$$
+
+clamped to $[L_5,\, L_6]$. Setting $K_{QP} = K_{QI} = 0$ leaves the loop dormant and the
+model reduces to `GENERIC1`.
+
+**Parameters:**
+
+Indices 1 to 23 are exactly those of [`GENERIC1`](#generic1-exc_generic1). The four that
+follow are new:
+
+| Index | Name | Description |
+|-------|------|-------------|
+| 24 | `KQP` | Reactive-power regulator proportional gain |
+| 25 | `KQI` | Reactive-power regulator integral gain |
+| 26 | `L5` | Regulator output lower limit (pu) |
+| 27 | `L6` | Regulator output upper limit (pu) |
+
+**Implementation details:**
+- `nbxvar = 8`, `nbzvar = 7`, `nbdata = 27`, `nbaddpar = 2`
+- Additional: `prm(28) = V0` (voltage reference) and `prm(29) = Qset`, both captured at
+  initialisation
+- Observables: those of `GENERIC1` plus `deltavq` and `Qset`
+
+### Usage Example
+
+<Tabs>
+<TabItem label="RAMSES Data File">
+```
+SYNC_MACH G4  N4 1. 1.  0.  0. 5 4.5 3. 0. 1.9333
+              XT  0.0937  2.027  0.210  0.173  2.027  *  0.173  0.1  6  0.00  3.1  0.0387  *  0.0387
+              EXC AVR_DG  2.865 -0.1  0.  1.  100. -1. -20  10  50  4  20  0.1  0  5
+                          ! IFLIM  d    fc   S   K1   K2   L1  L2  G  TA  TB  TE  L3 L4
+                          1  0.  5.  1.  1.  1.  1.  0.  0.
+                          ! SPEEDIN KPSS Tw  T1  T2  T3  T4  DVMIN DVMAX
+                          0.04  0.06  -0.2  0.33
+                          ! KQP   KQI    L5    L6
+              TOR HYDRO_DG  0.0  0.1  0.4  0.2  0.1  1.0 ;
+```
+</TabItem>
+<TabItem label="Notes">
+- The setpoint is **not** a parameter. `Qset` is captured from the power-flow solution at
+  initialisation, so the unit holds whatever reactive power it was dispatched at.
+- With `KQP` and `KQI` non-zero the unit regulates reactive power rather than terminal
+  voltage, which is the usual arrangement for dispersed generation connected to a
+  distribution network under a connection agreement.
+- `KPSS = 0` disables the stabiliser. Note that this drives the PSS branch to its lower
+  limit, so `DVMIN` should be 0 as well, as in the example above.
+- Pair it with [`HYDRO_DG`](/models/custom-governors/#hydro_dg-tor_hydro_dg) for a unit that
+  regulates both its active and reactive power and provides no primary frequency response.
 </TabItem>
 </Tabs>
 

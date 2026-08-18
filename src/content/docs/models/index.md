@@ -38,6 +38,7 @@ cannot be enabled through URAMSES either.
 | `GENERIC1`, `GENERIC2` | Built in | [Custom Exciters](/models/custom-exciters/) |
 | `GENERIC` | Registered, since 3.57 | [Custom Exciters](/models/custom-exciters/) |
 | `kundur` | Registered | [Custom Exciters](/models/custom-exciters/) |
+| `AVR_DG` | Registered, since 3.76 | [Custom Exciters](/models/custom-exciters/) |
 | `AC1A`, `AC4A`, `IEEET5` | Registered | [IEEE Exciters](/models/ieee-exciters/) |
 | `ST1A`, `ST1A_IEEEST`, `ST1A_PSS2B`, `ST1A_PSS4B` | Registered | [IEEE Exciters](/models/ieee-exciters/) |
 | `SEXS`, `SEXS_IEEEST` | Registered | [IEEE Exciters](/models/ieee-exciters/) |
@@ -53,6 +54,7 @@ cannot be enabled through URAMSES either.
 |----------------|-------|---------------|
 | `CONSTANT`, `1ST_ORDER` | Built in | [Custom Governors](/models/custom-governors/) |
 | `HYDRO_GENERIC1`, `THERMAL_GENERIC1` | Built in | [Custom Governors](/models/custom-governors/) |
+| `HYDRO_DG` | Registered, since 3.76 | [Custom Governors](/models/custom-governors/) |
 | `DEGOV1`, `ENTSOE_simp` | Registered, since 3.40 | [IEEE Governors](/models/ieee-governors/) |
 | `GAST`, `TGOV1`, `HYGOV` | Registered, since 3.50 | [IEEE Governors](/models/ieee-governors/) |
 | `tor_gasturbm`, `tor_govclasm`, `tor_govhydr`, `tor_govnuc` | Not registered | [Custom Governors](/models/custom-governors/) |
