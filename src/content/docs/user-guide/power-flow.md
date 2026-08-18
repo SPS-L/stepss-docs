@@ -413,6 +413,44 @@ The following table summarises which records are used by the power flow and by R
 | PSHIFT-P | Used | Ignored |
 | BUSPART, BRAPART | Used for reporting | Ignored |
 
+## Annotated One-line Diagram
+
+Helios can render a solved case onto an SVG drawing of the network instead of, or alongside, reading the same numbers off a table.
+
+A **template** is an SVG file with placeholder codes typed into its text elements as plain text. Any general-purpose SVG editor works: Helios finds a placeholder by its text content when it renders, not by any tool-specific metadata. A placeholder is a code letter directly followed by its argument, with no space, so `%A` (bus voltage magnitude) applied to bus `E` is written `%AE`. A branch code takes the branch name and the bus end separated by a comma: `%D` (P flow) on branch `D-E` at its `E` end is `%DD-E,E`.
+
+| Code | Argument | Value |
+|---|---|---|
+| `%A` | bus | voltage magnitude (pu) |
+| `%B` | bus | voltage (kV) |
+| `%C` | bus | angle (degrees) |
+| `%D` | branch, bus | P flow at that bus end (MW) |
+| `%E` | branch, bus | Q flow at that bus end (Mvar) |
+| `%F` | branch | loading fraction |
+| `%G` | generator | P (MW) |
+| `%H` | bus | shunt Q (Mvar) |
+| `%J` | transformer | tap position |
+| `%K` | generator | Q (Mvar) |
+| `%L` | SVC | Q (Mvar) |
+| `%R` | bus | load P (MW) |
+| `%S` | bus | load Q (Mvar) |
+| `%T` | branch | breaker status, blank or `X` |
+| `%U` | generator | breaker status, blank or `X` |
+
+:::caution[Codes that are not supported]
+`%I` and `%M` through `%Q` are recognised but not implemented: they need zone and sensitivity data the model does not carry, and render as the literal word `unknown`. They are documented here, not omitted, so that a code written into a template by mistake has something explaining the `unknown` it produces rather than nothing.
+:::
+
+The `1` command of the [interactive menu](#interactive-menu-commands) runs this substitution from the TUI. From Python, `pf.write_diagram('template.svg', 'diagram.svg')` does the same; see [Power Flow with Helios](/python/helios/).
+
+### In STEPSS GUI
+
+The template is an optional third slot on the *System Data* tab, alongside the data and disturbance files (the disturbance file on that tab is optional too, which is what makes a power-flow-only case a normal thing to load). Its button opens the named file in the platform's default SVG viewer or editor, for authoring or checking placeholders.
+
+Every **Run Power Flow** renders the template with the solved values and opens the result in a window of its own. Each run opens a new window, offset from the last one, so two runs can be compared side by side. The window supports zoom and pan (mouse wheel to zoom at the pointer, drag to pan, Fit and 100% buttons, double-click to fit) and Save as PNG or Save as SVG; Save as PNG saves the whole diagram, not only what is currently in view. A run that does not converge still opens a window, with a banner carrying the same status the main window's status bar shows.
+
+**Worked example:** [SPS-L/stepss-6-bus-MG](https://github.com/SPS-L/stepss-6-bus-MG), bundled in STEPSS GUI under *File > Open Examples*, ships `6bus.svg`, a template carrying these placeholder codes; Run Power Flow fills it in with the solved voltages, angles and flows.
+
 ## Next Steps
 
 - [Reference Frames & Initialization](/user-guide/reference-frames/), Understand how RAMSES initializes from the power flow solution
