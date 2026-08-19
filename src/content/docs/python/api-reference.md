@@ -260,7 +260,9 @@ All output/trace files are optional.
 
 ### Runtime Observables
 
-Runtime observables are displayed live during simulation using Gnuplot.
+Runtime observables are recorded by the engine while a simulation runs, into a
+curve file you can read with `cur` and plot with `curplot`. Nothing has to be
+installed for this.
 
 #### `addRunObs(obs_string)`
 
@@ -313,8 +315,11 @@ Remove all runtime observables.
 case.clearRunObs()
 ```
 
-:::caution
-Gnuplot must be installed and available in the system PATH for runtime observables to work.
+:::note
+Nothing needs to be installed. Before RAMSES v3.77 the engine drew these curves
+itself by piping to Gnuplot, so Gnuplot had to be on the `PATH` and
+`addRunObs()` silently did nothing without it. The engine now writes the curve
+file and calls nothing.
 :::
 
 ---
@@ -914,7 +919,7 @@ case.addOut('output.trace')
 case.addCont('cont.trace')
 case.addDisc('disc.trace')
 
-# Runtime observables (Gnuplot required)
+# Runtime observables, recorded by the engine into a curve file
 case.addRunObs('BV 1041')
 case.addRunObs('MS g1')
 case.addRunObs('RT RT')

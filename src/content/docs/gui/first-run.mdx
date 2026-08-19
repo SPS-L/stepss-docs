@@ -88,18 +88,23 @@ Set either from the **Tools** menu, which also offers **Open working folder** an
 An example is copied rather than run in place, so editing it is safe and the
 copy survives quitting. That is the point of copying: work on it freely.
 
-## Real-time plotting needs gnuplot
+## Real-time plotting needs nothing installed
 
 STEPSS GUI can plot curves while a simulation runs, which is covered on
-[The Interface](/gui/interface/). It draws them with gnuplot, and if gnuplot is
-not found the window says so on startup and real-time plotting is disabled. The
-rest of the application is unaffected, and trajectories can still be plotted
-after a run.
+[The Interface](/gui/interface/). It draws them itself, so there is nothing to
+install on any platform and no external plotting program involved.
 
-Windows carries its own copy and needs nothing. On Linux and macOS, see
-[the note on the installation page](/getting-started/installation/#installing-stepss-gui),
-which gives the package to install and explains why the plain `gnuplot` package
-is the wrong one on Linux.
+Earlier versions drew these curves with gnuplot, which had to be present on
+Linux and macOS and was bundled on Windows. That is no longer the case: gnuplot
+is neither required nor shipped. If you have a script or a habit built around
+the bundled copy, note that it is gone.
+
+The one thing run-time curves do need is a recent engine. They read a short
+header that RAMSES writes at the top of its observable file to say which column
+belongs to which observable, and an engine older than that header cannot be
+read: the window says so plainly rather than guessing. Extracting curves after
+a run is unaffected, because that path reads DYNGRAPH's output, which needs no
+header.
 
 :::caution[Could not prepare the simulation toolchain]
 The engines ship inside the application and are unpacked to a temporary

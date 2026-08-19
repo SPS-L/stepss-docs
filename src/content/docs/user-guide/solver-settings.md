@@ -25,7 +25,9 @@ $DISP_PROF T/F ;
 
 ### Run-Time Refresh Rate
 
-Refresh interval for runtime observable plots (requires Gnuplot):
+How often the engine flushes the run-time observable file, in seconds. A reader
+watching that file, such as STEPSS GUI's run-time curve window, polls at this
+rate, so it is also how often those curves advance:
 
 ```
 $GP_REFRESH_RATE time_interval(s) ;
@@ -33,17 +35,23 @@ $GP_REFRESH_RATE time_interval(s) ;
 
 ### Gnuplot Invocation
 
-Enable or disable launching Gnuplot for runtime observables. When set to `F`, the runtime observable data are still written to file but Gnuplot is never called; useful for batch/headless runs:
+Whether the engine drives Gnuplot itself through a pipe. **From RAMSES v3.77 the
+default is `F`**, and nothing in STEPSS relies on it any more: the engine writes
+the observable file and the `.plt` script beside it, and the interfaces draw
+their own curves. `$CALL_GP T` still restores the old piped behaviour for this
+release cycle, and requires Gnuplot on the `PATH`, which is no longer shipped
+with STEPSS.
 
 ```
 $CALL_GP T/F ;
 ```
 
-Default: `T`.
+Default: `F`, as of RAMSES v3.77. It was `T` in earlier versions.
 
 ### Gnuplot Output Mode
 
-Select whether runtime observables are displayed in an interactive terminal window or written to PNG image files:
+Which terminal the `.plt` script names, for anyone who opens that script in
+Gnuplot themselves. It has no effect on the curves STEPSS draws:
 
 ```
 $GP_MODE term/png ;

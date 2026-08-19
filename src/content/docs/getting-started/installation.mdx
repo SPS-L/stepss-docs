@@ -20,7 +20,7 @@ STEPSS GUI comes two ways: an **installer**, which needs nothing else on the mac
 :::note[Which Linux]
 **Debian and Ubuntu are the Linux distributions STEPSS is packaged for**, from Ubuntu 24.04 and its Debian contemporary onwards, on x86-64. That is what the `.deb` and the APT repository are built and tested against, and no package is produced for any other distribution or architecture.
 
-On anything else, including older Debian and Ubuntu releases, use **`stepss.jar`**. It needs a 64-bit Java 11 or later and gnuplot from your own package manager, and it carries the same engines. It is not tested there, but nothing in it is Debian-specific.
+On anything else, including older Debian and Ubuntu releases, use **`stepss.jar`**. It needs a 64-bit Java 11 or later and nothing else, and it carries the same engines. It is not tested there, but nothing in it is Debian-specific.
 :::
 
 <Tabs>
@@ -41,7 +41,7 @@ The installers bundle a Java runtime, so **nothing else needs installing** and a
 
 </Steps>
 
-On Linux, install the `.deb` with `sudo apt install ./stepss_<version>_amd64.deb` rather than `dpkg -i`, so that the packages it needs, gnuplot among them, are pulled in with it. It requires **Ubuntu 24.04 or newer**, or a Debian of the same vintage or later; on an older release, use the jar.
+On Linux, install the `.deb` with `sudo apt install ./stepss_<version>_amd64.deb` rather than `dpkg -i`, so that the libraries it needs are pulled in with it. It requires **Ubuntu 24.04 or newer**, or a Debian of the same vintage or later; on an older release, use the jar.
 
 Uninstall the way you would any other application on your system: Add or Remove Programs on Windows, dragging it to the Trash on macOS, `sudo apt remove stepss` on Debian and Ubuntu.
 
@@ -156,7 +156,7 @@ The jar is a single file that leaves nothing behind: it unpacks what it needs in
 
 </Steps>
 
-The jar is the one route that installs nothing alongside itself, so real-time plotting needs gnuplot put there by hand. On Linux that is `sudo apt install gnuplot-x11` (not plain `gnuplot`, which can resolve to a build with no interactive terminal), on macOS `brew install gnuplot`; Windows carries its own copy inside the jar and needs nothing.
+The jar installs nothing alongside itself and needs nothing installed for plotting: STEPSS draws its own curves, during a run and after one. Earlier versions needed gnuplot here, on Linux and macOS by hand and bundled on Windows, and no longer do.
 
 </TabItem>
 </Tabs>
@@ -171,7 +171,7 @@ pip install stepss
 
 That one command brings the engines with it: the package carries pre-compiled RAMSES and Helios binaries for Windows, Linux and macOS, so there is nothing to install alongside it and nothing to point it at. Trajectory plotting is built in, on top of Matplotlib, in place of the DYNGRAPH viewer the GUI launches.
 
-Two things it does not do for you, both covered by the [Python API Installation Guide](/python/installation/): on Linux and macOS the bundled binaries link against system runtime libraries (OpenBLAS, the gfortran and OpenMP runtimes) that your machine may not already have, and real-time plotting during a simulation wants gnuplot on your `PATH`. That page also covers version pinning, which is how you fix the engine version a script runs against.
+Two things it does not do for you, both covered by the [Python API Installation Guide](/python/installation/): on Linux and macOS the bundled binaries link against system runtime libraries (OpenBLAS, the gfortran and OpenMP runtimes) that your machine may not already have, and plotting observables while a run proceeds is your own loop over the curve file the engine writes, rather than something the package does for you. That page also covers version pinning, which is how you fix the engine version a script runs against.
 
 :::note[CODEGEN is not in this edition]
 `stepss` bundles RAMSES and Helios, not CODEGEN, so **writing your own models needs STEPSS GUI** or the toolchain below. Running a model someone else compiled works from either edition. [Two Editions](/getting-started/overview/#two-editions) sets out what each one carries.

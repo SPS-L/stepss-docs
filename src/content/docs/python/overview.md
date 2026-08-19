@@ -15,7 +15,7 @@ After importing the package, the following attributes are available:
 | `stepss.__ramses_version__` | Version of the bundled RAMSES library |
 | `stepss.__helios_version__` | Version of the bundled Helios library |
 | `stepss.__url__` | Documentation URL |
-| `stepss.__runTimeObs__` | `True` if Gnuplot was found in PATH at import time; runtime observables will be active |
+| `stepss.__runTimeObs__` | Always `True`, and deprecated. It used to report whether Gnuplot was on the `PATH`; run-time observables no longer depend on anything being installed |
 
 ## Main Classes
 

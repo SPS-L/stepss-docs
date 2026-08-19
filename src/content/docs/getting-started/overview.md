@@ -73,7 +73,7 @@ Neither edition wraps the other. Both are front ends onto the same Fortran
 engines, so a case built in one runs unchanged in the other.
 
 They do not carry identical toolchains. The GUI bundles all three modules plus
-the DYNGRAPH trajectory viewer and gnuplot. `stepss` bundles RAMSES and Helios,
+the DYNGRAPH trajectory extractor. `stepss` bundles RAMSES and Helios,
 so **CODEGEN is the one capability it lacks**: writing your own models needs the
 GUI, or the [CODEGEN toolchain](/developer/user-models/) directly.
 

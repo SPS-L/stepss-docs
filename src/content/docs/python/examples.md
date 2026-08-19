@@ -22,7 +22,7 @@ case.addTrj('output.trj')        # save trajectories for post-processing
 case.addObs('obs.dat')           # define which observables to record
 case.addCont('cont.trace')
 case.addDisc('disc.trace')
-case.addRunObs('BV 4044')        # live voltage display (requires Gnuplot)
+case.addRunObs('BV 4044')        # record bus voltage while the run proceeds
 case.addRunObs('BV 1041')
 case.writeCmdFile('cmd.txt')     # save for future reuse
 
