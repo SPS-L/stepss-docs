@@ -63,6 +63,13 @@ Use the **Type** dropdown in the topbar to select the model category:
 | **INJ** | Current injector | `ix`, `iy` | Orange |
 | **TWOP** | Two-port device | `ix1`, `iy1`, `ix2`, `iy2` | Purple |
 
+**New** in the topbar asks for the type before it clears the canvas, so a fresh
+model starts with the right RAMSES inputs and outputs already seeded.
+
+<img src="/images/screenshots/cg-studio-new-model.png"
+     alt="The New Model dialog over the editor. It asks whether to discard the current model and create a new one, and offers a Model type drop-down set to Excitation controller (exc), with Create and Cancel buttons."
+     class="shot-single" />
+
 The UI accent colour changes to reflect the active model type. Type the model name (max 20 characters, the limit CODEGEN itself enforces) in the **Name** field next to the dropdown.
 
 :::note[Model type determines available inputs]
@@ -122,9 +129,17 @@ Click a block on the canvas to select it. The **Block Inspector** (right panel) 
 
 The `algeq` (algebraic equation) block has a special **Expression** field for the equation set to zero.
 
+<img src="/images/screenshots/cg-studio-inspector.png"
+     alt="The CODEGEN Studio editor with a bus frequency estimator block selected on the canvas. The right panel's inspector is headed BUS FREQUENCY ESTIMATOR and holds an editable output signal field set to fbus, an argument field holding the data reference for the measurement time constant, and a comment field, above the live DSL preview."
+     class="shot-single" />
+
 ### 5. Fill in the Metadata Tables
 
 The four tabs below the canvas correspond to the four metadata sections of a CODEGEN DSL file:
+
+<img src="/images/screenshots/cg-studio-parameters.png"
+     alt="The %parameters tab of the metadata panel below the canvas, on the vfd_load injector. Each row holds a name, the Fortran expression it is defined by and a comment, with a delete button at the right of every row."
+     class="shot-single" />
 
 <Tabs>
 <TabItem label="%data">
@@ -241,6 +256,21 @@ The backend parser extracts all sections and blocks from the file, and the edito
    - Feedback loops are detected and handled gracefully
 
 This lets you visually inspect and edit any existing CODEGEN model, including the [example models](/developer/codegen-examples/).
+
+---
+
+## Checking the Model
+
+The **&#10003;** button on the canvas toolbar runs every structural check at
+once, without waiting for an export. Its findings go to the **Issues** panel in
+the right sidebar, which stays there rather than appearing as a dialog, so the
+list can be worked through while the canvas is edited. A model with nothing
+wrong reports that too, which is the useful half: it is the confirmation that
+the two export gates below will not stop you.
+
+<img src="/images/screenshots/cg-studio-check.png"
+     alt="The CODEGEN Studio editor after pressing the check button on the canvas toolbar. The Issues panel at the foot of the right sidebar is expanded and reads NO ISSUES, no issues found, for the loaded vfd_load injector."
+     class="shot-single" />
 
 ---
 

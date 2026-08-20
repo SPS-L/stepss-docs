@@ -26,12 +26,19 @@ worth knowing before you build a large case.
 caps and which component each applies to. Read it there rather than inferring
 them from the dialog.
 
+<img src="/images/screenshots/gui-license-light.png"
+     alt="The License Agreement dialog on first launch. It is headed License Agreement, RAMSES simulation engine, University of Liege, and the scrolling panel below shows the RAMSES licence beginning with the University of Liege copyright and the statement that RAMSES is not covered by the Apache License 2.0 that governs the STEPSS user interfaces. A line at the foot points to Help then About for the other components' licences, beside Decline and Accept buttons."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-license-dark.png"
+     alt="The License Agreement dialog on first launch. It is headed License Agreement, RAMSES simulation engine, University of Liege, and the scrolling panel below shows the RAMSES licence beginning with the University of Liege copyright and the statement that RAMSES is not covered by the Apache License 2.0 that governs the STEPSS user interfaces. A line at the foot points to Help then About for the other components' licences, beside Decline and Accept buttons."
+     class="light:sl-hidden" />
+
 You accept once. Later launches go straight to the window.
 
 ## Start from a bundled example
 
 The fastest way to see STEPSS work is not to load anything of your own. The
-application ships three complete test systems, and opening one copies it to disk
+application ships four complete test systems, and opening one copies it to disk
 and fills in every file slot, so **Run** works immediately.
 
 <Steps>
@@ -48,29 +55,40 @@ and fills in every file slot, so **Run** works immediately.
 </Steps>
 
 <img src="/images/screenshots/gui-open-examples-light.png"
-     alt="The Open Examples dialog. A list on the left offers Kundur two-area, IEEE Nordic and the 5-bus tutorial; the panel on the right describes the selected Kundur case, its 11 buses and 4 machines, and the load step its disturbance applies. Buttons below offer Open example and Documentation."
+     alt="The Open Examples dialog. A list on the left offers Kundur two-area, IEEE Nordic, the 5-bus tutorial and the 6-bus microgrid; the panel on the right describes the selected Kundur case, its 11 buses and 4 machines, and the load step its disturbance applies. Buttons below offer Open example and Documentation, and a Show this at startup tick sits at the foot."
      class="dark:sl-hidden" />
 <img src="/images/screenshots/gui-open-examples-dark.png"
-     alt="The Open Examples dialog. A list on the left offers Kundur two-area, IEEE Nordic and the 5-bus tutorial; the panel on the right describes the selected Kundur case, its 11 buses and 4 machines, and the load step its disturbance applies. Buttons below offer Open example and Documentation."
+     alt="The Open Examples dialog. A list on the left offers Kundur two-area, IEEE Nordic, the 5-bus tutorial and the 6-bus microgrid; the panel on the right describes the selected Kundur case, its 11 buses and 4 machines, and the load step its disturbance applies. Buttons below offer Open example and Documentation, and a Show this at startup tick sits at the foot."
      class="light:sl-hidden" />
 
 A banner across the top of the window then reports where the copy landed, with an
-**Open folder** button to reveal it.
+**Open folder** button to reveal it, and **Dismiss** to put it away. Behind it
+every file slot is already filled in.
+
+<img src="/images/screenshots/gui-example-banner-light.png"
+     alt="The System Data tab immediately after opening the Kundur two-area example. A banner across the top reads Kundur two-area opened in, followed by the path under the examples directory, with Open folder and Dismiss at its right. Below it the first three system data rows hold lf.dat, dyn.dat and solveroptions.dat, the disturbance row holds disturb.dst, and the one-line diagram row holds kundur.svg."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-example-banner-dark.png"
+     alt="The System Data tab immediately after opening the Kundur two-area example. A banner across the top reads Kundur two-area opened in, followed by the path under the examples directory, with Open folder and Dismiss at its right. Below it the first three system data rows hold lf.dat, dyn.dat and solveroptions.dat, the disturbance row holds disturb.dst, and the one-line diagram row holds kundur.svg."
+     class="light:sl-hidden" />
 
 The dialog appears on startup by default. Clear **Show this at startup** to stop
 that, and reach it from **File, Open Examples** whenever you want it back.
 
-## The three bundled systems
+## The four bundled systems
 
 | System | Size | What it is for |
 |---|---|---|
 | [5-bus tutorial](/test-systems/5bus/) | 5 buses, 1 machine | The teaching case from EEN452 at the Cyprus University of Technology, and the one to open first. One generator with detailed machine, governor and AVR models, a composite load, and an external grid, small enough to read end to end. Its disturbance file is deliberately empty, ready for you to add the records of the study you want. |
 | [Kundur two-area](/test-systems/kundur/) | 11 buses, 4 machines, 60 Hz | The standard benchmark for inter-area oscillations. Two symmetric areas joined by a weak tie. The shipped disturbance steps a load and the resulting inter-area mode is the object of the study. A second dynamic file with the stabiliser disabled ships beside the first, so the same run can be repeated with the PSS out and the damping compared. |
 | [IEEE Nordic](/test-systems/nordic/) | 74 buses, 20 machines, 400/220/130 kV | The reference system for long-term voltage stability, from IEEE PES technical report PES-TR19. It opens on the tripped-branch case it is best known for, with further disturbances, a second operating point and a set of load-increase variants shipped alongside. |
+| 6-bus microgrid | 6 buses, 2 generators, 6/11 kV | A power-flow-only case: two lines, four transformers, loads at buses D and E, and generators at A (slack) and F. It carries no dynamic data and no disturbance scenario, so it runs on **Power Flow Simulation** and not on **Dynamic Simulation**. It is the case the [annotated one-line diagram](/user-guide/power-flow/#annotated-one-line-diagram) is demonstrated with: `6bus.svg` is a template of placeholder codes that **Run power flow** fills in with the solved values. |
 
-Each links to its own page here, which carries the network, the models and the
-studies the system is used for. **Documentation** in the dialog opens the same
-system's source repository.
+The first three link to their own page here, which carries the network, the
+models and the studies the system is used for; the microgrid has no page of its
+own, because everything it demonstrates belongs to
+[Power Flow](/user-guide/power-flow/). **Documentation** in the dialog opens the
+system's source repository in every case.
 
 ## Where the files go
 
@@ -93,6 +111,18 @@ copy survives quitting. That is the point of copying: work on it freely.
 STEPSS GUI plots curves while a simulation runs, which is covered on
 [The Interface](/gui/interface/). It draws them itself: nothing has to be
 installed on any platform, and no external plotting program is involved.
+
+Each runtime observable you filled in gets a panel of its own, stacked on a
+shared time axis, and the window keeps drawing until the run ends. **Save
+PNG** and **Save CSV** keep the picture or the samples behind it, and **Reset
+zoom** returns to the full horizon after a drag.
+
+<img src="/images/screenshots/gui-runtime-curves-light.png"
+     alt="The Run-time curves window at the end of a Kundur run, titled Run-time curves (finished). Two stacked panels share a time axis running to 60 seconds: Machine G1 speed in per unit on top, dipping at the load step and settling just below 0.9996, and the voltage of bus 9 below it, dipping to 0.957 and recovering towards 0.965. Save PNG, Save CSV and Reset zoom sit above them, and the foot reads 6004 samples."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-runtime-curves-dark.png"
+     alt="The Run-time curves window at the end of a Kundur run, titled Run-time curves (finished). Two stacked panels share a time axis running to 60 seconds: Machine G1 speed in per unit on top, dipping at the load step and settling just below 0.9996, and the voltage of bus 9 below it, dipping to 0.957 and recovering towards 0.965. Save PNG, Save CSV and Reset zoom sit above them, and the foot reads 6004 samples."
+     class="light:sl-hidden" />
 
 Run-time curves need a RAMSES release that writes a column map into the header
 of its observable file. Against an engine that does not, the window says so

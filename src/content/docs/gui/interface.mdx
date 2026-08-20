@@ -3,6 +3,8 @@ title: The Interface
 description: What each tab of STEPSS GUI is for, the menus around them, and what the status bar reports
 ---
 
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
 The window is six tabs, and you use them roughly left to right: name the files,
 choose what to record, solve the initial operating point, run the simulation,
 then analyse the result. The sixth builds your own models.
@@ -20,15 +22,22 @@ Each row has a **Load file** button and a pencil that opens the file in an
 editor. **Clear files** empties the tab.
 
 <img src="/images/screenshots/gui-system-data-light.png"
-     alt="The System Data tab with the Kundur two-area case loaded. Rows one to three hold the load flow, dynamic data and solver options files; rows four to ten are empty. Below them a disturbance file row, marked optional, holds disturb.dst, and an empty row offers a one-line diagram annotated SVG."
+     alt="The System Data tab with the Kundur two-area case loaded. Rows one to three hold the load flow, dynamic data and solver options files; rows four to ten are empty. Below them a disturbance file row, marked optional, holds disturb.dst, and a third group, the optional one-line diagram annotated SVG, holds kundur.svg."
      class="dark:sl-hidden" />
 <img src="/images/screenshots/gui-system-data-dark.png"
-     alt="The System Data tab with the Kundur two-area case loaded. Rows one to three hold the load flow, dynamic data and solver options files; rows four to ten are empty. Below them a disturbance file row, marked optional, holds disturb.dst, and an empty row offers a one-line diagram annotated SVG."
+     alt="The System Data tab with the Kundur two-area case loaded. Rows one to three hold the load flow, dynamic data and solver options files; rows four to ten are empty. Below them a disturbance file row, marked optional, holds disturb.dst, and a third group, the optional one-line diagram annotated SVG, holds kundur.svg."
      class="light:sl-hidden" />
 
 Order does not matter and the rows need not be filled contiguously. Which files a
 case needs depends on the study: a network description, dynamic component data
 and solver settings are the usual three.
+
+The last row takes an **annotated SVG one-line diagram**, a drawing of the
+network with placeholder codes typed into it. Every **Run power flow** fills
+those codes in with the solved values and opens the result in a window of its
+own;
+[Annotated One-line Diagram](/user-guide/power-flow/#annotated-one-line-diagram)
+owns the codes and the authoring.
 
 ## Observables
 
@@ -74,6 +83,21 @@ because it is what says which quantities the trajectory should contain.
 and the eight equipment types it accepts. **Show observable dialog** builds one
 interactively instead of writing it by hand.
 
+Ticking it opens eight rows under the tab, one per equipment type. Name a piece
+of equipment and **Add** puts it on that row's list, **All** takes every one of
+that type in the case, and the list beside it is what will be recorded.
+
+<img src="/images/screenshots/gui-observable-picker-light.png"
+     alt="The Observables tab with Show observable dialog ticked. Eight rows appear below it, one each for buses, shunts, impedance loads, branches, synchronous machines, injectors, two-port injectors and discrete controllers. Every row has a name field, an Add button, an All tick, a drop-down of what has been chosen and a Remove button. Bus 9 has been added on the Buses row and machine G1 on the synchronous machines row."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-observable-picker-dark.png"
+     alt="The Observables tab with Show observable dialog ticked. Eight rows appear below it, one each for buses, shunts, impedance loads, branches, synchronous machines, injectors, two-port injectors and discrete controllers. Every row has a name field, an Add button, an All tick, a drop-down of what has been chosen and a Remove button. Bus 9 has been added on the Buses row and machine G1 on the synchronous machines row."
+     class="light:sl-hidden" />
+
+The eight lists are session state and are not written into a saved
+configuration, so a case saved with the box ticked comes back needing them
+filled in again.
+
 ## Power Flow Simulation
 
 Where the power flow is solved, giving the operating point the dynamic simulation
@@ -102,6 +126,58 @@ Seven buttons enable once a run succeeds:
      alt="The Power Flow Simulation tab after a successful run on the Kundur case. The pane shows the Helios log: three data files loaded, status CONVERGED in one iteration, and six result files exported. The inspection buttons below, Bus overview, Branch flows, Generators and SVCs, Adjustable transformers and Global power balance, are enabled, and the status bar reads Power flow finished, 3.0 s."
      class="light:sl-hidden" />
 
+Each of the four inspection buttons writes its table into the same pane, so the
+run's log and the answer you asked for stay in one place.
+
+<Tabs>
+<TabItem label="Bus overview">
+<img src="/images/screenshots/gui-bus-overview-light.png"
+     alt="The Power Flow Simulation pane showing the bus overview for the Kundur case. Each bus is a block giving its voltage in per unit, its angle in degrees and its voltage in kilovolts, followed by one indented line per branch, shunt and load at that bus with the P and Q flowing into it and the bus at the other end."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-bus-overview-dark.png"
+     alt="The Power Flow Simulation pane showing the bus overview for the Kundur case. Each bus is a block giving its voltage in per unit, its angle in degrees and its voltage in kilovolts, followed by one indented line per branch, shunt and load at that bus with the P and Q flowing into it and the bus at the other end."
+     class="light:sl-hidden" />
+</TabItem>
+<TabItem label="Branch flows">
+<img src="/images/screenshots/gui-branch-flows-light.png"
+     alt="The Power Flow Simulation pane showing branch flows for the Kundur case. Each branch is a pair of lines carrying P and Q at each end, the bus at that end, and a loss line giving the series and shunt losses and the loading as a percentage of rated MVA."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-branch-flows-dark.png"
+     alt="The Power Flow Simulation pane showing branch flows for the Kundur case. Each branch is a pair of lines carrying P and Q at each end, the bus at that end, and a loss line giving the series and shunt losses and the loading as a percentage of rated MVA."
+     class="light:sl-hidden" />
+</TabItem>
+<TabItem label="Generators & SVCs">
+<img src="/images/screenshots/gui-generators-svcs-light.png"
+     alt="The Power Flow Simulation pane showing the generator table for the Kundur case. Columns give status, P, Q, V, the deviation from the imposed voltage, and the reactive and active limits. All four machines are on PV control: G1 at 700.1 MW and 185.0 Mvar, G2 at 700.0 and 234.6, G3 at 719.0 and 176.0, and G4 at 700.0 and 202.0, none of them on a limit."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-generators-svcs-dark.png"
+     alt="The Power Flow Simulation pane showing the generator table for the Kundur case. Columns give status, P, Q, V, the deviation from the imposed voltage, and the reactive and active limits. All four machines are on PV control: G1 at 700.1 MW and 185.0 Mvar, G2 at 700.0 and 234.6, G3 at 719.0 and 176.0, and G4 at 700.0 and 202.0, none of them on a limit."
+     class="light:sl-hidden" />
+</TabItem>
+<TabItem label="Global power balance">
+<img src="/images/screenshots/gui-power-balance-light.png"
+     alt="The Power Flow Simulation pane showing the global power balance for the Kundur case, in MW and Mvar. Load totals 2734.0 MW and 200.0 Mvar; generation totals 2819.1 MW and 797.7 Mvar, split into 700.1 MW at the slack bus and 2119.0 MW elsewhere; bus shunts supply 515.0 Mvar; and network losses are 85.10 MW and 1112.67 Mvar, the reactive part split into 1195.22 in the series elements and minus 82.55 in the shunt ones."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-power-balance-dark.png"
+     alt="The Power Flow Simulation pane showing the global power balance for the Kundur case, in MW and Mvar. Load totals 2734.0 MW and 200.0 Mvar; generation totals 2819.1 MW and 797.7 Mvar, split into 700.1 MW at the slack bus and 2119.0 MW elsewhere; bus shunts supply 515.0 Mvar; and network losses are 85.10 MW and 1112.67 Mvar, the reactive part split into 1195.22 in the series elements and minus 82.55 in the shunt ones."
+     class="light:sl-hidden" />
+</TabItem>
+</Tabs>
+
+**Adjustable transformers** has no tab above it because the Kundur case has no
+adjustable transformer to report; on a case that has them, it lists each one's
+ratio and marks any that Helios moved.
+
+A case that also loaded a one-line diagram gets a window of its own on every
+run, with the solved values substituted into the drawing.
+
+<img src="/images/screenshots/gui-one-line-diagram-light.png"
+     alt="The one-line diagram window for the Kundur case, titled One-line diagram, kundur.svg, run 1. The two areas are drawn with their four machines, eleven buses and the double tie between buses 7 and 9, and every placeholder in the drawing has been replaced by a solved value: active powers in blue, reactive powers in green, voltage magnitudes in red and phase angles in orange, with a key at the top right. Fit, Zoom in and Zoom out sit at the bottom left, Save as PNG and Save as SVG at the bottom right."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-one-line-diagram-dark.png"
+     alt="The one-line diagram window for the Kundur case, titled One-line diagram, kundur.svg, run 1. The two areas are drawn with their four machines, eleven buses and the double tie between buses 7 and 9, and every placeholder in the drawing has been replaced by a solved value: active powers in blue, reactive powers in green, voltage magnitudes in red and phase angles in orange, with a key at the top right. Fit, Zoom in and Zoom out sit at the bottom left, Save as PNG and Save as SVG at the bottom right."
+     class="light:sl-hidden" />
+
 ## Dynamic Simulation
 
 Where the case is run. **Run dynamic simulation** starts
@@ -118,10 +194,10 @@ discrete trace or initialization data, so a result can be examined without
 re-running it. **Search** finds text in the pane.
 
 <img src="/images/screenshots/gui-dynamic-simulation-light.png"
-     alt="The Dynamic Simulation tab after a completed run. The pane lists the solver settings in force, then reports 0.5043 seconds of elapsed time over 6004 time steps at an average step of 0.01 seconds, with Jacobian, solution and evaluation counts for the network and the injectors, ending in Simulation finished."
+     alt="The Dynamic Simulation tab after a completed run. The pane lists the solver settings in force, the synchronous reference frame and the KLU sparse solver among them, notes that parallel computing is deactivated because the case sets one thread, then reports about half a second of elapsed time over 6004 time steps at an average step of 0.01 seconds, with Jacobian, solution and evaluation counts for the network and the injectors, ending in Simulation finished."
      class="dark:sl-hidden" />
 <img src="/images/screenshots/gui-dynamic-simulation-dark.png"
-     alt="The Dynamic Simulation tab after a completed run. The pane lists the solver settings in force, then reports 0.5043 seconds of elapsed time over 6004 time steps at an average step of 0.01 seconds, with Jacobian, solution and evaluation counts for the network and the injectors, ending in Simulation finished."
+     alt="The Dynamic Simulation tab after a completed run. The pane lists the solver settings in force, the synchronous reference frame and the KLU sparse solver among them, notes that parallel computing is deactivated because the case sets one thread, then reports about half a second of elapsed time over 6004 time steps at an average step of 0.01 seconds, with Jacobian, solution and evaluation counts for the network and the injectors, ending in Simulation finished."
      class="light:sl-hidden" />
 
 ## Analysis
@@ -157,10 +233,10 @@ This is performed by RAMSES itself.
 what the results mean.
 
 <img src="/images/screenshots/gui-analysis-light.png"
-     alt="The Analysis tab with a completed run available. A Time-domain analysis row offers Extract curves, Save current trajectory and Load trajectory, with Close all curve windows at the right. Below it a Small-signal stability analysis section holds a results directory, a basename of ssa, an analysis time of 0.001 seconds, a real part limit of -1.0 and a participation-factor threshold of 0.05, with buttons to run the analysis and to save or load the dynamic Jacobian."
+     alt="The Analysis tab with a completed run available. A Time-domain analysis row offers Extract curves, Save current trajectory and Load trajectory, with Close all curve windows at the right. Below it a Small-signal stability analysis section offers Select results directory beside an empty field, a basename of ssa, an analysis time of 0.001 seconds, a real part limit of -1.0 and a participation-factor threshold of 0.05, with buttons to run the analysis and to save or load the dynamic Jacobian."
      class="dark:sl-hidden" />
 <img src="/images/screenshots/gui-analysis-dark.png"
-     alt="The Analysis tab with a completed run available. A Time-domain analysis row offers Extract curves, Save current trajectory and Load trajectory, with Close all curve windows at the right. Below it a Small-signal stability analysis section holds a results directory, a basename of ssa, an analysis time of 0.001 seconds, a real part limit of -1.0 and a participation-factor threshold of 0.05, with buttons to run the analysis and to save or load the dynamic Jacobian."
+     alt="The Analysis tab with a completed run available. A Time-domain analysis row offers Extract curves, Save current trajectory and Load trajectory, with Close all curve windows at the right. Below it a Small-signal stability analysis section offers Select results directory beside an empty field, a basename of ssa, an analysis time of 0.001 seconds, a real part limit of -1.0 and a participation-factor threshold of 0.05, with buttons to run the analysis and to save or load the dynamic Jacobian."
      class="light:sl-hidden" />
 
 The unlabelled field beside **Select results directory** is where results are
@@ -205,6 +281,13 @@ instead of by hand.
 **File** holds **Save configuration** and **Load configuration**, plus **Open
 Examples** and **Exit**.
 
+<img src="/images/screenshots/gui-file-menu-light.png"
+     alt="The File menu open, holding Save configuration with Ctrl+S, Load configuration with Ctrl+L, Open Examples, and Exit with Ctrl+Q."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-file-menu-dark.png"
+     alt="The File menu open, holding Save configuration with Ctrl+S, Load configuration with Ctrl+L, Open Examples, and Exit with Ctrl+Q."
+     class="light:sl-hidden" />
+
 **Save configuration** writes a `.cfg` holding everything a run is made of: the
 ten system data rows, the disturbance and observables files, the three runtime
 observable rows, and the four recording checkboxes. **Load configuration** puts
@@ -221,12 +304,20 @@ they hold absolute paths belonging to whoever last saved them, so what they
 name almost never exists on the machine opening them. Set the case up and save
 it again.
 
-**Tools** holds the working-directory controls (**Select working directory**,
-**Open working folder**, **Open terminal in working folder**), **Open in editor**,
-**Select external simulator**, **Save command file** and **Save observables
-file**, which write out the files a command-line run needs, then **Close all
-curve windows**, the **Dark theme** toggle and **Check for updates at
-startup**.
+**Tools** holds, in order, **Save command file** and **Save observables file**,
+which write out the files a command-line run needs; **Open in editor** and
+**Select external simulator**; the working-directory controls **Select working
+directory**, **Open working folder** and **Open terminal in working folder**;
+**Close all curve windows**; and, below a separator, the **Dark theme** toggle
+and **Check for updates at startup**. The last two are ticks rather than
+actions, and both are remembered between sessions.
+
+<img src="/images/screenshots/gui-tools-menu-light.png"
+     alt="The Tools menu open, holding Save command file, Save observables file, Open in editor with Ctrl+N, Select external simulator with Ctrl+R, Select working directory, Open working folder with Ctrl+E, Open terminal in working folder with Ctrl+T and Close all curve windows with Ctrl+G, then below a separator the Dark theme and Check for updates at startup ticks, both unticked."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-tools-menu-dark.png"
+     alt="The Tools menu open, holding Save command file, Save observables file, Open in editor with Ctrl+N, Select external simulator with Ctrl+R, Select working directory, Open working folder with Ctrl+E, Open terminal in working folder with Ctrl+T and Close all curve windows with Ctrl+G, then below a separator the Dark theme tick, which is ticked, and Check for updates at startup."
+     class="light:sl-hidden" />
 
 The command file that **Save command file** writes is the same one
 `ramses -t` reads, so a case set up here can be handed to the command line
@@ -240,3 +331,10 @@ application is doing. That last field runs from **Idle** through **Solving power
 flow** to **Power flow finished** and **Simulation finished**, each with the
 elapsed time, which is the quickest confirmation that a run actually did
 something.
+
+<img src="/images/screenshots/gui-status-bar-light.png"
+     alt="The status bar across the foot of the window: the working directory kundur-two-area on the left, and on the right the engine version RAMSES 3.78 followed by Simulation finished and an elapsed time of 0.9 seconds."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/gui-status-bar-dark.png"
+     alt="The status bar across the foot of the window: the working directory kundur-two-area on the left, and on the right the engine version RAMSES 3.78 followed by Simulation finished and an elapsed time of 0.9 seconds."
+     class="light:sl-hidden" />
