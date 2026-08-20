@@ -36,6 +36,13 @@ optional:
   one that would have caught the last set. A capture harness with no assertion
   about its output is a harness that fails silently.
 
+That last check belongs to the X11 path and to it alone. Run it against a
+CODEGEN Studio figure and it reports about 80% black, because that application
+paints its own background `#0f1117`, which is below the threshold: the figure
+is correct and the detector is measuring the app's design. `capture-cgstudio.py`
+therefore does not call it. Before "fixing" a CG Studio figure that a
+brightness check complains about, open it.
+
 ## Prerequisites
 
 - `Xvfb`, `openbox`, `xdotool`, `xprop`, `xwininfo`, ImageMagick (`import`,
