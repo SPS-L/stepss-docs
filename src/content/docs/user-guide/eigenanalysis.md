@@ -229,8 +229,11 @@ In STEPSS GUI the same run is read from the small-signal results window, which
 [Analysis tab](/gui/interface/#analysis) opens on the run it just made:
 
 <img src="/images/screenshots/gui-ssa-results-light.png"
-     alt="The small-signal results window for the Kundur case with stabilisers. A table lists the seven electromechanical modes with frequency, damping ratio and real and imaginary parts; the 0.6237 Hz inter-area mode at a damping ratio of 0.1087 is selected. An s-plane plot on the right places every mode against a stability boundary at the imaginary axis. Below, the Participation panel lists the selected mode's largest contributions, all four machines' speed and angle states, and a polar mode-shape plot shows G1 and G2 pointing opposite to G3 and G4."
-     class="shot-single" />
+     alt="The small-signal results window for the Kundur case. A table lists the seven electromechanical modes with frequency, damping ratio and real and imaginary parts; the 0.6237 Hz inter-area mode at a damping ratio of 0.1087 is selected. An s-plane plot on the right places every mode against a stability boundary at the imaginary axis. Below, the Participation panel lists the selected mode's largest contributions, the machines' speed and angle states, and a polar mode-shape plot shows the machines of one area swinging opposite to the other."
+     class="shot-single dark:sl-hidden" />
+<img src="/images/screenshots/gui-ssa-results-dark.png"
+     alt="The small-signal results window for the Kundur case. A table lists the seven electromechanical modes with frequency, damping ratio and real and imaginary parts; the 0.6237 Hz inter-area mode at a damping ratio of 0.1087 is selected. An s-plane plot on the right places every mode against a stability boundary at the imaginary axis. Below, the Participation panel lists the selected mode's largest contributions, the machines' speed and angle states, and a polar mode-shape plot shows the machines of one area swinging opposite to the other."
+     class="shot-single light:sl-hidden" />
 
 Reading that window across is the whole method in one view. The table gives the
 frequency and damping of each mode; the s-plane shows how much margin each one

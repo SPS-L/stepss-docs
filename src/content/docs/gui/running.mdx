@@ -53,13 +53,13 @@ the tab is the same setting, and either place works.
 
 ## 3. Solve the power flow
 
-On **Initialization**, click **Run power flow**.
+On **Power Flow Simulation**, click **Run power flow**.
 
-<img src="/images/screenshots/gui-initialization-light.png"
-     alt="The Initialization tab after a successful power flow. The pane shows bus 11 at 1.0083 pu, a generator table listing G1 to G4 as PV buses producing 700 to 719 MW, and a system power balance of 2734 MW load against 2819 MW generation with 85.1 MW of network losses. The status bar reads Power flow finished, 3.0 s."
+<img src="/images/screenshots/gui-power-flow-light.png"
+     alt="The Power Flow Simulation tab after a successful run on the Kundur case. The pane shows the Helios log: three data files loaded, status CONVERGED in one iteration, and six result files exported. The inspection buttons below, Bus overview, Branch flows, Generators and SVCs, Adjustable transformers and Global power balance, are enabled, and the status bar reads Power flow finished, 3.0 s."
      class="dark:sl-hidden" />
-<img src="/images/screenshots/gui-initialization-dark.png"
-     alt="The Initialization tab after a successful power flow. The pane shows bus 11 at 1.0083 pu, a generator table listing G1 to G4 as PV buses producing 700 to 719 MW, and a system power balance of 2734 MW load against 2819 MW generation with 85.1 MW of network losses. The status bar reads Power flow finished, 3.0 s."
+<img src="/images/screenshots/gui-power-flow-dark.png"
+     alt="The Power Flow Simulation tab after a successful run on the Kundur case. The pane shows the Helios log: three data files loaded, status CONVERGED in one iteration, and six result files exported. The inspection buttons below, Bus overview, Branch flows, Generators and SVCs, Adjustable transformers and Global power balance, are enabled, and the status bar reads Power flow finished, 3.0 s."
      class="light:sl-hidden" />
 
 Read the balance at the bottom before going on. For this case the load totals
@@ -126,10 +126,10 @@ on the same axes shows the oscillation *between* the areas rather than within on
 ## 6. Read the result
 
 <img src="/images/screenshots/gui-plot-light.png"
-     alt="Active power produced by generators G1 and G3 against time. Both are flat until the load step at t equals 1 second, then oscillate with a period of about 1.4 seconds. The two curves swing in opposition: G3 peaks while G1 is at its lowest. The oscillation decays over roughly six seconds, settling with each machine a few megawatts above where it started."
+     alt="Active power produced by generators G1 and G3 against time, drawn as two curves on one set of axes with a legend naming each. Both are flat until the load step at t equals 1 second, then oscillate at a little under one hertz. The oscillation decays over about ten seconds and both machines settle a few megawatts above where they started, G1 near 709 MW and G3 near 728 MW."
      class="dark:sl-hidden" />
 <img src="/images/screenshots/gui-plot-dark.png"
-     alt="Active power produced by generators G1 and G3 against time. Both are flat until the load step at t equals 1 second, then oscillate with a period of about 1.4 seconds. The two curves swing in opposition: G3 peaks while G1 is at its lowest. The oscillation decays over roughly six seconds, settling with each machine a few megawatts above where it started."
+     alt="Active power produced by generators G1 and G3 against time, drawn as two curves on one set of axes with a legend naming each. Both are flat until the load step at t equals 1 second, then oscillate at a little under one hertz. The oscillation decays over about ten seconds and both machines settle a few megawatts above where they started, G1 near 709 MW and G3 near 728 MW."
      class="light:sl-hidden" />
 
 Three things to see in it.

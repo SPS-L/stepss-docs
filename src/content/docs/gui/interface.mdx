@@ -20,10 +20,10 @@ Each row has a **Load file** button and a pencil that opens the file in an
 editor. **Clear files** empties the tab.
 
 <img src="/images/screenshots/gui-system-data-light.png"
-     alt="The System Data tab with the Kundur two-area case loaded. Rows one to three hold the load flow, dynamic data and solver options files; rows four to ten are empty. A separate disturbance file row below holds disturb.dst."
+     alt="The System Data tab with the Kundur two-area case loaded. Rows one to three hold the load flow, dynamic data and solver options files; rows four to ten are empty. Below them a disturbance file row, marked optional, holds disturb.dst, and an empty row offers a one-line diagram annotated SVG."
      class="dark:sl-hidden" />
 <img src="/images/screenshots/gui-system-data-dark.png"
-     alt="The System Data tab with the Kundur two-area case loaded. Rows one to three hold the load flow, dynamic data and solver options files; rows four to ten are empty. A separate disturbance file row below holds disturb.dst."
+     alt="The System Data tab with the Kundur two-area case loaded. Rows one to three hold the load flow, dynamic data and solver options files; rows four to ten are empty. Below them a disturbance file row, marked optional, holds disturb.dst, and an empty row offers a one-line diagram annotated SVG."
      class="light:sl-hidden" />
 
 Order does not matter and the rows need not be filled contiguously. Which files a
@@ -48,10 +48,10 @@ speed or a centre of inertia, and `RT` for wall time, which plots wall clock
 against simulation time.
 
 <img src="/images/screenshots/gui-observables-light.png"
-     alt="The Observables tab. Runtime observables are set to machine speed of G1 and the voltage of bus 9, with a one second plot refresh interval. Below, Save output trajectory and Save discrete trace are checked, and the observables file obs.dat is loaded."
+     alt="The Observables tab. Runtime observables are set to machine speed of G1 and the voltage of bus 9. Below, Save discrete trace and Save output trajectory are checked, and the observables file obs.dat is loaded."
      class="dark:sl-hidden" />
 <img src="/images/screenshots/gui-observables-dark.png"
-     alt="The Observables tab. Runtime observables are set to machine speed of G1 and the voltage of bus 9, with a one second plot refresh interval. Below, Save output trajectory and Save discrete trace are checked, and the observables file obs.dat is loaded."
+     alt="The Observables tab. Runtime observables are set to machine speed of G1 and the voltage of bus 9. Below, Save discrete trace and Save output trajectory are checked, and the observables file obs.dat is loaded."
      class="light:sl-hidden" />
 
 A quantity may be followed by extra gnuplot commands, separated by `/`. These
@@ -73,7 +73,7 @@ The **observables file** below them is required whenever a trajectory is saved,
 because it is what says which quantities the trajectory should contain. **Show
 observable dialog** builds one interactively instead of writing it by hand.
 
-## Initialization
+## Power Flow Simulation
 
 Where the power flow is solved, giving the operating point the dynamic simulation
 starts from.
@@ -92,11 +92,11 @@ Five buttons enable once a run succeeds:
 | **Adjustable transformers** | Transformer ratios, including any Helios adjusted |
 | **Global power balance** | Generation, load, shunts and network losses |
 
-<img src="/images/screenshots/gui-initialization-light.png"
-     alt="The Initialization tab after a successful power flow on the Kundur case. The pane reports bus voltages, a generator table listing G1 to G4 as PV buses, and a power balance of 2734 MW of load against 2819 MW of generation with 85.1 MW of losses. The five inspection buttons below are now enabled and the status bar reads Power flow finished."
+<img src="/images/screenshots/gui-power-flow-light.png"
+     alt="The Power Flow Simulation tab after a successful run on the Kundur case. The pane shows the Helios log: three data files loaded, status CONVERGED in one iteration, and six result files exported. The inspection buttons below, Bus overview, Branch flows, Generators and SVCs, Adjustable transformers and Global power balance, are enabled, and the status bar reads Power flow finished, 3.0 s."
      class="dark:sl-hidden" />
-<img src="/images/screenshots/gui-initialization-dark.png"
-     alt="The Initialization tab after a successful power flow on the Kundur case. The pane reports bus voltages, a generator table listing G1 to G4 as PV buses, and a power balance of 2734 MW of load against 2819 MW of generation with 85.1 MW of losses. The five inspection buttons below are now enabled and the status bar reads Power flow finished."
+<img src="/images/screenshots/gui-power-flow-dark.png"
+     alt="The Power Flow Simulation tab after a successful run on the Kundur case. The pane shows the Helios log: three data files loaded, status CONVERGED in one iteration, and six result files exported. The inspection buttons below, Bus overview, Branch flows, Generators and SVCs, Adjustable transformers and Global power balance, are enabled, and the status bar reads Power flow finished, 3.0 s."
      class="light:sl-hidden" />
 
 ## Dynamic Simulation
@@ -147,10 +147,10 @@ This is performed by RAMSES itself.
 what the results mean.
 
 <img src="/images/screenshots/gui-analysis-light.png"
-     alt="The Analysis tab with a completed run available. A Time-domain analysis row offers Extract curves, Preview curve, the save buttons, Load trajectory and Clear all gnuplot instances. Below it a Small-signal stability analysis section holds a results directory, a basename of ssa, an analysis time of 0.001 seconds, a real part limit of -1.0 and a participation-factor threshold of 0.05, with buttons to run the analysis, view results, and save or load the dynamic Jacobian."
+     alt="The Analysis tab with a completed run available. A Time-domain analysis row offers Extract curves, Save current trajectory and Load trajectory, with Close all curve windows at the right. Below it a Small-signal stability analysis section holds a results directory, a basename of ssa, an analysis time of 0.001 seconds, a real part limit of -1.0 and a participation-factor threshold of 0.05, with buttons to run the analysis and to save or load the dynamic Jacobian."
      class="dark:sl-hidden" />
 <img src="/images/screenshots/gui-analysis-dark.png"
-     alt="The Analysis tab with a completed run available. A Time-domain analysis row offers Extract curves, Preview curve, the save buttons, Load trajectory and Clear all gnuplot instances. Below it a Small-signal stability analysis section holds a results directory, a basename of ssa, an analysis time of 0.001 seconds, a real part limit of -1.0 and a participation-factor threshold of 0.05, with buttons to run the analysis, view results, and save or load the dynamic Jacobian."
+     alt="The Analysis tab with a completed run available. A Time-domain analysis row offers Extract curves, Save current trajectory and Load trajectory, with Close all curve windows at the right. Below it a Small-signal stability analysis section holds a results directory, a basename of ssa, an analysis time of 0.001 seconds, a real part limit of -1.0 and a participation-factor threshold of 0.05, with buttons to run the analysis and to save or load the dynamic Jacobian."
      class="light:sl-hidden" />
 
 The unlabelled field beside **Select results directory** is where results are
