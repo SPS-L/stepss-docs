@@ -141,6 +141,13 @@ already up alone, so two runs can be compared side by side. **Save dynamic
 Jacobian...** and **Load dynamic Jacobian...** write that run out as an archive
 and open it again later, each load in a window of its own too.
 
+The analysis needs `$SCHEME DE` and `$OMEGA_REF SYN`, and the button supplies
+both: it writes them into one small data file read after your own, where being
+last is what makes them win. So a case set up for time-domain runs analyses as
+it stands, and your own solver settings are neither edited nor left changed
+afterwards. The engine's output goes to the pane on the **Dynamic Simulation**
+tab, which is where a run that produced nothing says why.
+
 This is performed by RAMSES itself.
 [Eigenanalysis](/user-guide/eigenanalysis/) explains the method, the settings and
 what the results mean.

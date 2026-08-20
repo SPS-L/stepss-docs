@@ -86,6 +86,13 @@ operating point: pausing mid-swing linearises about a non-equilibrium.
 
 Both are refused rather than approximated. See [Refusals](#refusals) below.
 
+They are yours to set on the command line and from Python. The graphical
+interface's **Run small-signal stability analysis** writes both itself, into an
+extra data file read after the case's own, so a case configured for time-domain
+runs analyses without being edited. Settings are applied in the order they are
+read and the last of each kind wins, which is what makes that an override rather
+than a conflict.
+
 ## Output files
 
 Three files per analysis, named from the basename given to `EIG`. All are plain
