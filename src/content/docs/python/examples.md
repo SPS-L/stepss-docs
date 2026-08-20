@@ -135,6 +135,43 @@ ext.getInj('WT1a').Pw.plot()
 ext.getTwop('hvdc1').P1.plot()
 ```
 
+Every one of those calls opens a matplotlib figure. Run against the bundled
+Kundur two-area example, whose disturbance steps load `L9` at `t = 1 s`, the
+first three look like this.
+
+`ext.getSync('G1').P.plot()`, one curve, labelled from the trajectory:
+
+<img src="/images/screenshots/py-plot-single-light.png"
+     alt="Active power produced by generator G1 against time, in megawatts over 60 seconds. It sits at 700 MW until the load step at t equals 1 second, overshoots to 710, oscillates with a decaying amplitude for about ten seconds and then creeps up to settle near 709 MW."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/py-plot-single-dark.png"
+     alt="Active power produced by generator G1 against time, in megawatts over 60 seconds. It sits at 700 MW until the load step at t equals 1 second, overshoots to 710, oscillates with a decaying amplitude for about ten seconds and then creeps up to settle near 709 MW."
+     class="light:sl-hidden" />
+
+`stepss.curplot([...])`, several curves on one set of axes. Putting all four
+machines together is what separates the areas: `G3` starts 19 MW above the rest
+and stays there, while `G1`, `G2` and `G4` sit on top of one another.
+
+<img src="/images/screenshots/py-plot-multi-light.png"
+     alt="Active power produced by generators G1 to G4 against time, four curves on one set of axes with a legend below them. G3 runs alone near 719 MW and settles at 728; G1, G2 and G4 start together at 700 MW and settle together near 709. All four oscillate for about ten seconds after the load step at t equals 1 second."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/py-plot-multi-dark.png"
+     alt="Active power produced by generators G1 to G4 against time, four curves on one set of axes with a legend below them. G3 runs alone near 719 MW and settles at 728; G1, G2 and G4 start together at 700 MW and settle together near 709. All four oscillate for about ten seconds after the load step at t equals 1 second."
+     class="light:sl-hidden" />
+
+`ext.getBus('9').mag.plot()`, the same run seen as a voltage rather than a
+power:
+
+<img src="/images/screenshots/py-plot-bus-light.png"
+     alt="Voltage magnitude at bus 9 against time, in per unit over 60 seconds. It holds at 0.9714 until the load step at t equals 1 second, drops sharply to 0.957, oscillates briefly and then recovers slowly, reaching about 0.9645 by the end of the run."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/py-plot-bus-dark.png"
+     alt="Voltage magnitude at bus 9 against time, in per unit over 60 seconds. It holds at 0.9714 until the load step at t equals 1 second, drops sharply to 0.957, oscillates briefly and then recovers slowly, reaching about 0.9645 by the end of the run."
+     class="light:sl-hidden" />
+
+These are ordinary matplotlib figures, so the usual `savefig`, styling and
+subplot handling all apply to them.
+
 ## Live Plotting
 
 Watch chosen quantities as the simulation computes them, one panel per
@@ -156,6 +193,18 @@ mon = stepss.monitor(ram, [
 curves = mon.run(step=0.1)               # to the end of the scenario
 mon.savefig('live.png')
 ```
+
+Each observable gets a panel, the panels share the time axis, and the figure is
+redrawn as the run advances. `RT RT` is the one to include when you want to see
+how fast the run itself is going: a straight line means the engine is keeping a
+steady pace, and a knee in it is where the case got expensive.
+
+<img src="/images/screenshots/py-monitor-light.png"
+     alt="A live monitor figure titled Kundur two-area, four panels stacked on a shared time axis running to 60 seconds. From the top: the speed of machine G1 in per unit, the voltage magnitude of bus 9 in per unit, the active power at the origin of branch 7-8 number 1 in megawatts, and the elapsed real time in seconds, which rises as a straight line to about 0.26 seconds."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/py-monitor-dark.png"
+     alt="A live monitor figure titled Kundur two-area, four panels stacked on a shared time axis running to 60 seconds. From the top: the speed of machine G1 in per unit, the voltage magnitude of bus 9 in per unit, the active power at the origin of branch 7-8 number 1 in megawatts, and the elapsed real time in seconds, which rises as a straight line to about 0.26 seconds."
+     class="light:sl-hidden" />
 
 `run` returns the same `cur` objects the extractor produces, so the collected
 data goes straight into the post-processing above:
@@ -319,3 +368,14 @@ ext = stepss.extractor(case.getTrj())
 ext.getSync('G').P.plot()
 ext.getSync('G').Q.plot()
 ```
+
+The exciter set point rises by 0.05 pu, so the machine's reactive output is what
+moves: active power holds at its scheduled 450 MW while reactive power climbs
+from 68 to about 120 Mvar in a couple of seconds and settles there.
+
+<img src="/images/screenshots/py-five-bus-exciter-light.png"
+     alt="Active and reactive power produced by the 5-bus system's single generator against time, over 60 seconds. Active power is flat at 450 MW throughout. Reactive power starts at 68 Mvar, rises after the exciter set-point step at t equals 1 second, overshoots slightly past 120 Mvar around t equals 4 seconds and settles just under 120."
+     class="dark:sl-hidden" />
+<img src="/images/screenshots/py-five-bus-exciter-dark.png"
+     alt="Active and reactive power produced by the 5-bus system's single generator against time, over 60 seconds. Active power is flat at 450 MW throughout. Reactive power starts at 68 Mvar, rises after the exciter set-point step at t equals 1 second, overshoots slightly past 120 Mvar around t equals 4 seconds and settles just under 120."
+     class="light:sl-hidden" />

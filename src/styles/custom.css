@@ -57,16 +57,16 @@ th {
 /*
  * Screenshots that exist in one theme only, and so cannot follow the reader's.
  * A border gives them an edge to sit in, which a dark image needs on the dark
- * theme and a light image needs on the light one. Two upstream reasons, both
- * tracked and both expected to go away:
+ * theme and a light image needs on the light one. One upstream reason is left:
  *
  *   CODEGEN Studio is dark-only. :root in its style.css hard-codes
  *   --bg: #0f1117 with no light variant (SPS-L/stepss-cg-studio#1).
  *
- *   The small-signal results window is light-only. Its s-plane and mode-shape
- *   panels paint their own white background instead of taking it from the look
- *   and feel, so the dark theme leaves two glaring rectangles
- *   (SPS-L/stepss-java-ui#11).
+ * The small-signal results window used to be the second reason, because its
+ * s-plane and mode-shape panels painted their own white background instead of
+ * taking it from the look and feel. SPS-L/stepss-java-ui#11 closed that, and
+ * the figures reshot on 3.78.4 confirm it: both panels follow the theme, so
+ * those two are now an ordinary pair and no longer carry this class.
  *
  * Every other screenshot here ships as a light/dark pair and uses Starlight's
  * own light:sl-hidden and dark:sl-hidden, which needs no CSS at all. Prefer

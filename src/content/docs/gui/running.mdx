@@ -67,19 +67,21 @@ Read the balance at the bottom before going on. For this case the load totals
 losses. A balance that does not add up, or a generator sitting on a reactive limit,
 is a problem to fix here rather than to discover halfway through a dynamic run.
 
-The five buttons beside **Run power flow** become available now: **Bus overview**,
-**Generators & SVCs**, **Adjustable transformers** and **Global power balance**
-each open the corresponding table.
+The five inspection buttons beside **Run power flow** become available now:
+**Bus overview**, **Branch flows**, **Generators & SVCs**, **Adjustable
+transformers** and **Global power balance**, each of which writes its table
+into the same pane. [The Interface](/gui/interface/#power-flow-simulation)
+shows what each one produces.
 
 ## 4. Run the simulation
 
 On **Dynamic Simulation**, click **Run dynamic simulation**.
 
 <img src="/images/screenshots/gui-dynamic-simulation-light.png"
-     alt="The Dynamic Simulation tab after a completed run. The pane lists the solver settings in force, then reports a total elapsed time of 0.5043 seconds over 6004 time steps at an average step of 0.01 seconds, with Jacobian, solution and evaluation counts for the network and the injectors, ending in Simulation finished."
+     alt="The Dynamic Simulation tab after a completed run. The pane lists the solver settings in force, the synchronous reference frame and the KLU sparse solver among them, notes that parallel computing is deactivated because the case sets one thread, then reports about half a second of elapsed time over 6004 time steps at an average step of 0.01 seconds, with Jacobian, solution and evaluation counts for the network and the injectors, ending in Simulation finished."
      class="dark:sl-hidden" />
 <img src="/images/screenshots/gui-dynamic-simulation-dark.png"
-     alt="The Dynamic Simulation tab after a completed run. The pane lists the solver settings in force, then reports a total elapsed time of 0.5043 seconds over 6004 time steps at an average step of 0.01 seconds, with Jacobian, solution and evaluation counts for the network and the injectors, ending in Simulation finished."
+     alt="The Dynamic Simulation tab after a completed run. The pane lists the solver settings in force, the synchronous reference frame and the KLU sparse solver among them, notes that parallel computing is deactivated because the case sets one thread, then reports about half a second of elapsed time over 6004 time steps at an average step of 0.01 seconds, with Jacobian, solution and evaluation counts for the network and the injectors, ending in Simulation finished."
      class="light:sl-hidden" />
 
 The pane opens with the settings actually in force, which is the place to confirm
@@ -94,6 +96,10 @@ It also says **parallel computing deactivated by user**, because the case sets
 steps. The counts below are the cost of the run: how often the network and the
 injector Jacobians were rebuilt and solved. They are what to watch when a bigger
 case gets slow.
+
+If you set the runtime observables in step 2, a **Run-time curves** window drew
+them as the run advanced and is still up when it finishes; see
+[Real-time plotting](/gui/first-run/#real-time-plotting).
 
 ## 5. Extract the curves
 
@@ -141,7 +147,7 @@ local one: the two areas are oscillating against each other across the weak tie.
 The period is about 1.4 seconds, so roughly 0.7 Hz, which is the range inter-area
 modes normally sit in.
 
-The oscillation **decays**, and after about six seconds both machines settle a few
+The oscillation **decays**, and after about ten seconds both machines settle a few
 megawatts above where they began, sharing the extra load. That decay is the damping,
 and it is the quantity the next section changes.
 
