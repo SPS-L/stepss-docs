@@ -3,7 +3,9 @@ title: File Formats
 description: Data file syntax and conventions used in STEPSS
 ---
 
-Data files are organized into **records** and **comments**.
+Data files are organized into **records** and **comments**. The
+[observables file](#observables-file) is the one file a case needs that is
+neither: it is described at the end of this page.
 
 ## Records
 
@@ -83,6 +85,89 @@ A typical organization:
 - One file for simulation control parameters
 
 These files can be listed in any order in the command file. The second and third files, for instance, may be swapped in the list without any effect.
+
+## Observables File
+
+The observables file is not a data file. It carries no records, none of the
+keywords above and no semicolons: it is a plain list, one request per line,
+naming the equipment whose variables the trajectory file is to contain. STEPSS
+GUI takes it on the [Observables tab](/gui/interface/#recording-to-file), where
+it is required whenever a trajectory is saved.
+
+Each line is a type and a name:
+
+```
+SYNC g1
+```
+
+The name is the equipment's own, read into 20 characters and case-sensitive; a
+longer one is truncated silently. A `*` in place of a name selects every
+component of that type.
+
+### Types
+
+| Keyword | Selects | Recorded per component |
+|---|---|---|
+| `BUS` | buses | 2: voltage magnitude (pu), phase angle (deg) |
+| `SHUNT` | shunts | 1: reactive power produced (Mvar) |
+| `IMPLOAD` | impedance loads | 2: active (MW) and reactive (Mvar) power consumed |
+| `BRANCH` | lines and transformers | 6: P and Q entering at each end (MW, Mvar), then transformer ratio magnitude and its angle (deg) |
+| `SYNC` | synchronous machines | 15, plus whatever the machine's exciter and torque models publish |
+| `INJEC` | injectors | whatever the injector model publishes |
+| `TWOP` | two-port injectors | whatever the two-port model publishes |
+| `DCTL` | discrete controllers | whatever the controller publishes |
+
+A keyword is read all-uppercase or all-lowercase, so `Bus` is neither and is
+rejected. Dynamic loads are injectors and belong under `INJEC`; `IMPLOAD` is
+for the impedance loads alone.
+
+DYNGRAPH lists three of these categories under other names: `IMPLOAD` appears
+as `LOAD`, `INJEC` as `INJ` and `TWOP` as `LINK`. Those spellings belong to the
+listing, not to this file.
+
+:::caution
+An unknown keyword, and a name matching no equipment in the case, are both
+skipped with a warning rather than refused. The run then finishes normally with
+fewer curves in the trajectory than were asked for, so a missing curve is worth
+looking for in the log before it is blamed on the simulation.
+:::
+
+### Coordinates
+
+Two of the types take a three-letter suffix on the keyword, choosing what the
+recorded numbers mean:
+
+| Written | Records |
+|---|---|
+| `BUS-POL`, or plain `BUS` | voltage as magnitude and angle |
+| `BUS-REC` | voltage as real and imaginary parts (pu) |
+| `BRANCH-POW`, or plain `BRANCH` | flows as P and Q |
+| `BRANCH-CUR` | the current at each end, as real and imaginary parts (pu) |
+
+The suffix does not change how many values are recorded, only what they are.
+
+:::caution
+`BUS-REC *` does not do what it reads like. The wildcard sets polar coordinates
+outright and never looks at the suffix, so rectangular coordinates have to be
+asked for one bus at a time. `BRANCH-CUR *` has no such problem and is honoured.
+:::
+
+### Comments and an example
+
+A line whose first non-blank character is `#` or `!` is ignored, as is an empty
+line.
+
+```
+# what to record from the Kundur two-area run
+SYNC    g1
+SYNC    g2
+BUS     b7
+BUS-REC b9
+BRANCH  *
+```
+
+At least one request has to be accepted. A file where none is leaves the
+trajectory without a header, and nothing is recorded.
 
 ## Next Steps
 
