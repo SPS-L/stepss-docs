@@ -135,6 +135,48 @@ ext.getInj('WT1a').Pw.plot()
 ext.getTwop('hvdc1').P1.plot()
 ```
 
+## Live Plotting
+
+Watch chosen quantities as the simulation computes them, one panel per
+observable:
+
+```python
+import stepss
+
+ram = stepss.sim()
+ram.execSim(case, 0.0)                   # initialise, paused at t = 0
+
+mon = stepss.monitor(ram, [
+    'BV 4044',                           # voltage magnitude of bus 4044
+    'MS g6',                             # rotor speed of machine g6
+    'BPO 4041-4044',                     # active power at the branch origin
+    'RT RT',                             # wall clock, to gauge simulation speed
+], title='Nordic')
+
+curves = mon.run(step=0.1)               # to the end of the scenario
+mon.savefig('live.png')
+```
+
+`run` returns the same `cur` objects the extractor produces, so the collected
+data goes straight into the post-processing above:
+
+```python
+stepss.curplot(curves)
+```
+
+Drive the stepping yourself when the run needs disturbances injected along the
+way:
+
+```python
+mon = stepss.monitor(ram, ['BV 4044', 'BV 1041'])
+for target in range(10, 200, 10):
+    ram.contSim(float(target))
+    mon.sample()
+    mon.refresh()
+    if target == 100:
+        ram.addDisturb(105.0, 'CHGPRM DCTL 1-1041 Vsetpt -0.05 0')
+```
+
 ## Parameter Sweep
 
 Run multiple simulations with varying parameters and collect results:

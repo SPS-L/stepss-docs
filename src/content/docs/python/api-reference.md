@@ -899,6 +899,135 @@ stepss.curplot(curves)
 
 ---
 
+## `stepss.monitor`: Live Plotting
+
+`monitor` plots chosen quantities while a simulation runs. It steps the engine
+forward in slices, reads those quantities at every pause, and redraws a stacked
+figure: one panel per observable, all sharing the time axis.
+
+The engine is polled in process, so nothing is read from disk and nothing has to
+be installed beyond matplotlib, which pip installs with the package. Runtime
+observables, above, are a separate mechanism in which the engine writes a curve
+file of its own; the two are independent and can be used together.
+
+```python
+import stepss
+
+ram = stepss.sim()
+case = stepss.cfg('cmd.txt')
+ram.execSim(case, 0.0)                    # initialise, paused at t = 0
+
+mon = stepss.monitor(ram, ['BV 4044', 'MS g6', 'RT RT'], title='Nordic')
+curves = mon.run(step=0.5)                # run to the end of the scenario
+```
+
+The simulation must already be initialised and paused, which `execSim` does when
+given a `pause` time.
+
+### `monitor(ram, observables, title=None, refresh=0.2, show=True)`
+
+| Argument | Description |
+|-----------|-------------|
+| `ram` | The `stepss.sim` driving the run. |
+| `observables` | What to plot: descriptor strings, `(label, callable)` pairs, or bare callables. A single observable need not be wrapped in a list. |
+| `title` | Figure title. |
+| `refresh` | Minimum wall-clock seconds between redraws. Samples are never skipped, only draws; `0` redraws at every sample. |
+| `show` | `False` collects the samples and builds no figure. |
+
+### Observable descriptors
+
+The vocabulary is the one `addRunObs` uses, plus `BA` and the generic `OBS`:
+
+| Descriptor | Quantity | Unit |
+|-----------|-------------|------|
+| `BV BUSNAME` | Voltage magnitude of a bus | pu |
+| `BA BUSNAME` | Voltage phase of a bus | deg |
+| `MS MACHINE_NAME` | Rotor speed of a synchronous machine | pu |
+| `BPO / BQO / BPE / BQE BRANCH_NAME` | Active or reactive power at the origin or extremity of a branch | MW, Mvar |
+| `ON INJECTOR_NAME OBSERVABLE_NAME` | Named observable of an injector model | set by the model |
+| `TO TWOP_NAME OBSERVABLE_NAME` | Named observable of a two-port model | set by the model |
+| `OBS TYPE NAME OBSERVABLE_NAME` | Named observable of any component type `getObs` accepts | set by the model |
+| `RT RT` | Elapsed wall-clock time, to gauge simulation speed | s |
+
+Anything the descriptors do not cover is a callable, taking the simulator and
+returning one number:
+
+```python
+mon = stepss.monitor(ram, [
+    'BV 4044',
+    ('4044 reactive reserve (Mvar)', lambda r: r.getObs('SYN', 'g6', 'Q')[0]),
+])
+```
+
+### `run(step=1.0, until=None)`
+
+Advance the simulation, sampling and redrawing at each pause, and return one
+`cur` per observable. Returns when the engine reports the end of the scenario,
+when `until` is reached, or when a slice fails to advance the simulated time.
+
+```python
+curves = mon.run(step=0.1, until=30.0)    # 30 s of simulated time, sampled every 0.1 s
+```
+
+`step` is simulated seconds per slice, so it sets both the sampling resolution
+and the redraw cadence. The engine pauses at the first internal step at or after
+the requested time, so the samples land on or just after the multiples of `step`.
+
+If the engine raises, the samples taken up to that point stay available from
+`curves()`:
+
+```python
+from stepss.globals import RAMSESError
+
+try:
+    mon.run(step=1.0)
+except RAMSESError:
+    stepss.curplot(mon.curves())          # everything up to the failure
+```
+
+### `curves()`
+
+Return everything sampled so far, one `cur` per observable, in the order given
+to the constructor. These are the same objects `extractor` produces, so
+`curplot` and the rest of the post-processing accept them unchanged.
+
+### `sample()`
+
+Read every observable once, at the current simulated time. Call it directly when
+driving the simulation yourself:
+
+```python
+mon = stepss.monitor(ram, ['BV 4044'])
+for target in [10.0, 20.0, 30.0]:
+    ram.contSim(target)
+    ram.addDisturb(target + 1.0, 'CHGPRM DCTL 1-1041 Vsetpt -0.01 0')
+    mon.sample()
+    mon.refresh()
+```
+
+### `refresh(force=False)`
+
+Push the samples into the figure and redraw it. A draw falling inside the
+`refresh` interval is skipped unless `force` is set.
+
+### `savefig(fname, **kwargs)`
+
+Redraw and write the figure to a file, forwarding to
+`matplotlib.figure.Figure.savefig`.
+
+### `close()`
+
+Close the figure. The samples are unaffected: `curves()` keeps working.
+
+:::note
+On a file-only matplotlib backend such as `Agg`, and in Jupyter's inline mode,
+there is no window to animate: the monitor collects the samples and builds the
+figure, and `savefig` writes the same chart a window would have shown. Closing
+the window mid-run stops the redraws and leaves the run going.
+:::
+
+---
+
 ## Complete Example
 
 ```python

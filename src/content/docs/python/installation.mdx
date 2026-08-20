@@ -83,23 +83,37 @@ These provide the `libgfortran`, `libgomp`, and `libopenblas` dylibs that the bu
 simulation runs, and RAMSES writes them to a curve file as it goes. Nothing has
 to be installed for this.
 
-Plotting them is your own step, with the same tools you would use for a saved
-trajectory:
+The file is plain text, with a `#` header naming the columns and time in column
+one, so any reader takes it:
+
+```python
+import numpy as np
+data = np.loadtxt('temp_display.cur')
+```
+
+## Live plotting
+
+`stepss.monitor` plots chosen quantities *while* the simulation runs, one panel
+per observable:
 
 ```python
 import stepss
-c = stepss.cur('temp_display.cur')
-stepss.curplot(c)
+
+ram = stepss.sim()
+case = stepss.cfg('cmd.txt')
+ram.execSim(case, 0.0)                  # initialise, paused at t = 0
+
+mon = stepss.monitor(ram, ['BV 4044', 'MS g6'])
+curves = mon.run(step=0.5)              # run to the end of the scenario
 ```
+
+It polls the engine in process and draws with matplotlib, which pip installs
+with the package, so nothing further is needed. The
+[API reference](/python/api-reference/) lists the descriptor vocabulary and the
+rest of the methods.
 
 <Aside type="note">
 `stepss.__runTimeObs__` is always `True` and is deprecated. Do not branch on it.
-</Aside>
-
-<Aside type="caution">
-Plotting *during* a run, refreshing as the file grows, is not part of this
-package. STEPSS GUI does that natively. Here the curve file is readable as soon
-as the engine has flushed it, so a loop of your own can do the same.
 </Aside>
 
 ## Platform Support

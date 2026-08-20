@@ -24,6 +24,7 @@ After importing the package, the following attributes are available:
 | `stepss.cfg` | Defines a test case: data files, disturbance file, output files, observables, and runtime options. |
 | `stepss.sim` | Runs simulations. Supports start/pause/continue, runtime queries, and disturbance injection. |
 | `stepss.extractor` | Extracts and visualises time-series results from trajectory files produced by a simulation. |
+| `stepss.monitor` | Plots chosen quantities while a simulation runs, one panel per observable. |
 | `stepss.helios.HeliosSession` | Runs AC power flows with the Helios engine: load, modify with redispatch, solve, contingency screening, and file exports. |
 
 ## Platform Support
@@ -32,7 +33,7 @@ stepss supports Windows, Linux, and macOS for both dynamic simulation and power 
 
 ## Further Reading
 
-- [API Reference](/python/api-reference/), Detailed documentation for `cfg`, `sim`, and `extractor`
+- [API Reference](/python/api-reference/), Detailed documentation for `cfg`, `sim`, `extractor` and `monitor`
 - [Power Flow (Helios)](/python/helios/), Running AC power flows from Python with `HeliosSession`
 - [Examples](/python/examples/), Practical simulation examples and notebooks
 
