@@ -119,7 +119,8 @@ The header records `nstates`, `nalg`, the time, and the `real_limit`,
 ### `<name>_pf.dat`
 
 Participation factors, one line per mode and state:
-`mode`, `state`, `pf`, `family`, `device`, `variable`.
+`mode`, `state`, `pf`, `family`, `device`, `variable`. The `pf` column is the
+participation factor itself, which STEPSS GUI abbreviates to **PF**.
 
 The participation of state $k$ in mode $i$ is $p_{ki} = \lvert w_{ki}\,v_{ki}\rvert$,
 built from the left and right eigenvectors and normalised so each mode's largest
@@ -245,10 +246,12 @@ In STEPSS GUI the same run is read from the small-signal results window, which
 Reading that window across is the whole method in one view. The table gives the
 frequency and damping of each mode; the s-plane shows how much margin each one
 has, with the boundary drawn at the imaginary axis, so a mode crossing it is the
-instability. The **Participation** panel answers which machines make up the
-selected mode, and the mode shape answers how they move relative to each other:
-here G1 and G2 swing against G3 and G4, which is what makes 0.62 Hz the
-inter-area mode rather than a local one.
+instability. Every mode is one circle there, crimson if it is unstable and
+filled if it is the one selected. The **Participation** panel answers which
+machines make up that mode, its last column **PF** being the participation
+factor, normalised so the largest in each mode is 1. The mode shape answers how
+those machines move relative to each other: here G1 and G2 swing against G3 and
+G4, which is what makes 0.62 Hz the inter-area mode rather than a local one.
 
 Ticking **electromechanical only** restricts the table to the 0.1 to 2.5 Hz band,
 which is where rotor-angle modes live. The full spectrum for this case is 70
