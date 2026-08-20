@@ -35,23 +35,21 @@ $GP_REFRESH_RATE time_interval(s) ;
 
 ### Gnuplot Invocation
 
-Whether the engine drives Gnuplot itself through a pipe. **From RAMSES v3.77 the
-default is `F`**, and nothing in STEPSS relies on it any more: the engine writes
-the observable file and the `.plt` script beside it, and the interfaces draw
-their own curves. `$CALL_GP T` still restores the old piped behaviour for this
-release cycle, and requires Gnuplot on the `PATH`, which is no longer shipped
-with STEPSS.
+Whether the engine drives Gnuplot itself through a pipe. With `F` it writes the
+observable file and the `.plt` script beside it and calls nothing, which is what
+the STEPSS interfaces read. With `T` it pipes to Gnuplot, which must then be on
+the `PATH`; STEPSS does not ship it.
 
 ```
 $CALL_GP T/F ;
 ```
 
-Default: `F`, as of RAMSES v3.77. It was `T` in earlier versions.
+Default: `F`.
 
 ### Gnuplot Output Mode
 
-Which terminal the `.plt` script names, for anyone who opens that script in
-Gnuplot themselves. It has no effect on the curves STEPSS draws:
+Which terminal the `.plt` script names, for opening that script in Gnuplot. It
+has no effect on the curves STEPSS draws:
 
 ```
 $GP_MODE term/png ;

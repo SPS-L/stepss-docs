@@ -316,10 +316,7 @@ case.clearRunObs()
 ```
 
 :::note
-Nothing needs to be installed. Before RAMSES v3.77 the engine drew these curves
-itself by piping to Gnuplot, so Gnuplot had to be on the `PATH` and
-`addRunObs()` silently did nothing without it. The engine now writes the curve
-file and calls nothing.
+Nothing needs to be installed for run-time observables.
 :::
 
 ---

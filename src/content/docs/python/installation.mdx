@@ -81,9 +81,7 @@ These provide the `libgfortran`, `libgomp`, and `libopenblas` dylibs that the bu
 
 `case.addRunObs(...)` asks the engine to record chosen quantities while a
 simulation runs, and RAMSES writes them to a curve file as it goes. Nothing has
-to be installed for this: earlier versions needed Gnuplot on the `PATH`, because
-the engine drew those curves itself by piping to it, and from RAMSES v3.77 the
-engine writes the file and calls nothing.
+to be installed for this.
 
 Plotting them is your own step, with the same tools you would use for a saved
 trajectory:
@@ -95,15 +93,13 @@ stepss.curplot(c)
 ```
 
 <Aside type="note">
-`stepss.__runTimeObs__` is now always `True` and is deprecated. It used to
-report whether Gnuplot had been found at import time, and `addRunObs()` was a
-silent no-op when it was `False`. Do not branch on it.
+`stepss.__runTimeObs__` is always `True` and is deprecated. Do not branch on it.
 </Aside>
 
 <Aside type="caution">
-Plotting *during* a run, refreshing as the file grows, is not built into this
-package yet. STEPSS GUI does that natively; here the curve file is readable as
-soon as the engine has flushed it, so a loop of your own can do the same.
+Plotting *during* a run, refreshing as the file grows, is not part of this
+package. STEPSS GUI does that natively. Here the curve file is readable as soon
+as the engine has flushed it, so a loop of your own can do the same.
 </Aside>
 
 ## Platform Support
