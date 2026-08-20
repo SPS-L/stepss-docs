@@ -19,7 +19,7 @@ Recognised injector model names (case-sensitive):
 - **Uppercase short names** (no prefix): `LOAD`, `RESTLD`, `THEVEQ`, `INDMACH1`, `INDMACH2`, `SVC_GENERIC1`.
 - **Prefixed names**: RAMSES adds the `inj_` prefix automatically: `VFAULT`/`inj_VFAULT`, `vfd_load`/`inj_vfd_load`, `PQ`/`inj_PQ`, `IBG`/`inj_IBG`, `WT3`/`inj_WT3`, `WT4`/`inj_WT4`, `BESS`/`inj_BESS`, `GFOL`/`inj_GFOL`, `GFOR`/`inj_GFOR`, `PMU`/`inj_PMU`.
 
-All of the above are built into every RAMSES distribution (standalone executable and shared library used by stepss). `inj_INDM1` and `inj_PVG`, documented below, are compiled into the library but registered under no name; each becomes callable by adding one case to the URAMSES router (see the [URAMSES guide](/developer/uramses/)). `inj_norton` is excluded from the build entirely and is not available.
+All of the above are built into every RAMSES distribution (standalone executable and shared library used by stepss). `INDM1` and `PV`, documented below, have been callable since 3.79; before that they were compiled under no name. `inj_norton` is excluded from the build entirely and is not available: it calls a Python bridge (`initialize_model_instance`, `call_python_evaluate`) that is not part of this source tree.
 
 **Note on case sensitivity.** Match the case used above exactly. The uppercase short names must be uppercase. For the prefixed family, `vfd_load` and `VFAULT` use those exact cases. Most others follow the convention `inj_<UPPERCASE>` (e.g. `inj_PQ`, `inj_GFOR`).
 :::
@@ -436,10 +436,10 @@ INJEC  INDMACH2  MTR2  BUS_MV  1.  1.  0.  0.  10.0  0.01  0.08  2.00  0.02  0.0
 
 ---
 
-### inj_INDM1: Alternative Induction Machine (not registered)
+### inj_INDM1: Alternative Induction Machine
 
-:::caution
-`inj_INDM1` is documented here for reference but is not callable out of the box in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)). For built-in single-cage motors, use `INDMACH1` instead.
+:::note
+Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected. For built-in single-cage motors, use `INDMACH1` instead.
 :::
 
 #### Description
@@ -700,10 +700,10 @@ INJEC  WT4  WT4_1  BUS_WIND  1.  1.  0.  0.
 
 ---
 
-### inj_PVG: Photovoltaic Generator (not registered)
+### inj_PVG: Photovoltaic Generator
 
-:::caution
-`inj_PVG` is documented here for reference but is not callable out of the box in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)). For built-in IBR modelling, use `IBG`, `WT3`, or `WT4`. Note that the subroutine inside `inj_PVG.f90` is named `inj_PV`; both refer to the same single model.
+:::note
+Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected. For built-in IBR modelling, use `IBG`, `WT3`, or `WT4`. Note that the subroutine inside `inj_PVG.f90` is named `inj_PV`; both refer to the same single model.
 :::
 
 #### Description
@@ -742,7 +742,7 @@ Low-voltage power-logic (LVPL) limits active current during deep voltage sags vi
 #### Usage Example
 
 ```
-INJEC  PVG  PV1  BUS_PV  1.  1.  0.  0.  1.2  1.0  0.5  0.02  0.01  0.5  1.0  0.05  1.1
+INJEC  PV  PV1  BUS_PV  1.  1.  0.  0.  1.2  1.0  0.5  0.02  0.01  0.5  1.0  0.05  1.1
                           20.0  0.1  2.0  0.1  0.5  0.95  1.05  0.0  2.0  1.0
                           1.0  0.0  0.05  1  2.0  1.5  2.0  2.0  -0.02  0.02  1  1  1  0.85  0  ;
 ```

@@ -301,10 +301,12 @@ The other four routers follow the same shape, with `tor_`, `inj_`, `twop_` and
 `dctl_` prefixes and their own pointer names. A data file then refers to the
 model as either `MY_EXCITER` or `exc_MY_EXCITER`.
 
-This is also how you reach a model that RAMSES already compiles but registers
-under no name, such as `exc_AC8B` or `twop_HVDC_VSC`: add the case, leave
-`custom_models/` empty, and relink. The subroutine is already in `libramses`, so
-no `external` declaration or source file of your own is needed.
+Up to RAMSES 3.78 this was also how you reached a model that RAMSES compiled
+but registered under no name, such as `exc_AC8B` or `twop_HVDC_VSC`. From 3.79
+every compiled model is registered, so that step is no longer needed. The
+technique still works for anything you want to expose under a second name: the
+subroutine is already in `libramses`, so no `external` declaration or source
+file of your own is required.
 
 ### Included Example Models
 

@@ -17,10 +17,9 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
 
 RAMSES adds the `exc_` prefix to the model name automatically, so both `AC1A` and `exc_AC1A` are accepted.
 
-Not every model in the catalogue below is callable by name. The **State** column of the Model Index says which is which:
+The **State** column of the Model Index says whether a model is compiled and callable, or only a DSL description:
 
-- **Registered**, callable from a data file as it stands.
-- **Not registered**, compiled into the library but mapped to no name, so RAMSES rejects it in a data file. Each becomes callable by adding one case to the URAMSES router and relinking, without recompiling the model itself (see the [URAMSES guide](/developer/uramses/)).
+- **Registered**, callable from a data file as it stands. Every compiled exciter has been registered since 3.79; before that, fifteen of them were mapped to no name and RAMSES rejected them in a data file.
 - **DSL only**, present as a CODEGEN model description but not as compiled Fortran. `ENTSOE_lim` ships as a ready-made example in the URAMSES `custom_models/` directory; `AC8B_lim` is listed for reference only and is not distributed.
 
 The [Model Reference index](/models/) carries the same information across all model families.
@@ -33,33 +32,33 @@ The [Model Reference index](/models/) carries the same information across all mo
 | Model Name | State | Base Type | PSS | OEL / Limiter | IEEE Reference |
 |---|---|---|---|---|---|
 | `AC1A` | Registered | AC type 1 | | | IEEE 421.5 Type AC1A |
-| `AC1A_MAXEX2` | Not registered | AC type 1 | | MAXEX2 field current limiter | IEEE 421.5 Type AC1A |
-| `AC1A_RETRO` | Not registered | AC type 1 (retrofit) | PSS4B (internal) | | |
-| `AC1A_RETRO_PSS4B` | Not registered | AC type 1 (retrofit) | PSS4B | | |
+| `AC1A_MAXEX2` | Registered | AC type 1 | | MAXEX2 field current limiter | IEEE 421.5 Type AC1A |
+| `AC1A_RETRO` | Registered | AC type 1 (retrofit) | PSS4B (internal) | | |
+| `AC1A_RETRO_PSS4B` | Registered | AC type 1 (retrofit) | PSS4B | | |
 | `AC4A` | Registered | AC type 4 | | | IEEE 421.5 Type AC4A |
-| `AC8B` | Not registered | AC type 8 | | | IEEE 421.5 Type AC8B |
-| `AC8B_PSS3B_lim` | Not registered | AC type 8 | PSS3B | Integral OEL + SCL | IEEE 421.5 Type AC8B |
+| `AC8B` | Registered | AC type 8 | | | IEEE 421.5 Type AC8B |
+| `AC8B_PSS3B_lim` | Registered | AC type 8 | PSS3B | Integral OEL + SCL | IEEE 421.5 Type AC8B |
 | `AC8B_lim` | DSL only | AC type 8 | | Integral OEL + SCL | IEEE 421.5 Type AC8B |
-| `DC3A` | Not registered | DC type 3 | | | IEEE 421.5 Type DC3A |
+| `DC3A` | Registered | DC type 3 | | | IEEE 421.5 Type DC3A |
 | `ENTSOE_simp` | Registered | ENTSO-E simplified | IEEEST (internal) | | ENTSO-E |
 | `ENTSOE_lim` | DSL only | ENTSO-E simplified | IEEEST (internal) | Integral OEL | ENTSO-E |
-| `EXPIC1` | Not registered | AC/ST (PIC type) | | | |
+| `EXPIC1` | Registered | AC/ST (PIC type) | | | |
 | `EXPIC1_PSS2B` | Registered | AC/ST (PIC type) | PSS2B | | |
-| `EXPIC1_PSS2B_MAXEX2` | Not registered | AC/ST (PIC type) | PSS2B | MAXEX2 | |
+| `EXPIC1_PSS2B_MAXEX2` | Registered | AC/ST (PIC type) | PSS2B | MAXEX2 | |
 | `IEEET5` | Registered | DC type 5 | | | IEEE 421.5 Type DC5A (legacy) |
 | `SEXS` | Registered | ST simplified | | | CIGRÉ simplified |
 | `SEXS_IEEEST` | Registered | ST simplified | IEEEST | | CIGRÉ simplified |
-| `SEXS_STAB3_lim` | Not registered | ST simplified | STAB3 | Integral OEL | |
+| `SEXS_STAB3_lim` | Registered | ST simplified | STAB3 | Integral OEL | |
 | `ST1A` | Registered | ST type 1 | | | IEEE 421.5 Type ST1A |
 | `ST1A_IEEEST` | Registered | ST type 1 | IEEEST | | IEEE 421.5 Type ST1A |
-| `ST1A_IEEEST_MAXEX2` | Not registered | ST type 1 | IEEEST | MAXEX2 | IEEE 421.5 Type ST1A |
+| `ST1A_IEEEST_MAXEX2` | Registered | ST type 1 | IEEEST | MAXEX2 | IEEE 421.5 Type ST1A |
 | `ST1A_PSS2B` | Registered | ST type 1 | PSS2B | | IEEE 421.5 Type ST1A |
-| `ST1A_PSS2B_MAXEX2` | Not registered | ST type 1 | PSS2B | MAXEX2 | IEEE 421.5 Type ST1A |
-| `ST1A_PSS3B` | Not registered | ST type 1 | PSS3B | | IEEE 421.5 Type ST1A |
+| `ST1A_PSS2B_MAXEX2` | Registered | ST type 1 | PSS2B | MAXEX2 | IEEE 421.5 Type ST1A |
+| `ST1A_PSS3B` | Registered | ST type 1 | PSS3B | | IEEE 421.5 Type ST1A |
 | `ST1A_PSS4B` | Registered | ST type 1 | PSS4B | | IEEE 421.5 Type ST1A |
-| `ST1A_PSS4B_MAXEX2` | Not registered | ST type 1 | PSS4B | MAXEX2 | IEEE 421.5 Type ST1A |
-| `ST1A_lim` | Not registered | ST type 1 | | Integral OEL + SCL | IEEE 421.5 Type ST1A |
-| `ST2A` | Not registered | ST type 2 | | | IEEE 421.5 Type ST2A (via EXPIC1) |
+| `ST1A_PSS4B_MAXEX2` | Registered | ST type 1 | PSS4B | MAXEX2 | IEEE 421.5 Type ST1A |
+| `ST1A_lim` | Registered | ST type 1 | | Integral OEL + SCL | IEEE 421.5 Type ST1A |
+| `ST2A` | Registered | ST type 2 | | | IEEE 421.5 Type ST2A (via EXPIC1) |
 
 ---
 
@@ -685,6 +684,14 @@ Power System Stabilizers (PSS) inject an additional signal $V_{PSS}$ at the AVR 
 ### PSS2B: Dual-Input Stabilizer
 
 PSS2B accepts two input signals (typically speed $\omega$ and electrical power $P_e$) and processes them through independent washout chains before combining. It corresponds to IEEE Std 421.5-2016 Type PSS2B.
+
+:::note[Differences from other vendors' PSS2B]
+Implementations of PSS2B vary, so parameter lists do not transfer between tools unchanged. Three differences are worth knowing when porting data in:
+
+- RAMSES names the two transducer lags $T_6$ and $T_7$, following IEEE 421.5. Some tools name the same two constants $T_{W6}$ and $T_{W7}$, which is easy to misread as a third and fourth washout.
+- RAMSES has no $K_{S4}$ and no ramp-tracking filter ($AA$, $T_A$, $T_B$). Data sets carrying those come from an extended PSS2B and cannot be transferred field by field.
+- RAMSES adds a leading `speedinput` selector that chooses the speed signal source. It has no counterpart elsewhere and must be supplied as the first stabiliser parameter.
+:::
 
 $$V_{S1} = \text{clamp}(VSI_1, V_{S1MIN}, V_{S1MAX})$$
 

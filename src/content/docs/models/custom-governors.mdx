@@ -19,7 +19,7 @@ SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
 
 This page documents the four governors built into every RAMSES distribution, `CONSTANT`, `1ST_ORDER`, `HYDRO_GENERIC1` and `THERMAL_GENERIC1`, which take no prefix and are written in uppercase, together with `HYDRO_DG`, registered since 3.76.
 
-It also documents `tor_gasturbm`, `tor_govclasm`, `tor_govhydr` and `tor_govnuc`, which are compiled but **registered under no name**, so RAMSES rejects them in a data file. Enabling one means adding a case to the URAMSES router (see the [URAMSES guide](/developer/uramses/)).
+It also documents `GASTURBM`, `GOVCLASM`, `GOVHYDR` and `GOVNUC`, which the family dispatcher has handled directly since 3.79. Before 3.79 they were compiled under no name and RAMSES rejected them in a data file.
 
 The IEEE governors, `DEGOV1`, `ENTSOE_simp`, `GAST`, `TGOV1` and `HYGOV`, are on the [IEEE Governors](/models/ieee-governors/) page. For the whole catalogue at a glance, see the [Model Reference index](/models/).
 :::
@@ -431,10 +431,10 @@ SYNC_MACH G4  N4 1. 1.  0.  0. 5 4.5 3. 0. 1.9333
 
 ---
 
-## tor_gasturbm (not registered)
+## tor_gasturbm
 
-:::caution
-`tor_gasturbm` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::note
+Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected.
 :::
 
 ### Scientific Description
@@ -512,10 +512,10 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 
 ---
 
-## tor_govclasm (not registered)
+## tor_govclasm
 
-:::caution
-`tor_govclasm` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::note
+Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected.
 :::
 
 ### Scientific Description
@@ -529,7 +529,7 @@ The speed error passes through a deadband $[DBON, DEADB]$ before entering a prop
 **Valve and combustion dynamics:**
 
 The valve demand passes through:
-1. A governor with static gain $V0$ and fuel-flow limit $VFN$
+1. A governor integrator with time constant $TSM$, its rate held inside $[VFN,\, V0]$
 2. A first-order lag $TFV$ (valve actuator)
 3. A rate limiter $[PVARMIN,\, PVARMAX]$ (with gain $GPVAR$) representing fuel response
 4. A combustion/steam chest lag $KCR$, $TCR$ producing fuel flow
@@ -545,8 +545,8 @@ The valve demand passes through:
 | 2 | `DEADB` | Deadband half-width (pu) |
 | 3 | `DBON` | Deadband onset (pu) |
 | 4 | `TSM` | Speed measurement / filter time constant (s) |
-| 5 | `V0` | Governor voltage reference (pu) |
-| 6 | `VFN` | Fuel-flow nominal (pu) |
+| 5 | `V0` | Maximum valve opening rate, upper limit on the governor integrator rate (pu/s) |
+| 6 | `VFN` | Minimum valve rate, applied directly as the lower bound, so normally negative (pu/s) |
 | 7 | `TFV` | Valve actuator time constant (s) |
 | 8 | `VFR` | Fuel flow rate limit (pu/s) |
 | 9 | `MAXINT` | Maximum integral output (pu) |
@@ -586,10 +586,10 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 
 ---
 
-## tor_govhydr (not registered)
+## tor_govhydr
 
-:::caution
-`tor_govhydr` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::note
+Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected.
 :::
 
 ### Scientific Description
@@ -630,8 +630,8 @@ derived from the non-linear head-flow curve approximated at initialisation.
 | 2 | `KP` | Proportional gain |
 | 3 | `KI` | Integral gain |
 | 4 | `TC` | Governor/servo time constant (s) |
-| 5 | `V0` | Reference voltage (pu) |
-| 6 | `VF` | Flow gain |
+| 5 | `V0` | Maximum gate opening rate, upper limit on gate velocity (pu/s) |
+| 6 | `VF` | Maximum gate closing rate, entered as a positive magnitude and applied as $-V_F$ (pu/s) |
 | 7 | `TCE2` | Second penstock time constant (s) |
 | 8 | `TCE1` | First penstock time constant (s) |
 
@@ -661,10 +661,10 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 
 ---
 
-## tor_govnuc (not registered)
+## tor_govnuc
 
-:::caution
-`tor_govnuc` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::note
+Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected.
 :::
 
 ### Scientific Description
@@ -691,7 +691,7 @@ $$
 
 where the limiter prevents over-power and $f$ is a piecewise-linear characteristic.
 
-The fuel valve dynamics use time constants $TFV$ (valve), $V0$ (reference), and $VFR$ (flow rate), then go through lag $TRES$ (reset) and $GOMP$ to produce the final torque.
+The steam-valve rate is held inside $[VFN,\, V0]$, then passes the valve actuator lag $TFV$, the reset lag $TRES$ and $GOMP$ to produce the final torque. $VFR$ overrides the rate during fast valving, a path the shipped model never takes: the code fixes its selector at 1 and leaves the fast-valving logic unwritten.
 
 **Parameters from Fortran source:**
 
@@ -704,8 +704,8 @@ The fuel valve dynamics use time constants $TFV$ (valve), $V0$ (reference), and 
 | 5 | `GRADMIN` | Minimum load gradient / unloading rate (pu/s) |
 | 6 | `TGRAD` | Ramp filter time constant (s) |
 | 7 | `TSM` | Servo time constant (s) |
-| 8 | `V0` | Governor reference (pu) |
-| 9 | `VFN` | Nominal valve position (pu) |
+| 8 | `V0` | Maximum valve opening rate, upper limit on the steam-valve rate (pu/s) |
+| 9 | `VFN` | Minimum valve rate, applied directly as the lower bound, so normally negative (pu/s) |
 | 10 | `TFV` | Valve actuator time constant (s) |
 | 11 | `VFR` | Valve rate limit (pu/s) |
 | 12 | `ALPHA` | Integral gain |

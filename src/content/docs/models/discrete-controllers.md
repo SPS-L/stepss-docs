@@ -25,7 +25,7 @@ Recognised discrete-controller model names (case-sensitive):
 - **Uppercase short names** (no prefix): `PST`, `LTC`, `LTC2`, `OLTC2`, `LTCINV`, `MAIS`, `UVLS`, `RT`, `UVPROT`, `FRT`, `VOLT_VAR`, `SIM_MINMAXVOLT`, `SIM_MINMAXSPEED`.
 - **Prefixed name**: RAMSES adds the `dctl_` prefix automatically, so both `line_prot` and `dctl_line_prot` resolve to the line-protection model.
 
-All of the above are built into every RAMSES distribution (standalone executable and shared library used by stepss). `MAIS` is an automatic shunt-reactor switching scheme (*Manoeuvre Automatique d'Inductances Shunt*) that switches susceptance at a monitored bus on under-voltage, voltage-drop and over-voltage thresholds; it does not have a dedicated documentation section below. `dctl_hvdc_lim`, `dctl_injprot` and `dctl_losprot`, documented below, are compiled into the library but registered under no name; each becomes callable by adding one case to the URAMSES router (see the [URAMSES guide](/developer/uramses/)).
+All of the above are built into every RAMSES distribution (standalone executable and shared library used by stepss). `MAIS` is an automatic shunt-reactor switching scheme (*Manoeuvre Automatique d'Inductances Shunt*) that switches susceptance at a monitored bus on under-voltage, voltage-drop and over-voltage thresholds; it does not have a dedicated documentation section below. `HVDC_LIM`, `injprot` and `LOSPROT`, documented below, have been callable since 3.79; before that they were compiled under no name.
 :::
 
 ---
@@ -372,10 +372,10 @@ DCTL  FRT  FRT_WTG1  WT1  0.90  0.15  0.70  0.5  0.20  1.0  0.05 ;
 
 ---
 
-### dctl_injprot: Injector Protection (not registered)
+### dctl_injprot: Injector Protection
 
-:::caution
-`dctl_injprot` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::note
+Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected.
 :::
 
 #### Description
@@ -413,15 +413,15 @@ The controller latches once tripped and cannot reset. State variable `w(7)`:
 #### Usage Example
 
 ```
-DCTL  injprot  PROT_WTG1  WT1  I  0.0  1.2  0.1 ;   ! Not callable in a standard RAMSES distribution; see URAMSES guide
+DCTL  injprot  PROT_WTG1  WT1  I  0.0  1.2  0.1 ;
 ```
 
 ---
 
-### dctl_losprot: Loss-of-Synchronism Protection (not registered)
+### dctl_losprot: Loss-of-Synchronism Protection
 
-:::caution
-`dctl_losprot` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::note
+Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected.
 :::
 
 #### Description
@@ -452,7 +452,7 @@ The timer resets if the speed returns within bounds. The controller latches perm
 #### Usage Example
 
 ```
-DCTL  losprot  LOS_GEN2  GEN2  1.05  0.2 ;   ! Not callable in a standard RAMSES distribution; see URAMSES guide
+DCTL  LOSPROT  LOS_GEN2  GEN2  1.05  0.2 ;
 ```
 
 ---
@@ -567,8 +567,8 @@ DCTL  RT  RT_CTL  1.0  0.01 ;
 
 ### `dctl_hvdc_lim`: HVDC LCC Limiter/Controller
 
-:::caution
-`dctl_hvdc_lim` is documented here for reference but is **not callable out of the box** in a standard RAMSES distribution. To use it, enable it via URAMSES (see the [URAMSES guide](/developer/uramses/)).
+:::note
+Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected.
 :::
 
 #### Description
@@ -618,7 +618,7 @@ It interacts directly with the HVDC two-port model's internal parameters.
 #### Usage Example
 
 ```
-DCTL  hvdc_lim  HVDCLIM1  HVDClink     ! Not callable in a standard RAMSES distribution; see URAMSES guide
+DCTL  HVDC_LIM  HVDCLIM1  HVDClink
       0.85  1.15  0.00625
       0.85  1.15  0.00625
       15.0  18.0  15.0  18.0

@@ -19,13 +19,15 @@ A model can be in one of three states, and the tables below say which:
 |-------|---------|
 | **Built in** | Handled directly by the family dispatcher, no prefix |
 | **Registered** | Compiled and mapped to a name, callable from a data file |
-| **Not registered** | Compiled but reachable only after adding a case through [URAMSES](/developer/uramses/) |
+| **Not compiled** | Present as source but excluded from the build, so not reachable at all |
 
-:::caution[Compiled is not the same as reachable]
-Several models ship inside the library under no name at all. They cannot be loaded
-by writing their name in a data file, however correct the spelling. The
-Hydro-Québec families (`models/*/hq/`) are excluded from the build entirely and
-cannot be enabled through URAMSES either.
+:::note[Every compiled model is reachable]
+As of 3.79 every model compiled into the library is mapped to a name and can be
+loaded by writing that name in a data file. Before 3.79 twenty-four of them
+shipped under no name and could only be reached by adding a case through
+[URAMSES](/developer/uramses/). The Hydro-Québec families (`models/*/hq/`) and
+`inj_norton` are excluded from the build entirely and are not reachable by any
+route.
 :::
 
 ## Exciters
@@ -44,7 +46,7 @@ cannot be enabled through URAMSES either.
 | `SEXS`, `SEXS_IEEEST` | Registered | [IEEE Exciters](/models/ieee-exciters/) |
 | `EXPIC1_PSS2B` | Registered | [IEEE Exciters](/models/ieee-exciters/) |
 | `ENTSOE_simp` | Registered | [IEEE Exciters](/models/ieee-exciters/) |
-| `AC1A_MAXEX2`, `AC1A_RETRO*`, `AC8B`, `DC3A`, `EXPIC1`, `SEXS_STAB3_lim`, `ST1A_lim` | Not registered | [IEEE Exciters](/models/ieee-exciters/) |
+| `AC1A_MAXEX2`, `AC1A_RETRO`, `AC1A_RETRO_PSS4B`, `AC8B`, `AC8B_PSS3B_lim`, `DC3A`, `EXPIC1`, `EXPIC1_PSS2B_MAXEX2`, `SEXS_STAB3_lim`, `ST1A_IEEEST_MAXEX2`, `ST1A_lim`, `ST1A_PSS2B_MAXEX2`, `ST1A_PSS3B`, `ST1A_PSS4B_MAXEX2`, `ST2A` | Registered, since 3.79 | [IEEE Exciters](/models/ieee-exciters/) |
 
 ## Governors
 
@@ -57,7 +59,7 @@ cannot be enabled through URAMSES either.
 | `HYDRO_DG` | Registered, since 3.76 | [Custom Governors](/models/custom-governors/) |
 | `DEGOV1`, `ENTSOE_simp` | Registered, since 3.40 | [IEEE Governors](/models/ieee-governors/) |
 | `GAST`, `TGOV1`, `HYGOV` | Registered, since 3.50 | [IEEE Governors](/models/ieee-governors/) |
-| `tor_gasturbm`, `tor_govclasm`, `tor_govhydr`, `tor_govnuc` | Not registered | [Custom Governors](/models/custom-governors/) |
+| `GASTURBM`, `GOVCLASM`, `GOVHYDR`, `GOVNUC` | Built in, since 3.79 | [Custom Governors](/models/custom-governors/) |
 
 ## Injectors
 
@@ -74,7 +76,7 @@ cannot be enabled through URAMSES either.
 | `BESS`, `GFOL`, `GFOR` | Registered |
 | `vfd_load`, `PMU` | Registered |
 | `VFAULT` | Registered, added automatically by RAMSES |
-| `inj_INDM1`, `inj_PVG` | Not registered |
+| `INDM1`, `PV` | Registered, since 3.79 |
 | `inj_norton` | Excluded from the build |
 
 ## Two-Port Models
@@ -86,7 +88,7 @@ cannot be enabled through URAMSES either.
 | `HVDC_LCC` | Registered |
 | `HVDC_VSC_SC` | Registered |
 | `DCL_WCL` | Registered |
-| `twop_HVDC_VSC` | Not registered |
+| `HVDC_VSC` | Registered, since 3.79 |
 
 ## Discrete Controllers
 
