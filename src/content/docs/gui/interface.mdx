@@ -69,8 +69,10 @@ The last of those writes the settings, the comments and the initialization data
 to `dump.trace`; hover any of the four for what it records.
 
 The **observables file** below them is required whenever a trajectory is saved,
-because it is what says which quantities the trajectory should contain. **Show
-observable dialog** builds one interactively instead of writing it by hand.
+because it is what says which quantities the trajectory should contain.
+[Observables File](/user-guide/file-formats/#observables-file) gives its syntax
+and the eight equipment types it accepts. **Show observable dialog** builds one
+interactively instead of writing it by hand.
 
 ## Power Flow Simulation
 
@@ -81,12 +83,14 @@ starts from.
 pane above: bus voltages and angles, the generator table with its limits, the
 system power balance, and the files it exported.
 
-Five buttons enable once a run succeeds:
+Seven buttons enable once a run succeeds:
 
 | Button | What it does |
 |---|---|
-| **Add Helios results to data** | Feeds the solution back into the loaded case |
+| **Add Helios results to data** | Puts the solved `in_volt_trfo.dat` into system data row ten, so the dynamic simulation starts from this operating point |
+| **Save power flow solution** | Keeps a copy of that file, which the next run would otherwise overwrite |
 | **Bus overview** | Bus voltages and angles |
+| **Branch flows** | P and Q at each end, losses, and loading against rated MVA |
 | **Generators & SVCs** | Generator and SVC output, against their limits |
 | **Adjustable transformers** | Transformer ratios, including any Helios adjusted |
 | **Global power balance** | Generation, load, shunts and network losses |
@@ -173,7 +177,7 @@ run:
 |---|---|
 | **Load files for Codegen** | Takes one or more model descriptions in the [CODEGEN language](/developer/user-models/) |
 | **Run Codegen** | Translates them into Fortran, reporting each block with its equation and state counts |
-| **Display loaded files** | Shows the descriptions that were read |
+| **Display loaded files** | Lists the Fortran files generated so far, not the descriptions that were read |
 | **Save converted files** | Writes the generated `.f90` out |
 | **Compile** | Builds and links it against the engine, giving a custom simulator |
 | **Save executable** | Keeps that simulator, rather than rebuilding it next time |
