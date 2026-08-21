@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1140 407" width="1140" height="407" role="img">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#4b5162"/></marker><marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#2b6cb0"/></marker></defs>
+<text x="14" y="166" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#23262f">vx, vy</text>
+<path d="M 76 161 L 110 161" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="110" y="134" width="230" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="225.0" y="165.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">vq = vy cos &#948;g &#8722; vx sin &#948;g</text>
+<path d="M 92 161 L 92 57 L 150 57" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<circle cx="92" cy="161" r="2.6" fill="#4b5162"/>
+<rect x="150" y="30" width="170" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="235.0" y="61.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">V = &#8730;(vx&#178; + vy&#178;)</text>
+<path d="M 320 57 L 360 57" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="360" y="30" width="200" height="54" rx="4" fill="#e7f0fa" stroke="#7ba7d4" stroke-width="1.2"/>
+<text x="460.0" y="53.7" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" fill="#23262f">Blocking hysteresis</text>
+<text x="460.0" y="67.7" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" fill="#23262f">block &lt; Vpllb, release &gt; Vpllu</text>
+<path d="M 340 161 L 447 161" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="400" y="153" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#4b5162">vq</text>
+<path d="M 460 84 L 460 287" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<circle cx="460" cy="161" r="13" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<path d="M 454.54 155.54 L 465.46 166.46 M 454.54 166.46 L 465.46 155.54" stroke="#b6becd" stroke-width="1.2"/>
+<path d="M 473 161 L 580 161" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<circle cx="520" cy="161" r="2.6" fill="#4b5162"/>
+<rect x="580" y="137" width="130" height="48" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="645.0" y="165.3" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">Kp&#969;</text>
+<path d="M 520 161 L 520 90 L 580 90" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="580" y="66" width="130" height="48" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="645.0" y="94.3" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">Ki&#969; / s</text>
+<circle cx="790" cy="161" r="13" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<path d="M 783.5 161 L 796.5 161 M 790 154.5 L 790 167.5" stroke="#b6becd" stroke-width="1"/>
+<text x="769" y="157" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">+</text>
+<text x="792" y="187" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">+</text>
+<path d="M 710 161 L 777 161" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 710 90 L 790 90 L 790 148" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 803 161 L 1000 161" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="1008" y="166" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#23262f">&#969;g</text>
+<circle cx="950" cy="161" r="2.6" fill="#4b5162"/>
+<path d="M 950 161 L 950 300 L 900 300" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="800" y="276" width="100" height="48" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="850.0" y="304.3" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">&#969;N</text>
+<circle cx="700" cy="300" r="13" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<path d="M 693.5 300 L 706.5 300 M 700 293.5 L 700 306.5" stroke="#b6becd" stroke-width="1"/>
+<text x="679" y="296" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">+</text>
+<text x="702" y="326" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">&#8722;</text>
+<path d="M 800 300 L 713 300" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="700" y="372" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#4b5162">&#969;ref</text>
+<path d="M 700 358 L 700 313" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 687 300 L 473 300" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<circle cx="460" cy="300" r="13" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<path d="M 454.54 294.54 L 465.46 305.46 M 454.54 305.46 L 465.46 294.54" stroke="#b6becd" stroke-width="1.2"/>
+<path d="M 447 300 L 384 300" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="300" y="276" width="84" height="48" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="342.0" y="304.3" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">1 / s</text>
+<path d="M 300 300 L 200 300 L 200 188" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="246" y="291" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#4b5162">&#948;g</text>
+<text x="560" y="388" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" fill="#4b5162" font-style="italic">The PLL freezes while the terminal voltage is below Vpllb, and resumes above Vpllu.</text>
+</svg>

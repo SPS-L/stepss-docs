@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 501" width="620" height="501" role="img">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#a8b0bf"/></marker><marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#78aeea"/></marker></defs>
+<path d="M 110 420 L 540 420" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 110 420 L 110 40" fill="none" stroke="#a8b0bf" stroke-width="1.3"/>
+<path d="M 110 40 L 110 28" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="558" y="426" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#e5e7eb">id</text>
+<text x="104" y="20" text-anchor="end" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#e5e7eb">iq</text>
+<path d="M 110 170 A 250 250 0 0 1 360 420" fill="none" stroke="#78aeea" stroke-width="1.6"/>
+<text x="300" y="190" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#b8bdc9">I = Imax</text>
+<path d="M 110 420 L 460 210" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<circle cx="460" cy="210" r="2.6" fill="#a8b0bf"/>
+<circle cx="324.373231428136" cy="291.37606114311836" r="2.6" fill="#a8b0bf"/>
+<path d="M 110 210 L 460 210" fill="none" stroke="#a8b0bf" stroke-width="1.3" stroke-dasharray="4 3"/>
+<path d="M 460 420 L 460 210" fill="none" stroke="#a8b0bf" stroke-width="1.3" stroke-dasharray="4 3"/>
+<text x="100" y="215" text-anchor="end" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#b8bdc9">iq*</text>
+<text x="460" y="442" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#b8bdc9">id*</text>
+<path d="M 110 291.37606114311836 L 324.373231428136 291.37606114311836" fill="none" stroke="#a8b0bf" stroke-width="1.3" stroke-dasharray="4 3"/>
+<path d="M 324.373231428136 420 L 324.373231428136 291.37606114311836" fill="none" stroke="#a8b0bf" stroke-width="1.3" stroke-dasharray="4 3"/>
+<text x="100" y="296.37606114311836" text-anchor="end" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#b8bdc9">iqs*</text>
+<text x="324.373231428136" y="442" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#b8bdc9">ids*</text>
+<path d="M 440 204 Q 360 130 330.373231428136 277.37606114311836" fill="none" stroke="#78aeea" stroke-width="1.6" marker-end="url(#arrow-accent)"/>
+<text x="310" y="482" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" fill="#b8bdc9" font-style="italic">Both components are scaled by the same factor, so the angle of the current is kept.</text>
+</svg>

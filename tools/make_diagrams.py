@@ -141,6 +141,19 @@ class Canvas:
             cx += w
         return boxes, cx
 
+    def mult(self, x, y, r=13):
+        """A multiplying junction."""
+        t = self.t
+        self._seen(x + r, y + r)
+        self.parts.append(
+            f'<circle cx="{x}" cy="{y}" r="{r}" fill="{t["box"]}" '
+            f'stroke="{t["edge"]}" stroke-width="1.2"/>')
+        d = r * 0.42
+        self.parts.append(
+            f'<path d="M {x - d} {y - d} L {x + d} {y + d} M {x - d} {y + d} '
+            f'L {x + d} {y - d}" stroke="{t["edge"]}" stroke-width="1.2"/>')
+        return x, y
+
     def summing(self, x, y, signs=("+", "+"), r=13):
         """A summing junction. `signs` are placed left and below."""
         t = self.t
@@ -171,7 +184,10 @@ class Canvas:
             f'width="{w}" height="{h}" role="img">\n'
             f'<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" '
             f'markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
-            f'<path d="M 0 1 L 10 5 L 0 9 z" fill="{t["line"]}"/></marker></defs>\n'
+            f'<path d="M 0 1 L 10 5 L 0 9 z" fill="{t["line"]}"/></marker>'
+            f'<marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" '
+            f'markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
+            f'<path d="M 0 1 L 10 5 L 0 9 z" fill="{t["accent"]}"/></marker></defs>\n'
             + "\n".join(self.parts)
             + "\n</svg>\n"
         )
@@ -1227,6 +1243,432 @@ def exc_generic(t):
 
 
 # ------------------------------------------------------------- injectors
+def inj_wt3(t):
+    """The WECC composite structure the engine actually implements: an
+    electrical chain across the top, the mechanical one below it."""
+    c = Canvas(1240, 480, t)
+    ey = 67
+    c.label(14, ey + 5, "Pref, Vref", anchor="start", mono=True, size=12)
+    c.arrow(92, ey, 140, ey)
+    c.box(140, 40, 180, 54, ["Plant controller", "REPC_A"], size=12)
+    c.arrow(320, ey, 500, ey)
+    c.box(500, 40, 200, 54, ["Electrical controller", "REEC_A"], size=12)
+    c.arrow(700, ey, 760, ey)
+    c.box(760, 40, 180, 54, ["Generator interface", "REGC_A"], accent=True, size=12)
+    c.arrow(940, ey, 1040, ey)
+    c.label(1048, ey + 5, "ix, iy", anchor="start", mono=True, size=13)
+
+    my = 277
+    c.label(14, my + 5, "Wind speed", anchor="start", mono=True, size=12)
+    c.arrow(112, my, 140, my)
+    c.box(140, 250, 180, 54, ["Aerodynamic rotor", "WTGAR_A"], size=12)
+    c.arrow(320, my, 380, my)
+    c.box(380, 250, 200, 54, ["Two-mass drivetrain", "WTGT_A"], size=12)
+    c.arrow(580, my, 700, my)
+    c.wire(636, my, "&#969;g")
+    c.box(700, 250, 200, 54, ["Torque controller", "WTGTRQ_A"], size=12)
+
+    # electrical torque acts on the shaft, straight down between the two rows
+    c.path("M 540 94 L 540 250", arrow=True)
+    c.label(552, 178, "Te", anchor="start", mono=True, size=12, muted=True)
+
+    # the speed-power characteristic sets the active power order
+    c.path("M 900 277 L 1010 277 L 1010 160 L 600 160 L 600 94", arrow=True)
+    c.label(806, 152, "Te,ref from the speed-power table", size=11, muted=True, italic=True)
+
+    # and the same speed drives the pitch
+    c.dot(650, my)
+    c.path("M 650 277 L 650 407 L 580 407", arrow=True)
+    c.box(380, 380, 200, 54, ["Pitch controller", "WTGPT_A"], size=12)
+    c.path("M 380 407 L 230 407 L 230 304", arrow=True)
+    c.label(244, 400, "pitch angle", anchor="start", size=11, muted=True, italic=True)
+    return c
+
+
+def inj_wt4(t):
+    c = Canvas(1360, 400, t)
+    ey = 67
+    c.label(14, ey + 5, "Pref, Vref", anchor="start", mono=True, size=12)
+    c.arrow(92, ey, 140, ey)
+    c.box(140, 40, 180, 54, ["Plant controller", "REPC_A"], size=12)
+    c.arrow(320, ey, 380, ey)
+    c.box(380, 40, 190, 54, ["Power order ramp", "dPmax, dPmin"], accent=True, size=12)
+    c.arrow(570, ey, 630, ey)
+    c.box(630, 40, 200, 54, ["Electrical controller", "REEC_A"], size=12)
+    c.arrow(830, ey, 890, ey)
+    c.box(890, 40, 180, 54, ["Generator interface", "REGC_A"], accent=True, size=12)
+    c.arrow(1070, ey, 1170, ey)
+    c.label(1178, ey + 5, "ix, iy", anchor="start", mono=True, size=13)
+
+    my = 257
+    c.label(452, my + 5, "Tm", anchor="start", mono=True, size=12)
+    c.arrow(500, my, 630, my)
+    c.box(630, 230, 240, 54, ["Two-mass drivetrain", "WTGT_A"], size=12)
+    c.arrow(870, my, 970, my)
+    c.label(978, my + 5, "&#969;g", anchor="start", mono=True, size=13)
+    c.path("M 710 94 L 710 230", arrow=True)
+    c.label(722, 168, "Te", anchor="start", mono=True, size=12, muted=True)
+    c.label(680, 330, "There is no pitch controller or aerodynamic rotor: all the power "
+                      "passes through the converter.", size=11, muted=True, italic=True)
+    return c
+
+
+def tor_thermal_generic1(t):
+    c = Canvas(1340, 520, t)
+    gy = 67
+    c.label(14, gy + 5, "&#969;", anchor="start", mono=True, size=13)
+    c.summing(110, gy, ("+", "&#8722;"))
+    c.arrow(42, gy, 97, gy)
+    c.label(110, gy + 66, "1", size=13, muted=True, mono=True)
+    c.arrow(110, gy + 52, 110, gy + 13)
+    c.arrow(123, gy, 160, gy)
+    c.box(160, 40, 90, 54, ["1 / &#963;"], size=13)
+    c.arrow(250, gy, 290, gy)
+    c.box(290, 40, 150, 54, ["1 / (1 + sTmes)"], size=12)
+    c.summing(500, gy, ("&#8722;", "&#8722;"))
+    c.label(524, gy - 24, "+", size=13)
+    c.arrow(440, gy, 487, gy)
+    c.label(500, 20, "P0", size=12, muted=True, mono=True)
+    c.arrow(500, 26, 500, gy - 13)
+    c.arrow(513, gy, 550, gy)
+    c.box(550, 40, 100, 54, ["1 / Tsm"], size=13)
+    c.arrow(650, gy, 690, gy)
+    c.box(690, 40, 160, 54, ["Rate limits", "zdotmin, zdotmax"], accent=True, size=11)
+    c.arrow(850, gy, 890, gy)
+    c.box(890, 40, 140, 54, ["1 / s", "zmin, zmax"], accent=True, size=12)
+    c.arrow(1030, gy, 1110, gy)
+    c.label(1118, gy + 5, "z", anchor="start", mono=True, size=13)
+
+    # the gate position closes the governor loop, and drives the turbine below
+    c.dot(1070, gy)
+    c.path(f"M 1070 {gy} L 1070 150 L 500 150 L 500 {gy + 13}", arrow=True)
+    c.dot(1070, 150)
+    c.path("M 1070 150 L 1070 200 L 60 200 L 60 277 L 120 277", arrow=True)
+
+    ty = 277
+    c.box(120, 250, 150, 54, ["1 / (1 + sThp)"], size=12)
+    c.arrow(270, ty, 320, ty)
+    c.box(320, 250, 150, 54, ["1 / (1 + sTr)"], size=12)
+    c.arrow(470, ty, 520, ty)
+    c.box(520, 250, 150, 54, ["1 / (1 + sTlp)"], size=12)
+    c.arrow(670, ty, 710, ty)
+    c.box(710, 250, 150, 54, ["1 &#8722; Fhp &#8722; Fmp"], size=12)
+
+    c.summing(900, ty, ("+", "+"))
+    c.arrow(860, ty, 887, ty)
+    c.summing(1000, ty, ("+", "+"))
+    c.arrow(913, ty, 987, ty)
+
+    c.dot(295, ty)
+    c.path("M 295 277 L 295 440 L 700 440", arrow=True)
+    c.box(700, 413, 120, 54, ["Fhp"], size=13)
+    c.path("M 820 440 L 1000 440 L 1000 290", arrow=True)
+
+    c.dot(495, ty)
+    c.path("M 495 277 L 495 358 L 700 358", arrow=True)
+    c.box(700, 331, 120, 54, ["Fmp &#183; ivo"], size=12)
+    c.path("M 820 358 L 900 358 L 900 290", arrow=True)
+
+    c.arrow(1013, ty, 1080, ty)
+    c.wire(1046, ty, "Pm")
+    c.box(1080, 250, 120, 54, ["Pm / &#969;"], size=13)
+    c.arrow(1200, ty, 1260, ty)
+    c.label(1268, ty + 5, "Tm", anchor="start", mono=True, size=13)
+    c.label(1140, 340, "&#969;", mono=True, size=12, muted=True)
+    c.arrow(1140, 326, 1140, 304)
+    c.label(600, 500, "The reheat stage carries the initial valve opening ivo as a "
+                      "factor, in the lag and in the fraction alike.",
+            size=11, muted=True, italic=True)
+    return c
+
+
+# --------------------------------------------- grid-following converter
+def gfol_pll(t):
+    c = Canvas(1140, 400, t)
+    my = 161
+    c.label(14, my + 5, "vx, vy", anchor="start", mono=True, size=12)
+    c.arrow(76, my, 110, my)
+    c.box(110, 134, 230, 54, ["vq = vy cos &#948;g &#8722; vx sin &#948;g"], size=12)
+    c.path(f"M 92 {my} L 92 57 L 150 57", arrow=True)
+    c.dot(92, my)
+    c.box(150, 30, 170, 54, ["V = &#8730;(vx&#178; + vy&#178;)"], size=12)
+    c.arrow(320, 57, 360, 57)
+    c.box(360, 30, 200, 54, ["Blocking hysteresis", "block &lt; Vpllb, release &gt; Vpllu"],
+          accent=True, size=11)
+
+    # the block signal gates both integrators, on one vertical
+    c.arrow(340, my, 447, my)
+    c.wire(400, my, "vq")
+    c.path("M 460 84 L 460 287", arrow=True)
+    c.mult(460, my)
+
+    c.arrow(473, my, 580, my)
+    c.dot(520, my)
+    c.box(580, 137, 130, 48, ["Kp&#969;"], size=13)
+    c.path(f"M 520 {my} L 520 90 L 580 90", arrow=True)
+    c.box(580, 66, 130, 48, ["Ki&#969; / s"], size=13)
+    c.summing(790, my, ("+", "+"))
+    c.arrow(710, my, 777, my)
+    c.path(f"M 710 90 L 790 90 L 790 {my - 13}", arrow=True)
+    c.arrow(803, my, 1000, my)
+    c.label(1008, my + 5, "&#969;g", anchor="start", mono=True, size=13)
+
+    # and the angle comes back round the bottom, right to left
+    c.dot(950, my)
+    c.path(f"M 950 {my} L 950 300 L 900 300", arrow=True)
+    c.box(800, 276, 100, 48, ["&#969;N"], size=13)
+    c.summing(700, 300, ("+", "&#8722;"))
+    c.arrow(800, 300, 713, 300)
+    c.label(700, 372, "&#969;ref", size=12, muted=True, mono=True)
+    c.arrow(700, 358, 700, 313)
+    c.arrow(687, 300, 473, 300)
+    c.mult(460, 300)
+    c.arrow(447, 300, 384, 300)
+    c.box(300, 276, 84, 48, ["1 / s"], size=13)
+    c.path("M 300 300 L 200 300 L 200 188", arrow=True)
+    c.wire(246, 300, "&#948;g", dy=-9)
+    c.label(560, 388, "The PLL freezes while the terminal voltage is below Vpllb, and "
+                      "resumes above Vpllu.", size=11, muted=True, italic=True)
+    return c
+
+
+def gfol_currentctl(t):
+    c = Canvas(1080, 430, t)
+    for row, (ref, meas, out, cross, sign) in enumerate((
+            ("id", "id", "vmd", "&#969;g L iq", "&#8722;"),
+            ("iq", "iq", "vmq", "&#969;g L id", "+"))):
+        y = 140 + row * 190
+        c.label(14, y + 5, f"{ref}ref", anchor="start", mono=True, size=12)
+        c.summing(150, y, ("+", "&#8722;"))
+        c.arrow(70, y, 137, y)
+        c.label(150, y + 62, meas, size=12, muted=True, mono=True)
+        c.arrow(150, y + 48, 150, y + 13)
+        c.arrow(163, y, 300, y)
+        c.dot(220, y)
+        c.box(300, y - 24, 110, 48, ["Kp"], size=13)
+        c.path(f"M 220 {y} L 220 {y - 72} L 300 {y - 72}", arrow=True)
+        c.box(300, y - 96, 110, 48, ["Ki / s"], size=13)
+        c.summing(480, y, ("+", "+"))
+        c.arrow(410, y, 467, y)
+        c.path(f"M 410 {y - 72} L 480 {y - 72} L 480 {y - 13}", arrow=True)
+        c.summing(620, y, ("+", sign))
+        c.arrow(493, y, 607, y)
+        c.label(620, y + 62, cross, size=12, muted=True, mono=True)
+        c.arrow(620, y + 48, 620, y + 13)
+        if row == 0:
+            c.label(620, y - 62, "vd / r", size=12, muted=True, mono=True)
+            c.arrow(620, y - 48, 620, y - 13)
+        c.arrow(633, y, 730, y)
+        c.label(738, y + 5, out, anchor="start", mono=True, size=13)
+    return c
+
+
+def gfol_pctl(t):
+    c = Canvas(1200, 470, t)
+    y = 130
+    c.label(14, y + 5, "P", anchor="start", mono=True, size=12)
+    c.arrow(44, y, 100, y)
+    c.box(100, y - 27, 160, 54, ["1 / (1 + sTlpf)"], size=12)
+    c.summing(340, y, ("+", "&#8722;"))
+    c.arrow(260, y, 327, y)
+    c.label(340, y - 62, "P0", size=12, muted=True, mono=True)
+    c.arrow(340, y - 48, 340, y - 13)
+    c.arrow(353, y, 450, y)
+    c.dot(400, y)
+    c.box(450, y - 27, 140, 54, ["Kip / s", "&#177;Idmax"], accent=True, size=12)
+    c.path(f"M 400 {y} L 400 {y - 76} L 450 {y - 76}", arrow=True)
+    c.box(450, y - 100, 140, 48, ["Kpp"], size=13)
+    c.summing(680, y, ("+", "+"))
+    c.arrow(590, y, 667, y)
+    c.path(f"M 590 {y - 76} L 680 {y - 76} L 680 {y - 13}", arrow=True)
+    c.arrow(693, y, 800, y)
+    c.wire(746, y, "id_pi")
+    c.box(800, y - 27, 150, 54, ["Limiter", "&#177;Idmax"], accent=True, size=12)
+    c.arrow(950, y, 1010, y)
+    c.label(1018, y + 5, "idref", anchor="start", mono=True, size=13)
+
+    # the d-axis headroom, which the reactive current gets first claim on
+    y2 = 340
+    c.label(14, y2 + 5, "iq", anchor="start", mono=True, size=12)
+    c.arrow(48, y2, 100, y2)
+    c.box(100, y2 - 27, 190, 54, ["&#8730;max(Imax&#178; &#8722; iq&#178;, 0)"], size=12)
+    c.summing(370, y2, ("+", "&#8722;"))
+    c.arrow(290, y2, 357, y2)
+    c.arrow(383, y2, 440, y2)
+    c.box(440, y2 - 27, 110, 54, ["1 / Trlim"], size=12)
+    c.arrow(550, y2, 600, y2)
+    c.box(600, y2 - 27, 170, 54, ["Rate limits", "dPdt_min, dPdt_max"], accent=True, size=11)
+    c.arrow(770, y2, 820, y2)
+    c.box(820, y2 - 27, 150, 54, ["1 / s", "&#177;Imax"], accent=True, size=12)
+    c.arrow(970, y2, 1030, y2)
+    c.label(1038, y2 + 5, "Idmax", anchor="start", mono=True, size=13)
+    c.dot(1000, y2)
+    c.path(f"M 1000 {y2} L 1000 {y2 + 78} L 370 {y2 + 78} L 370 {y2 + 13}", arrow=True)
+    c.path(f"M 875 {y2 - 27} L 875 {y - 27 + 54 + 46}", arrow=False, dash=True)
+    c.path(f"M 875 {y + 74} L 875 {y + 27}", arrow=True, dash=True)
+    c.label(940, y + 62, "sets the limits above", size=11, muted=True, italic=True)
+    return c
+
+
+def gfol_qctl(t):
+    c = Canvas(1320, 470, t)
+    ya, yb = 96, 204
+    c.label(14, ya + 5, "Vcomp", anchor="start", mono=True, size=12)
+    c.arrow(88, ya, 130, ya)
+    c.box(130, ya - 24, 150, 48, ["1 / (1 + sTlpf)"], size=12)
+    c.summing(350, ya, ("+", "&#8722;"))
+    c.arrow(280, ya, 337, ya)
+    c.label(350, ya - 54, "Vcomp0", size=11, muted=True, mono=True)
+    c.arrow(350, ya - 42, 350, ya - 13)
+
+    c.label(14, yb + 5, "Q", anchor="start", mono=True, size=12)
+    c.arrow(44, yb, 130, yb)
+    c.box(130, yb - 24, 150, 48, ["1 / (1 + sTlpf)"], size=12)
+    c.summing(350, yb, ("+", "&#8722;"))
+    c.arrow(280, yb, 337, yb)
+    c.label(350, yb + 58, "Q0", size=11, muted=True, mono=True)
+    c.arrow(350, yb + 44, 350, yb + 13)
+
+    # one of the two, chosen by vqswitch, and zeroed while the voltage is very low
+    sw = 470
+    c.path(f"M 363 {ya} L {sw} {ya} L {sw} 136", arrow=False)
+    c.path(f"M 363 {yb} L {sw} {yb} L {sw} 164", arrow=False)
+    c.label(sw + 4, ya - 12, "vqswitch = 1", anchor="start", size=11, muted=True, mono=True)
+    c.label(sw + 4, yb + 22, "vqswitch = 0", anchor="start", size=11, muted=True, mono=True)
+    c.path(f"M {sw} 136 L {sw} 164", arrow=False, dash=True)
+    c.dot(sw, ya)
+    c.dot(sw, yb)
+    my = 150
+    c.arrow(sw, my, 587, my)
+    c.mult(600, my)
+    c.box(430, 320, 220, 54, ["Freeze below Vs2", "gate is 0, else 1"], accent=True, size=12)
+    c.path(f"M 600 320 L 600 {my + 13}", arrow=True)
+    c.label(300, 352, "V", anchor="start", mono=True, size=12)
+    c.arrow(330, 347, 430, 347)
+
+    c.arrow(613, my, 700, my)
+    c.dot(660, my)
+    c.box(700, my - 24, 130, 48, ["Kiv / s", "&#177;iq1max"], accent=True, size=12)
+    c.path(f"M 660 {my} L 660 {my - 74} L 700 {my - 74}", arrow=True)
+    c.box(700, my - 98, 130, 48, ["Kpv"], size=13)
+    c.summing(900, my, ("+", "+"))
+    c.arrow(830, my, 887, my)
+    c.path(f"M 830 {my - 74} L 900 {my - 74} L 900 {my - 13}", arrow=True)
+    c.arrow(913, my, 970, my)
+    c.box(970, my - 24, 130, 48, ["&#177;iq1max"], accent=True, size=12)
+    c.wire(1120, my, "iq1", dy=-11)
+    c.arrow(1100, my, 1147, my)
+    c.summing(1160, my, ("+", "+"))
+    c.arrow(1173, my, 1220, my)
+    c.box(1220, my - 24, 120, 48, ["&#177;Imax"], accent=True, size=12)
+    c.arrow(1340, my, 1390, my)
+    c.label(1398, my + 5, "iqref", anchor="start", mono=True, size=13)
+
+    # the dynamic voltage support branch
+    c.box(760, 320, 300, 54, ["Dynamic voltage support: 0 above Vs1,",
+                              "ramping to &#8722;Imax at Vs2"], accent=True, size=11)
+    c.dot(400, 347)
+    c.path("M 400 347 L 400 430 L 706 430 L 706 347 L 760 347", arrow=True)
+    c.path(f"M 1060 347 L 1160 347 L 1160 {my + 13}", arrow=True)
+    c.wire(1118, 347, "iq2", dy=-9)
+    return c
+
+
+# ---------------------------------------------- grid-forming converter
+def gfor_vsm(t):
+    c = Canvas(1260, 400, t)
+    my = 200
+    c.label(14, my + 5, "P*", anchor="start", mono=True, size=12)
+    c.summing(140, my, ("+", "+"))
+    c.arrow(52, my, 127, my)
+    c.summing(300, my, ("+", "&#8722;"))
+    c.label(324, my - 26, "&#8722;", size=13)
+    c.arrow(153, my, 287, my)
+    c.label(300, my + 62, "Pvirt", size=12, muted=True, mono=True)
+    c.arrow(300, my + 48, 300, my + 13)
+    c.arrow(313, my, 380, my)
+    c.box(380, my - 27, 130, 54, ["1 / 2Hs"], size=13)
+    c.path(f"M 510 {my} L 620 {my}", arrow=False)
+    c.wire(566, my, "&#969;m")
+    c.dot(620, my)
+    c.box(680, my - 27, 100, 54, ["&#969;N"], size=13)
+    c.arrow(620, my, 680, my)
+    c.summing(860, my, ("+", "&#8722;"))
+    c.arrow(780, my, 847, my)
+    c.label(860, my + 62, "&#969;ref", size=12, muted=True, mono=True)
+    c.arrow(860, my + 48, 860, my + 13)
+    c.arrow(873, my, 940, my)
+    c.box(940, my - 27, 100, 54, ["1 / s"], size=13)
+    c.arrow(1040, my, 1100, my)
+    c.label(1108, my + 5, "&#948;m", anchor="start", mono=True, size=13)
+
+    # damping against the PLL estimate of grid frequency
+    ty = 62
+    c.summing(620, ty, ("", "+"))
+    c.path(f"M 620 {my} L 620 {ty + 13}", arrow=True)
+    c.box(1000, ty - 24, 90, 48, ["PLL"], accent=True, size=13)
+    c.arrow(1000, ty, 633, ty)
+    c.wire(760, ty, "&#969;g")
+    c.label(648, ty - 20, "&#8722;", size=13)
+    c.box(400, ty - 24, 90, 48, ["D"], size=13)
+    c.arrow(607, ty, 490, ty)
+    c.path(f"M 400 {ty} L 300 {ty} L 300 {my - 13}", arrow=True)
+
+    # optional droop on the same speed
+    by = 340
+    c.summing(620, by, ("", ""))
+    c.path(f"M 620 {my} L 620 {by - 13}", arrow=True)
+    c.label(598, by - 20, "&#8722;", size=13)
+    c.label(648, by + 20, "+", size=13)
+    c.label(720, by + 5, "1", anchor="start", mono=True, size=13)
+    c.arrow(716, by, 633, by)
+    c.box(400, by - 24, 100, 48, ["1 / Rdroop"], size=12)
+    c.arrow(607, by, 500, by)
+    c.path(f"M 400 {by} L 140 {by} L 140 {my + 13}", arrow=True)
+    return c
+
+
+def gfor_currentlim(t):
+    c = Canvas(620, 500, t)
+    ox, oy = 110, 420          # origin
+    r = 250                    # the Imax circle
+    tt = c.t
+    c.path(f"M {ox} {oy} L {ox + 430} {oy}", arrow=True)
+    c.path(f"M {ox} {oy} L {ox} {oy - 380}", arrow=False)
+    c.path(f"M {ox} {oy - 380} L {ox} {oy - 392}", arrow=True)
+    c.label(ox + 448, oy + 6, "id", anchor="start", mono=True, size=13)
+    c.label(ox - 6, oy - 400, "iq", anchor="end", mono=True, size=13)
+
+    # the limit circle
+    c.parts.append(
+        f'<path d="M {ox} {oy - r} A {r} {r} 0 0 1 {ox + r} {oy}" fill="none" '
+        f'stroke="{tt["accent"]}" stroke-width="1.6"/>')
+    c.label(ox + 190, oy - 230, "I = Imax", size=13, muted=True, mono=True)
+
+    # the unsaturated command, and where it lands after scaling
+    dx, dy = 350, 210
+    sx, sy = 0.0, 0.0
+    import math
+    k = r / math.hypot(dx, dy)
+    sx, sy = dx * k, dy * k
+    c.path(f"M {ox} {oy} L {ox + dx} {oy - dy}", arrow=True)
+    c.dot(ox + dx, oy - dy)
+    c.dot(ox + sx, oy - sy)
+    for px, py, xl, yl in ((dx, dy, "id*", "iq*"), (sx, sy, "ids*", "iqs*")):
+        c.path(f"M {ox} {oy - py} L {ox + px} {oy - py}", arrow=False, dash=True)
+        c.path(f"M {ox + px} {oy} L {ox + px} {oy - py}", arrow=False, dash=True)
+        c.label(ox - 10, oy - py + 5, yl, anchor="end", mono=True, size=12, muted=True)
+        c.label(ox + px, oy + 22, xl, mono=True, size=12, muted=True)
+
+    c.parts.append(
+        f'<path d="M {ox + dx - 20} {oy - dy - 6} Q {ox + 250} {oy - 290} '
+        f'{ox + sx + 6} {oy - sy - 14}" fill="none" stroke="{tt["accent"]}" '
+        f'stroke-width="1.6" marker-end="url(#arrow-accent)"/>')
+    c.label(310, 482, "Both components are scaled by the same factor, so the angle of "
+                      "the current is kept.", size=11, muted=True, italic=True)
+    return c
+
+
 def dctl_ltc_timing(t):
     """A tap changer is an automaton, not a transfer function, so the useful
     picture is the sequence in time rather than a signal path."""
@@ -1516,6 +1958,18 @@ DIAGRAMS = {
     "exc-avr-dg": exc_avr_dg,
     "exc-generic2": exc_generic2,
     "exc-generic": exc_generic,
+    # models/custom-governors.mdx
+    "tor-thermal-generic1": tor_thermal_generic1,
+    # models/custom-injectors.md, wind
+    "inj-wt3": inj_wt3,
+    "inj-wt4": inj_wt4,
+    # models/custom-injectors.md, converters
+    "inj-gfol-pll": gfol_pll,
+    "inj-gfol-currentctl": gfol_currentctl,
+    "inj-gfol-pctl": gfol_pctl,
+    "inj-gfol-qctl": gfol_qctl,
+    "inj-gfor-vsm": gfor_vsm,
+    "inj-gfor-currentlim": gfor_currentlim,
     # models/discrete-controllers.md
     "dctl-ltc-timing": dctl_ltc_timing,
     "dctl-relay-timing": dctl_relay_timing,

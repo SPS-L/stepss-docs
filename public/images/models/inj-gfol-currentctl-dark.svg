@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 430" width="1080" height="430" role="img">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#a8b0bf"/></marker><marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#78aeea"/></marker></defs>
+<text x="14" y="145" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">idref</text>
+<circle cx="150" cy="140" r="13" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<path d="M 143.5 140 L 156.5 140 M 150 133.5 L 150 146.5" stroke="#4a5160" stroke-width="1"/>
+<text x="129" y="136" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">+</text>
+<text x="152" y="166" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">&#8722;</text>
+<path d="M 70 140 L 137 140" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="150" y="202" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#b8bdc9">id</text>
+<path d="M 150 188 L 150 153" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 163 140 L 300 140" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<circle cx="220" cy="140" r="2.6" fill="#a8b0bf"/>
+<rect x="300" y="116" width="110" height="48" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="355.0" y="144.3" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">Kp</text>
+<path d="M 220 140 L 220 68 L 300 68" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="300" y="44" width="110" height="48" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="355.0" y="72.3" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">Ki / s</text>
+<circle cx="480" cy="140" r="13" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<path d="M 473.5 140 L 486.5 140 M 480 133.5 L 480 146.5" stroke="#4a5160" stroke-width="1"/>
+<text x="459" y="136" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">+</text>
+<text x="482" y="166" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">+</text>
+<path d="M 410 140 L 467 140" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 410 68 L 480 68 L 480 127" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<circle cx="620" cy="140" r="13" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<path d="M 613.5 140 L 626.5 140 M 620 133.5 L 620 146.5" stroke="#4a5160" stroke-width="1"/>
+<text x="599" y="136" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">+</text>
+<text x="622" y="166" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">&#8722;</text>
+<path d="M 493 140 L 607 140" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="620" y="202" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#b8bdc9">&#969;g L iq</text>
+<path d="M 620 188 L 620 153" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="620" y="78" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#b8bdc9">vd / r</text>
+<path d="M 620 92 L 620 127" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 633 140 L 730 140" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="738" y="145" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#e5e7eb">vmd</text>
+<text x="14" y="335" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">iqref</text>
+<circle cx="150" cy="330" r="13" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<path d="M 143.5 330 L 156.5 330 M 150 323.5 L 150 336.5" stroke="#4a5160" stroke-width="1"/>
+<text x="129" y="326" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">+</text>
+<text x="152" y="356" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">&#8722;</text>
+<path d="M 70 330 L 137 330" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="150" y="392" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#b8bdc9">iq</text>
+<path d="M 150 378 L 150 343" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 163 330 L 300 330" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<circle cx="220" cy="330" r="2.6" fill="#a8b0bf"/>
+<rect x="300" y="306" width="110" height="48" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="355.0" y="334.3" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">Kp</text>
+<path d="M 220 330 L 220 258 L 300 258" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="300" y="234" width="110" height="48" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="355.0" y="262.3" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">Ki / s</text>
+<circle cx="480" cy="330" r="13" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<path d="M 473.5 330 L 486.5 330 M 480 323.5 L 480 336.5" stroke="#4a5160" stroke-width="1"/>
+<text x="459" y="326" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">+</text>
+<text x="482" y="356" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">+</text>
+<path d="M 410 330 L 467 330" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 410 258 L 480 258 L 480 317" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<circle cx="620" cy="330" r="13" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<path d="M 613.5 330 L 626.5 330 M 620 323.5 L 620 336.5" stroke="#4a5160" stroke-width="1"/>
+<text x="599" y="326" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">+</text>
+<text x="622" y="356" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">+</text>
+<path d="M 493 330 L 607 330" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="620" y="392" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#b8bdc9">&#969;g L id</text>
+<path d="M 620 378 L 620 343" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 633 330 L 730 330" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="738" y="335" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#e5e7eb">vmq</text>
+</svg>

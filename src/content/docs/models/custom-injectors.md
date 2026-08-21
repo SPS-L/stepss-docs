@@ -620,7 +620,12 @@ A Type 3 wind turbine model implementing the WECC composite structure with four 
 
 The doubly-fed induction generator (DFIG) topology allows decoupled control of active and reactive power via rotor-side converter injection.
 
-<img src="/images/models/inj_wt3.svg" alt="WT3 (DFIG) wind turbine model block diagram" style="width:60%" />
+<img src="/images/models/inj-wt3-light.svg"
+     alt="WT3 block diagram. Across the top, the plant controller REPC_A feeds the electrical controller REEC_A, which feeds the generator interface REGC_A and the injected currents ix and iy. Along the bottom, the wind speed drives the aerodynamic rotor WTGAR_A, then the two-mass drivetrain WTGT_A, whose speed drives the torque controller WTGTRQ_A and the pitch controller WTGPT_A. The torque controller returns a reference from the speed-power table to the electrical controller, the pitch controller returns a pitch angle to the rotor, and the electrical torque acts on the drivetrain."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-wt3-dark.svg"
+     alt="WT3 block diagram. Across the top, the plant controller REPC_A feeds the electrical controller REEC_A, which feeds the generator interface REGC_A and the injected currents ix and iy. Along the bottom, the wind speed drives the aerodynamic rotor WTGAR_A, then the two-mass drivetrain WTGT_A, whose speed drives the torque controller WTGTRQ_A and the pitch controller WTGPT_A. The torque controller returns a reference from the speed-power table to the electrical controller, the pitch controller returns a pitch angle to the rotor, and the electrical torque acts on the drivetrain."
+     class="light:sl-hidden" />
 
 #### Scientific Description
 
@@ -643,6 +648,22 @@ with limiter $[I_{ql1}, I_{qh1}]$.
 The plant controller (REPC_A) optionally provides frequency response:
 
 $$\Delta P_{\mathrm{ref}} = D_{\mathrm{dn}}\,\mathrm{sat}(\Delta f, f_{\mathrm{dbd1}}, 0) + D_{\mathrm{up}}\,\mathrm{sat}(\Delta f, 0, f_{\mathrm{dbd2}})$$
+
+**Network interface.** REGC_A injects a current rather than a voltage behind an
+impedance. The filtered active and reactive current commands $I_{pf}$, $I_{qf}$ are
+resolved into the network frame with the PLL angle and rescaled from the machine
+rating to the system base:
+
+$$i_x = \left(I_{pf}\cos\theta_{\mathrm{pll}} + I_{qf}\sin\theta_{\mathrm{pll}}\right)\frac{S_{\mathrm{nom}}}{S_{\mathrm{base}}}$$
+
+$$i_y = \left(I_{pf}\sin\theta_{\mathrm{pll}} - I_{qf}\cos\theta_{\mathrm{pll}}\right)\frac{S_{\mathrm{nom}}}{S_{\mathrm{base}}}$$
+
+The PLL angle itself tracks the $q$-axis component of the filtered terminal voltage:
+
+$$v_q = -v_{x,\mathrm{filt}}\sin\theta_{\mathrm{pll}} + v_{y,\mathrm{filt}}\cos\theta_{\mathrm{pll}}$$
+
+[WT4](#wt4-inj_wt4-type-4-wind-turbine-full-converter) and
+[BESS](#bess-inj_bess-battery-energy-storage-system) use the same interface.
 
 #### Parameters (selected key parameters)
 
@@ -678,7 +699,12 @@ The data-file model name is `WT4` (or `inj_WT4`).
 
 A Type 4 wind turbine with full-rated converter. Unlike Type 3, the generator is fully decoupled from the grid through a back-to-back converter. The model implements the same WECC framework as WT3 but without the doubly-fed rotor circuit: the mechanical sub-model is a single-mass (or two-mass) drive train, and all electrical power passes through the converter. Sub-models include REPC_A (plant controller), REEC_A (electrical controller), WTGT_A (drivetrain), and REGC_A (generator/converter).
 
-<img src="/images/models/inj_wt4.svg" alt="WT4 full-converter wind turbine model block diagram" style="width:60%" />
+<img src="/images/models/inj-wt4-light.svg"
+     alt="WT4 block diagram. The plant controller REPC_A feeds a power order ramp limited by dPmax and dPmin, then the electrical controller REEC_A and the generator interface REGC_A, which injects ix and iy. Below, the mechanical torque drives the two-mass drivetrain WTGT_A to give the generator speed, with the electrical torque acting on it from the electrical controller. There is no pitch controller and no aerodynamic rotor."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-wt4-dark.svg"
+     alt="WT4 block diagram. The plant controller REPC_A feeds a power order ramp limited by dPmax and dPmin, then the electrical controller REEC_A and the generator interface REGC_A, which injects ix and iy. Below, the mechanical torque drives the two-mass drivetrain WTGT_A to give the generator speed, with the electrical torque acting on it from the electrical controller. There is no pitch controller and no aerodynamic rotor."
+     class="light:sl-hidden" />
 
 #### Scientific Description
 
@@ -800,7 +826,12 @@ The PLL is frozen (hysteresis) when the PCC voltage falls below 0.4 pu and react
 
 **Active power and phase angle control (VSM).**
 
-<img src="/images/models/inj_gfor_vsm.png" alt="GFOR virtual synchronous machine active power and phase angle control block diagram" style="width:75%" />
+<img src="/images/models/inj-gfor-vsm-light.svg"
+     alt="Grid-forming virtual synchronous machine block diagram. The active power setpoint, the droop contribution, the damping term and the virtual power are summed and divided by 2Hs to give the virtual speed. That speed multiplied by the nominal angular frequency, less the reference, is integrated into the internal angle. The same speed is compared with the PLL estimate of grid frequency through the damping gain D, and with unity through the droop 1 over Rdroop."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-gfor-vsm-dark.svg"
+     alt="Grid-forming virtual synchronous machine block diagram. The active power setpoint, the droop contribution, the damping term and the virtual power are summed and divided by 2Hs to give the virtual speed. That speed multiplied by the nominal angular frequency, less the reference, is integrated into the internal angle. The same speed is compared with the PLL estimate of grid frequency through the damping gain D, and with unity through the droop 1 over Rdroop."
+     class="light:sl-hidden" />
 
 $$2H\frac{d\omega_m}{dt} = P^* - P_{\mathrm{virt}} - D\left(\omega_m - \tilde{\omega}_g\right) + \frac{1 - \omega_m}{R_{\mathrm{droop}}}$$
 
@@ -820,7 +851,12 @@ The current overload ratio $\rho = \sqrt{(i_d^*)^2 + (i_q^*)^2}\,/\,I_{\mathrm{m
 
 $$i_{ds}^* = \frac{i_d^*}{\rho_s}, \qquad i_{qs}^* = \frac{i_q^*}{\rho_s}$$
 
-<img src="/images/models/inj_gfor_currentlim.png" alt="GFOR current limitation: proportional scaling of the dq current vector back to the Imax circle" style="width:45%" />
+<img src="/images/models/inj-gfor-currentlim-light.svg"
+     alt="Grid-forming current limitation. In the d-q current plane, a quarter circle marks the maximum current Imax. The unsaturated command lies outside it, and both components are divided by the same factor so the saturated command lands on the circle along the same ray, preserving the angle of the current."
+     class="dark:sl-hidden" style="max-width:400px" />
+<img src="/images/models/inj-gfor-currentlim-dark.svg"
+     alt="Grid-forming current limitation. In the d-q current plane, a quarter circle marks the maximum current Imax. The unsaturated command lies outside it, and both components are divided by the same factor so the saturated command lands on the circle along the same ray, preserving the angle of the current."
+     class="light:sl-hidden" style="max-width:400px" />
 
 and the modulated voltage is set to the value that yields the saturated currents:
 
@@ -904,7 +940,12 @@ with the analogous transformation for the converter-side currents ($i_{xt} = k\,
 
 **Phase Locked Loop.**
 
-<img src="/images/models/inj_gfol_pll.png" alt="GFOL phase locked loop block diagram with blocking hysteresis" style="width:75%" />
+<img src="/images/models/inj-gfol-pll-light.svg"
+     alt="Grid-following phase-locked loop block diagram. The terminal voltage magnitude drives a blocking hysteresis that gates the loop, blocking below Vpllb and releasing above Vpllu. The q-axis voltage, formed from vx and vy with the PLL angle, is gated and drives a proportional-integral controller whose output is the grid frequency estimate. That estimate, scaled by the nominal angular frequency and less the reference, is gated again and integrated to give the PLL angle, which returns to the q-axis voltage transformation."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-gfol-pll-dark.svg"
+     alt="Grid-following phase-locked loop block diagram. The terminal voltage magnitude drives a blocking hysteresis that gates the loop, blocking below Vpllb and releasing above Vpllu. The q-axis voltage, formed from vx and vy with the PLL angle, is gated and drives a proportional-integral controller whose output is the grid frequency estimate. That estimate, scaled by the nominal angular frequency and less the reference, is gated again and integrated to give the PLL angle, which returns to the q-axis voltage transformation."
+     class="light:sl-hidden" />
 
 The $q$-axis voltage error drives a PI controller whose output is the grid frequency estimate $\tilde{\omega}_g$ (state `w_pll`); integrating $\omega_N(\tilde{\omega}_g - \omega_{\mathrm{ref}})$ gives the PLL angle. The PI gains follow from the PLL response time $\tau$:
 
@@ -914,7 +955,12 @@ The PLL is blocked once the PCC voltage $V$ falls below `Vpllb` and reactivated 
 
 **Inner current control.**
 
-<img src="/images/models/inj_gfol_currentctl.png" alt="GFOL dq current control loops block diagram" style="width:55%" />
+<img src="/images/models/inj-gfol-currentctl-light.svg"
+     alt="Grid-following inner current control. Two identical loops compare the d-axis and q-axis current references with the measured currents, drive proportional-integral controllers, and add the cross-coupling terms: the d-axis output takes the transformer voltage over the ratio and subtracts the coupling term, the q-axis output adds it."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-gfol-currentctl-dark.svg"
+     alt="Grid-following inner current control. Two identical loops compare the d-axis and q-axis current references with the measured currents, drive proportional-integral controllers, and add the cross-coupling terms: the d-axis output takes the transformer voltage over the ratio and subtracts the coupling term, the q-axis output adds it."
+     class="light:sl-hidden" />
 
 $$v_{md} = \frac{v_d}{r} - \tilde{\omega}_g L\, i_q + \left(K_p + \frac{K_i}{s}\right)\left(i_d^{\mathrm{ref}} - i_d\right)$$
 
@@ -926,7 +972,12 @@ $$v_{md} = \frac{v_d}{r} + R\, i_d - \tilde{\omega}_g L\, i_q, \qquad v_{mq} = \
 
 **Active power control.**
 
-<img src="/images/models/inj_gfol_pctl.png" alt="GFOL active power control and rate-limited d-axis current limit block diagram" style="width:75%" />
+<img src="/images/models/inj-gfol-pctl-light.svg"
+     alt="Grid-following active power control. The measured active power is filtered, compared with the setpoint, and drives a proportional-integral controller whose output passes a limiter to give the d-axis current reference. Below, the d-axis headroom is computed as the square root of Imax squared less the reactive current squared, and tracked through a lag with rate limits and an integrator; its output sets the limits of the loop above."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-gfol-pctl-dark.svg"
+     alt="Grid-following active power control. The measured active power is filtered, compared with the setpoint, and drives a proportional-integral controller whose output passes a limiter to give the d-axis current reference. Below, the d-axis headroom is computed as the square root of Imax squared less the reactive current squared, and tracked through a lag with rate limits and an integrator; its output sets the limits of the loop above."
+     class="light:sl-hidden" />
 
 The measured active power is filtered with time constant $T_{\mathrm{lpf}}$ and compared with the setpoint $P^0$; a PI controller ($K_{pp}$, $K_{ip}$) with non-windup limits $\pm I_d^{\max}$ produces $i_d^{\mathrm{ref}}$. The limit gives **priority to the reactive current**:
 
@@ -936,7 +987,12 @@ and $I_d^{\max}$ tracks this static value through a first-order lag ($T_{\mathrm
 
 **Voltage / reactive power control.**
 
-<img src="/images/models/inj_gfol_qctl.png" alt="GFOL voltage/reactive power control and dynamic voltage support block diagram" style="width:85%" />
+<img src="/images/models/inj-gfol-qctl-light.svg"
+     alt="Grid-following voltage and reactive power control. Either the compensated voltage or the reactive power is filtered and compared with its setpoint, selected by vqswitch. The error is gated to zero below Vs2, drives a proportional-integral controller with limits, and gives the first reactive current component. A second component implements dynamic voltage support, zero above Vs1 and ramping to minus Imax at Vs2. The two are summed and limited to give the reactive current reference."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-gfol-qctl-dark.svg"
+     alt="Grid-following voltage and reactive power control. Either the compensated voltage or the reactive power is filtered and compared with its setpoint, selected by vqswitch. The error is gated to zero below Vs2, drives a proportional-integral controller with limits, and gives the first reactive current component. A second component implements dynamic voltage support, zero above Vs1 and ramping to minus Imax at Vs2. The two are summed and limited to give the reactive current reference."
+     class="light:sl-hidden" />
 
 Depending on `vqswitch`, either the compensated voltage or the reactive power is controlled:
 

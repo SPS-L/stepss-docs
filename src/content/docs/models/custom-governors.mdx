@@ -172,43 +172,54 @@ The data-file model name is `THERMAL_GENERIC1`.
 
 The `tor_thermal_generic1` model is a **generic multi-stage steam turbine governor**, suitable for both single-shaft and cross-compound units. It includes a speed controller with rate-limiting, a three-section steam chest/reheater, and separate HP, MP, and LP turbine stages.
 
-<img src="/images/models/tor_thermal_generic1.svg" alt="Thermal generic governor block diagram" style="width:60%" />
+<img src="/images/models/tor-thermal-generic1-light.svg"
+     alt="THERMAL_GENERIC1 block diagram. The speed deviation from unity is divided by the droop sigma and filtered with time constant Tmes. That term and the gate position are subtracted from the power setpoint P0, divided by the servo time constant Tsm, rate-limited between zdotmin and zdotmax, and integrated between zmin and zmax to give the gate opening z. The gate drives three lags in series with time constants Thp, Tr and Tlp; the three stage powers are formed with the fractions Fhp, Fmp times ivo and one minus Fhp minus Fmp, summed into the mechanical power, and divided by the rotor speed to give the torque."
+     class="dark:sl-hidden" />
+<img src="/images/models/tor-thermal-generic1-dark.svg"
+     alt="THERMAL_GENERIC1 block diagram. The speed deviation from unity is divided by the droop sigma and filtered with time constant Tmes. That term and the gate position are subtracted from the power setpoint P0, divided by the servo time constant Tsm, rate-limited between zdotmin and zdotmax, and integrated between zmin and zmax to give the gate opening z. The gate drives three lags in series with time constants Thp, Tr and Tlp; the three stage powers are formed with the fractions Fhp, Fmp times ivo and one minus Fhp minus Fmp, summed into the mechanical power, and divided by the rotor speed to give the torque."
+     class="light:sl-hidden" />
 
 **Speed governor:**
 
-A speed measurement with time constant $T_{mes}$ feeds a droop-based error:
+The speed deviation is divided by the droop $\sigma$ and measured with time constant $T_{mes}$:
 
 $$
-e_{gov} = P_0 - P_{meas} \cdot \sigma + (1 - \omega)
+T_{mes}\,\dot{x}_1 = -x_1 + \frac{\omega - 1}{\sigma}
 $$
 
-where $\sigma$ is the droop coefficient.
+The gate demand is what remains of the power setpoint after that term and the current gate position are taken off:
 
-The gate/valve demand is computed by an integrator with rate limits $[zdot_{min},\, zdot_{max}]$ and position limits $[z_{min},\, z_{max}]$, filtered through a servo time constant $T_{sm}$.
+$$
+e_{gov} = P_0 - x_1 - z
+$$
+
+It is divided by the servo time constant $T_{sm}$, rate-limited to $[zdot_{min},\, zdot_{max}]$, and integrated into the gate opening $z$ within $[z_{min},\, z_{max}]$.
 
 **Turbine power stages:**
 
-The steam chest dynamics drive three stages with power fractions $F_{hp}$, $F_{mp}$, $(1-F_{hp}-F_{mp})$:
+The gate opening drives three lags in series, the reheat stage carrying the initial valve opening $ivo$ as a factor:
 
 $$
-\frac{d T_{mHP}}{dt} = \frac{1}{T_{hp}}(F_{hp} \cdot z - T_{mHP})
+T_{hp}\,\dot{x}_{hp} = -x_{hp} + z, \qquad
+T_r\,\dot{x}_r = -x_r + x_{hp}, \qquad
+T_{lp}\,\dot{x}_{lp} = -x_{lp} + ivo\,x_r
 $$
 
-$$
-\frac{d T_{mMP}}{dt} = \frac{1}{T_r}(F_{mp} \cdot T_{mHP}/F_{hp} - T_{mMP})
-$$
+Each stage contributes its own fraction of the power, and the three fractions sum to one:
 
 $$
-\frac{d T_{mLP}}{dt} = \frac{1}{T_{lp}}((1-F_{hp}-F_{mp}) \cdot T_{mMP}/F_{mp} - T_{mLP})
+P_{mHP} = F_{hp}\,x_{hp}, \qquad
+P_{mMP} = F_{mp}\,ivo\,x_r, \qquad
+P_{mLP} = (1 - F_{hp} - F_{mp})\,x_{lp}
 $$
 
-Total mechanical power:
+Total mechanical power, and the torque delivered to the shaft:
 
 $$
-P_m = T_{mHP} + T_{mMP} + T_{mLP}
+P_m = P_{mHP} + P_{mMP} + P_{mLP}, \qquad T_m = \frac{P_m}{\omega}
 $$
 
-**Parameters from Fortran `associate` block:**
+**Parameters:**
 
 | Parameter | Index | Description |
 |-----------|-------|-------------|
@@ -306,7 +317,7 @@ $$
 P_m = T_m \cdot \omega
 $$
 
-**Parameters from Fortran `associate` block:**
+**Parameters:**
 
 | Parameter | Index | Description |
 |-----------|-------|-------------|
