@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 328" width="1180" height="328" role="img">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#4b5162"/></marker></defs>
+<text x="14" y="59" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#23262f">V, Id, Iq</text>
+<path d="M 90 53.0 L 124 53.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="124" y="26" width="160" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="204.0" y="49.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Compensator</text>
+<text x="204.0" y="64.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">V + Xc&#183;Iq &#8722; Rc&#183;Id</text>
+<path d="M 284 53 L 321 53" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="304" y="45" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#4b5162">Vc</text>
+<circle cx="334" cy="53" r="13" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<path d="M 327.5 53 L 340.5 53 M 334 46.5 L 334 59.5" stroke="#b6becd" stroke-width="1"/>
+<text x="313" y="49" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">&#8722;</text>
+<text x="336" y="79" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">+</text>
+<text x="290" y="17" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#4b5162">Vref</text>
+<path d="M 334 11 L 334 40" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 347 53.0 L 381 53.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="381" y="26" width="198" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="480.0" y="49.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">PI + proportional</text>
+<text x="480.0" y="64.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">KP + KI/s + C(1+sTC)/(1+sTB)</text>
+<path d="M 579 53.0 L 613 53.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="613" y="26" width="150" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="688.0" y="57.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Amplifier KA / (1+sTA)</text>
+<path d="M 763 53.0 L 797 53.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="797" y="26" width="176" height="54" rx="4" fill="#e7f0fa" stroke="#7ba7d4" stroke-width="1.2"/>
+<text x="885.0" y="49.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">AC exciter 1 / sTE</text>
+<text x="885.0" y="64.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">KE&#183;VE + SE(VE)</text>
+<path d="M 973 53 L 1013 53" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="1021" y="58" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#23262f">vf</text>
+<text x="14" y="209" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#23262f">&#969; or P</text>
+<path d="M 76 203.0 L 110 203.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="110" y="176" width="150" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="185.0" y="199.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Washout and</text>
+<text x="185.0" y="214.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">two lead-lag stages</text>
+<text x="290" y="195" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#4b5162">VPSS</text>
+<path d="M 260 203 L 334 203 L 334 66" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="14" y="294" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#23262f">Ifd</text>
+<path d="M 52 290 L 130 290" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="134" y="268" width="176" height="44" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="222.0" y="294.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">OEL</text>
+<path d="M 310 290 L 334 290 L 334 203" fill="none" stroke="#4b5162" stroke-width="1.3"/>
+<circle cx="334" cy="203" r="2.6" fill="#4b5162"/>
+<text x="378" y="280" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#4b5162">VOEL</text>
+</svg>

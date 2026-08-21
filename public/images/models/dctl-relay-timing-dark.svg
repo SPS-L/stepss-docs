@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 312" width="1020" height="312" role="img">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#a8b0bf"/></marker></defs>
+<text x="30" y="60" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#e5e7eb">V</text>
+<path d="M 96 178 L 930 178" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 96 40 L 96 178" fill="none" stroke="#a8b0bf" stroke-width="1.3"/>
+<path d="M 96 118 L 900 118" fill="none" stroke="#a8b0bf" stroke-width="1.3" stroke-dasharray="4 3"/>
+<text x="910" y="122" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#b8bdc9">threshold</text>
+<path d="M 96 78 L 210 78 L 224 150 L 316 150 L 330 78 L 520 78 L 534 158 L 900 158" fill="none" stroke="#a8b0bf" stroke-width="1.3"/>
+<path d="M 224 46 L 224 276" fill="none" stroke="#a8b0bf" stroke-width="1.3" stroke-dasharray="4 3"/>
+<path d="M 330 46 L 330 276" fill="none" stroke="#a8b0bf" stroke-width="1.3" stroke-dasharray="4 3"/>
+<path d="M 534 46 L 534 276" fill="none" stroke="#a8b0bf" stroke-width="1.3" stroke-dasharray="4 3"/>
+<path d="M 700 46 L 700 276" fill="none" stroke="#a8b0bf" stroke-width="1.3" stroke-dasharray="4 3"/>
+<text x="277" y="36" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#b8bdc9" font-style="italic">recovers before the delay expires</text>
+<text x="617" y="36" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#b8bdc9">delay</text>
+<path d="M 224 196 L 330 196" fill="none" stroke="#a8b0bf" stroke-width="1.3"/>
+<path d="M 224 190 L 224 202 M 330 190 L 330 202" fill="none" stroke="#a8b0bf" stroke-width="1.3"/>
+<path d="M 534 196 L 700 196" fill="none" stroke="#a8b0bf" stroke-width="1.3"/>
+<path d="M 534 190 L 534 202 M 700 190 L 700 202" fill="none" stroke="#a8b0bf" stroke-width="1.3"/>
+<text x="277" y="214" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#b8bdc9" font-style="italic">timer resets</text>
+<text x="617" y="214" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#b8bdc9" font-style="italic">timer completes</text>
+<text x="6" y="250" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#e5e7eb">output</text>
+<path d="M 96 278 L 930 278" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 96 262 L 700 262 L 700 238 L 900 238" fill="none" stroke="#a8b0bf" stroke-width="1.3"/>
+<text x="790" y="230" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#b8bdc9">trip</text>
+<text x="934" y="292" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#e5e7eb">t</text>
+</svg>

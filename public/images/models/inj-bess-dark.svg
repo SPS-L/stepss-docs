@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 250" width="1180" height="250" role="img">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#a8b0bf"/></marker></defs>
+<text x="14" y="58" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">Pref, Vref</text>
+<path d="M 104 53.0 L 138 53.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="138" y="26" width="156" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="216.0" y="49.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Plant controller</text>
+<text x="216.0" y="64.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">REPC_A</text>
+<path d="M 294 53.0 L 328 53.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="328" y="26" width="188" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="422.0" y="49.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Converter electrical</text>
+<text x="422.0" y="64.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">REEC_C, Ip and Iq vs V</text>
+<path d="M 516 53.0 L 550 53.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="550" y="26" width="166" height="54" rx="4" fill="#1d2b3d" stroke="#3f6087" stroke-width="1.2"/>
+<text x="633.0" y="49.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Generator interface</text>
+<text x="633.0" y="64.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">REGC_A</text>
+<path d="M 716 53 L 760 53" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="768" y="58" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">ix, iy</text>
+<rect x="316" y="140" width="214" height="58" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="423.0" y="165.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">State of charge</text>
+<text x="423.0" y="180.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">clamps set Pmax, Pmin</text>
+<path d="M 423 140 L 423 80" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 738 53 L 738 169 L 530 169" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<circle cx="738" cy="53" r="2.6" fill="#a8b0bf"/>
+<text x="640" y="160" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#b8bdc9">Pbess</text>
+<text x="430" y="228" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" fill="#b8bdc9" font-style="italic">A depleted or full battery has its dispatch limit driven to zero.</text>
+</svg>

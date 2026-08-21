@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 258" width="1120" height="258" role="img">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#4b5162"/></marker></defs>
+<text x="14" y="63" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#23262f">Ifd or Efd</text>
+<path d="M 96 57.0 L 130 57.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="130" y="30" width="176" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="218.0" y="53.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Timer, three points</text>
+<text x="218.0" y="68.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">(Ifd, T)</text>
+<path d="M 306 57.0 L 340 57.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="340" y="30" width="150" height="54" rx="4" fill="#e7f0fa" stroke="#7ba7d4" stroke-width="1.2"/>
+<text x="415.0" y="53.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Hysteresis latch</text>
+<text x="415.0" y="68.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">when timer &#8805; 1</text>
+<path d="M 490 57 L 534 57" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="542" y="62" text-anchor="start" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" fill="#4b5162" font-style="italic">latched</text>
+<text x="14" y="193" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#23262f">Ifd,ref</text>
+<path d="M 76 187 L 115 187" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<circle cx="128" cy="187" r="13" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<path d="M 121.5 187 L 134.5 187 M 128 180.5 L 128 193.5" stroke="#b6becd" stroke-width="1"/>
+<text x="107" y="183" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">+</text>
+<text x="130" y="213" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">&#8722;</text>
+<text x="128" y="239" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#4b5162">Ifd,mes</text>
+<path d="M 128 225 L 128 200" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="158" y="179" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#4b5162">eIFD</text>
+<path d="M 141 187.0 L 175 187.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="175" y="160" width="188" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="269.0" y="183.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Limited integrator</text>
+<text x="269.0" y="198.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">1 / KOEL, gated by the latch</text>
+<path d="M 363 187 L 407 187" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="415" y="192" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#23262f">VOEL</text>
+<text x="415" y="213" text-anchor="start" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" fill="#4b5162" font-style="italic">injected at the reference summation</text>
+</svg>

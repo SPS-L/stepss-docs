@@ -22,6 +22,7 @@ a pair.
 from __future__ import annotations
 
 import pathlib
+import re
 
 OUT = pathlib.Path(__file__).resolve().parent.parent / "public" / "images" / "models"
 
@@ -44,12 +45,20 @@ class Canvas:
     def __init__(self, width: int, height: int, t: dict):
         self.w, self.h, self.t = width, height, t
         self.parts: list[str] = []
+        self.maxx = self.maxy = 0.0
+
+    def _seen(self, x, y):
+        """Widen the recorded extent. render() fits the viewBox to it, so a
+        diagram that outgrows its declared size is not silently clipped."""
+        self.maxx = max(self.maxx, float(x))
+        self.maxy = max(self.maxy, float(y))
 
     # -- primitives ---------------------------------------------------------
     def box(self, x, y, w, h, lines, accent=False, size=13):
         t = self.t
         fill = t["accent_box"] if accent else t["box"]
         edge = t["accent_edge"] if accent else t["edge"]
+        self._seen(x + w, y + h)
         self.parts.append(
             f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="4" '
             f'fill="{fill}" stroke="{edge}" stroke-width="1.2"/>'
@@ -69,6 +78,10 @@ class Canvas:
         t = self.t
         fam = MONO if mono else FONT
         fill = t["muted"] if muted else t["ink"]
+        plain = re.sub(r"&#\d+;", "x", str(text))
+        width = len(plain) * size * (0.62 if mono else 0.56)
+        right = x + (width if anchor == "start" else width / 2 if anchor == "middle" else 0)
+        self._seen(right, y + size * 0.3)
         style = ' font-style="italic"' if italic else ""
         self.parts.append(
             f'<text x="{x}" y="{y}" text-anchor="{anchor}" font-family="{fam}" '
@@ -77,6 +90,8 @@ class Canvas:
 
     def path(self, d, arrow=True, dash=False):
         t = self.t
+        for a, b in re.findall(r"(-?[\d.]+)\s+(-?[\d.]+)", d):
+            self._seen(a, b)
         marker = ' marker-end="url(#arrow)"' if arrow else ""
         stroke = ' stroke-dasharray="4 3"' if dash else ""
         self.parts.append(
@@ -91,6 +106,17 @@ class Canvas:
         """One right-angle bend, horizontal first or vertical first."""
         mid = f"L {x2} {y1}" if first == "h" else f"L {x1} {y2}"
         self.path(f"M {x1} {y1} {mid} L {x2} {y2}")
+
+    def band(self, x, y, w, h, label=None):
+        """A shaded horizontal band: a deadband, or a region around a threshold."""
+        t = self.t
+        self._seen(x + w, y + h)
+        self.parts.append(
+            f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{t["accent_box"]}" '
+            f'stroke="{t["accent_edge"]}" stroke-width="0.9" stroke-dasharray="4 3"/>')
+        if label:
+            self.label(x + w + 10, y + h / 2 + 4, label, anchor="start",
+                       size=11, muted=True, mono=True)
 
     def dot(self, x, y):
         self.parts.append(f'<circle cx="{x}" cy="{y}" r="2.6" fill="{self.t["line"]}"/>')
@@ -118,6 +144,7 @@ class Canvas:
     def summing(self, x, y, signs=("+", "+"), r=13):
         """A summing junction. `signs` are placed left and below."""
         t = self.t
+        self._seen(x + r, y + r)
         self.parts.append(
             f'<circle cx="{x}" cy="{y}" r="{r}" fill="{t["box"]}" '
             f'stroke="{t["edge"]}" stroke-width="1.2"/>')
@@ -137,9 +164,11 @@ class Canvas:
     # -- output -------------------------------------------------------------
     def render(self) -> str:
         t = self.t
+        w = max(self.w, int(self.maxx + 16))
+        h = max(self.h, int(self.maxy + 16))
         return (
-            f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {self.w} {self.h}" '
-            f'width="{self.w}" height="{self.h}" role="img">\n'
+            f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" '
+            f'width="{w}" height="{h}" role="img">\n'
             f'<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" '
             f'markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
             f'<path d="M 0 1 L 10 5 L 0 9 z" fill="{t["line"]}"/></marker></defs>\n'
@@ -600,6 +629,857 @@ def exc_kundur(t):
     return c
 
 
+# ------------------------------------------------------- IEEE exciters
+def exc_ac1a(t):
+    c = Canvas(1180, 330, t)
+    y = 26
+    c.label(14, y + 33, "Vt, P, Q", anchor="start", mono=True, size=12)
+    boxes, x = c.chain(84, y, [
+        (150, ["Line drop comp.", "Kv, Rc, Xc"]),
+        (146, ["Transducer", "1 / (1 + sTR)"]),
+    ])
+    sx, sy = x + 52, y + 27
+    c.arrow(x, sy, sx - 13, sy)
+    c.wire(x + 22, sy, "Vc")
+    c.summing(sx, sy, ("&#8722;", "&#8722;"))
+    c.label(sx - 46, sy - 36, "VREF", size=11, muted=True, mono=True)
+    c.arrow(sx, sy - 42, sx, sy - 13)
+    boxes2, x2 = c.chain(sx + 13, y, [
+        (156, ["Lead-lag", "(1 + sTC) / (1 + sTB)"]),
+        (160, ["Amplifier KA / (1+sTA)", "limits VAMIN, VAMAX"]),
+        (132, ["HV gate VUEL", "LV gate VOEL"]),
+        (128, ["Limiter", "VRMIN, VRMAX"]),
+    ])
+    c.arrow(x2, sy, x2 + 40, sy)
+    c.wire(x2 + 22, sy, "VR")
+
+    ry = y + 176
+    c.path(f"M {x2 + 40} {sy} L 1146 {sy} L 1146 {ry + 27}", arrow=False)
+    c.arrow(1146, ry + 27, 1074, ry + 27)
+    c.box(908, ry, 166, 54, ["Exciter integrator", "1 / sTE, VE &#8805; 0"], "accent")
+    c.arrow(908, ry + 27, 840, ry + 27)
+    c.wire(874, ry + 27, "VE", dy=-10)
+    c.box(676, ry, 164, 54, ["Rectifier", "Efd = vrectif(Ifd, VE, KC)"])
+    c.arrow(676, ry + 27, 606, ry + 27)
+    c.label(598, ry + 32, "Efd", anchor="end", mono=True, size=12)
+
+    # demagnetisation and saturation, and the rate feedback
+    c.box(908, ry + 84, 166, 46, ["VFE = KD&#183;Ifd + (KE + SE)&#183;VE"], size=11)
+    c.path(f"M 991 {ry + 84} L 991 {ry + 54}", arrow=True)
+    c.box(320, ry, 200, 54, ["Rate feedback", "sKF / TF / (1 + sTF)"])
+    c.path(f"M 908 {ry + 107} L 420 {ry + 107} L 420 {ry + 54}", arrow=True)
+    c.path(f"M 320 {ry + 27} L {sx} {ry + 27} L {sx} {sy + 13}", arrow=True)
+    c.wire(sx + 34, sy + 46, "VF", dy=0)
+    return c
+
+
+def exc_ac4a(t):
+    c = Canvas(1160, 200, t)
+    y = 40
+    c.label(14, y + 33, "Vt, P, Q", anchor="start", mono=True, size=12)
+    boxes, x = c.chain(84, y, [
+        (146, ["Line drop comp."]),
+        (140, ["Transducer 1/(1+sTR)"]),
+    ])
+    sx, sy = x + 50, y + 27
+    c.arrow(x, sy, sx - 13, sy)
+    c.wire(x + 20, sy, "Vc")
+    c.summing(sx, sy, ("&#8722;", ""))
+    c.label(sx - 44, sy - 36, "VREF", size=11, muted=True, mono=True)
+    c.arrow(sx, sy - 42, sx, sy - 13)
+    boxes2, x2 = c.chain(sx + 13, y, [
+        (134, ["Input limiter", "VIMIN, VIMAX"]),
+        (150, ["Lead-lag", "(1 + sTC) / (1 + sTB)"]),
+        (110, ["HV gate VUEL"]),
+        (168, ["Amplifier KA / (1+sTA)", "limits VRMIN, uplim"], "accent"),
+    ])
+    c.arrow(x2, sy, x2 + 44, sy)
+    c.label(x2 + 52, sy + 5, "Efd", anchor="start", mono=True, size=12)
+    c.label(x2 - 84, y + 132, "uplim = VRMAX &#8722; KC&#183;Ifd", size=11, muted=True, mono=True)
+    c.arrow(x2 - 84, y + 118, x2 - 84, y + 54)
+    return c
+
+
+def exc_ac8b(t):
+    c = Canvas(1140, 260, t)
+    y = 30
+    c.label(14, y + 33, "Vt", anchor="start", mono=True, size=12)
+    boxes, x = c.chain(52, y, [(146, ["Transducer 1/(1+sTR)"])])
+    sx, sy = x + 50, y + 27
+    c.arrow(x, sy, sx - 13, sy)
+    c.wire(x + 20, sy, "Vc")
+    c.summing(sx, sy, ("+", "&#8722;"))
+    c.label(sx - 44, sy - 36, "VREF", size=11, muted=True, mono=True)
+    c.arrow(sx, sy - 42, sx, sy - 13)
+
+    # the PID has a derivative branch beside the proportional-integral one
+    c.dot(sx + 34, sy)
+    c.box(sx + 62, y - 46, 168, 46, ["Derivative sKDR / (1 + sTDR)"], size=11)
+    c.box(sx + 62, y + 34, 168, 46, ["PI  KPR + KIR / s"], size=11)
+    c.path(f"M {sx + 34} {sy} L {sx + 34} {y - 23} L {sx + 62} {y - 23}", arrow=True)
+    c.path(f"M {sx + 34} {sy} L {sx + 34} {y + 57} L {sx + 62} {y + 57}", arrow=True)
+    ax = sx + 268
+    c.path(f"M {sx + 230} {y - 23} L {ax} {y - 23} L {ax} {sy - 13}", arrow=False)
+    c.path(f"M {sx + 230} {y + 57} L {ax} {y + 57} L {ax} {sy + 13}", arrow=False)
+    c.summing(ax, sy, ("", ""))
+    boxes2, x2 = c.chain(ax + 13, y, [
+        (144, ["PID limits", "VPIDMIN, VPIDMAX"]),
+        (150, ["Amplifier KA / (1+sTA)"]),
+        (156, ["Exciter integrator", "1 / sTE, VFEMAX limit"], "accent"),
+    ])
+    c.arrow(x2, sy, x2 + 40, sy)
+    c.wire(x2 + 22, sy, "VE")
+    c.box(x2 + 44, y, 148, 54, ["Saturation SE(VE)", "and rectifier"])
+    c.arrow(x2 + 192, sy, x2 + 232, sy)
+    c.label(x2 + 240, sy + 5, "Efd", anchor="start", mono=True, size=12)
+    return c
+
+
+def exc_dc3a(t):
+    c = Canvas(1080, 250, t)
+    y = 34
+    c.label(14, y + 33, "Vt", anchor="start", mono=True, size=12)
+    boxes, x = c.chain(48, y, [(146, ["Transducer 1/(1+sTR)"])])
+    sx, sy = x + 50, y + 27
+    c.arrow(x, sy, sx - 13, sy)
+    c.wire(x + 20, sy, "Vc")
+    c.summing(sx, sy, ("&#8722;", ""))
+    c.label(sx - 44, sy - 36, "VREF", size=11, muted=True, mono=True)
+    c.arrow(sx, sy - 42, sx, sy - 13)
+    c.wire(sx + 32, sy, "VERR")
+    boxes2, x2 = c.chain(sx + 13, y, [
+        (166, ["Rheostat integrator", "limits VRMIN, VRMAX"]),
+        (176, ["Three-position switch", "VRMIN / VRH / VRMAX"], "accent"),
+        (176, ["DC exciter", "1/sTE, KE + SE(Efd)"]),
+    ])
+    c.arrow(x2, sy, x2 + 44, sy)
+    c.label(x2 + 52, sy + 5, "Efd", anchor="start", mono=True, size=12)
+    c.label(540, 216, "The switch selects on the deadband: VERR below &#8722;KV lowers, "
+                      "above +KV raises, inside holds VRH.",
+            size=11, muted=True, italic=True)
+    return c
+
+
+def exc_ieeet5(t):
+    c = Canvas(1080, 250, t)
+    y = 34
+    c.label(14, y + 33, "Vt", anchor="start", mono=True, size=12)
+    boxes, x = c.chain(48, y, [(146, ["Transducer 1/(1+sTR)"])])
+    sx, sy = x + 50, y + 27
+    c.arrow(x, sy, sx - 13, sy)
+    c.wire(x + 20, sy, "Vc")
+    c.summing(sx, sy, ("&#8722;", ""))
+    c.label(sx - 44, sy - 36, "VREF", size=11, muted=True, mono=True)
+    c.arrow(sx, sy - 42, sx, sy - 13)
+    c.wire(sx + 32, sy, "VERR")
+    boxes2, x2 = c.chain(sx + 13, y, [
+        (168, ["Deadband gate lim_civ", "&#177; KV"]),
+        (166, ["Integrator 1 / sTRH", "limits VRMIN, VRMAX"]),
+        (176, ["DC exciter", "1/sTE, KE + SE(Efd)"]),
+    ])
+    c.arrow(x2, sy, x2 + 44, sy)
+    c.label(x2 + 52, sy + 5, "Efd", anchor="start", mono=True, size=12)
+    c.label(540, 216, "The gate integrates only while the error is outside the deadband, "
+                      "which is what makes it rheostatic.",
+            size=11, muted=True, italic=True)
+    return c
+
+
+def exc_st1a(t):
+    c = Canvas(1180, 340, t)
+    y = 26
+    c.label(14, y + 33, "Vt, P, Q", anchor="start", mono=True, size=12)
+    boxes, x = c.chain(84, y, [
+        (140, ["Line drop comp."]),
+        (140, ["Transducer 1/(1+sTR)"]),
+    ])
+    sx, sy = x + 50, y + 27
+    c.arrow(x, sy, sx - 13, sy)
+    c.wire(x + 20, sy, "Vc")
+    c.summing(sx, sy, ("&#8722;", "&#8722;"))
+    c.label(sx - 52, sy - 36, "VREF, VPSS", size=11, muted=True, mono=True)
+    c.arrow(sx, sy - 42, sx, sy - 13)
+    boxes2, x2 = c.chain(sx + 13, y, [
+        (126, ["Limiter", "VIMIN, VIMAX"]),
+        (104, ["HV gate VUEL"]),
+        (150, ["Lead-lag", "(1+sTC) / (1+sTB)"]),
+        (156, ["Lead-lag", "(1+sTC1) / (1+sTB1)"]),
+    ])
+    c.arrow(x2, sy, x2 + 40, sy)
+
+    ry = y + 188
+    c.box(x2 + 44, y, 158, 54, ["Amplifier KA / (1+sTA)", "limits VAMIN, VAMAX"])
+    c.path(f"M {x2 + 202} {sy} L 1146 {sy} L 1146 {ry + 27}", arrow=False)
+    c.arrow(1146, ry + 27, 1064, ry + 27)
+    c.wire(1104, ry + 27, "VA", dy=-10)
+    c.box(920, ry, 144, 54, ["Field current limiter", "VLR"])
+    c.arrow(920, ry + 27, 856, ry + 27)
+    c.box(732, ry, 124, 54, ["HV gate VUEL", "LV gate VOEL"])
+    c.arrow(732, ry + 27, 668, ry + 27)
+    c.box(492, ry, 176, 54, ["Output limits scaled", "by terminal voltage"], "accent")
+    c.arrow(492, ry + 27, 428, ry + 27)
+    c.label(420, ry + 32, "Efd", anchor="end", mono=True, size=12)
+
+    c.box(160, ry, 190, 54, ["Rate feedback", "sKF / TF / (1 + sTF)"])
+    c.path(f"M 460 {ry + 27} L 350 {ry + 27}", arrow=True)
+    c.dot(460, ry + 27)
+    c.path(f"M 160 {ry + 27} L {sx} {ry + 27} L {sx} {sy + 13}", arrow=True)
+    c.wire(sx + 30, sy + 48, "VF", dy=0)
+    return c
+
+
+def exc_st2a(t):
+    c = Canvas(1160, 280, t)
+    y = 30
+    c.label(14, y + 33, "Vt", anchor="start", mono=True, size=12)
+    boxes, x = c.chain(48, y, [(146, ["Transducer 1/(1+sTR)"])])
+    sx, sy = x + 50, y + 27
+    c.arrow(x, sy, sx - 13, sy)
+    c.wire(x + 20, sy, "Vc")
+    c.summing(sx, sy, ("&#8722;", "&#8722;"))
+    c.label(sx - 52, sy - 36, "VREF, VPSS", size=11, muted=True, mono=True)
+    c.arrow(sx, sy - 42, sx, sy - 13)
+    boxes2, x2 = c.chain(sx + 13, y, [
+        (110, ["HV gate VUEL"]),
+        (150, ["PI amplifier", "KA&#183;TA, KA"]),
+        (128, ["Limiter", "VRMIN, VRMAX"]),
+        (150, ["Field integrator", "VR&#183;VB &#8722; KE&#183;Efd"], "accent"),
+    ])
+    c.arrow(x2, sy, x2 + 44, sy)
+    c.label(x2 + 52, sy + 5, "Efd", anchor="start", mono=True, size=12)
+
+    c.box(340, y + 150, 190, 50, ["Rate feedback", "sKF / TF / (1 + sTF)"])
+    c.path(f"M {x2 + 22} {sy} L {x2 + 22} {y + 175} L 530 {y + 175}", arrow=True)
+    c.dot(x2 + 22, sy)
+    c.path(f"M 340 {y + 175} L {sx} {y + 175} L {sx} {sy + 13}", arrow=True)
+    c.wire(sx + 30, sy + 48, "VF", dy=0)
+    c.label(870, y + 180, "VB from the rectifier voltage VE", size=11, muted=True, italic=True)
+    return c
+
+
+def exc_sexs(t):
+    c = Canvas(900, 180, t)
+    y = 40
+    c.label(14, y + 33, "Vt, VPSS", anchor="start", mono=True, size=12)
+    sx, sy = 158, y + 27
+    c.arrow(96, sy, sx - 13, sy)
+    c.summing(sx, sy, ("&#8722;", ""))
+    c.label(sx, sy + 52, "Vo", size=11, muted=True, mono=True)
+    c.arrow(sx, sy + 38, sx, sy + 13)
+    boxes, x = c.chain(sx + 13, y, [
+        (166, ["Lead-lag", "(1 + sTA) / (1 + sTB)"]),
+        (186, ["Exciter KE / (1 + sTE)", "limits EMIN, EMAX"], "accent"),
+    ])
+    c.arrow(x, sy, x + 48, sy)
+    c.label(x + 56, sy + 5, "Efd", anchor="start", mono=True, size=12)
+    c.label(450, 160, "Vo = Vt + Efd0 / KE at initialisation, so the initial error is zero.",
+            size=11, muted=True, italic=True)
+    return c
+
+
+def exc_entsoe_simp(t):
+    c = Canvas(1180, 290, t)
+    y = 26
+    c.label(14, y + 33, "Vt", anchor="start", mono=True, size=12)
+    sx, sy = 740, y + 27
+    c.arrow(48, sy, sx - 13, sy)
+    c.summing(sx, sy, ("&#8722;", "+"))
+    c.label(sx, sy - 46, "Vo", size=11, muted=True, mono=True)
+    c.arrow(sx, sy - 40, sx, sy - 13)
+    boxes, x = c.chain(sx + 13, y, [
+        (150, ["Lead-lag", "(1+sTA) / (1+sTB)"]),
+        (172, ["Exciter KE / (1 + sTE)", "limits EMIN, EMAX"], "accent"),
+    ])
+    c.arrow(x, sy, x + 44, sy)
+    c.label(x + 52, sy + 5, "Efd", anchor="start", mono=True, size=12)
+
+    py = y + 160
+    c.label(14, py + 33, "&#969; &#8722; 1", anchor="start", mono=True, size=12)
+    boxes2, x2 = c.chain(70, py, [
+        (128, ["Washout", "sTW1 / (1+sTW1)"]),
+        (128, ["Washout", "sTW2 / (1+sTW2)"]),
+        (92, ["Gain KS1"]),
+        (140, ["Lead-lag", "(1+sT1) / (1+sT2)"]),
+        (140, ["Lead-lag", "(1+sT3) / (1+sT4)"]),
+    ], gap=24)
+    c.wire(x2 + 30, py + 27, "VPSS")
+    c.path(f"M {x2} {py + 27} L {sx} {py + 27} L {sx} {sy + 13}", arrow=True)
+    return c
+
+
+# ------------------------------------------------------------ stabilisers
+def pss_pss2b(t):
+    c = Canvas(1160, 270, t)
+    y = 26
+    c.label(14, y + 33, "&#969;", anchor="start", mono=True, size=13)
+    boxes, x = c.chain(46, y, [
+        (128, ["Washout", "sTW1 / (1+sTW1)"]),
+        (128, ["Washout", "sTW2 / (1+sTW2)"]),
+        (128, ["Lag 1 / (1 + sT6)"]),
+    ], gap=26)
+    py = y + 120
+    c.label(14, py + 33, "Pe", anchor="start", mono=True, size=12)
+    boxes2, x2 = c.chain(46, py, [
+        (128, ["Washout", "sTW3 / (1+sTW3)"]),
+        (128, ["Washout", "sTW4 / (1+sTW4)"]),
+        (128, ["Lag 1 / (1 + sT7)"]),
+    ], gap=26)
+    ax = x + 56
+    c.path(f"M {x} {y + 27} L {ax} {y + 27} L {ax} {y + 60}", arrow=False)
+    c.path(f"M {x2} {py + 27} L {ax} {py + 27} L {ax} {y + 88}", arrow=False)
+    c.summing(ax, y + 74, ("", ""))
+    boxes3, x3 = c.chain(ax + 13, y + 47, [
+        (140, ["Ramp-track filter", "N, M stages"]),
+        (140, ["Lead-lag", "(1+sT1) / (1+sT2)"]),
+        (140, ["Lead-lag", "(1+sT3) / (1+sT4)"]),
+        (124, ["Limits", "VSTMIN, VSTMAX"]),
+    ], gap=26)
+    c.arrow(x3, y + 74, x3 + 40, y + 74)
+    c.label(x3 + 48, y + 79, "VPSS", anchor="start", mono=True, size=12)
+    return c
+
+
+def pss_pss3b(t):
+    c = Canvas(1160, 260, t)
+    y = 26
+    c.label(14, y + 33, "VSI1", anchor="start", mono=True, size=12)
+    boxes, x = c.chain(64, y, [
+        (128, ["Lag 1 / (1 + sT1)"]),
+        (160, ["Washout", "KS1&#183;sTW1 / (1+sTW1)"]),
+    ], gap=26)
+    py = y + 116
+    c.label(14, py + 33, "VSI2", anchor="start", mono=True, size=12)
+    boxes2, x2 = c.chain(64, py, [
+        (128, ["Lag 1 / (1 + sT2)"]),
+        (160, ["Washout", "KS2&#183;sTW2 / (1+sTW2)"]),
+    ], gap=26)
+    ax = x + 54
+    c.path(f"M {x} {y + 27} L {ax} {y + 27} L {ax} {y + 58}", arrow=False)
+    c.path(f"M {x2} {py + 27} L {ax} {py + 27} L {ax} {y + 84}", arrow=False)
+    c.summing(ax, y + 71, ("+", "&#8722;"))
+    boxes3, x3 = c.chain(ax + 13, y + 44, [
+        (152, ["Washout", "KS&#183;sTW3 / (1+sTW4)"]),
+        (140, ["2nd-order filter TF1"]),
+        (140, ["2nd-order filter TF2"]),
+    ], gap=26)
+    c.arrow(x3, y + 71, x3 + 40, y + 71)
+    c.label(x3 + 48, y + 76, "VPSS", anchor="start", mono=True, size=12)
+    return c
+
+
+def pss_pss4b(t):
+    c = Canvas(1080, 300, t)
+    c.label(14, 46, "&#916;&#969;", anchor="start", mono=True, size=12)
+    c.arrow(48, 42, 96, 42)
+    c.box(100, 20, 156, 44, ["Digital transducer"], size=12)
+    c.label(14, 152, "Pe", anchor="start", mono=True, size=12)
+    c.arrow(48, 148, 96, 148)
+    c.box(100, 126, 156, 44, ["Two washouts", "and a low-pass"], size=11)
+    bands = [
+        (30, "Low band", "KL1(KL11 + sTL1)"),
+        (114, "Intermediate band", "KI1(KI11 + sTI1)"),
+        (198, "High band", "KH1(KH11 + sTH1)"),
+    ]
+    ax = 700
+    for by, title, expr in bands:
+        c.box(340, by, 240, 54, [title, expr])
+        c.path(f"M 256 {by + 27} L 340 {by + 27}" if by != 198 else
+               f"M 256 148 L 300 148 L 300 {by + 27} L 340 {by + 27}", arrow=True)
+        c.path(f"M 580 {by + 27} L {ax} {by + 27} L {ax} 130", arrow=False)
+    c.summing(ax, 116, ("", ""))
+    c.arrow(ax + 13, 116, ax + 60, 116)
+    c.box(ax + 64, 94, 130, 44, ["Limits", "VSTMIN, VSTMAX"], size=11)
+    c.arrow(ax + 194, 116, ax + 234, 116)
+    c.label(ax + 242, 121, "VPSS", anchor="start", mono=True, size=12)
+    return c
+
+
+def pss_ieeest(t):
+    c = Canvas(1180, 180, t)
+    y = 40
+    c.label(14, y + 33, "VS1", anchor="start", mono=True, size=12)
+    boxes, x = c.chain(58, y, [
+        (152, ["2nd-order filter", "1 / (A2 + sA1 + ...)"]),
+        (152, ["2nd-order filter", "(A6 + sA5 + ...)"]),
+        (134, ["Lead-lag", "(1+sT1)/(1+sT2)"]),
+        (134, ["Lead-lag", "(1+sT3)/(1+sT4)"]),
+        (146, ["Washout", "KS&#183;sT5 / T6 / (1+sT6)"]),
+    ], gap=24)
+    c.arrow(x, y + 27, x + 40, y + 27)
+    c.box(x + 44, y, 120, 54, ["Clamp", "LSMIN, LSMAX"], size=11)
+    c.arrow(x + 164, y + 27, x + 200, y + 27)
+    c.label(x + 208, y + 32, "VPSS", anchor="start", mono=True, size=12)
+    c.label(560, 156, "The input signal is selectable: speed, electrical power, "
+                      "or accelerating power.", size=11, muted=True, italic=True)
+    return c
+
+
+def pss_stab3(t):
+    c = Canvas(1000, 170, t)
+    y = 40
+    c.label(14, y + 33, "Pe", anchor="start", mono=True, size=12)
+    boxes, x = c.chain(50, y, [
+        (140, ["Lag 1 / (1 + sTt)"]),
+        (144, ["Lag 1 / (1 + sTX1)"]),
+        (160, ["Washout", "&#8722;KX&#183;s / (1 + sTX2)"]),
+        (128, ["Clamp &#177; VLIM"]),
+    ])
+    c.arrow(x, y + 27, x + 44, y + 27)
+    c.label(x + 52, y + 32, "VPSS", anchor="start", mono=True, size=12)
+    return c
+
+
+# ------------------------------------------------------------- limiters
+def exc_maxex2(t):
+    c = Canvas(1120, 250, t)
+    y = 30
+    c.label(14, y + 33, "Ifd or Efd", anchor="start", mono=True, size=12)
+    boxes, x = c.chain(96, y, [
+        (176, ["Timer, three points", "(Ifd, T)"]),
+        (150, ["Hysteresis latch", "when timer &#8805; 1"], "accent"),
+    ])
+    c.arrow(x, y + 27, x + 44, y + 27)
+    c.label(x + 52, y + 32, "latched", anchor="start", size=11, muted=True, italic=True)
+
+    py = y + 130
+    c.label(14, py + 33, "Ifd,ref", anchor="start", mono=True, size=12)
+    sx, sy = 128, py + 27
+    c.arrow(76, sy, sx - 13, sy)
+    c.summing(sx, sy, ("+", "&#8722;"))
+    c.label(sx, sy + 52, "Ifd,mes", size=11, muted=True, mono=True)
+    c.arrow(sx, sy + 38, sx, sy + 13)
+    c.wire(sx + 30, sy, "eIFD")
+    boxes2, x2 = c.chain(sx + 13, py, [
+        (188, ["Limited integrator", "1 / KOEL, gated by the latch"]),
+    ])
+    c.arrow(x2, sy, x2 + 44, sy)
+    c.label(x2 + 52, sy + 5, "VOEL", anchor="start", mono=True, size=12)
+    c.label(x2 + 52, sy + 26, "injected at the reference summation",
+            anchor="start", size=11, muted=True, italic=True)
+    return c
+
+
+def exc_integral_oel(t):
+    c = Canvas(1120, 190, t)
+    y = 40
+    c.label(14, y + 33, "Ifd", anchor="start", mono=True, size=12)
+    sx, sy = 130, y + 27
+    c.arrow(52, sy, sx - 13, sy)
+    c.summing(sx, sy, ("+", "&#8722;"))
+    c.label(sx, sy + 54, "1.05&#183;IFDN", size=11, muted=True, mono=True)
+    c.arrow(sx, sy + 40, sx, sy + 13)
+    boxes, x = c.chain(sx + 13, y, [
+        (166, ["Input clamp", "min(&#916;Ifd, 0.35&#183;IFDN)"]),
+        (170, ["Integrator 1 / TOEL", "limits LOEL, UOEL"]),
+        (166, ["Gain KOEL, clamp", "OELLI to 0"], "accent"),
+    ])
+    c.arrow(x, sy, x + 44, sy)
+    c.label(x + 52, sy + 5, "VOEL", anchor="start", mono=True, size=12)
+    c.label(560, 168, "The stator current limiter has the same structure on the "
+                      "stator current.", size=11, muted=True, italic=True)
+    return c
+
+
+# ------------------------------------------------------ other exciters
+def exc_generic1(t):
+    c = Canvas(1180, 300, t)
+    y = 26
+    c.label(14, y + 33, "V", anchor="start", mono=True, size=12)
+    sx, sy = 640, y + 27
+    c.arrow(40, sy, sx - 13, sy)
+    c.summing(sx, sy, ("&#8722;", "+"))
+    c.label(sx - 44, sy - 36, "Vref", size=11, muted=True, mono=True)
+    c.arrow(sx, sy - 42, sx, sy - 13)
+    boxes, x = c.chain(sx + 13, y, [
+        (178, ["AVR", "G(1 + sTA) / (1 + sTB)"]),
+        (172, ["Exciter 1 / (1 + sTE)", "limits L3, L4"], "accent"),
+    ])
+    c.arrow(x, sy, x + 44, sy)
+    c.label(x + 52, sy + 5, "vf", anchor="start", mono=True, size=12)
+
+    py = y + 130
+    c.label(14, py + 33, "&#969; or P", anchor="start", mono=True, size=12)
+    boxes2, x2 = c.chain(76, py, [
+        (150, ["Washout", "KPSS&#183;sTW / (1+sTW)"]),
+        (140, ["Lead-lag", "(1+sT1) / (1+sT2)"]),
+        (140, ["Lead-lag", "(1+sT3) / (1+sT4)"]),
+    ], gap=26)
+    c.wire(x2 + 30, py + 27, "VPSS")
+    c.path(f"M {x2} {py + 27} L {sx} {py + 27} L {sx} {sy + 13}", arrow=True)
+
+    oy = y + 226
+    c.label(14, oy + 20, "Ifd", anchor="start", mono=True, size=12)
+    c.arrow(52, oy + 16, 130, oy + 16)
+    c.box(134, oy - 6, 210, 44, ["Inverse-time OEL"], size=12)
+    c.path(f"M 344 {oy + 16} L {sx} {oy + 16} L {sx} {py + 27}", arrow=False)
+    c.dot(sx, py + 27)
+    c.wire(sx + 44, oy + 16, "VOEL", dy=-10)
+    return c
+
+
+def exc_avr_dg(t):
+    c = Canvas(1180, 300, t)
+    y = 26
+    c.label(14, y + 33, "V", anchor="start", mono=True, size=12)
+    sx, sy = 640, y + 27
+    c.arrow(40, sy, sx - 13, sy)
+    c.summing(sx, sy, ("&#8722;", "+"))
+    c.label(sx - 44, sy - 36, "Vref", size=11, muted=True, mono=True)
+    c.arrow(sx, sy - 42, sx, sy - 13)
+    boxes, x = c.chain(sx + 13, y, [
+        (178, ["AVR", "G(1 + sTA) / (1 + sTB)"]),
+        (172, ["Exciter 1 / (1 + sTE)", "limits L3, L4"], "accent"),
+    ])
+    c.arrow(x, sy, x + 44, sy)
+    c.label(x + 52, sy + 5, "vf", anchor="start", mono=True, size=12)
+
+    py = y + 122
+    c.label(14, py + 33, "&#969; or P", anchor="start", mono=True, size=12)
+    boxes2, x2 = c.chain(76, py, [
+        (150, ["Washout", "KPSS&#183;sTW / (1+sTW)"]),
+        (140, ["Lead-lag", "(1+sT1) / (1+sT2)"]),
+        (140, ["Lead-lag", "(1+sT3) / (1+sT4)"]),
+    ], gap=26)
+    c.wire(x2 + 30, py + 27, "VPSS")
+    c.path(f"M {x2} {py + 27} L {sx} {py + 27} L {sx} {sy + 13}", arrow=True)
+
+    qy = y + 226
+    c.label(14, qy + 20, "Q* &#8722; Q", anchor="start", mono=True, size=12)
+    c.arrow(84, qy + 16, 160, qy + 16)
+    c.box(164, qy - 6, 214, 44, ["Reactive-power PI", "KQP + KQI / s"], "accent")
+    c.path(f"M 378 {qy + 16} L {sx} {qy + 16} L {sx} {py + 27}", arrow=False)
+    c.dot(sx, py + 27)
+    c.wire(sx - 120, qy + 16, "&#916;VQ", dy=-10)
+    c.label(760, qy + 21, "Everything else is GENERIC1, unchanged.",
+            anchor="start", size=11, muted=True, italic=True)
+    return c
+
+
+def exc_generic2(t):
+    c = Canvas(1180, 300, t)
+    y = 26
+    c.label(14, y + 33, "V, Id, Iq", anchor="start", mono=True, size=12)
+    boxes, x = c.chain(90, y, [(160, ["Compensator", "V + Xc&#183;Iq &#8722; Rc&#183;Id"])])
+    sx, sy = x + 50, y + 27
+    c.arrow(x, sy, sx - 13, sy)
+    c.wire(x + 20, sy, "Vc")
+    c.summing(sx, sy, ("&#8722;", "+"))
+    c.label(sx - 44, sy - 36, "Vref", size=11, muted=True, mono=True)
+    c.arrow(sx, sy - 42, sx, sy - 13)
+    boxes2, x2 = c.chain(sx + 13, y, [
+        (198, ["PI + proportional", "KP + KI/s + C(1+sTC)/(1+sTB)"]),
+        (150, ["Amplifier KA / (1+sTA)"]),
+        (176, ["AC exciter 1 / sTE", "KE&#183;VE + SE(VE)"], "accent"),
+    ])
+    c.arrow(x2, sy, x2 + 40, sy)
+    c.label(x2 + 48, sy + 5, "vf", anchor="start", mono=True, size=12)
+
+    py = y + 150
+    c.label(14, py + 33, "&#969; or P", anchor="start", mono=True, size=12)
+    boxes3, x3 = c.chain(76, py, [
+        (150, ["Washout and", "two lead-lag stages"]),
+    ])
+    c.wire(x3 + 30, py + 27, "VPSS")
+    c.path(f"M {x3} {py + 27} L {sx} {py + 27} L {sx} {sy + 13}", arrow=True)
+    c.label(14, py + 118, "Ifd", anchor="start", mono=True, size=12)
+    c.arrow(52, py + 114, 130, py + 114)
+    c.box(134, py + 92, 176, 44, ["OEL"], size=12)
+    c.path(f"M 310 {py + 114} L {sx} {py + 114} L {sx} {py + 27}", arrow=False)
+    c.dot(sx, py + 27)
+    c.wire(sx + 44, py + 114, "VOEL", dy=-10)
+    return c
+
+
+def exc_generic(t):
+    c = Canvas(1180, 290, t)
+    y = 26
+    c.label(14, y + 33, "V", anchor="start", mono=True, size=12)
+    sx, sy = 640, y + 27
+    c.arrow(40, sy, sx - 13, sy)
+    c.summing(sx, sy, ("&#8722;", "+"))
+    c.label(sx - 40, sy - 36, "V0", size=11, muted=True, mono=True)
+    c.arrow(sx, sy - 42, sx, sy - 13)
+    boxes, x = c.chain(sx + 13, y, [
+        (176, ["TGR", "G(1 + sTa) / (1 + sTb)"]),
+        (176, ["Exciter 1 / (1 + sTe)", "limits Vfmin, Vfmax"], "accent"),
+    ])
+    c.arrow(x, sy, x + 44, sy)
+    c.label(x + 52, sy + 5, "vf", anchor="start", mono=True, size=12)
+
+    py = y + 126
+    c.label(14, py + 33, "&#969;", anchor="start", mono=True, size=13)
+    boxes2, x2 = c.chain(50, py, [
+        (150, ["Washout", "KPSS&#183;sTW / (1+sTW)"]),
+        (140, ["Lead-lag", "(1+sT1) / (1+sT2)"]),
+        (140, ["Lead-lag", "(1+sT3) / (1+sT4)"]),
+    ], gap=26)
+    c.wire(x2 + 30, py + 27, "VPSS")
+    c.path(f"M {x2} {py + 27} L {sx} {py + 27} L {sx} {sy + 13}", arrow=True)
+
+    oy = y + 216
+    c.label(14, oy + 20, "Ifd", anchor="start", mono=True, size=12)
+    c.arrow(52, oy + 16, 130, oy + 16)
+    c.box(134, oy - 6, 210, 44, ["OEL"], size=12)
+    c.path(f"M 344 {oy + 16} L {sx} {oy + 16} L {sx} {py + 27}", arrow=False)
+    c.dot(sx, py + 27)
+    c.wire(sx + 44, oy + 16, "VOEL", dy=-10)
+    return c
+
+
+# ------------------------------------------------------------- injectors
+def dctl_ltc_timing(t):
+    """A tap changer is an automaton, not a transfer function, so the useful
+    picture is the sequence in time rather than a signal path."""
+    c = Canvas(1020, 350, t)
+    x0, x1 = 96, 900
+    band_top, band_bot = 92, 126
+    taps = (392, 546, 700)
+    dist = 226
+
+    # -- the monitored voltage
+    c.label(30, 60, "V", anchor="start", mono=True, size=13)
+    c.band(x0, band_top, x1 - x0, band_bot - band_top, "Vset &#177; &#948;V")
+    c.path(f"M {x0} 186 L {x1 + 30} 186", arrow=True)
+    c.path(f"M {x0} 40 L {x0} 186", arrow=False)
+    c.path(f"M {x0} 110 L {dist} 110 L {dist} 168 "
+           f"L {taps[0]} 168 L {taps[0]} 154 "
+           f"L {taps[1]} 154 L {taps[1]} 138 "
+           f"L {taps[2]} 138 L {taps[2]} 114 L {x1} 114",
+           arrow=False)
+
+    # -- the tap position it produces
+    c.label(18, 268, "tap", anchor="start", mono=True, size=13)
+    c.path(f"M {x0} 316 L {x1 + 30} 316", arrow=True)
+    c.path(f"M {x0} 232 L {x0} 316", arrow=False)
+    c.path(f"M {x0} 300 L {taps[0]} 300 L {taps[0]} 278 "
+           f"L {taps[1]} 278 L {taps[1]} 256 "
+           f"L {taps[2]} 256 L {taps[2]} 234 L {x1} 234",
+           arrow=False)
+    c.label(x1 + 34, 330, "t", anchor="start", mono=True, size=13)
+
+    # -- the instants that matter, and the delay that separates them
+    for x, text in ((dist, "disturbance"), (taps[0], ""), (taps[1], ""), (taps[2], "")):
+        c.path(f"M {x} 44 L {x} 322", arrow=False, dash=True)
+        if text:
+            c.label(x, 34, text, size=13, muted=True, italic=True)
+    for a, b, text in ((dist, taps[0], "delay_first"),
+                       (taps[0], taps[1], "delay_next"),
+                       (taps[1], taps[2], "delay_next")):
+        c.path(f"M {a} 210 L {b} 210", arrow=False)
+        c.path(f"M {a} 204 L {a} 216 M {b} 204 L {b} 216", arrow=False)
+        c.label((a + b) / 2, 202, text, size=13, muted=True, mono=True)
+
+    c.label(510, 344, "The tap holds once the voltage is back inside the deadband, and "
+                      "stops at ratio_min or ratio_max.",
+            size=13, muted=True, italic=True)
+    return c
+
+
+def dctl_relay_timing(t):
+    """Pickup, hold, trip; and the reset that makes a transient dip harmless."""
+    c = Canvas(1020, 312, t)
+    x0, x1 = 96, 900
+    thr = 118
+
+    c.label(30, 60, "V", anchor="start", mono=True, size=13)
+    c.path(f"M {x0} 178 L {x1 + 30} 178", arrow=True)
+    c.path(f"M {x0} 40 L {x0} 178", arrow=False)
+    c.path(f"M {x0} {thr} L {x1} {thr}", arrow=False, dash=True)
+    c.label(x1 + 10, thr + 4, "threshold", anchor="start", size=13, muted=True, mono=True)
+
+    # a dip that recovers in time, then one that does not
+    c.path(f"M {x0} 78 L 210 78 L 224 150 L 316 150 L 330 78 L 520 78 "
+           f"L 534 158 L {x1} 158", arrow=False)
+
+    for x in (224, 330, 534, 700):
+        c.path(f"M {x} 46 L {x} 276", arrow=False, dash=True)
+    c.label(277, 36, "recovers before the delay expires", size=13, muted=True, italic=True)
+    c.label(617, 36, "delay", size=13, muted=True, mono=True)
+
+    c.path("M 224 196 L 330 196", arrow=False)
+    c.path("M 224 190 L 224 202 M 330 190 L 330 202", arrow=False)
+    c.path("M 534 196 L 700 196", arrow=False)
+    c.path("M 534 190 L 534 202 M 700 190 L 700 202", arrow=False)
+    c.label(277, 214, "timer resets", size=13, muted=True, italic=True)
+    c.label(617, 214, "timer completes", size=13, muted=True, italic=True)
+
+    c.label(6, 250, "output", anchor="start", mono=True, size=13)
+    c.path(f"M {x0} 278 L {x1 + 30} 278", arrow=True)
+    c.path(f"M {x0} 262 L 700 262 L 700 238 L {x1} 238", arrow=False)
+    c.label(790, 230, "trip", size=13, muted=True, mono=True)
+    c.label(x1 + 34, 292, "t", anchor="start", mono=True, size=13)
+    return c
+
+
+def inj_load(t):
+    c = Canvas(880, 270, t)
+    y, mid = 26, 53
+    c.label(14, mid + 5, "V, f", anchor="start", mono=True, size=12)
+    c.arrow(46, mid, 100, mid)
+    c.box(100, y, 186, 54, ["Steady-state term", "(V/V0)^&#945;s &#183; (1 + DP&#183;&#916;&#969;)"], size=12)
+    sx = 316
+    c.arrow(286, mid, sx - 13, mid)
+    c.summing(sx, mid, ("+", "&#8722;"))
+    c.arrow(sx + 13, mid, sx + 44, mid)
+    c.box(sx + 44, y, 168, 54, ["1 / sTr", "limits xPmin, xPmax"], accent=True, size=12)
+    xp = sx + 236
+    c.wire(xp, mid, "xP")
+    c.arrow(sx + 212, mid, xp + 28, mid)
+    c.box(xp + 28, y, 202, 54, ["P = P0 &#183; xP &#183; (V/V0)&#178;", "&#183; (1 + DP&#183;&#916;&#969;)"], size=12)
+    c.arrow(xp + 230, mid, xp + 268, mid)
+    c.label(xp + 276, mid + 5, "P", anchor="start", mono=True, size=12)
+
+    # the recovery state is scaled by the transient exponent on its way back
+    fy = 176
+    c.box(340, fy - 25, 178, 50, ["&#215; (V/V0)^&#945;t"], size=12)
+    c.path(f"M {xp} {mid} L {xp} {fy} L 518 {fy}", arrow=True)
+    c.dot(xp, mid)
+    c.path(f"M 340 {fy} L {sx} {fy} L {sx} {mid + 13}", arrow=True)
+    c.path(f"M 70 {mid} L 70 236 L 429 236 L 429 {fy + 25}", arrow=True)
+    c.dot(70, mid)
+    c.label(440, 258, "Q follows the same structure, with exponents &#946;s, &#946;t and "
+                      "its own limits.", size=11, muted=True, italic=True)
+    return c
+
+
+def inj_ibg(t):
+    c = Canvas(1180, 320, t)
+    y = 26
+    c.label(14, y + 33, "&#916;f", anchor="start", mono=True, size=12)
+    boxes, x = c.chain(48, y, [
+        (166, ["Frequency response", "deadband fdbd"]),
+        (162, ["Active power order", "P = Pext(1 + b&#183;sat)"]),
+    ])
+    c.arrow(x, y + 27, x + 40, y + 27)
+    c.wire(x + 22, y + 27, "Ip")
+
+    py = y + 110
+    c.label(14, py + 33, "Vt", anchor="start", mono=True, size=12)
+    boxes2, x2 = c.chain(48, py, [
+        (166, ["LVRT / HVRT logic"]),
+        (170, ["Reactive boost", "kRCI&#183;(Vref &#8722; Vt)"]),
+    ])
+    c.arrow(x2, py + 27, x2 + 40, py + 27)
+    c.wire(x2 + 22, py + 27, "Iq")
+
+    lx = max(x, x2) + 44
+    c.box(lx, y + 34, 178, 66, ["Current limit Imax", "reactive priority in LVRT"], accent=True)
+    c.path(f"M {x + 40} {y + 27} L {lx - 20} {y + 27} L {lx - 20} {y + 56} "
+           f"L {lx} {y + 56}", arrow=True)
+    c.path(f"M {x2 + 40} {py + 27} L {lx - 20} {py + 27} L {lx - 20} {y + 80} "
+           f"L {lx} {y + 80}", arrow=True)
+    c.arrow(lx + 178, y + 67, lx + 218, y + 67)
+    c.box(lx + 222, y + 34, 174, 66, ["Park transform", "ix, iy from &#952;PLL"])
+    c.arrow(lx + 396, y + 67, lx + 436, y + 67)
+    c.label(lx + 444, y + 72, "ix, iy", anchor="start", mono=True, size=12)
+
+    ry = y + 232
+    c.label(14, ry + 20, "vq", anchor="start", mono=True, size=12)
+    c.arrow(52, ry + 16, 130, ry + 16)
+    c.box(134, ry - 6, 214, 44, ["PLL, second-order PI", "freeze below Vmin,pll"], size=11)
+    c.path(f"M 348 {ry + 16} L {lx + 309} {ry + 16} L {lx + 309} {y + 100}", arrow=True)
+    c.wire(lx + 250, ry + 16, "&#952;PLL", dy=-10)
+    return c
+
+
+def inj_pvg(t):
+    c = Canvas(1220, 240, t)
+    y1, m1 = 66, 93
+    c.label(14, m1 + 5, "Pref", anchor="start", mono=True, size=12)
+    _, x1 = c.chain(58, y1, [
+        (150, ["Ip,cmd = Pref / Vt"]),
+        (172, ["LVPL limit", "piecewise in Vt"]),
+        (140, ["1 / (1 + sTg)"]),
+    ])
+    y2, m2 = 160, 187
+    c.label(14, m2 + 5, "Qref, Vt", anchor="start", mono=True, size=12)
+    _, x2 = c.chain(96, y2, [
+        (176, ["Iq,cmd = fQV(Vt, Qref)"]),
+        (140, ["1 / (1 + sTm)"]),
+    ])
+    c.wire(x1 + 24, m1, "Ip")
+    c.wire(x2 + 24, m2, "Iq")
+
+    lx = max(x1, x2) + 60
+    c.box(lx, 107, 170, 66, ["Current limit", "Ip&#178; + Iq&#178; &#8804; Imax&#178;"], accent=True)
+    c.path(f"M {x1} {m1} L {lx - 22} {m1} L {lx - 22} 127 L {lx} 127", arrow=True)
+    c.path(f"M {x2} {m2} L {lx - 22} {m2} L {lx - 22} 155 L {lx} 155", arrow=True)
+    c.arrow(lx + 170, 140, lx + 204, 140)
+    c.box(lx + 204, 107, 166, 66, ["Park transform", "ix, iy"])
+    c.arrow(lx + 370, 140, lx + 404, 140)
+    c.label(lx + 412, 145, "ix, iy", anchor="start", mono=True, size=12)
+
+    c.label(414, 24, "Vt", mono=True, size=12)
+    c.arrow(414, 32, 414, y1)
+    return c
+
+
+def inj_bess(t):
+    c = Canvas(1180, 250, t)
+    y, mid = 26, 53
+    c.label(14, mid + 5, "Pref, Vref", anchor="start", mono=True, size=12)
+    _, x = c.chain(104, y, [
+        (156, ["Plant controller", "REPC_A"]),
+        (188, ["Converter electrical", "REEC_C, Ip and Iq vs V"]),
+        (166, ["Generator interface", "REGC_A"], "accent"),
+    ])
+    c.arrow(x, mid, x + 44, mid)
+    c.label(x + 52, mid + 5, "ix, iy", anchor="start", mono=True, size=12)
+
+    c.box(316, 140, 214, 58, ["State of charge", "clamps set Pmax, Pmin"], size=12)
+    c.path(f"M 423 140 L 423 {y + 54}", arrow=True)
+    c.path(f"M {x + 22} {mid} L {x + 22} 169 L 530 169", arrow=True)
+    c.dot(x + 22, mid)
+    c.wire(640, 169, "Pbess", dy=-9)
+    c.label(430, 228, "A depleted or full battery has its dispatch limit driven to zero.",
+            size=11, muted=True, italic=True)
+    return c
+
+
+def inj_svc_generic1(t):
+    c = Canvas(1280, 330, t)
+    y, mid = 26, 53
+    sx = 600
+    c.label(14, mid + 5, "V", anchor="start", mono=True, size=12)
+    c.arrow(40, mid, sx - 13, mid)
+    c.summing(sx, mid, ("&#8722;", "+"))
+    c.label(sx - 44, mid - 34, "Vref", size=11, muted=True, mono=True)
+    c.arrow(sx, mid - 40, sx, mid - 13)
+    c.label(sx + 18, mid - 20, "+", size=13)
+    _, x = c.chain(sx + 13, y, [
+        (162, ["PI regulator Kp, Ki", "with droop Bp"]),
+        (156, ["Susceptance limits", "Bmin, Bmax"], "accent"),
+    ])
+    c.arrow(x, mid, x + 40, mid)
+    c.wire(x + 22, mid, "Bsvc")
+    c.box(x + 44, y, 164, 54, ["Reactive current", "iy = Bsvc &#183; V"])
+    c.arrow(x + 208, mid, x + 246, mid)
+    c.label(x + 254, mid + 5, "Q", anchor="start", mono=True, size=12)
+
+    # two parallel stabiliser channels, summed and limited together
+    a, b = 148, 232
+    c.label(14, a + 29, "Input 1", anchor="start", mono=True, size=12)
+    c.arrow(78, a + 24, 124, a + 24)
+    c.box(124, a, 214, 48, ["Channel 1: G1, T1, a, K1, &#177;L1"], size=12)
+    c.label(14, b + 29, "Input 2", anchor="start", mono=True, size=12)
+    c.arrow(78, b + 24, 124, b + 24)
+    c.box(124, b, 214, 48, ["Channel 2: G2, T2, b, K2, &#177;L2"], size=12)
+
+    jx, jy = 386, 190
+    c.path(f"M 338 {a + 24} L {jx} {a + 24} L {jx} {jy - 13}", arrow=True)
+    c.path(f"M 338 {b + 24} L {jx} {b + 24} L {jx} {jy + 13}", arrow=True)
+    c.summing(jx, jy, ("", ""))
+    c.arrow(jx + 13, jy, jx + 44, jy)
+    c.box(jx + 44, jy - 24, 130, 48, ["&#177;Ltot"], accent=True, size=12)
+    c.wire(jx + 194, jy, "dvpss", dy=-12)
+    c.path(f"M {jx + 174} {jy} L {sx} {jy} L {sx} {mid + 13}", arrow=True)
+    c.label(820, 226, "The stabiliser output shifts the voltage reference; Vref itself is "
+                      "set from", size=11, muted=True, italic=True)
+    c.label(820, 244, "the power flow, so the model starts in equilibrium.",
+            size=11, muted=True, italic=True)
+    return c
+
+
 DIAGRAMS = {
     # models/ieee-governors.mdx
     "tor-entsoe-simp": tor_entsoe_simp,
@@ -614,6 +1494,37 @@ DIAGRAMS = {
     # models/custom-exciters.mdx
     "exc-1storder": exc_1storder,
     "exc-kundur": exc_kundur,
+    # models/ieee-exciters.md
+    "exc-ac1a": exc_ac1a,
+    "exc-ac4a": exc_ac4a,
+    "exc-ac8b": exc_ac8b,
+    "exc-dc3a": exc_dc3a,
+    "exc-ieeet5": exc_ieeet5,
+    "exc-st1a": exc_st1a,
+    "exc-st2a": exc_st2a,
+    "exc-sexs": exc_sexs,
+    "exc-entsoe-simp": exc_entsoe_simp,
+    "pss-pss2b": pss_pss2b,
+    "pss-pss3b": pss_pss3b,
+    "pss-pss4b": pss_pss4b,
+    "pss-ieeest": pss_ieeest,
+    "pss-stab3": pss_stab3,
+    "exc-maxex2": exc_maxex2,
+    "exc-integral-oel": exc_integral_oel,
+    # models/custom-exciters.mdx, continued
+    "exc-generic1": exc_generic1,
+    "exc-avr-dg": exc_avr_dg,
+    "exc-generic2": exc_generic2,
+    "exc-generic": exc_generic,
+    # models/discrete-controllers.md
+    "dctl-ltc-timing": dctl_ltc_timing,
+    "dctl-relay-timing": dctl_relay_timing,
+    # models/custom-injectors.md
+    "inj-load": inj_load,
+    "inj-ibg": inj_ibg,
+    "inj-pvg": inj_pvg,
+    "inj-bess": inj_bess,
+    "inj-svc-generic1": inj_svc_generic1,
     # models/two-port-models.mdx
     "twop-hvdc-lcc-control": hvdc_lcc,
     "twop-hvdc-vsc-control": hvdc_vsc,

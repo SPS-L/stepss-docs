@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 250" width="1080" height="250" role="img">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#a8b0bf"/></marker></defs>
+<text x="14" y="67" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">Vt</text>
+<path d="M 48 61.0 L 82 61.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="82" y="34" width="146" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="155.0" y="65.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Transducer 1/(1+sTR)</text>
+<path d="M 228 61 L 265 61" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="248" y="53" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#b8bdc9">Vc</text>
+<circle cx="278" cy="61" r="13" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<path d="M 271.5 61 L 284.5 61 M 278 54.5 L 278 67.5" stroke="#4a5160" stroke-width="1"/>
+<text x="257" y="57" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">&#8722;</text>
+<text x="234" y="25" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#b8bdc9">VREF</text>
+<path d="M 278 19 L 278 48" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="310" y="53" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#b8bdc9">VERR</text>
+<path d="M 291 61.0 L 325 61.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="325" y="34" width="166" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="408.0" y="57.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Rheostat integrator</text>
+<text x="408.0" y="72.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">limits VRMIN, VRMAX</text>
+<path d="M 491 61.0 L 525 61.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="525" y="34" width="176" height="54" rx="4" fill="#1d2b3d" stroke="#3f6087" stroke-width="1.2"/>
+<text x="613.0" y="57.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Three-position switch</text>
+<text x="613.0" y="72.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">VRMIN / VRH / VRMAX</text>
+<path d="M 701 61.0 L 735 61.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="735" y="34" width="176" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="823.0" y="57.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">DC exciter</text>
+<text x="823.0" y="72.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">1/sTE, KE + SE(Efd)</text>
+<path d="M 911 61 L 955 61" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="963" y="66" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">Efd</text>
+<text x="540" y="216" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" fill="#b8bdc9" font-style="italic">The switch selects on the deadband: VERR below &#8722;KV lowers, above +KV raises, inside holds VRH.</text>
+</svg>

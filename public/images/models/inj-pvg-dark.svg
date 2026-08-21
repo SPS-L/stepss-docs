@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1220 240" width="1220" height="240" role="img">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#a8b0bf"/></marker></defs>
+<text x="14" y="98" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">Pref</text>
+<path d="M 58 93.0 L 92 93.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="92" y="66" width="150" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="167.0" y="97.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Ip,cmd = Pref / Vt</text>
+<path d="M 242 93.0 L 276 93.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="276" y="66" width="172" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="362.0" y="89.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">LVPL limit</text>
+<text x="362.0" y="104.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">piecewise in Vt</text>
+<path d="M 448 93.0 L 482 93.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="482" y="66" width="140" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="552.0" y="97.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">1 / (1 + sTg)</text>
+<text x="14" y="192" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">Qref, Vt</text>
+<path d="M 96 187.0 L 130 187.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="130" y="160" width="176" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="218.0" y="191.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Iq,cmd = fQV(Vt, Qref)</text>
+<path d="M 306 187.0 L 340 187.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="340" y="160" width="140" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="410.0" y="191.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">1 / (1 + sTm)</text>
+<text x="646" y="85" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#b8bdc9">Ip</text>
+<text x="504" y="179" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#b8bdc9">Iq</text>
+<rect x="682" y="107" width="170" height="66" rx="4" fill="#1d2b3d" stroke="#3f6087" stroke-width="1.2"/>
+<text x="767.0" y="136.3" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">Current limit</text>
+<text x="767.0" y="152.3" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">Ip&#178; + Iq&#178; &#8804; Imax&#178;</text>
+<path d="M 622 93 L 660 93 L 660 127 L 682 127" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 480 187 L 660 187 L 660 155 L 682 155" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 852 140 L 886 140" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="886" y="107" width="166" height="66" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="969.0" y="136.3" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">Park transform</text>
+<text x="969.0" y="152.3" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">ix, iy</text>
+<path d="M 1052 140 L 1086 140" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="1094" y="145" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">ix, iy</text>
+<text x="414" y="24" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">Vt</text>
+<path d="M 414 32 L 414 66" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+</svg>

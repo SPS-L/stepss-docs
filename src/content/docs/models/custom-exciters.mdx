@@ -237,6 +237,13 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
 
 The data-file model name is `GENERIC1`.
 
+<img src="/images/models/exc-generic1-light.svg"
+     alt="exc_generic1 block diagram. The terminal voltage is subtracted from Vref, summed with the stabiliser signal and the over-excitation limiter output, and the error drives an AVR of gain G with a lead-lag of TA and TB and an exciter lag TE limited between L3 and L4. The stabiliser takes speed or active power through a washout of gain KPSS and two lead-lag stages, and an inverse-time OEL acts on the field current."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-generic1-dark.svg"
+     alt="exc_generic1 block diagram. The terminal voltage is subtracted from Vref, summed with the stabiliser signal and the over-excitation limiter output, and the error drives an AVR of gain G with a lead-lag of TA and TB and an exciter lag TE limited between L3 and L4. The stabiliser takes speed or active power through a washout of gain KPSS and two lead-lag stages, and an inverse-time OEL acts on the field current."
+     class="light:sl-hidden" />
+
 ### Scientific Description
 
 The `exc_generic1` model is a **generic AVR with OEL (Over-Excitation Limiter) and PSS**, implemented in Fortran. It includes a proportional–integral AVR, a PSS acting on rotor speed or active power, and an inverse-time OEL.
@@ -316,6 +323,13 @@ SYNC_MACH GEN1  BUS1  1. 1.  0.  0.   600. 570. 3. 0. 0.95
 
 The data-file model name is `AVR_DG`. Registered since 3.76.
 
+<img src="/images/models/exc-avr-dg-light.svg"
+     alt="exc_AVR_DG block diagram. The excitation system, stabiliser and over-excitation limiter are those of GENERIC1. What is added is a reactive-power PI regulator with gains KQP and KQI acting on the deviation from the reactive-power setpoint, whose output is a third contribution to the same summing junction, so the unit holds a reactive-power setpoint."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-avr-dg-dark.svg"
+     alt="exc_AVR_DG block diagram. The excitation system, stabiliser and over-excitation limiter are those of GENERIC1. What is added is a reactive-power PI regulator with gains KQP and KQI acting on the deviation from the reactive-power setpoint, whose output is a third contribution to the same summing junction, so the unit holds a reactive-power setpoint."
+     class="light:sl-hidden" />
+
 ### Scientific Description
 
 An AVR for **dispersed generation**: the [`GENERIC1`](#generic1-exc_generic1) excitation
@@ -394,6 +408,13 @@ SYNC_MACH G4  N4 1. 1.  0.  0. 5 4.5 3. 0. 1.9333
 ## GENERIC2 (`exc_generic2`)
 
 The data-file model name is `GENERIC2`.
+
+<img src="/images/models/exc-generic2-light.svg"
+     alt="exc_generic2 block diagram. The terminal voltage is compensated for line drop with Xc and Rc, subtracted from Vref and summed with the stabiliser and over-excitation limiter signals. The error drives a combined proportional, integral and transient-gain-reduction regulator, an amplifier of gain KA and time constant TA, and an AC exciter of time constant TE with the saturation term SE."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-generic2-dark.svg"
+     alt="exc_generic2 block diagram. The terminal voltage is compensated for line drop with Xc and Rc, subtracted from Vref and summed with the stabiliser and over-excitation limiter signals. The error drives a combined proportional, integral and transient-gain-reduction regulator, an amplifier of gain KA and time constant TA, and an AC exciter of time constant TE with the saturation term SE."
+     class="light:sl-hidden" />
 
 ### Scientific Description
 
@@ -507,6 +528,13 @@ On 3.57 and later, a record naming `exc_GENERIC3` or `exc_GENERIC4` stops with
 data parameters and their order are unchanged, so nothing else in the record
 moves.
 :::
+
+<img src="/images/models/exc-generic-light.svg"
+     alt="exc_GENERIC block diagram. The terminal voltage is subtracted from V0, summed with the stabiliser signal and less the over-excitation limiter output, and the error drives a transient-gain-reduction block of gain G with Ta and Tb and an exciter lag Te limited between Vfmin and Vfmax. The stabiliser takes rotor speed through a washout of gain KPSS and two lead-lag stages."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-generic-dark.svg"
+     alt="exc_GENERIC block diagram. The terminal voltage is subtracted from V0, summed with the stabiliser signal and less the over-excitation limiter output, and the error drives a transient-gain-reduction block of gain G with Ta and Tb and an exciter lag Te limited between Vfmin and Vfmax. The stabiliser takes rotor speed through a washout of gain KPSS and two lead-lag stages."
+     class="light:sl-hidden" />
 
 ### Scientific Description
 

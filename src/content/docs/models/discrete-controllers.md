@@ -36,6 +36,17 @@ All of the above are built into every RAMSES distribution (standalone executable
 The [TRFO record](/user-guide/network/#data-format-combined-model-trfo) combines the transformer model with load tap changer data (tap range, positions, controlled bus, voltage setpoint), but this data is used **only by the power flow** for ratio adjustment. To control a transformer's ratio during dynamic simulation with RAMSES, a DCTL LTC controller (below) must be associated with the transformer, whether it was defined with TRANSFO or TRFO.
 :::
 
+Every controller in this section is a timed automaton rather than a transfer
+function: it watches a quantity, waits out a delay, then acts. The tap changers
+share the sequence below, and differ only in how the delay is computed.
+
+<img src="/images/models/dctl-ltc-timing-light.svg"
+     alt="Tap changer timing diagram. The monitored voltage starts inside a deadband around the setpoint, a disturbance drives it below, and after delay_first the first tap change is made. Two further changes follow, each after delay_next, raising the voltage step by step until it is back inside the deadband, after which the tap holds. A second trace shows the tap position rising as a staircase at those same instants."
+     class="dark:sl-hidden" />
+<img src="/images/models/dctl-ltc-timing-dark.svg"
+     alt="Tap changer timing diagram. The monitored voltage starts inside a deadband around the setpoint, a disturbance drives it below, and after delay_first the first tap change is made. Two further changes follow, each after delay_next, raising the voltage step by step until it is back inside the deadband, after which the tap holds. A second trace shows the tap position rising as a staircase at those same instants."
+     class="light:sl-hidden" />
+
 ### LTC (`dctl_ltc`): Load Tap Changer (Standard)
 
 #### Description
@@ -232,6 +243,18 @@ DCTL  OLTC2  OLTC_TR2  FROM_BUS  TO_BUS  1  1  0.88  1.12  25  0.0075
 ---
 
 ## Protection
+
+The protection and ride-through models share a definite-time sequence: the
+monitored quantity crosses a threshold, a timer runs, and the trip is issued only
+if the quantity is still beyond the threshold when the timer expires. A quantity
+that recovers first resets the timer, so a transient dip passes without action.
+
+<img src="/images/models/dctl-relay-timing-light.svg"
+     alt="Definite-time relay timing diagram. The monitored voltage dips below the threshold and a timer starts, but the voltage recovers before the delay expires and the timer resets with no trip. A second, deeper dip keeps the voltage below the threshold for the full delay, and the output goes to trip when the timer completes."
+     class="dark:sl-hidden" />
+<img src="/images/models/dctl-relay-timing-dark.svg"
+     alt="Definite-time relay timing diagram. The monitored voltage dips below the threshold and a timer starts, but the voltage recovers before the delay expires and the timer resets with no trip. A second, deeper dip keeps the voltage below the threshold for the full delay, and the output goes to trip when the timer completes."
+     class="light:sl-hidden" />
 
 ### UVPROT (`dctl_uvprot`): Under-Voltage Protection Relay
 

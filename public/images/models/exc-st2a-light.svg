@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 280" width="1160" height="280" role="img">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#4b5162"/></marker></defs>
+<text x="14" y="63" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#23262f">Vt</text>
+<path d="M 48 57.0 L 82 57.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="82" y="30" width="146" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="155.0" y="61.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Transducer 1/(1+sTR)</text>
+<path d="M 228 57 L 265 57" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="248" y="49" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#4b5162">Vc</text>
+<circle cx="278" cy="57" r="13" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<path d="M 271.5 57 L 284.5 57 M 278 50.5 L 278 63.5" stroke="#b6becd" stroke-width="1"/>
+<text x="257" y="53" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">&#8722;</text>
+<text x="280" y="83" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">&#8722;</text>
+<text x="226" y="21" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#4b5162">VREF, VPSS</text>
+<path d="M 278 15 L 278 44" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 291 57.0 L 325 57.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="325" y="30" width="110" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="380.0" y="61.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">HV gate VUEL</text>
+<path d="M 435 57.0 L 469 57.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="469" y="30" width="150" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="544.0" y="53.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">PI amplifier</text>
+<text x="544.0" y="68.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">KA&#183;TA, KA</text>
+<path d="M 619 57.0 L 653 57.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="653" y="30" width="128" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="717.0" y="53.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Limiter</text>
+<text x="717.0" y="68.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">VRMIN, VRMAX</text>
+<path d="M 781 57.0 L 815 57.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="815" y="30" width="150" height="54" rx="4" fill="#e7f0fa" stroke="#7ba7d4" stroke-width="1.2"/>
+<text x="890.0" y="53.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Field integrator</text>
+<text x="890.0" y="68.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">VR&#183;VB &#8722; KE&#183;Efd</text>
+<path d="M 965 57 L 1009 57" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="1017" y="62" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#23262f">Efd</text>
+<rect x="340" y="180" width="190" height="50" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="435.0" y="201.3" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">Rate feedback</text>
+<text x="435.0" y="217.3" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">sKF / TF / (1 + sTF)</text>
+<path d="M 987 57 L 987 205 L 530 205" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<circle cx="987" cy="57" r="2.6" fill="#4b5162"/>
+<path d="M 340 205 L 278 205 L 278 70" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="308" y="105" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#4b5162">VF</text>
+<text x="870" y="210" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" fill="#4b5162" font-style="italic">VB from the rectifier voltage VE</text>
+</svg>

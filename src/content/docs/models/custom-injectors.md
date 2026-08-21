@@ -34,6 +34,13 @@ All of the above are built into every RAMSES distribution (standalone executable
 
 The exponential recovery load model captures the transient and steady-state voltage and frequency dependency of aggregated loads. Immediately after a voltage disturbance, the load behaves according to a transient voltage exponent; it then recovers exponentially to a steady-state behaviour described by a different exponent. The model supports separate active ($P$) and reactive ($Q$) power recovery dynamics, each with individual minimum/maximum limiters on the recovery variable.
 
+<img src="/images/models/inj-load-light.svg"
+     alt="Exponential recovery load block diagram. The bus voltage and frequency drive a steady-state term (V/V0) raised to alpha-s times one plus DP times the speed deviation. From it is subtracted the recovery state xP scaled by the transient term (V/V0) raised to alpha-t. The difference feeds an integrator of time constant Tr, limited between xPmin and xPmax, whose state xP sets the injected power P0 times xP times (V/V0) squared times one plus DP times the speed deviation. The reactive side has the same structure with exponents beta-s and beta-t."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-load-dark.svg"
+     alt="Exponential recovery load block diagram. The bus voltage and frequency drive a steady-state term (V/V0) raised to alpha-s times one plus DP times the speed deviation. From it is subtracted the recovery state xP scaled by the transient term (V/V0) raised to alpha-t. The difference feeds an integrator of time constant Tr, limited between xPmin and xPmax, whose state xP sets the injected power P0 times xP times (V/V0) squared times one plus DP times the speed deviation. The reactive side has the same structure with exponents beta-s and beta-t."
+     class="light:sl-hidden" />
+
 #### Scientific Description
 
 The model is parameterized in terms of initial active and reactive conductance/susceptance, $G_0 = P_0/V_0^2$ and $B_0 = -Q_0/V_0^2$. Two recovery state variables $x_P$ and $x_Q$ evolve according to:
@@ -505,6 +512,13 @@ INJEC  INDM1  MTR3  BUS_MV  1.  1.  0.  0.  10.0  0.01  0.10  2.50  0.015  0.10 
 
 A generic inverter-based generation model suitable for representing aggregated distributed generation or any grid-following IBR. The model includes a Phase-Locked Loop (PLL), inner current control with active ($I_p$) and reactive ($I_q$) current commands, LVRT/HVRT logic with voltage-dependent reactive current injection, frequency-responsive active power modulation, and reconnection logic after disconnection events.
 
+<img src="/images/models/inj-ibg-light.svg"
+     alt="Generic inverter-based generator block diagram. The frequency deviation passes a deadband fdbd and sets the active power order Pext times one plus b times the saturated deviation, giving the active current Ip. The terminal voltage drives the LVRT and HVRT logic and a reactive boost kRCI times Vref minus Vt, giving the reactive current Iq. Both enter a current limiter of magnitude Imax that gives priority to reactive current during a voltage dip, and a Park transform resolves them into ix and iy using the PLL angle. The q-axis voltage drives a second-order PI phase-locked loop that freezes below Vmin,pll and supplies that angle."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-ibg-dark.svg"
+     alt="Generic inverter-based generator block diagram. The frequency deviation passes a deadband fdbd and sets the active power order Pext times one plus b times the saturated deviation, giving the active current Ip. The terminal voltage drives the LVRT and HVRT logic and a reactive boost kRCI times Vref minus Vt, giving the reactive current Iq. Both enter a current limiter of magnitude Imax that gives priority to reactive current during a voltage dip, and a Park transform resolves them into ix and iy using the PLL angle. The q-axis voltage drives a second-order PI phase-locked loop that freezes below Vmin,pll and supplies that angle."
+     class="light:sl-hidden" />
+
 #### Scientific Description
 
 The PLL tracks the terminal voltage angle $\theta$ via a second-order PI controller with a freeze option below $V_{\mathrm{min,pll}}$:
@@ -709,6 +723,13 @@ Callable since 3.79. Earlier releases compiled this model under no name, so a da
 #### Description
 
 A photovoltaic generator model with similar WECC-derived structure to the wind turbine models. The model includes a plant controller (voltage/reactive power regulation), an electrical controller (current limits, LVRT), and generator/converter representation. Unlike wind turbines, there is no mechanical drive train; the active power set-point follows an irradiance input or a fixed reference. LVRT/HVRT logic and current limiting are identical to the Type 4 wind model.
+
+<img src="/images/models/inj-pvg-light.svg"
+     alt="Photovoltaic generator block diagram. The active power reference divided by the terminal voltage gives the active current command, which passes a low-voltage power-logic limit that is piecewise in Vt and a first-order filter of time constant Tg. The reactive command is a function of terminal voltage and reactive reference and passes a first-order filter of time constant Tm. Both currents enter a limiter enforcing that the sum of their squares stays below Imax squared, and a Park transform resolves them into ix and iy."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-pvg-dark.svg"
+     alt="Photovoltaic generator block diagram. The active power reference divided by the terminal voltage gives the active current command, which passes a low-voltage power-logic limit that is piecewise in Vt and a first-order filter of time constant Tg. The reactive command is a function of terminal voltage and reactive reference and passes a first-order filter of time constant Tm. Both currents enter a limiter enforcing that the sum of their squares stays below Imax squared, and a Park transform resolves them into ix and iy."
+     class="light:sl-hidden" />
 
 #### Scientific Description
 
@@ -1017,6 +1038,13 @@ $$P_{\max} = \begin{cases} 0 & \mathrm{SOC} \ge \mathrm{SOC}_{\max}\\ P_{\max,\m
 
 $$P_{\min} = \begin{cases} 0 & \mathrm{SOC} \le \mathrm{SOC}_{\min}\\ P_{\min,\mathrm{rated}} & \text{otherwise}\end{cases}$$
 
+<img src="/images/models/inj-bess-light.svg"
+     alt="Battery energy storage block diagram. The active power and voltage references pass the REPC_A plant controller, the REEC_C converter electrical controller with its piecewise current-versus-voltage characteristics, and the REGC_A generator interface, which injects ix and iy. The injected power is integrated into the state of charge, whose clamps at SOCmin and SOCmax drive the active power limits Pmax and Pmin of the converter controller to zero."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-bess-dark.svg"
+     alt="Battery energy storage block diagram. The active power and voltage references pass the REPC_A plant controller, the REEC_C converter electrical controller with its piecewise current-versus-voltage characteristics, and the REGC_A generator interface, which injects ix and iy. The injected power is integrated into the state of charge, whose clamps at SOCmin and SOCmax drive the active power limits Pmax and Pmin of the converter controller to zero."
+     class="light:sl-hidden" />
+
 #### Parameters (key parameters)
 
 | # | Name | Sub-model | Description | Unit |
@@ -1084,6 +1112,13 @@ $$V_{ref} = V_0 + B_p \cdot B_{svc,0}$$
 
 where $B_p$ is the droop and $B_{svc,0}$ the initial susceptance implied by the
 reactive current at the bus.
+
+<img src="/images/models/inj-svc-generic1-light.svg"
+     alt="Generic static var compensator block diagram. The bus voltage is subtracted from the reference Vref, to which the stabiliser output dvpss is added. The error drives a PI regulator with gains Kp and Ki and droop Bp, whose output is the susceptance Bsvc limited between Bmin and Bmax, and the injected reactive current is Bsvc times V. Two parallel lead-lag stabiliser channels, each with its own gain, time constant, lead-lag coefficient, output gain and limit, are summed and limited together by Ltot to form dvpss."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-svc-generic1-dark.svg"
+     alt="Generic static var compensator block diagram. The bus voltage is subtracted from the reference Vref, to which the stabiliser output dvpss is added. The error drives a PI regulator with gains Kp and Ki and droop Bp, whose output is the susceptance Bsvc limited between Bmin and Bmax, and the injected reactive current is Bsvc times V. Two parallel lead-lag stabiliser channels, each with its own gain, time constant, lead-lag coefficient, output gain and limit, are summed and limited together by Ltot to form dvpss."
+     class="light:sl-hidden" />
 
 #### Parameters
 

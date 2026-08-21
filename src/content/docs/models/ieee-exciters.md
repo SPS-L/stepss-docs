@@ -68,6 +68,13 @@ The [Model Reference index](/models/) carries the same information across all mo
 
 The AC1A is a rotating AC exciter with a self-excited field winding and non-linear saturation. It corresponds to IEEE Std 421.5-2016 Type AC1A. The generator terminal voltage $V_t$ is compensated for line drop and filtered before being compared with the reference. An AC alternator supplies the field through a rectifier whose output depends on the commutation voltage $V_E$ and field current $I_{fd}$.
 
+<img src="/images/models/exc-ac1a-light.svg"
+     alt="AC1A block diagram. The terminal quantities pass line-drop compensation and a transducer of time constant TR to give Vc, which is subtracted from VREF together with the rate feedback VF. The error drives a lead-lag with TC and TB, an amplifier of gain KA and time constant TA limited between VAMIN and VAMAX, high- and low-value gates against the under- and over-excitation limiters, and an output limiter between VRMIN and VRMAX. The exciter integrator of time constant TE, held at or above zero, gives VE, which the rectifier converts to Efd. The demagnetisation and saturation term VFE feeds the rate feedback of gain KF over TF."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-ac1a-dark.svg"
+     alt="AC1A block diagram. The terminal quantities pass line-drop compensation and a transducer of time constant TR to give Vc, which is subtracted from VREF together with the rate feedback VF. The error drives a lead-lag with TC and TB, an amplifier of gain KA and time constant TA limited between VAMIN and VAMAX, high- and low-value gates against the under- and over-excitation limiters, and an output limiter between VRMIN and VRMAX. The exciter integrator of time constant TE, held at or above zero, gives VE, which the rectifier converts to Efd. The demagnetisation and saturation term VFE feeds the rate feedback of gain KF over TF."
+     class="light:sl-hidden" />
+
 #### Mathematical Description
 
 The voltage regulator processes the error signal through a lead-lag network and a limited amplifier:
@@ -159,6 +166,13 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 
 The AC4A is a simplified static representation of an AC exciter system with an inner-loop voltage-dependent output limit. It corresponds to IEEE Std 421.5-2016 Type AC4A. The upper output limit is a function of field current: $V_{RMAX,eff} = V_{RMAX} - K_C \cdot I_{fd}$.
 
+<img src="/images/models/exc-ac4a-light.svg"
+     alt="AC4A block diagram. The compensated and filtered terminal voltage Vc is subtracted from VREF, the error is limited between VIMIN and VIMAX, passes a lead-lag with TC and TB and a high-value gate against the under-excitation limiter, and drives an amplifier of gain KA and time constant TA. The upper limit of that amplifier is not fixed: it is VRMAX minus KC times the field current."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-ac4a-dark.svg"
+     alt="AC4A block diagram. The compensated and filtered terminal voltage Vc is subtracted from VREF, the error is limited between VIMIN and VIMAX, passes a lead-lag with TC and TB and a high-value gate against the under-excitation limiter, and drives an amplifier of gain KA and time constant TA. The upper limit of that amplifier is not fixed: it is VRMAX minus KC times the field current."
+     class="light:sl-hidden" />
+
 #### Mathematical Description
 
 $$\Delta V = V_{REF} - V_c$$
@@ -221,6 +235,13 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 ### AC8B
 
 The AC8B is a rotating AC exciter with a PID voltage regulator (rather than the proportional-integral amplifier of earlier types). It corresponds to IEEE Std 421.5-2016 Type AC8B. The PID structure, proportional gain $K_{PR}$, integral gain $K_{IR}$, and derivative gain $K_{DR}$, provides improved transient response compared to Type AC1A.
+
+<img src="/images/models/exc-ac8b-light.svg"
+     alt="AC8B block diagram. The filtered terminal voltage is compared with VREF and the error drives a PID: a derivative branch of gain KDR over TDR and a proportional-integral branch with KPR and KIR, summed and limited between VPIDMIN and VPIDMAX. An amplifier of gain KA and time constant TA follows, then an exciter integrator of time constant TE limited by VFEMAX, and finally the saturation and rectifier stage giving Efd."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-ac8b-dark.svg"
+     alt="AC8B block diagram. The filtered terminal voltage is compared with VREF and the error drives a PID: a derivative branch of gain KDR over TDR and a proportional-integral branch with KPR and KIR, summed and limited between VPIDMIN and VPIDMAX. An amplifier of gain KA and time constant TA follows, then an exciter integrator of time constant TE limited by VFEMAX, and finally the saturation and rectifier stage giving Efd."
+     class="light:sl-hidden" />
 
 #### Mathematical Description
 
@@ -303,6 +324,13 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 
 The DC3A represents a non-continuously acting (rheostat-type) DC excitation system. It corresponds to IEEE Std 421.5-2016 Type DC3A. Rather than a proportional amplifier, it uses a three-position switch (VRMIN / VRH / VRMAX) driven by an integrator that holds the rheostat position $V_{RH}$. The switch position is determined by whether the error signal $V_{ERR}$ falls inside or outside a deadband $\pm K_V$.
 
+<img src="/images/models/exc-dc3a-light.svg"
+     alt="DC3A block diagram. The error between VREF and the filtered terminal voltage drives a rheostat integrator limited between VRMIN and VRMAX. A three-position switch then selects VRMIN, the rheostat position VRH, or VRMAX according to whether the error is below the deadband, inside it, or above it. The selected voltage drives a DC exciter of time constant TE with the saturation term KE plus SE."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-dc3a-dark.svg"
+     alt="DC3A block diagram. The error between VREF and the filtered terminal voltage drives a rheostat integrator limited between VRMIN and VRMAX. A three-position switch then selects VRMIN, the rheostat position VRH, or VRMAX according to whether the error is below the deadband, inside it, or above it. The selected voltage drives a DC exciter of time constant TE with the saturation term KE plus SE."
+     class="light:sl-hidden" />
+
 #### Mathematical Description
 
 $$V_{ERR} = V_{REF} - V_c$$
@@ -360,6 +388,13 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 ### ST1A
 
 The ST1A is a static (thyristor) excitation system with two cascaded lead-lag networks in the voltage regulator path and an inner field current limiter (KLR/ILR). It corresponds to IEEE Std 421.5-2016 Type ST1A. The output limits are proportional to terminal voltage $V_t$, and field current derating applies through $K_C$: $uplim = V_t \cdot V_{RMAX} - K_C \cdot I_{fd}$.
+
+<img src="/images/models/exc-st1a-light.svg"
+     alt="ST1A block diagram. The compensated and filtered terminal voltage is subtracted from VREF along with the stabiliser signal and the rate feedback. The error is limited between VIMIN and VIMAX, passes a high-value gate against the under-excitation limiter and two lead-lag stages, then an amplifier of gain KA limited between VAMIN and VAMAX. A field current limiter is subtracted, further gates apply the under- and over-excitation limiters, and the output limits are scaled by the terminal voltage to give Efd. The rate feedback of gain KF over TF closes back on the summation."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-st1a-dark.svg"
+     alt="ST1A block diagram. The compensated and filtered terminal voltage is subtracted from VREF along with the stabiliser signal and the rate feedback. The error is limited between VIMIN and VIMAX, passes a high-value gate against the under-excitation limiter and two lead-lag stages, then an amplifier of gain KA limited between VAMIN and VAMAX. A field current limiter is subtracted, further gates apply the under- and over-excitation limiters, and the output limits are scaled by the terminal voltage to give Efd. The rate feedback of gain KF over TF closes back on the summation."
+     class="light:sl-hidden" />
 
 #### Mathematical Description
 
@@ -463,6 +498,13 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 
 The EXPIC1 model implements a static exciter with an AC rotating bus-fed rectifier and an integrating (PI-type) amplifier path: $K_A(1 + sT_A)/s$. The output $V_B$ is proportional to the AC voltage phasor magnitude, creating a bus-fed topology analogous to IEEE Type ST2A. When $K_P = K_I = 0$, the rectifier gain is unity.
 
+<img src="/images/models/exc-st2a-light.svg"
+     alt="ST2A block diagram. The filtered terminal voltage is subtracted from VREF along with the stabiliser signal and the rate feedback, a high-value gate applies the under-excitation limiter, and a PI amplifier with gains KA times TA and KA drives an output limiter between VRMIN and VRMAX. A field integrator forms Efd from VR times VB less KE times Efd, where VB comes from the rectifier voltage. The rate feedback of gain KF over TF closes back on the summation."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-st2a-dark.svg"
+     alt="ST2A block diagram. The filtered terminal voltage is subtracted from VREF along with the stabiliser signal and the rate feedback, a high-value gate applies the under-excitation limiter, and a PI amplifier with gains KA times TA and KA drives an output limiter between VRMIN and VRMAX. A field integrator forms Efd from VR times VB less KE times Efd, where VB comes from the rectifier voltage. The rate feedback of gain KF over TF closes back on the summation."
+     class="light:sl-hidden" />
+
 #### Mathematical Description
 
 The AC exciter voltage and rectifier:
@@ -536,6 +578,13 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 
 The IEEET5 (also referenced as DC5A in some conventions) is a non-continuously acting exciter similar to DC3A but uses an inner limiter block `lim_civ` that gates the integrator holding signal within a deadband $\pm K_V$. This creates the three-state (hold/raise/lower) behavior of rheostatic controllers.
 
+<img src="/images/models/exc-ieeet5-light.svg"
+     alt="IEEET5 block diagram. The error between VREF and the filtered terminal voltage passes a deadband gate of width plus or minus KV, which allows the integrator of time constant TRH to run only while the error is outside the band. The integrator output, limited between VRMIN and VRMAX, drives a DC exciter of time constant TE with the saturation term KE plus SE."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-ieeet5-dark.svg"
+     alt="IEEET5 block diagram. The error between VREF and the filtered terminal voltage passes a deadband gate of width plus or minus KV, which allows the integrator of time constant TRH to run only while the error is outside the band. The integrator output, limited between VRMIN and VRMAX, drives a DC exciter of time constant TE with the saturation term KE plus SE."
+     class="light:sl-hidden" />
+
 #### Mathematical Description
 
 $$V_{ERR} = V_{REF} - V_c$$
@@ -579,6 +628,13 @@ $$\dot{E}_{fd} = \frac{1}{T_E}\left[V_R - \left(K_E + S_E(E_{fd})\right) E_{fd}\
 ### SEXS
 
 The SEXS (Simplified Excitation System) is a minimal two-parameter static exciter model from CIGRÉ publications, widely used for cases where detailed exciter data is unavailable. It has no measurement filter, no line drop compensation, and no rate feedback, just a lead-lag network and a limited first-order block.
+
+<img src="/images/models/exc-sexs-light.svg"
+     alt="SEXS block diagram. The terminal voltage plus the stabiliser signal is compared with Vo, the error passes a lead-lag with TA and TB and an exciter of gain KE and time constant TE limited between EMIN and EMAX, giving Efd. Vo is set at initialisation as the terminal voltage plus Efd0 over KE, so the initial error is zero."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-sexs-dark.svg"
+     alt="SEXS block diagram. The terminal voltage plus the stabiliser signal is compared with Vo, the error passes a lead-lag with TA and TB and an exciter of gain KE and time constant TE limited between EMIN and EMAX, giving Efd. Vo is set at initialisation as the terminal voltage plus Efd0 over KE, so the initial error is zero."
+     class="light:sl-hidden" />
 
 #### Mathematical Description
 
@@ -624,6 +680,13 @@ SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
 ### ENTSOE_simp
 
 The ENTSO-E simplified exciter combines a built-in speed-signal PSS with a simple lead-lag AVR and first-order exciter block. It is the standard ENTSO-E model for dynamic studies where detailed exciter data is unavailable.
+
+<img src="/images/models/exc-entsoe-simp-light.svg"
+     alt="ENTSOE_simp block diagram. A built-in stabiliser takes the speed deviation through two washouts with TW1 and TW2, a gain KS1 and two lead-lag stages with T1 to T4 to give VPSS. That signal is summed with the terminal voltage and Vo, and the error drives a lead-lag with TA and TB and an exciter of gain KE and time constant TE limited between EMIN and EMAX."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-entsoe-simp-dark.svg"
+     alt="ENTSOE_simp block diagram. A built-in stabiliser takes the speed deviation through two washouts with TW1 and TW2, a gain KS1 and two lead-lag stages with T1 to T4 to give VPSS. That signal is summed with the terminal voltage and Vo, and the error drives a lead-lag with TA and TB and an exciter of gain KE and time constant TE limited between EMIN and EMAX."
+     class="light:sl-hidden" />
 
 #### Mathematical Description
 
@@ -734,6 +797,13 @@ $$V_{PSS} = \text{clamp}(V_{PSS,unlim}, V_{STMIN}, V_{STMAX})$$
 
 ---
 
+<img src="/images/models/pss-pss2b-light.svg"
+     alt="PSS2B block diagram. Speed passes two washouts with TW1 and TW2 and a transducer lag T6; electrical power passes two washouts with TW3 and TW4 and a transducer lag T7. The two channels are summed, then pass a ramp-tracking filter of N and M stages, two lead-lag stages with T1 to T4, and output limits VSTMIN and VSTMAX."
+     class="dark:sl-hidden" />
+<img src="/images/models/pss-pss2b-dark.svg"
+     alt="PSS2B block diagram. Speed passes two washouts with TW1 and TW2 and a transducer lag T6; electrical power passes two washouts with TW3 and TW4 and a transducer lag T7. The two channels are summed, then pass a ramp-tracking filter of N and M stages, two lead-lag stages with T1 to T4, and output limits VSTMIN and VSTMAX."
+     class="light:sl-hidden" />
+
 ### PSS3B: Two-Input Second-Order Filter Stabilizer
 
 PSS3B processes two input channels through measurement filters and washout stages, then combines them and applies two cascaded second-order lead-lag filters. It corresponds to IEEE Std 421.5-2016 Type PSS3B.
@@ -762,6 +832,13 @@ $$V_{PSS} = \text{clamp}(V_{PSS,unlim}, V_{STMIN}, V_{STMAX})$$
 | `VSTMIN`, `VSTMAX` | Output limits |
 
 ---
+
+<img src="/images/models/pss-pss3b-light.svg"
+     alt="PSS3B block diagram. Each of the two input signals passes a measurement lag and a washout with its own gain, the second is subtracted from the first, and the difference passes a further washout with TW3 and TW4 and two second-order lead-lag filters TF1 and TF2 to give VPSS."
+     class="dark:sl-hidden" />
+<img src="/images/models/pss-pss3b-dark.svg"
+     alt="PSS3B block diagram. Each of the two input signals passes a measurement lag and a washout with its own gain, the second is subtracted from the first, and the difference passes a further washout with TW3 and TW4 and two second-order lead-lag filters TF1 and TF2 to give VPSS."
+     class="light:sl-hidden" />
 
 ### PSS4B: Three-Band Multi-Input Stabilizer
 
@@ -805,6 +882,13 @@ $$V_{PSS} = \text{clamp}(V_{PSSL} + V_{PSSI} + V_{PSSH},\, V_{STMin}, V_{STMax})
 
 ---
 
+<img src="/images/models/pss-pss4b-light.svg"
+     alt="PSS4B block diagram. The speed deviation passes a digital transducer and electrical power passes two washouts and a low-pass filter. Three bands, low, intermediate and high, each with its own gains and time constants, are summed and limited between VSTMIN and VSTMAX to give VPSS."
+     class="dark:sl-hidden" />
+<img src="/images/models/pss-pss4b-dark.svg"
+     alt="PSS4B block diagram. The speed deviation passes a digital transducer and electrical power passes two washouts and a low-pass filter. Three bands, low, intermediate and high, each with its own gains and time constants, are summed and limited between VSTMIN and VSTMAX to give VPSS."
+     class="light:sl-hidden" />
+
 ### IEEEST: Single-Input Stabilizer
 
 The IEEEST is a general-purpose single-input PSS with selectable input signal (speed deviation, electrical power, or computed accelerating power). It corresponds to IEEE Std 421.5-2016 Type PSS1A. Two second-order lead-lag filters provide frequency shaping before two first-order lead-lags and a washout stage.
@@ -831,6 +915,13 @@ Input selection (`speedinput`): 1 = rotor speed deviation, 3 = electrical power,
 
 ---
 
+<img src="/images/models/pss-ieeest-light.svg"
+     alt="IEEEST block diagram. The selected input signal passes two second-order filters set by the A coefficients, two first-order lead-lag stages with T1 to T4, and a washout of gain KS with T5 and T6, and is finally clamped between LSMIN and LSMAX."
+     class="dark:sl-hidden" />
+<img src="/images/models/pss-ieeest-dark.svg"
+     alt="IEEEST block diagram. The selected input signal passes two second-order filters set by the A coefficients, two first-order lead-lag stages with T1 to T4, and a washout of gain KS with T5 and T6, and is finally clamped between LSMIN and LSMAX."
+     class="light:sl-hidden" />
+
 ### STAB3: Power-Input Stabilizer
 
 The STAB3 is a simplified PSS that takes electrical power $P_e$ as input, applies two sequential first-order filters and a washout-type derivative block, producing a stabilizing signal.
@@ -854,6 +945,13 @@ $$V_{PSS} = \text{clamp}(stab_3, -V_{LIM}, V_{LIM})$$
 ## OEL and Limiter Models
 
 Over-Excitation Limiters (OEL) prevent sustained field current overloads that would thermally damage the field winding. They generate a signal $V_{OEL}$ that reduces the AVR output when field current exceeds thermal limits.
+
+<img src="/images/models/pss-stab3-light.svg"
+     alt="STAB3 block diagram. Electrical power passes a lag of time constant Tt, a second lag TX1, and a washout-type derivative of gain minus KX with time constant TX2, and the result is clamped to plus or minus VLIM."
+     class="dark:sl-hidden" />
+<img src="/images/models/pss-stab3-dark.svg"
+     alt="STAB3 block diagram. Electrical power passes a lag of time constant Tt, a second lag TX1, and a washout-type derivative of gain minus KX with time constant TX2, and the result is clamped to plus or minus VLIM."
+     class="light:sl-hidden" />
 
 ### MAXEX2: Field Current Limiter with Timer and Hysteresis
 
@@ -883,6 +981,13 @@ $V_{OEL}$ is subtracted from the reference ($V_{REF} - V_{OEL}$, i.e. Negative r
 | `VLOW` | Lower limit of OEL output (e.g. −1.0 pu) |
 
 ---
+
+<img src="/images/models/exc-maxex2-light.svg"
+     alt="MAXEX2 block diagram. The measured field current, or Efd, drives a timer defined by three current and time points, and a hysteresis block latches once the timer reaches one. Once latched, the error between the reference and measured field currents drives a limited integrator of gain one over KOEL, whose output VOEL is injected at the reference summation rather than at a low-value gate."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-maxex2-dark.svg"
+     alt="MAXEX2 block diagram. The measured field current, or Efd, drives a timer defined by three current and time points, and a hysteresis block latches once the timer reaches one. Once latched, the error between the reference and measured field currents drives a limited integrator of gain one over KOEL, whose output VOEL is injected at the reference summation rather than at a low-value gate."
+     class="light:sl-hidden" />
 
 ### Integral OEL (\_lim variants)
 
@@ -918,3 +1023,10 @@ A stator current limiter (SCL) with analogous structure acts on $I_{st} = \sqrt{
 ---
 
 For full documentation of the CODEGEN DSL primitives used in these models (`tf1p`, `tf1p1z`, `tf1plim`, `inlim`, `pictl`, etc.), see the [CODEGEN Blocks](/developer/codegen-blocks/) reference.
+<img src="/images/models/exc-integral-oel-light.svg"
+     alt="Integral over-excitation limiter block diagram. The field current less 1.05 times the rated field current is clamped above at 0.35 times the rated value, integrated with time constant TOEL between the limits LOEL and UOEL, then scaled by KOEL and clamped between OELLI and zero to give VOEL. The stator current limiter has the same structure on the stator current."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-integral-oel-dark.svg"
+     alt="Integral over-excitation limiter block diagram. The field current less 1.05 times the rated field current is clamped above at 0.35 times the rated value, integrated with time constant TOEL between the limits LOEL and UOEL, then scaled by KOEL and clamped between OELLI and zero to give VOEL. The stator current limiter has the same structure on the stator current."
+     class="light:sl-hidden" />
+

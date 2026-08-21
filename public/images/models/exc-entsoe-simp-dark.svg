@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1233 290" width="1233" height="290" role="img">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#a8b0bf"/></marker></defs>
+<text x="14" y="59" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">Vt</text>
+<path d="M 48 53 L 727 53" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<circle cx="740" cy="53" r="13" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<path d="M 733.5 53 L 746.5 53 M 740 46.5 L 740 59.5" stroke="#4a5160" stroke-width="1"/>
+<text x="719" y="49" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">&#8722;</text>
+<text x="742" y="79" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">+</text>
+<text x="740" y="7" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#b8bdc9">Vo</text>
+<path d="M 740 13 L 740 40" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 753 53.0 L 787 53.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="787" y="26" width="150" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="862.0" y="49.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Lead-lag</text>
+<text x="862.0" y="64.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">(1+sTA) / (1+sTB)</text>
+<path d="M 937 53.0 L 971 53.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="971" y="26" width="172" height="54" rx="4" fill="#1d2b3d" stroke="#3f6087" stroke-width="1.2"/>
+<text x="1057.0" y="49.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Exciter KE / (1 + sTE)</text>
+<text x="1057.0" y="64.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">limits EMIN, EMAX</text>
+<path d="M 1143 53 L 1187 53" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="1195" y="58" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">Efd</text>
+<text x="14" y="219" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">&#969; &#8722; 1</text>
+<path d="M 70 213.0 L 94 213.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="94" y="186" width="128" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="158.0" y="209.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Washout</text>
+<text x="158.0" y="224.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">sTW1 / (1+sTW1)</text>
+<path d="M 222 213.0 L 246 213.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="246" y="186" width="128" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="310.0" y="209.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Washout</text>
+<text x="310.0" y="224.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">sTW2 / (1+sTW2)</text>
+<path d="M 374 213.0 L 398 213.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="398" y="186" width="92" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="444.0" y="217.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Gain KS1</text>
+<path d="M 490 213.0 L 514 213.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="514" y="186" width="140" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="584.0" y="209.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Lead-lag</text>
+<text x="584.0" y="224.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">(1+sT1) / (1+sT2)</text>
+<path d="M 654 213.0 L 678 213.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="678" y="186" width="140" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
+<text x="748.0" y="209.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Lead-lag</text>
+<text x="748.0" y="224.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">(1+sT3) / (1+sT4)</text>
+<text x="848" y="205" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#b8bdc9">VPSS</text>
+<path d="M 818 213 L 740 213 L 740 66" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+</svg>
