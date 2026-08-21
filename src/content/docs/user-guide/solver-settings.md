@@ -167,6 +167,26 @@ Default: `5000`. The reduced state matrix is solved densely, so the peak
 workspace is roughly $9N_x^2$ doubles, about 1.8 GB at the default. Above the
 limit the analysis refuses and exits 78 rather than attempting the allocation.
 
+### Participation Factor Floor
+
+Floor below which a participation entry is not written to `<name>_pf.dat` by
+[small-signal analysis](/user-guide/eigenanalysis/#namepfdat):
+
+```
+$PF_THRES Number ;
+```
+
+Default: `1e-3`. This is a size guard rather than a parameter of the analysis,
+which is why it sits here beside `$EIG_MAX_STATES` and not on the `EIG` record.
+Participation is the one output quadratic in the state count, one row per
+(mode, state) pair, so at the `$EIG_MAX_STATES` default an unfloored file would
+be 25 million rows and roughly 2 GB.
+
+No mode can be emptied by it for any value below 1: each mode's column is
+normalised so its largest entry is exactly 1. Raise it to bound the file on a
+large system; lower it to see smaller entries. Which entries are worth reading
+is decided by whoever reads the file, not here.
+
 ### Latency Settings
 
 ```

@@ -162,7 +162,9 @@ raise_win "$M"
 c $ANA_SSA 330; sleep 35
 S=$(wait_win "Small-signal results" 60) && {
     sleep 3
-    click_in "$S" 250 236; sleep 2.5     # the 0.62 Hz inter-area mode
+    # The modes table sits below three filter rows and a count line now, so
+    # the first data row is about 66 px further down than it was.
+    click_in "$S" 250 302; sleep 2.5     # the 0.62 Hz inter-area mode
     shot "$THEME/gui-ssa-results" "$S" 1.5
     xdotool windowminimize "$S"; sleep 1
 }

@@ -236,7 +236,16 @@ time(s) EIG 'name_of_filename'
 ```
 
 Reduces the linearised model to a state matrix, solves the eigenproblem, and
-writes `<name>_modes.dat`, `<name>_pf.dat` and `<name>_ms.dat`.
+writes `<name>_modes.dat`, `<name>_pf.dat` and `<name>_ms.dat`, all three
+carrying every mode.
+
+The record takes a basename and nothing else. It used to accept an optional
+`real_limit` and `pf_threshold` pair; `real_limit` chose which modes got
+participation and mode-shape output, which is now decided when the results are
+read, and `pf_threshold` became the
+[`$PF_THRES`](/user-guide/solver-settings/#participation-factor-floor) solver
+setting. A record still carrying either is refused rather than having it
+ignored.
 
 Required solver settings:
 ```

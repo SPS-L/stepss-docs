@@ -86,6 +86,12 @@ operating point: pausing mid-swing linearises about a non-equilibrium.
 
 Both are refused rather than approximated. See [Refusals](#refusals) below.
 
+One optional setting, `$PF_THRES x`, sets the floor below which a participation
+entry is not written, default `1e-3`. It is a size guard on the one output that
+is quadratic in the state count, in the same family as `$EIG_MAX_STATES`, and
+not a threshold anyone is meant to tune per analysis; see
+[`<name>_pf.dat`](#namepfdat) below.
+
 They are yours to set on the command line and from Python. The graphical
 interface's **Run small-signal stability analysis** writes both itself, into an
 extra data file read after the case's own, so a case configured for time-domain
@@ -100,6 +106,13 @@ whitespace-separated text with `#` comment headers, so `numpy.loadtxt` reads
 them directly. Names are left-justified and contain no spaces, so splitting on
 whitespace is safe.
 
+**All three carry every mode.** Nothing the engine writes decides which modes
+are worth looking at; that is the reader's job, and both interfaces filter live
+against the full set. The only floor anywhere is `$PF_THRES`, on participation
+alone, and its reason is size rather than significance.
+
+The first line of each file is a version banner, and these three are at **v2**.
+
 ### `<name>_modes.dat`
 
 One line per mode, every mode written.
@@ -110,11 +123,19 @@ One line per mode, every mode written.
 | `re`, `im` | Real and imaginary parts of $\lambda$ |
 | `zeta` | Damping ratio |
 | `freq_hz` | Frequency in Hz |
-| `dom` | 1 if $\mathrm{Re}(\lambda)$ exceeded the `real_limit` filter |
 | `smp` | 1 if the eigenvalue is simple, 0 if degenerate |
 
-The header records `nstates`, `nalg`, the time, and the `real_limit`,
-`pf_threshold` and `gap_tol` values used.
+The header records `nstates`, `nalg`, the time, `gap_tol`, and `pf_floor`, the
+participation floor the run applied.
+
+:::caution[Reading a v1 file]
+v1 carried a `dom` column between `freq_hz` and `smp`, holding the engine's
+verdict on whether the mode passed the `real_limit` it was given, and recorded
+`real_limit` and `pf_threshold` in the header instead of `pf_floor`. The two
+layouts have the same field widths, so a reader that ignores the banner does
+not fail on the wrong one: it reads `smp` out of the `dom` column and answers
+wrongly. Check the first line.
+:::
 
 ### `<name>_pf.dat`
 
@@ -124,18 +145,30 @@ participation factor itself, which STEPSS GUI abbreviates to **PF**.
 
 The participation of state $k$ in mode $i$ is $p_{ki} = \lvert w_{ki}\,v_{ki}\rvert$,
 built from the left and right eigenvectors and normalised so each mode's largest
-entry is 1. Written only for dominant modes, and only for entries above
-`pf_threshold`, so a state that is absent is below the threshold rather than
-exactly zero.
+entry is 1.
+
+Written for every mode, and for every entry above
+[`$PF_THRES`](/user-guide/solver-settings/), so a state that is absent is below
+that floor rather than exactly zero. This is the one output quadratic in the
+state count: one row per (mode, state) pair, so at the `$EIG_MAX_STATES` ceiling
+of 5000 states an unfloored file would be 25 million rows and roughly 2 GB,
+nearly all of it entries too small to read. At the default the same run writes
+on the order of a hundred thousand.
+
+**No mode can be emptied by the floor** for any value below 1, because
+normalisation puts one entry at exactly 1 in every mode. Raise it to bound the
+file on a large system; lower it to see smaller entries.
 
 ### `<name>_ms.dat`
 
 Mode shapes, one line per mode and machine:
 `mode`, `state`, `magnitude`, `angle_deg`, `device`.
 
-Rotor-speed components, normalised so the largest magnitude in each mode is 1,
-with **angles relative to that largest entry**, because an eigenvector's absolute
-phase is arbitrary.
+Rotor-speed components for every mode, normalised so the largest magnitude in
+each mode is 1, with **angles relative to that largest entry**, because an
+eigenvector's absolute phase is arbitrary. No floor applies: this carries one
+row per machine per mode, which is linear in the state count rather than
+quadratic.
 
 ## Saving a run as one archive
 
@@ -151,7 +184,7 @@ by side.
 
 | In the archive | |
 |---|---|
-| `stepss-ssa.txt` | The manifest: the basename, the engine version, `t`, `real_limit` and `pf_threshold` |
+| `stepss-ssa.txt` | The manifest: the basename, the engine version and `t` (older archives also carry the `real_limit` and `pf_threshold` their run was given) |
 | `<name>_modes.dat`, `<name>_pf.dat`, `<name>_ms.dat` | The results above |
 | `<name>_eqs.dat`, `<name>_var.dat`, `<name>_val.dat`, `<name>_struc.dat` | The unreduced Jacobian |
 
@@ -201,6 +234,16 @@ refusal writes no results files, states the reason in the log and through
 | `$SCHEME IN` | The pure DAE values are not available at that point |
 | States above `$EIG_MAX_STATES` | The dense solve is not practical at that size |
 | Singular $g_y$ | The model is not index-1 |
+| `EIG` carrying parameters | The record takes a basename and nothing else |
+
+That last one is a migration, not a mistake in the usual sense. `EIG` used to
+accept an optional `real_limit` and `pf_threshold` pair; `real_limit` decided
+which modes got participation and mode-shape output, and `pf_threshold` became
+the `$PF_THRES` solver setting. A `.dst` still carrying them is refused rather
+than having them ignored, because the values changed what the old engine wrote
+and accepting one silently would produce a results set that looks entirely
+normal and answers a different question. Remove the parameters; if you want the
+old participation floor, write `$PF_THRES 0.05 ;` in your solver settings.
 
 A run that produced nothing and exited **0** is a different problem, most likely
 an engine older than v3.60.
@@ -232,15 +275,20 @@ Participation factors separate the two local modes without any prior knowledge
 of the topology: the 1.085 Hz mode lists only G1 and G2, the 1.116 Hz mode only
 G3 and G4, and the inter-area mode lists all four.
 
+Every one of those numbers is available for every mode, which was not always
+true: the engine used to write participation factors and mode shapes only for
+modes above a `real_limit` fixed before the run, so answering a question about
+a mode outside it meant running the case again.
+
 In STEPSS GUI the same run is read from the small-signal results window, which
 **Run small-signal stability analysis** on the
 [Analysis tab](/gui/interface/#analysis) opens on the run it just made:
 
 <img src="/images/screenshots/gui-ssa-results-light.png"
-     alt="The small-signal results window for the Kundur case. A table lists the seven electromechanical modes with frequency, damping ratio and real and imaginary parts; the 0.6237 Hz inter-area mode at a damping ratio of 0.1087 is selected. An s-plane plot on the right places every mode against a stability boundary at the imaginary axis. Below, the Participation panel lists the selected mode's largest contributions, the machines' speed and angle states, and a polar mode-shape plot shows the machines of one area swinging opposite to the other."
+     alt="The small-signal results window for the Kundur case. Above the table are three filters: an electromechanical only tick, a real part above tick with a value beside it, and a PF at least field, with a count of how many modes are shown. The table lists the electromechanical modes with frequency, damping ratio and real and imaginary parts; the 0.6237 Hz inter-area mode at a damping ratio of 0.1087 is selected. An s-plane plot on the right places every mode against a stability boundary at the imaginary axis, with Reset zoom and Save plot buttons beneath it. Below, the Participation panel lists the selected mode's largest contributions, the machines' speed and angle states, and a polar mode-shape plot shows the machines of one area swinging opposite to the other."
      class="dark:sl-hidden" />
 <img src="/images/screenshots/gui-ssa-results-dark.png"
-     alt="The small-signal results window for the Kundur case. A table lists the seven electromechanical modes with frequency, damping ratio and real and imaginary parts; the 0.6237 Hz inter-area mode at a damping ratio of 0.1087 is selected. An s-plane plot on the right places every mode against a stability boundary at the imaginary axis. Below, the Participation panel lists the selected mode's largest contributions, the machines' speed and angle states, and a polar mode-shape plot shows the machines of one area swinging opposite to the other."
+     alt="The small-signal results window for the Kundur case. Above the table are three filters: an electromechanical only tick, a real part above tick with a value beside it, and a PF at least field, with a count of how many modes are shown. The table lists the electromechanical modes with frequency, damping ratio and real and imaginary parts; the 0.6237 Hz inter-area mode at a damping ratio of 0.1087 is selected. An s-plane plot on the right places every mode against a stability boundary at the imaginary axis, with Reset zoom and Save plot buttons beneath it. Below, the Participation panel lists the selected mode's largest contributions, the machines' speed and angle states, and a polar mode-shape plot shows the machines of one area swinging opposite to the other."
      class="light:sl-hidden" />
 
 Reading that window across is the whole method in one view. The table gives the
@@ -253,10 +301,33 @@ factor, normalised so the largest in each mode is 1. The mode shape answers how
 those machines move relative to each other: here G1 and G2 swing against G3 and
 G4, which is what makes 0.62 Hz the inter-area mode rather than a local one.
 
-Ticking **electromechanical only** restricts the table to the 0.1 to 2.5 Hz band,
-which is where rotor-angle modes live. The full spectrum for this case is 70
-states, most of them fast controller and network dynamics that no rotor
-participates in.
+### Filtering and zooming
+
+Three controls sit above the table, and all of them act on results already in
+hand. Changing one re-filters what is on screen; none of them requires the
+analysis to be run again.
+
+| Control | What it does |
+|---|---|
+| **electromechanical only** | Restricts to the 0.1 to 2.5 Hz band, where rotor-angle modes live. On by default |
+| **real part above** | Hides modes at or below the value beside it. Off by default |
+| **PF at least** | Trims the Participation panel to entries at or above the value beside it |
+
+The count underneath says how many modes survive, so a filter that empties the
+table reads as a filter rather than as a broken load.
+
+**real part above** is the one that used to be the `real_limit` parameter of the
+run. It is worth reaching for on a full spectrum: this case is 70 states, most
+of them fast controller and network dynamics that no rotor participates in, and
+a handful of them sit far enough to the left to stretch the s-plane's real axis
+until everything worth reading is squashed against the boundary. The plot refits
+its axes whenever the filter changes, so hiding those modes closes the plane in
+around what is left.
+
+For a closer look than a filter gives, **drag a rectangle on the s-plane** to
+zoom into it. **Reset zoom**, beside **Save plot...**, goes back to the fitted
+window, and double-clicking the plot does the same. A zoomed plot exports
+zoomed: **Save plot...** writes what is on screen, not the whole plane.
 
 :::note
 This screenshot is light in both site themes. The window itself follows the

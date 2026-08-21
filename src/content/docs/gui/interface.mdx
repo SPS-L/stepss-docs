@@ -214,9 +214,14 @@ trajectory. **Load trajectory** reads a trajectory from an earlier run.
 [Running a Simulation](/gui/running/) walks through this.
 
 **Small-signal stability analysis** runs the engine's eigenanalysis at a chosen
-instant. Point it at a results directory, set a basename, the analysis time, a
-real-part limit and a participation factor (PF) threshold, then **Run
-small-signal stability analysis**. Each run opens its own results window and
+instant. Point it at a results directory, set a basename and the analysis time,
+then **Run small-signal stability analysis**.
+
+There are no thresholds here. There used to be a real-part limit and a
+participation factor (PF) threshold, and both decided what the engine would
+write; every mode is written now, and the thresholds live in the results window
+where changing one re-filters what is already on screen. See
+[Eigenanalysis](/user-guide/eigenanalysis/#filtering-and-zooming). Each run opens its own results window and
 leaves any already up alone, so two runs can be compared side by side. **Save dynamic
 Jacobian...** and **Load dynamic Jacobian...** write that run out as an archive
 and open it again later, each load in a window of its own too.
@@ -233,10 +238,10 @@ This is performed by RAMSES itself.
 what the results mean.
 
 <img src="/images/screenshots/gui-analysis-light.png"
-     alt="The Analysis tab with a completed run available. A Time-domain analysis row offers Extract curves, Save current trajectory and Load trajectory, with Close all curve windows at the right. Below it a Small-signal stability analysis section offers Select results directory beside an empty field, a basename of ssa, an analysis time of 0.001 seconds, a real part limit of -1.0 and a participation-factor threshold of 0.05, with buttons to run the analysis and to save or load the dynamic Jacobian."
+     alt="The Analysis tab with a completed run available. A Time-domain analysis row offers Extract curves, Save current trajectory and Load trajectory, with Close all curve windows at the right. Below it a Small-signal stability analysis section offers Select results directory beside an empty field, a basename of ssa and an analysis time of 0.001 seconds, with buttons to run the analysis and to save or load the dynamic Jacobian."
      class="dark:sl-hidden" />
 <img src="/images/screenshots/gui-analysis-dark.png"
-     alt="The Analysis tab with a completed run available. A Time-domain analysis row offers Extract curves, Save current trajectory and Load trajectory, with Close all curve windows at the right. Below it a Small-signal stability analysis section offers Select results directory beside an empty field, a basename of ssa, an analysis time of 0.001 seconds, a real part limit of -1.0 and a participation-factor threshold of 0.05, with buttons to run the analysis and to save or load the dynamic Jacobian."
+     alt="The Analysis tab with a completed run available. A Time-domain analysis row offers Extract curves, Save current trajectory and Load trajectory, with Close all curve windows at the right. Below it a Small-signal stability analysis section offers Select results directory beside an empty field, a basename of ssa and an analysis time of 0.001 seconds, with buttons to run the analysis and to save or load the dynamic Jacobian."
      class="light:sl-hidden" />
 
 The unlabelled field beside **Select results directory** is where results are
