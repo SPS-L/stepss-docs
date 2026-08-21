@@ -46,7 +46,7 @@ The window is six tabs, used left to right:
 3. On **Observables**, tick what to record, and optionally set a quantity to plot
    live while the run proceeds
 
-4. On **Initialization**, **Run power flow** to get the operating point
+4. On **Power Flow Simulation**, **Run power flow** to get the operating point
 
 5. On **Dynamic Simulation**, **Run dynamic simulation**
 
@@ -185,20 +185,20 @@ Lines starting with `#` in the command file are treated as comments and skipped.
 1. **Launch STEPSS** and load the network and power-flow data files on the
    **System Data** tab
 
-2. Go to **Initialization** and click **Run power flow**. The pane reports bus
+2. Go to **Power Flow Simulation** and click **Run power flow**. The pane reports bus
    voltages and angles, the generator table with its limits, and the system power
    balance
 
-3. Inspect the result through **Bus overview**, **Generators & SVCs**,
-   **Adjustable transformers** and **Global power balance**, which enable once the
-   run succeeds
+3. Inspect the result through **Bus overview**, **Branch flows**, **Generators &
+   SVCs**, **Adjustable transformers** and **Global power balance**, which enable
+   once the run succeeds
 
 4. **Add Helios results to data** feeds the solution back into the loaded case,
    ready for the dynamic simulation
 
 </Steps>
 
-See [The Interface](/gui/interface/#initialization) for what each control does.
+See [The Interface](/gui/interface/#power-flow-simulation) for what each control does.
 
 </TabItem>
 <TabItem label="Command Line">
