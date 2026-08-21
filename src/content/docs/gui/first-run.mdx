@@ -82,13 +82,15 @@ that, and reach it from **File, Open Examples** whenever you want it back.
 | [5-bus tutorial](/test-systems/5bus/) | 5 buses, 1 machine | The teaching case from EEN452 at the Cyprus University of Technology, and the one to open first. One generator with detailed machine, governor and AVR models, a composite load, and an external grid, small enough to read end to end. Its disturbance file is deliberately empty, ready for you to add the records of the study you want. |
 | [Kundur two-area](/test-systems/kundur/) | 11 buses, 4 machines, 60 Hz | The standard benchmark for inter-area oscillations. Two symmetric areas joined by a weak tie. The shipped disturbance steps a load and the resulting inter-area mode is the object of the study. A second dynamic file with the stabiliser disabled ships beside the first, so the same run can be repeated with the PSS out and the damping compared. |
 | [IEEE Nordic](/test-systems/nordic/) | 74 buses, 20 machines, 400/220/130 kV | The reference system for long-term voltage stability, from IEEE PES technical report PES-TR19. It opens on the tripped-branch case it is best known for, with further disturbances, a second operating point and a set of load-increase variants shipped alongside. |
-| 6-bus microgrid | 6 buses, 2 generators, 6/11 kV | A power-flow-only case: two lines, four transformers, loads at buses D and E, and generators at A (slack) and F. It carries no dynamic data and no disturbance scenario, so it runs on **Power Flow Simulation** and not on **Dynamic Simulation**. It is the case the [annotated one-line diagram](/user-guide/power-flow/#annotated-one-line-diagram) is demonstrated with: `6bus.svg` is a template of placeholder codes that **Run power flow** fills in with the solved values. |
+| [6-bus microgrid](https://github.com/SPS-L/stepss-6-bus-MG) | 6 buses, 2 generators, 6/11 kV | A power-flow-only case: two lines, four transformers, loads at buses D and E, and generators at A (slack) and F. It carries no dynamic data and no disturbance scenario, so it runs on **Power Flow Simulation** and not on **Dynamic Simulation**. It is the case the [annotated one-line diagram](/user-guide/power-flow/#annotated-one-line-diagram) is demonstrated with: `6bus.svg` is a template of placeholder codes that **Run power flow** fills in with the solved values. |
 
 The first three link to their own page here, which carries the network, the
-models and the studies the system is used for; the microgrid has no page of its
+models and the studies the system is used for. The microgrid has no page of its
 own, because everything it demonstrates belongs to
-[Power Flow](/user-guide/power-flow/). **Documentation** in the dialog opens the
-system's source repository in every case.
+[Power Flow](/user-guide/power-flow/), so its name links to
+[its repository](https://github.com/SPS-L/stepss-6-bus-MG) instead.
+**Documentation** in the dialog opens the system's source repository in every
+case.
 
 ## Where the files go
 
