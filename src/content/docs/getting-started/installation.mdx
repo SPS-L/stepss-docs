@@ -268,12 +268,16 @@ cg-studio
 interface is a web page, not that anything leaves your machine: the server is
 local and so is every file it reads.
 
-<Aside type="note" title="The editor is not the compiler">
-The wheel carries the editor alone, so the **Run Codegen** button needs a
-`codegen` executable you point Settings (the gear icon) at. Leaving it unset
-costs you nothing much: exporting the DSL file is what the editor is for, and
-STEPSS GUI runs CODEGEN over that file without any of this. See
-[User-Defined Models](/developer/user-models/) for what happens to it next.
+<Aside type="note" title="CODEGEN comes with it">
+The wheel carries the CODEGEN executables for Linux, Windows and macOS, so
+**Run Codegen** generates Fortran on a fresh install with nothing to obtain and
+no path to set. On macOS, add `brew install gcc`: that build links against
+`libgfortran`, because Apple does not support fully static executables. See
+[User-Defined Models](/developer/user-models/) for what happens to the generated
+file next.
+
+CODEGEN is not Apache 2.0 like the editor around it, so this wheel is
+mixed-licence: see [License](/getting-started/license/#codegen-license).
 </Aside>
 
 See [CODEGEN Studio](/developer/cg-studio/) for the command-line options, a

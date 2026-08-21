@@ -330,14 +330,21 @@ Click **"Run Codegen"** (the accent-coloured button with the play icon) to compi
 The same mandatory-output validation runs first. If validation passes:
 
 1. The editor generates the DSL text
-2. The backend writes it to a temporary file and invokes the `codegen` binary
+2. The backend writes it to a temporary file and invokes the bundled CODEGEN
 3. On **success**, a modal displays the generated `.f90` source code with options to **"Download .f90"** or **"Close"**
-4. On **failure**, a modal shows the error output from the `codegen` binary
+4. On **failure**, a modal shows the error output from CODEGEN
 
 The downloaded `.f90` file follows the naming convention `exc_simple_avr.f90` (type prefix + model name) and is ready to compile and link with RAMSES.
 
-:::caution[Codegen binary required]
-The `codegen` executable must be installed and its path configured. Click the **gear icon** in the topbar to open Settings, then set the **"Codegen binary path"** to the full path of your `codegen` executable (or just `codegen` if it is on your system `PATH`).
+:::note[Nothing to install or configure]
+CODEGEN ships inside the wheel, for Linux x86-64, Windows x86-64 and macOS
+Apple Silicon, so this works on a fresh `pip install stepss-cg-studio`. There
+is no binary to obtain and no path to set; Settings shows which CODEGEN release
+this install runs, and the package version names it too.
+
+macOS is the one platform that needs anything else: `brew install gcc`, because
+Apple does not support fully static executables and that build links against
+`libgfortran`.
 :::
 
 ---
@@ -371,17 +378,25 @@ Shortcuts are disabled while typing in text fields.
 Click the **gear icon** in the topbar to configure:
 
 <img src="/images/screenshots/cg-studio-settings.png"
-     alt="The Settings dialog over the editor, with three fields: codegen binary path set to codegen, server host set to 127.0.0.1, and server port set to 8765. Each carries a line of help text, and Save and Cancel buttons sit at the foot."
+     alt="The Settings dialog over the editor, with three rows: Bundled CODEGEN showing v5.2.0 as flat monospace text rather than an editable field, server host set to 127.0.0.1, and server port set to 8765. Each carries a line of help text, and Save and Cancel buttons sit at the foot."
      class="shot-single" />
 
 
-| Setting | Default | Description |
+| Row | Default | Description |
 |---------|---------|-------------|
-| **Codegen binary path** | `codegen` | Full path to the `codegen` executable |
+| **Bundled CODEGEN** | (read-only) | Which CODEGEN release this install runs |
 | **Server host** | `127.0.0.1` | Bind address (change to `0.0.0.0` for network access) |
 | **Server port** | `8765` | HTTP port |
 
-Changes to host and port require a server restart. The codegen path takes effect immediately.
+Changes to host and port require a server restart.
+
+**Bundled CODEGEN is not a setting.** It reports what the wheel carries, and
+the two leading components of the package's own version name the same release:
+`stepss-cg-studio` 5.3.0 and 5.3.1 both run CODEGEN 5.3, and 5.4.0 is the first
+release on CODEGEN 5.4. Running a different generator therefore means
+installing a different `stepss-cg-studio`, not repointing the editor. Earlier
+versions had a "Codegen binary path" field, which existed only because no
+CODEGEN was shipped; an upgrade drops it from `config.json` automatically.
 
 Settings are stored in a platform-specific config file:
 
