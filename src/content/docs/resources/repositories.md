@@ -87,13 +87,3 @@ Browser-based visual editor for building CODEGEN user-defined models with drag-a
 :::note
 Test-system data repositories (Nordic, 5-bus, Kundur, GB Network, and others) are not listed here; see the [Test Systems](/test-systems/) section of this site.
 :::
-
-## Contributing
-
-Contributions to public repositories are welcome. For each repository:
-
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request
-
-For issues or feature requests, use the GitHub Issues tab on the relevant repository.
