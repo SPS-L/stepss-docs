@@ -173,10 +173,10 @@ The data-file model name is `THERMAL_GENERIC1`.
 The `tor_thermal_generic1` model is a **generic multi-stage steam turbine governor**, suitable for both single-shaft and cross-compound units. It includes a speed controller with rate-limiting, a three-section steam chest/reheater, and separate HP, MP, and LP turbine stages.
 
 <img src="/images/models/tor-thermal-generic1-light.svg"
-     alt="THERMAL_GENERIC1 block diagram. The speed deviation from unity is divided by the droop sigma and filtered with time constant Tmes. That term and the gate position are subtracted from the power setpoint P0, divided by the servo time constant Tsm, rate-limited between zdotmin and zdotmax, and integrated between zmin and zmax to give the gate opening z. The gate drives three lags in series with time constants Thp, Tr and Tlp; the three stage powers are formed with the fractions Fhp, Fmp times ivo and one minus Fhp minus Fmp, summed into the mechanical power, and divided by the rotor speed to give the torque."
+     alt="THERMAL_GENERIC1 block diagram. The speed deviation from unity is divided by the droop sigma and filtered with time constant Tmes. That term and the gate position are subtracted from the power setpoint P0, divided by the servo time constant Tsm, rate-limited between zdotmin and zdotmax, and integrated between zmin and zmax to give the gate opening z. The gate drives three lags in series with time constants Thp, Tr and Tlp; the three stage powers are formed with the fractions Fhp, Fmp times the intercept valve factor ivo and one minus Fhp minus Fmp, summed into the mechanical power, and divided by the rotor speed to give the torque."
      class="dark:sl-hidden" />
 <img src="/images/models/tor-thermal-generic1-dark.svg"
-     alt="THERMAL_GENERIC1 block diagram. The speed deviation from unity is divided by the droop sigma and filtered with time constant Tmes. That term and the gate position are subtracted from the power setpoint P0, divided by the servo time constant Tsm, rate-limited between zdotmin and zdotmax, and integrated between zmin and zmax to give the gate opening z. The gate drives three lags in series with time constants Thp, Tr and Tlp; the three stage powers are formed with the fractions Fhp, Fmp times ivo and one minus Fhp minus Fmp, summed into the mechanical power, and divided by the rotor speed to give the torque."
+     alt="THERMAL_GENERIC1 block diagram. The speed deviation from unity is divided by the droop sigma and filtered with time constant Tmes. That term and the gate position are subtracted from the power setpoint P0, divided by the servo time constant Tsm, rate-limited between zdotmin and zdotmax, and integrated between zmin and zmax to give the gate opening z. The gate drives three lags in series with time constants Thp, Tr and Tlp; the three stage powers are formed with the fractions Fhp, Fmp times the intercept valve factor ivo and one minus Fhp minus Fmp, summed into the mechanical power, and divided by the rotor speed to give the torque."
      class="light:sl-hidden" />
 
 **Speed governor:**
@@ -197,7 +197,7 @@ It is divided by the servo time constant $T_{sm}$, rate-limited to $[zdot_{min},
 
 **Turbine power stages:**
 
-The gate opening drives three lags in series, the reheat stage carrying the initial valve opening $ivo$ as a factor:
+The gate opening drives three lags in series, the reheat stage carrying the intercept valve factor $ivo$:
 
 $$
 T_{hp}\,\dot{x}_{hp} = -x_{hp} + z, \qquad
@@ -226,7 +226,7 @@ $$
 | `sigma` | 1 | Speed droop (pu/pu) |
 | `Tmes` | 2 | Speed measurement time constant (s) |
 | `Tsm` | 3 | Servo/gate time constant (s) |
-| `zdotmin` | 4 | Minimum gate rate (pu/s), also additional parameter |
+| `zdotmin` | 4 | Minimum gate rate (pu/s) |
 | `zdotmax` | 5 | Maximum gate rate (pu/s) |
 | `zmin` | 6 | Minimum gate opening (pu) |
 | `zmax` | 7 | Maximum gate opening (pu) |
@@ -238,7 +238,14 @@ $$
 
 **Implementation details:**
 - `nbxvar = 10`, `nbzvar = 2`, `nbdata = 12`, `nbaddpar = 2`
-- Additional: `prm(13) = P0` (initial power), `prm(14) = ivo` (initial valve opening)
+- Additional: `prm(13) = P0` (initial power), `prm(14) = ivo` (intercept valve factor)
+
+:::caution
+`ivo` is an *additional* parameter: it is computed at initialisation rather than
+read from the record, and the engine sets it to 1 unconditionally. The intercept
+valve factor is therefore always 1 and cannot be given another value from a data
+file.
+:::
 - Observables: `z`, `PmHP`, `PmMP`, `PmLP`, `Pm`
 
 ### Usage Example

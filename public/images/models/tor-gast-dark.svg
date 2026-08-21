@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 300" width="1180" height="300" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 330" width="1180" height="330" role="img">
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#a8b0bf"/></marker><marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#78aeea"/></marker></defs>
 <text x="14" y="67" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">&#969; &#8722; 1</text>
 <path d="M 70 61 L 103 61" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
@@ -44,4 +44,5 @@
 <rect x="320" y="188" width="132" height="44" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
 <text x="386.0" y="214.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">AT + KT(AT &#8722; p4)</text>
 <path d="M 320 210 L 381 210 L 381 88" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="1168" y="320" text-anchor="end" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#b8bdc9" opacity="0.7">Generated automatically from the RAMSES source. Report an error at github.com/SPS-L/stepss-docs/issues</text>
 </svg>

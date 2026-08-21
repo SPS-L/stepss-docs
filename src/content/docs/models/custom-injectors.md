@@ -102,6 +102,13 @@ INJEC  LOAD  LOAD1  BUS1  1.  1.  0.  0.  1.5  0.3  1.0  0.2  2.0  0.5  1.8  0.4
 
 The VFD load model represents aggregate industrial loads driven by variable-frequency drives, where the power consumption exhibits a composite voltage-dependent characteristic with multiple exponential components and frequency sensitivity. It also includes low-voltage protection: below a configurable threshold $V_{\min}$, the load switches to a constant-admittance representation, preventing numerical difficulties during deep voltage sags.
 
+<img src="/images/models/inj-vfd-load-light.svg"
+     alt="Variable frequency drive load block diagram. The bus voltage passes a 3 ms filter and is multiplied by the frequency factor, then by a three-component exponential blend with fractions a1 and a2 and exponents alpha1, alpha2 and alpha3, normalised at the initial voltage. Below the threshold Vlow the model switches to an equivalent constant admittance Geq and Beq, whose values are set at initialisation so the two regimes meet at Vlow. The frequency deviation comes either from the local bus, measured with time constant Tmes, or from the centre-of-inertia speed."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-vfd-load-dark.svg"
+     alt="Variable frequency drive load block diagram. The bus voltage passes a 3 ms filter and is multiplied by the frequency factor, then by a three-component exponential blend with fractions a1 and a2 and exponents alpha1, alpha2 and alpha3, normalised at the initial voltage. Below the threshold Vlow the model switches to an equivalent constant admittance Geq and Beq, whose values are set at initialisation so the two regimes meet at Vlow. The frequency deviation comes either from the local bus, measured with time constant Tmes, or from the centre-of-inertia speed."
+     class="light:sl-hidden" />
+
 #### Scientific Description
 
 The active and reactive powers depend on bus voltage $V$ and frequency deviation $\Delta f = f/f_0 - 1$:
@@ -173,6 +180,13 @@ INJEC  vfd_load  VFD1  BUS_IND  1.  1.  0.  0.  1.5  0.7  2.0  0.2  1.0  0.5
 
 The restorative load model represents loads that self-restore toward a nominal characteristic after a voltage disturbance. The load's active and reactive powers are governed by two internal recovery variables that evolve dynamically, allowing the simulation to capture the slow restoration of thermostatically controlled loads (heating, cooling) and similar self-restoring demand.
 
+<img src="/images/models/inj-restld-light.svg"
+     alt="Restorative load block diagram. The steady-state term, the voltage raised to alpha-s times one plus DP times the speed deviation, has the recovery state multiplied by the transient term subtracted from it. The difference drives an integrator of time constant Tr limited between xPmin and xPmax, whose state scales the injected currents through the initial conductance and susceptance. The reactive side has the same structure with exponents beta-s and beta-t."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-restld-dark.svg"
+     alt="Restorative load block diagram. The steady-state term, the voltage raised to alpha-s times one plus DP times the speed deviation, has the recovery state multiplied by the transient term subtracted from it. The difference drives an integrator of time constant Tr limited between xPmin and xPmax, whose state scales the injected currents through the initial conductance and susceptance. The reactive side has the same structure with exponents beta-s and beta-t."
+     class="light:sl-hidden" />
+
 #### Scientific Description
 
 The recovery variable $x_P$ for active power satisfies:
@@ -228,6 +242,13 @@ INJEC  RESTLD  RESTLD1  BUS2  1.  1.  0.  0.  1.5  0.5  2.0  0.0  2.0  1.2  0.5 
 
 The simplest injector model: maintains constant active and reactive power consumption regardless of bus voltage or frequency. The power is fixed at its initial operating-point value. A small first-order filter (time constant `Tout`) drives the injected currents smoothly to their target values, preventing algebraic loops.
 
+<img src="/images/models/inj-pq-light.svg"
+     alt="Constant PQ load block diagram. The two current references are formed from the initial powers and the measured voltage components divided by the voltage squared, and each passes a first-order filter of time constant Tout to give the injected current. The initial powers are fixed, so the power drawn does not follow the voltage."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-pq-dark.svg"
+     alt="Constant PQ load block diagram. The two current references are formed from the initial powers and the measured voltage components divided by the voltage squared, and each passes a first-order filter of time constant Tout to give the injected current. The initial powers are fixed, so the power drawn does not follow the voltage."
+     class="light:sl-hidden" />
+
 #### Scientific Description
 
 The current references are set to deliver the initial powers $P_0$ and $Q_0$ at the measured voltage $V$:
@@ -273,6 +294,13 @@ INJEC  inj_PQ  LOAD_PQ  BUS3  1.  1.  0.  0.  0.01  ;
 #### Description
 
 Models an external network or generator cluster as a Thévenin equivalent: an ideal voltage source $\bar{E}_{\mathrm{th}}$ behind a pure reactance $X_{\mathrm{th}}$. The model computes the internal voltage magnitude and phase angle at initialization from the initial bus conditions and holds them constant during the simulation. It is useful for representing neighbouring system equivalents or simplified machine representations.
+
+<img src="/images/models/inj-theveq-light.svg"
+     alt="Thevenin equivalent block diagram. The internal voltage magnitude and phase angle are fixed at initialisation, and the injected currents follow directly from them, the terminal voltage and the Thevenin reactance. The model has no state."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-theveq-dark.svg"
+     alt="Thevenin equivalent block diagram. The internal voltage magnitude and phase angle are fixed at initialisation, and the injected currents follow directly from them, the terminal voltage and the Thevenin reactance. The model has no state."
+     class="light:sl-hidden" />
 
 #### Scientific Description
 
@@ -322,6 +350,13 @@ INJEC  THEVEQ  EQUIV1  SLACK_BUS  1.  1.  0.  0.  2000.0  ;
 #### Description
 
 A single-cage (single-rotor-circuit) induction machine model for motor loads. The machine is represented on its own MVA base (or inferred from load factor `LF`) with a shunt capacitor $B_{\mathrm{sh}}$ to represent power factor correction. The mechanical torque is a quadratic function of rotor speed. At initialization, the model solves nonlinear algebraic equations to find the operating-point slip and flux linkages.
+
+<img src="/images/models/inj-indmach1-light.svg"
+     alt="Single-cage induction machine block diagram. The terminal voltage drives the stator equations to give the machine currents, which with the rotor flux linkages give the electromagnetic torque. The load torque, a quadratic function of rotor speed, is subtracted and the difference is integrated through twice the inertia constant to give the rotor speed, which returns both to the load torque and to the rotor circuit as slip against the network frame."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-indmach1-dark.svg"
+     alt="Single-cage induction machine block diagram. The terminal voltage drives the stator equations to give the machine currents, which with the rotor flux linkages give the electromagnetic torque. The load torque, a quadratic function of rotor speed, is subtracted and the difference is integrated through twice the inertia constant to give the rotor speed, which returns both to the load torque and to the rotor circuit as slip against the network frame."
+     class="light:sl-hidden" />
 
 #### Scientific Description
 
@@ -390,6 +425,13 @@ INJEC  INDMACH1  MTR1  BUS_MV  1.  1.  0.  0.  10.0  0.01  0.10  2.50  0.015  0.
 
 A double-cage (double-rotor-circuit) induction machine model following the Eurostag formulation. Two parallel rotor cages allow more accurate representation of the machine's impedance-vs-frequency characteristic, which is especially important for the starting transient. The model structure mirrors `inj_indmach1` but includes a second set of rotor flux states.
 
+<img src="/images/models/inj-indmach2-light.svg"
+     alt="Double-cage induction machine block diagram. The structure is that of INDMACH1 with the rotor doubled: the stator equations give the machine currents, two rotor cages carry their own flux linkages, and the electromagnetic torque sums a contribution from each. The load torque is subtracted and the difference integrated through twice the inertia constant to give the rotor speed, which returns to the load torque and to both cages as slip."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-indmach2-dark.svg"
+     alt="Double-cage induction machine block diagram. The structure is that of INDMACH1 with the rotor doubled: the stator equations give the machine currents, two rotor cages carry their own flux linkages, and the electromagnetic torque sums a contribution from each. The load torque is subtracted and the difference integrated through twice the inertia constant to give the rotor speed, which returns to the load torque and to both cages as slip."
+     class="light:sl-hidden" />
+
 #### Scientific Description
 
 The machine has parameters: stator resistance $R_1$, stator leakage $L_1$, magnetizing inductance $L_m$, cage-1 resistance $R_2$ and leakage $L_2$, cage-2 resistance $R_3$ and leakage $L_3$. The state vector is $(\psi_{dr1},\psi_{qr1},\psi_{dr2},\psi_{qr2},\omega_m)$ with flux-linkage equations for each cage:
@@ -443,7 +485,9 @@ INJEC  INDMACH2  MTR2  BUS_MV  1.  1.  0.  0.  10.0  0.01  0.08  2.00  0.02  0.0
 
 ---
 
-### inj_INDM1: Alternative Induction Machine
+### INDM1 (`inj_INDM1`): Alternative Induction Machine
+
+The data-file model name is `INDM1` (or `inj_INDM1`).
 
 :::note
 Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected. For built-in single-cage motors, use `INDMACH1` instead.
@@ -455,7 +499,7 @@ An alternative single-cage induction machine model that uses the `INI_indmach1` 
 
 #### Scientific Description
 
-The model equations match those of `inj_indmach1`. The key distinction is the use of the `INI_indmach1` function at parameter-evaluation time to pre-compute $B_{\mathrm{sh}}$, $T_{m0}$, and the initial flux linkages and rotor speed, rather than solving the initialization system in Fortran. With $L_{ss} = L_{sr} + L_{ls}$ and $L_{rr} = L_{sr} + L_{lr}$, the rotor flux equations are:
+The model equations match those of [`inj_indmach1`](#indmach1-inj_indmach1-single-cage-induction-machine), whose block diagram applies here unchanged. The key distinction is the use of the `INI_indmach1` function at parameter-evaluation time to pre-compute $B_{\mathrm{sh}}$, $T_{m0}$, and the initial flux linkages and rotor speed, rather than solving the initialization system in Fortran. With $L_{ss} = L_{sr} + L_{ls}$ and $L_{rr} = L_{sr} + L_{lr}$, the rotor flux equations are:
 
 $$\frac{d\psi_{dr}}{dt} = 2\pi f_0 \left[ -\frac{R_R}{L_{rr}}\psi_{dr} + \frac{L_{SR} R_R}{L_{rr}} i_{ym} - (\omega - \omega_m)\psi_{qr} \right]$$
 
@@ -740,20 +784,22 @@ INJEC  WT4  WT4_1  BUS_WIND  1.  1.  0.  0.
 
 ---
 
-### inj_PVG: Photovoltaic Generator
+### PV (`inj_PV`): Photovoltaic Generator
+
+The data-file model name is `PV` (or `inj_PV`).
 
 :::note
-Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected. For built-in IBR modelling, use `IBG`, `WT3`, or `WT4`. Note that the subroutine inside `inj_PVG.f90` is named `inj_PV`; both refer to the same single model.
+Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected.
 :::
 
 #### Description
 
 A photovoltaic generator model with similar WECC-derived structure to the wind turbine models. The model includes a plant controller (voltage/reactive power regulation), an electrical controller (current limits, LVRT), and generator/converter representation. Unlike wind turbines, there is no mechanical drive train; the active power set-point follows an irradiance input or a fixed reference. LVRT/HVRT logic and current limiting are identical to the Type 4 wind model.
 
-<img src="/images/models/inj-pvg-light.svg"
+<img src="/images/models/inj-pv-light.svg"
      alt="Photovoltaic generator block diagram. The active power reference divided by the terminal voltage gives the active current command, which passes a low-voltage power-logic limit that is piecewise in Vt and a first-order filter of time constant Tg. The reactive command is a function of terminal voltage and reactive reference and passes a first-order filter of time constant Tm. Both currents enter a limiter enforcing that the sum of their squares stays below Imax squared, and a Park transform resolves them into ix and iy."
      class="dark:sl-hidden" />
-<img src="/images/models/inj-pvg-dark.svg"
+<img src="/images/models/inj-pv-dark.svg"
      alt="Photovoltaic generator block diagram. The active power reference divided by the terminal voltage gives the active current command, which passes a low-voltage power-logic limit that is piecewise in Vt and a first-order filter of time constant Tg. The reactive command is a function of terminal voltage and reactive reference and passes a first-order filter of time constant Tm. Both currents enter a limiter enforcing that the sum of their squares stays below Imax squared, and a Park transform resolves them into ix and iy."
      class="light:sl-hidden" />
 
@@ -1230,6 +1276,13 @@ without perturbing the solution.
 The frequency estimate is a first-order filter on the bus voltage phasor. The
 measurement time constant is clamped to a floor of 0.05 s, so values below that
 have no effect.
+
+<img src="/images/models/inj-pmu-light.svg"
+     alt="Phasor measurement unit block diagram. The bus voltage feeds three independent measurement chains: the voltage magnitude and angle, a first-order frequency estimate whose time constant is floored at 0.05 seconds, and the speed and angle of the moving DQ reference frame. The model injects zero current."
+     class="dark:sl-hidden" />
+<img src="/images/models/inj-pmu-dark.svg"
+     alt="Phasor measurement unit block diagram. The bus voltage feeds three independent measurement chains: the voltage magnitude and angle, a first-order frequency estimate whose time constant is floored at 0.05 seconds, and the speed and angle of the moving DQ reference frame. The model injects zero current."
+     class="light:sl-hidden" />
 
 #### Parameters
 

@@ -24,3 +24,7 @@ pnpm-debug.log*
 # gitlink once broke recursive cloning of the umbrella repo)
 .claude/
 .mcp.json
+
+# Python bytecode from tools/
+__pycache__/
+*.pyc

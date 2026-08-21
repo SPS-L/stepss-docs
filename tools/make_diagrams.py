@@ -29,6 +29,9 @@ OUT = pathlib.Path(__file__).resolve().parent.parent / "public" / "images" / "mo
 FONT = "Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif"
 MONO = "JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace"
 
+FOOTNOTE = ("Generated automatically from the RAMSES source. "
+            "Report an error at github.com/SPS-L/stepss-docs/issues")
+
 THEMES = {
     "light": dict(ink="#23262f", muted="#4b5162", line="#4b5162",
                   box="#f2f4f8", edge="#b6becd", accent="#2b6cb0",
@@ -177,8 +180,8 @@ class Canvas:
     # -- output -------------------------------------------------------------
     def render(self) -> str:
         t = self.t
-        w = max(self.w, int(self.maxx + 16))
-        h = max(self.h, int(self.maxy + 16))
+        w = max(self.w, int(self.maxx + 16), int(len(FOOTNOTE) * 6.0) + 24)
+        h = max(self.h, int(self.maxy + 16)) + 30
         return (
             f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {w} {h}" '
             f'width="{w}" height="{h}" role="img">\n'
@@ -189,6 +192,9 @@ class Canvas:
             f'markerWidth="7" markerHeight="7" orient="auto-start-reverse">'
             f'<path d="M 0 1 L 10 5 L 0 9 z" fill="{t["accent"]}"/></marker></defs>\n'
             + "\n".join(self.parts)
+            + f'\n<text x="{w - 12}" y="{h - 10}" text-anchor="end" '
+              f'font-family="{FONT}" font-size="12" fill="{t["muted"]}" '
+              f'opacity="0.7">{FOOTNOTE}</text>'
             + "\n</svg>\n"
         )
 
@@ -452,9 +458,10 @@ def tor_degov1(t):
     c.label(14, y + 33, "&#916;&#969;", anchor="start", mono=True, size=12)
     sx, sy = 106, y + 27
     c.arrow(52, sy, sx - 13, sy)
-    c.summing(sx, sy, ("+", "+"))
-    c.label(sx, sy + 54, "REF = V60&#183;R", size=11, muted=True, mono=True)
-    c.arrow(sx, sy + 40, sx, sy + 13)
+    c.summing(sx, sy, ("+", ""))
+    c.label(sx, sy - 44, "REF = V60&#183;R", size=11, muted=True, mono=True)
+    c.arrow(sx, sy - 34, sx, sy - 13)
+    c.label(sx + 20, sy - 18, "+", size=13)
     boxes, x = c.chain(sx + 13, y, [
         (186, ["Governor lead-lag", "(1+sT3) / (1+sT1)(1+sT2)"]),
         (156, ["Actuator", "K(1+sT4) / (1+sT6)"]),
@@ -465,8 +472,9 @@ def tor_degov1(t):
         (152, ["Engine dead time", "Pad&#233; e^(&#8722;sTD)"]),
         (120, ["Lag 1 / (1 + sTE)"]),
     ], arrow_in=False)
-    c.path(f"M {x} {sy} L {x + 30} {sy} L {x + 30} {y + 127} L 190 {y + 127}", arrow=False)
-    c.arrow(190, y + 127, 150, y + 127)
+    c.path(f"M {x} {sy} L {x + 30} {sy} L {x + 30} {y + 77} L 110 {y + 77} "
+           f"L 110 {y + 127}", arrow=False)
+    c.arrow(110, y + 127, 150, y + 127)
     c.arrow(x2, y + 127, x2 + 44, y + 127)
     c.label(x2 + 52, y + 132, "Tm", anchor="start", mono=True, size=12)
     c.label(x2 + 52, y + 152, "Pm = Tm&#183;&#969;", anchor="start", size=11, muted=True, mono=True)
@@ -833,14 +841,14 @@ def exc_st1a(t):
     c.box(732, ry, 124, 54, ["HV gate VUEL", "LV gate VOEL"])
     c.arrow(732, ry + 27, 668, ry + 27)
     c.box(492, ry, 176, 54, ["Output limits scaled", "by terminal voltage"], "accent")
-    c.arrow(492, ry + 27, 428, ry + 27)
-    c.label(420, ry + 32, "Efd", anchor="end", mono=True, size=12)
+    c.arrow(492, ry + 27, 160, ry + 27)
+    c.label(152, ry + 33, "Efd", anchor="end", mono=True, size=13)
 
-    c.box(160, ry, 190, 54, ["Rate feedback", "sKF / TF / (1 + sTF)"])
-    c.path(f"M 460 {ry + 27} L 350 {ry + 27}", arrow=True)
-    c.dot(460, ry + 27)
-    c.path(f"M 160 {ry + 27} L {sx} {ry + 27} L {sx} {sy + 13}", arrow=True)
-    c.wire(sx + 30, sy + 48, "VF", dy=0)
+    c.dot(180, ry + 27)
+    c.path(f"M 180 {ry + 27} L 180 147 L 200 147", arrow=True)
+    c.box(200, 120, 190, 54, ["Rate feedback", "sKF / TF / (1 + sTF)"])
+    c.path(f"M 390 147 L {sx} 147 L {sx} {sy + 13}", arrow=True)
+    c.wire(sx + 30, 120, "VF", dy=0)
     return c
 
 
@@ -869,7 +877,7 @@ def exc_st2a(t):
     c.dot(x2 + 22, sy)
     c.path(f"M 340 {y + 175} L {sx} {y + 175} L {sx} {sy + 13}", arrow=True)
     c.wire(sx + 30, sy + 48, "VF", dy=0)
-    c.label(870, y + 180, "VB from the rectifier voltage VE", size=11, muted=True, italic=True)
+    c.label(870, y + 166, "VB from the rectifier voltage VE", size=11, muted=True, italic=True)
     return c
 
 
@@ -1376,8 +1384,8 @@ def tor_thermal_generic1(t):
     c.label(1268, ty + 5, "Tm", anchor="start", mono=True, size=13)
     c.label(1140, 340, "&#969;", mono=True, size=12, muted=True)
     c.arrow(1140, 326, 1140, 304)
-    c.label(600, 500, "The reheat stage carries the initial valve opening ivo as a "
-                      "factor, in the lag and in the fraction alike.",
+    c.label(600, 500, "ivo is the intercept valve factor. The engine fixes it at 1, so "
+                      "it cannot be set from a data file.",
             size=11, muted=True, italic=True)
     return c
 
@@ -1753,6 +1761,199 @@ def dctl_relay_timing(t):
     return c
 
 
+def inj_indmach2(t):
+    """Same structure as INDMACH1, with the rotor doubled."""
+    c = Canvas(1200, 350, t)
+    y, mid = 30, 57
+    c.label(14, mid + 5, "vx, vy", anchor="start", mono=True, size=12)
+    c.arrow(76, mid, 120, mid)
+    c.box(120, y, 180, 54, ["Stator equations", "R1, L1, Lm"], size=12)
+    c.arrow(300, mid, 350, mid)
+    c.wire(318, mid, "ixm, iym")
+    c.box(350, y, 190, 54, ["Two rotor cages",
+                            "&#968;dr1, &#968;qr1 and &#968;dr2, &#968;qr2"], size=11)
+    c.arrow(540, mid, 590, mid)
+    c.box(590, y, 200, 54, ["Te = (Lm/LA)&#183;cage 1",
+                            "+ (Lm/LB)&#183;cage 2"], size=11)
+    c.arrow(790, mid, 847, mid)
+    c.summing(860, mid, ("+", "&#8722;"))
+    c.arrow(873, mid, 920, mid)
+    c.box(920, y, 110, 54, ["1 / 2Hs"], accent=True, size=13)
+    c.arrow(1030, mid, 1090, mid)
+    c.label(1098, mid + 5, "&#969;m", anchor="start", mono=True, size=13)
+
+    c.dot(1060, mid)
+    c.path(f"M 1060 {mid} L 1060 280 L 420 280 L 420 200 L 460 200", arrow=True)
+    c.box(460, 173, 240, 54, ["Load torque",
+                              "Tm0(A&#969;m&#178; + B&#969;m + 1 &#8722; A &#8722; B)"], size=11)
+    c.path(f"M 700 200 L 860 200 L 860 {mid + 13}", arrow=True)
+    c.dot(1060, 240)
+    c.path("M 1060 240 L 445 240 L 445 84", arrow=True)
+    c.label(760, 234, "&#969;m, as slip against the network frame", size=11,
+            muted=True, italic=True)
+    c.label(150, 330, "LA = Lm + L2 and LB = Lm + L3. The swing equation is the same as "
+                      "INDMACH1's.", anchor="start", size=11, muted=True, italic=True)
+    return c
+
+
+def inj_theveq(t):
+    c = Canvas(940, 240, t)
+    y, mid = 40, 67
+    c.box(110, y, 220, 54, ["Eth and &#966;", "fixed at t = 0"], accent=True, size=12)
+    c.arrow(330, mid, 390, mid)
+    c.box(390, y, 300, 54, ["ix = (Eth&#183;sin&#966; &#8722; vy) / Xth",
+                            "iy = &#8722;(Eth&#183;cos&#966; &#8722; vx) / Xth"], size=12)
+    c.arrow(690, mid, 750, mid)
+    c.label(758, mid + 5, "ix, iy", anchor="start", mono=True, size=13)
+    c.label(14, 175, "vx, vy", anchor="start", mono=True, size=12)
+    c.path("M 76 170 L 540 170 L 540 94", arrow=True)
+    c.label(470, 226, "Xth = Sbase / Ssc, from the short-circuit power on the record. "
+                      "Nothing here has a state.", size=11, muted=True, italic=True)
+    return c
+
+
+def inj_pmu(t):
+    c = Canvas(1000, 290, t)
+    rows = ((30, ["Bus voltage magnitude", "and angle"], "V, &#952;"),
+            (110, ["Frequency estimate", "first order, Tmes floored at 0.05 s"], "f"),
+            (190, ["DQ reference frame", "speed and angle"], "&#969;dq, &#952;dq"))
+    c.label(14, 62, "vx, vy", anchor="start", mono=True, size=12)
+    c.arrow(76, 57, 90, 57)
+    c.path("M 90 57 L 90 217", arrow=False)
+    for y, lines, out in rows:
+        m = y + 27
+        c.dot(90, m)
+        c.arrow(90, m, 150, m)
+        c.box(150, y, 300, 54, lines, size=12)
+        c.arrow(450, m, 510, m)
+        c.label(518, m + 5, out, anchor="start", mono=True, size=13)
+    c.label(400, 276, "The model injects zero current, so attaching one does not change "
+                      "the network solution.", size=11, muted=True, italic=True)
+    return c
+
+
+def inj_vfd_load(t):
+    c = Canvas(900, 330, t)
+    y1, m1 = 90, 117
+    y2, m2 = 210, 237
+    c.box(40, 14, 260, 54, ["Frequency deviation &#916;f",
+                            "local bus via Tmes, or COI speed"], size=11)
+    c.path("M 300 41 L 350 41 L 350 104", arrow=True)
+
+    c.label(14, m1 + 5, "V", anchor="start", mono=True, size=12)
+    c.arrow(46, m1, 96, m1)
+    c.box(96, y1, 140, 54, ["Voltage filter 3 ms"], size=12)
+    c.arrow(236, m1, 337, m1)
+    c.dot(256, m1)
+    c.mult(350, m1)
+    c.arrow(363, m1, 390, m1)
+    c.box(390, y1, 240, 54,
+          ["a1&#183;V^&#945;1 + a2&#183;V^&#945;2 + (1&#8722;a1&#8722;a2)&#183;V^&#945;3",
+           "normalised at V0"], size=11)
+
+    c.path(f"M 256 {m1} L 256 {m2} L 390 {m2}", arrow=True)
+    c.box(390, y2, 240, 54, ["Constant admittance",
+                             "Geq&#183;V&#178;, &#8722;Beq&#183;V&#178;"], size=12)
+
+    # the two regimes, chosen by where V sits against Vlow
+    c.path(f"M 630 {m1} L 700 {m1} L 700 150", arrow=False)
+    c.path(f"M 630 {m2} L 700 {m2} L 700 178", arrow=False)
+    c.path("M 700 150 L 700 178", arrow=False, dash=True)
+    c.dot(700, m1)
+    c.dot(700, m2)
+    c.label(708, m1 - 6, "V &#8805; Vlow", anchor="start", size=11, muted=True, mono=True)
+    c.label(708, m2 + 16, "V &lt; Vlow", anchor="start", size=11, muted=True, mono=True)
+    c.arrow(700, 164, 770, 164)
+    c.label(778, 169, "P, Q", anchor="start", mono=True, size=13)
+    c.label(400, 316, "Geq and Beq are set at initialisation so the two regimes meet "
+                      "at Vlow.", size=11, muted=True, italic=True)
+    return c
+
+
+def inj_restld(t):
+    c = Canvas(900, 270, t)
+    y, mid = 26, 53
+    c.label(14, mid + 5, "V, &#916;&#969;", anchor="start", mono=True, size=12)
+    c.arrow(66, mid, 110, mid)
+    c.box(110, y, 186, 54, ["Steady-state term",
+                            "V^&#945;s &#183; (1 + DP&#183;&#916;&#969;)"], size=12)
+    sx = 326
+    c.arrow(296, mid, sx - 13, mid)
+    c.summing(sx, mid, ("+", "&#8722;"))
+    c.arrow(sx + 13, mid, sx + 44, mid)
+    c.box(sx + 44, y, 168, 54, ["1 / sTr", "limits xPmin, xPmax"], accent=True, size=12)
+    xp = sx + 236
+    c.wire(xp, mid, "xP")
+    c.arrow(sx + 212, mid, xp + 28, mid)
+    c.box(xp + 28, y, 196, 54, ["ix, iy from G0&#183;xP", "and B0&#183;xQ"], size=12)
+    c.arrow(xp + 224, mid, xp + 262, mid)
+    c.label(xp + 270, mid + 5, "ix, iy", anchor="start", mono=True, size=12)
+
+    fy = 176
+    c.box(350, fy - 25, 168, 50, ["&#215; V^&#945;t"], size=12)
+    c.path(f"M {xp} {mid} L {xp} {fy} L 518 {fy}", arrow=True)
+    c.dot(xp, mid)
+    c.path(f"M 350 {fy} L {sx} {fy} L {sx} {mid + 13}", arrow=True)
+    c.path(f"M 80 {mid} L 80 236 L 434 236 L 434 {fy + 25}", arrow=True)
+    c.dot(80, mid)
+    c.label(450, 258, "The reactive side is the same, with exponents &#946;s and &#946;t.",
+            size=11, muted=True, italic=True)
+    return c
+
+
+def inj_pq(t):
+    c = Canvas(1000, 250, t)
+    rows = (("Ixset =", "(P0&#183;vx + Q0&#183;vy) / V&#178;", "ix"),
+            ("Iyset =", "(P0&#183;vy &#8722; Q0&#183;vx) / V&#178;", "iy"))
+    for row, (lhs, num, out) in enumerate(rows):
+        y = 40 + row * 110
+        c.label(14, y + 33, "vx, vy", anchor="start", mono=True, size=12)
+        c.arrow(76, y + 27, 130, y + 27)
+        c.box(130, y, 250, 54, [lhs, num], size=12)
+        c.arrow(380, y + 27, 430, y + 27)
+        c.box(430, y, 160, 54, ["1 / (1 + sTout)"], size=12)
+        c.arrow(590, y + 27, 650, y + 27)
+        c.label(658, y + 32, out, anchor="start", mono=True, size=13)
+    c.label(500, 232, "P0 and Q0 are fixed at their initial values, so the power drawn "
+                      "does not follow the voltage.", size=11, muted=True, italic=True)
+    return c
+
+
+def inj_indmach1(t):
+    c = Canvas(1200, 350, t)
+    y, mid = 30, 57
+    c.label(14, mid + 5, "vx, vy", anchor="start", mono=True, size=12)
+    c.arrow(76, mid, 120, mid)
+    c.box(120, y, 180, 54, ["Stator equations",
+                            "Rs, Lss &#8722; Lsr&#178;/Lrr"], size=12)
+    c.arrow(300, mid, 350, mid)
+    c.wire(318, mid, "ixm, iym")
+    c.box(350, y, 190, 54, ["Rotor flux linkages", "&#968;dr, &#968;qr"], size=12)
+    c.arrow(540, mid, 590, mid)
+    c.box(590, y, 200, 54, ["Te = (Lsr/Lrr)&#183;",
+                            "(&#968;qr&#183;iym &#8722; &#968;dr&#183;ixm)"], size=11)
+    c.arrow(790, mid, 847, mid)
+    c.summing(860, mid, ("+", "&#8722;"))
+    c.arrow(873, mid, 920, mid)
+    c.box(920, y, 110, 54, ["1 / 2Hs"], accent=True, size=13)
+    c.arrow(1030, mid, 1090, mid)
+    c.label(1098, mid + 5, "&#969;m", anchor="start", mono=True, size=13)
+
+    # the load torque, and the slip the rotor circuit needs
+    c.dot(1060, mid)
+    c.path(f"M 1060 {mid} L 1060 280 L 420 280 L 420 200 L 460 200", arrow=True)
+    c.box(460, 173, 240, 54, ["Load torque",
+                              "Tm0(A&#969;m&#178; + B&#969;m + 1 &#8722; A &#8722; B)"], size=11)
+    c.path(f"M 700 200 L 860 200 L 860 {mid + 13}", arrow=True)
+    c.dot(1060, 240)
+    c.path("M 1060 240 L 445 240 L 445 84", arrow=True)
+    c.label(760, 234, "&#969;m, as slip against the network frame", size=11,
+            muted=True, italic=True)
+    c.label(150, 330, "A shunt susceptance Bsh at the terminal represents power factor "
+                      "correction.", anchor="start", size=11, muted=True, italic=True)
+    return c
+
+
 def inj_load(t):
     c = Canvas(880, 270, t)
     y, mid = 26, 53
@@ -1793,7 +1994,7 @@ def inj_ibg(t):
         (162, ["Active power order", "P = Pext(1 + b&#183;sat)"]),
     ])
     c.arrow(x, y + 27, x + 40, y + 27)
-    c.wire(x + 22, y + 27, "Ip")
+    c.wire(x + 10, y + 27, "Ip")
 
     py = y + 110
     c.label(14, py + 33, "Vt", anchor="start", mono=True, size=12)
@@ -1802,7 +2003,7 @@ def inj_ibg(t):
         (170, ["Reactive boost", "kRCI&#183;(Vref &#8722; Vt)"]),
     ])
     c.arrow(x2, py + 27, x2 + 40, py + 27)
-    c.wire(x2 + 22, py + 27, "Iq")
+    c.wire(x2 + 10, py + 27, "Iq")
 
     lx = max(x, x2) + 44
     c.box(lx, y + 34, 178, 66, ["Current limit Imax", "reactive priority in LVRT"], accent=True)
@@ -1824,7 +2025,7 @@ def inj_ibg(t):
     return c
 
 
-def inj_pvg(t):
+def inj_pv(t):
     c = Canvas(1220, 240, t)
     y1, m1 = 66, 93
     c.label(14, m1 + 5, "Pref", anchor="start", mono=True, size=12)
@@ -1975,8 +2176,15 @@ DIAGRAMS = {
     "dctl-relay-timing": dctl_relay_timing,
     # models/custom-injectors.md
     "inj-load": inj_load,
+    "inj-vfd-load": inj_vfd_load,
+    "inj-restld": inj_restld,
+    "inj-pq": inj_pq,
+    "inj-indmach1": inj_indmach1,
+    "inj-indmach2": inj_indmach2,
+    "inj-theveq": inj_theveq,
+    "inj-pmu": inj_pmu,
     "inj-ibg": inj_ibg,
-    "inj-pvg": inj_pvg,
+    "inj-pv": inj_pv,
     "inj-bess": inj_bess,
     "inj-svc-generic1": inj_svc_generic1,
     # models/two-port-models.mdx

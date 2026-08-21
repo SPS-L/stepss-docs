@@ -1,13 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1010 210" width="1010" height="210" role="img">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1010 240" width="1010" height="240" role="img">
 <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#a8b0bf"/></marker><marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#78aeea"/></marker></defs>
 <text x="14" y="67" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">&#916;&#969;</text>
 <path d="M 52 61 L 93 61" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
 <circle cx="106" cy="61" r="13" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
 <path d="M 99.5 61 L 112.5 61 M 106 54.5 L 106 67.5" stroke="#4a5160" stroke-width="1"/>
 <text x="85" y="57" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">+</text>
-<text x="108" y="87" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">+</text>
-<text x="106" y="115" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#b8bdc9">REF = V60&#183;R</text>
-<path d="M 106 101 L 106 74" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="106" y="17" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#b8bdc9">REF = V60&#183;R</text>
+<path d="M 106 27 L 106 48" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="126" y="43" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#e5e7eb">+</text>
 <path d="M 119 61.0 L 153 61.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
 <rect x="153" y="34" width="186" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
 <text x="246.0" y="57.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Governor lead-lag</text>
@@ -29,9 +29,10 @@
 <path d="M 486 161.0 L 520 161.0" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
 <rect x="520" y="134" width="120" height="54" rx="4" fill="#252a33" stroke="#4a5160" stroke-width="1.2"/>
 <text x="580.0" y="165.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#e5e7eb">Lag 1 / (1 + sTE)</text>
-<path d="M 683 61 L 713 61 L 713 161 L 190 161" fill="none" stroke="#a8b0bf" stroke-width="1.3"/>
-<path d="M 190 161 L 150 161" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 683 61 L 713 61 L 713 111 L 110 111 L 110 161" fill="none" stroke="#a8b0bf" stroke-width="1.3"/>
+<path d="M 110 161 L 150 161" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
 <path d="M 640 161 L 684 161" fill="none" stroke="#a8b0bf" stroke-width="1.3" marker-end="url(#arrow)"/>
 <text x="692" y="166" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#e5e7eb">Tm</text>
 <text x="692" y="186" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#b8bdc9">Pm = Tm&#183;&#969;</text>
+<text x="998" y="230" text-anchor="end" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#b8bdc9" opacity="0.7">Generated automatically from the RAMSES source. Report an error at github.com/SPS-L/stepss-docs/issues</text>
 </svg>
