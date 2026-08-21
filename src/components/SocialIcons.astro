@@ -1,0 +1,63 @@
+---
+/**
+ * Adds a User Guide download to the site header.
+ *
+ * The PDF was previously reachable only from an aside halfway down the landing
+ * page, so from any other page there was no way to find it. Starlight exposes
+ * no slot of its own in the header, and `SocialIcons` is the supported way in:
+ * the stock component is rendered immediately after this, untouched, so the
+ * GitHub and contact icons keep working.
+ *
+ * The header's right-hand group is hidden below Starlight's `md` breakpoint,
+ * which is why the sidebar carries the same link under Resources. That entry is
+ * the one a phone gets, and it is not redundant.
+ */
+import { Icon } from '@astrojs/starlight/components';
+import Default from '@astrojs/starlight/components/SocialIcons.astro';
+---
+
+<a
+	class="pdf-link"
+	href="/stepss_docs.pdf"
+	download
+	aria-label="Download the STEPSS User Guide as a PDF"
+>
+	<Icon name="download" size="1em" />
+	<span class="pdf-label">User Guide</span>
+</a>
+<Default><slot /></Default>
+
+<style>
+	.pdf-link {
+		display: flex;
+		align-items: center;
+		gap: 0.4em;
+		padding: 0.35rem 0.7rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 999px;
+		color: var(--sl-color-text-accent);
+		font-size: var(--sl-text-xs);
+		font-weight: 600;
+		line-height: 1;
+		white-space: nowrap;
+		text-decoration: none;
+	}
+
+	.pdf-link:hover,
+	.pdf-link:focus-visible {
+		color: var(--sl-color-white);
+		border-color: var(--sl-color-text-accent);
+		background-color: var(--sl-color-gray-6);
+	}
+
+	/* Between the md breakpoint and a comfortable width the header is tight, so
+	   drop to the icon alone rather than squeezing the search box. */
+	@media (max-width: 72rem) {
+		.pdf-label {
+			display: none;
+		}
+		.pdf-link {
+			padding: 0.4rem;
+		}
+	}
+</style>

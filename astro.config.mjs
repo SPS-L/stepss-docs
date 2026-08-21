@@ -39,6 +39,11 @@ export default defineConfig({
 			editLink: {
 				baseUrl: 'https://github.com/SPS-L/stepss-docs/edit/main/',
 			},
+			// Only to hang the User Guide download off the header; the override
+			// renders Starlight's own SocialIcons straight after its own button.
+			components: {
+				SocialIcons: './src/components/SocialIcons.astro',
+			},
 			customCss: [
 				'@fontsource/inter/400.css',
 				'@fontsource/inter/600.css',
@@ -161,6 +166,8 @@ export default defineConfig({
 						{ label: 'Repositories',  slug: 'resources/repositories' },
 						{ label: 'Releases',      slug: 'resources/releases' },
 						{ label: 'Publications',  slug: 'resources/references' },
+						{ label: 'User Guide (PDF)', link: '/stepss_docs.pdf',
+						  attrs: { download: true } },
 					],
 				},
 			],
