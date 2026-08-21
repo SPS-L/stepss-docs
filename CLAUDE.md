@@ -106,6 +106,17 @@ parameter-conversion reference implementation, is likewise unrelated.
 The `JAC` disturbance stays documented. It exports the raw matrices and is a
 different feature from `EIG`, which analyses them.
 
+**`EIG` takes a basename and nothing else, and its two former parameters are
+not to be documented as options.** From RAMSES 3.79 the engine writes every
+mode into all three results files: `real_limit` became a live control in the
+results window (`user-guide/eigenanalysis.md`, "Filtering and zooming"), and
+`pf_threshold` became the `$PF_THRES` solver setting, owned by
+`user-guide/solver-settings.md`. The Analysis tab has no threshold fields, so
+do not describe any on `gui/interface.mdx`. Both parameters appear on this site
+only as migration notes saying where they went, because a `.dst` still carrying
+either is refused rather than ignored and a reader hitting that needs to be
+told what to do.
+
 Check with:
 
 ```sh

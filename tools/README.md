@@ -67,12 +67,36 @@ brightness check complains about, open it.
 
 ## Running it
 
+`capture-gui.sh` reads `shotlib.sh` and `launch.sh` **out of the work
+directory**, not out of this one, and it does not start the display itself.
+Both are easy to miss, and the failure is a `source: no such file` before
+anything has been captured:
+
 ```sh
 export SHOT_WORK=${TMPDIR:-/tmp}/stepss-shots     # optional, this is the default
+mkdir -p "$SHOT_WORK"
+cp shotlib.sh launch.sh "$SHOT_WORK/"
+( source "$SHOT_WORK/shotlib.sh"; start_x )       # Xvfb + openbox on :44
+
 ./capture-gui.sh light
 ./capture-gui.sh dark
 python3 capture-cgstudio.py
 python3 capture-python.py
+
+pkill -f 'Xvfb :44'; pkill -f 'openbox --sm-disable'
+```
+
+`STEPSS_APP` points `launch.sh` at an application directory other than the
+system install, which is what a capture run **immediately after a release**
+needs: the bundle pins RAMSES by release asset, so the engine the figures show
+is whichever one the jar beside it carries, and the installed copy is a release
+behind until someone upgrades it. Unpack the new `.deb` and point at it, no
+root required:
+
+```sh
+gh release download vX.Y --repo SPS-L/stepss-java-ui --pattern '*.deb'
+dpkg-deb -x stepss_X.Y_amd64.deb /tmp/stepss-new
+export STEPSS_APP=/tmp/stepss-new/opt/stepss/lib/app
 ```
 
 Then copy them in, light and dark becoming the filename suffix the pages
@@ -90,6 +114,13 @@ cp cgstudio/*.png python/*.png ../../public/images/screenshots/
 
 ## Things worth knowing before editing these
 
+- **Every figure is checked by opening it, not by the run exiting 0.** The
+  coordinates address controls by position, so a layout change moves a click
+  onto its neighbour and the capture still succeeds. The small-signal results
+  window gained three filter rows and a count line, which pushed the modes
+  table down 83 px, and the run that followed selected the mode one row above
+  the intended one and reported nothing wrong. Look at what changed before
+  copying a set in.
 - **The GUI window is pinned to 1600x760 by seeded preferences, and every
   coordinate in `capture-gui.sh` is a fixed point inside it.** Seeding is not a
   convenience: `windowMaximised` defaults to true, an unseeded launch fills the

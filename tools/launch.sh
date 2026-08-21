@@ -7,6 +7,13 @@
 # unseeded launch fills the screen and openbox then refuses the resize.
 #
 # Usage: launch.sh light|dark
+#
+# STEPSS_APP overrides where the application is read from, defaulting to the
+# system install. Point it at an unpacked bundle (dpkg-deb -x, or the app
+# directory of any build) to capture a release that is not the installed one,
+# which is what a capture run immediately after a release needs: the bundle
+# pins RAMSES by release asset, so the engine the figures show is whichever
+# one the jar beside it carries.
 
 set -eu
 THEME=${1:-light}
@@ -14,6 +21,8 @@ MODE=${2:-normal}   # "first" leaves the first-run flag out, so the licence show
 WORK="${SHOT_WORK:-${TMPDIR:-/tmp}/stepss-shots}"
 PREFS="$WORK/prefs"
 EXAMPLES="$HOME/stepss-examples"
+APP="${STEPSS_APP:-/opt/stepss/lib/app}"
+[ -f "$APP/stepss.jar" ] || { echo "no stepss.jar under $APP" >&2; exit 1; }
 NODE="$PREFS/.java/.userPrefs"
 
 case "$THEME" in
@@ -62,7 +71,7 @@ cd "$WORK/run"
 DISPLAY=:44 nohup java \
     -Djava.util.prefs.userRoot="$PREFS" \
     -Djava.util.prefs.systemRoot="$PREFS" \
-    -cp "/opt/stepss/lib/app/stepss.jar:/opt/stepss/lib/app/lib/*" \
+    -cp "$APP/stepss.jar:$APP/lib/*" \
     my.stepss.StepssUI > "$WORK/stepss-$THEME.log" 2>&1 &
 echo "$!" > "$WORK/app.pid"
 echo "started STEPSS ($THEME) pid $(cat "$WORK/app.pid")"
