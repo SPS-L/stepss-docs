@@ -139,18 +139,12 @@ The current order $I_{ord}$ is obtained from the desired current $I_{des}$ throu
 
 #### Control Structure
 
-```
-Pset or Idset ──► [Power/Current → Ides] ──► [1st-order filter Tp] ──► Iord
-                                                                              │
-                                                                         rectifier
-                                                                         firing angle α
-                                                                              │
-                                                              Vdr ────────────┘
-                                                               │
-                                                              ─── RL ─── Vdi
-                                                                          │
-                                                               inverter: voltage/γ control
-```
+<img src="/images/models/twop-hvdc-lcc-control-light.svg"
+     alt="The HVDC_LCC control chain. Pset or Idset becomes a current order Ides, is filtered with time constant Tp to give Iord, and drives the rectifier's firing angle alpha, which sets the DC voltage Vdr. Vdr feeds the DC line resistance RL, giving Vdi at the inverter, which controls voltage or the extinction angle gamma."
+     class="dark:sl-hidden" />
+<img src="/images/models/twop-hvdc-lcc-control-dark.svg"
+     alt="The HVDC_LCC control chain. Pset or Idset becomes a current order Ides, is filtered with time constant Tp to give Iord, and drives the rectifier's firing angle alpha, which sets the DC voltage Vdr. Vdr feeds the DC line resistance RL, giving Vdi at the inverter, which controls voltage or the extinction angle gamma."
+     class="light:sl-hidden" />
 
 The rectifier minimises $\alpha$ (advances firing) to maintain the current order. The inverter maintains DC voltage via the compounding characteristic $V_{set} = V_{di} + R_{comp} I_d$.
 
@@ -307,21 +301,12 @@ Internal (auto-initialised) parameters: `Pref`, `Vdcref`, `Qref`, `Vacref`, `swi
 
 #### Control Structure
 
-```
-Pref, Vdcref ─► [P-V droop: α1·ΔP + β1·ΔVdc] ─► [Integr. 1/Kid] ─► idref_unlim
-                                                                              │
-                                                                         [Limiter Idmin/Idmax]
-                                                                              │ idref
-                                                     [Inner current PI] ◄────┘
-                  vd, ω·L·iq ──────────────────────────────────────────► vmd
-                  vq, ω·L·id ──────────────────────────────────────────► vmq
-
-Qref, Vacref ─► [Q-Vac droop: α2·ΔQ + β2·ΔVac] ─► [Integr. 1/Kiq] ─► iqref1_unlim
-                                                                              │
-FRT boost ────► iqref2 ────────────────────────────────────────────────► iqref = iqref1 + iqref2
-                                                                              │
-                                                     [Inner current PI] ◄────┘
-```
+<img src="/images/models/twop-hvdc-vsc-control-light.svg"
+     alt="The HVDC_VSC control, one strip per axis. On the d axis Pref and Vdcref drive a P-V droop, an integrator of gain 1/Kid and a limiter between Idmin and Idmax to give idref, which the inner current PI turns into vmd using the feed-forward term vd plus omega L iq. On the q axis Qref and Vacref drive a Q-Vac droop and an integrator of gain 1/Kiq to give iqref1, which is summed with the FRT boost iqref2 to give iqref, and the inner current PI turns that into vmq using vq plus omega L id."
+     class="dark:sl-hidden" />
+<img src="/images/models/twop-hvdc-vsc-control-dark.svg"
+     alt="The HVDC_VSC control, one strip per axis. On the d axis Pref and Vdcref drive a P-V droop, an integrator of gain 1/Kid and a limiter between Idmin and Idmax to give idref, which the inner current PI turns into vmd using the feed-forward term vd plus omega L iq. On the q axis Qref and Vacref drive a Q-Vac droop and an integrator of gain 1/Kiq to give iqref1, which is summed with the FRT boost iqref2 to give iqref, and the inner current PI turns that into vmq using vq plus omega L id."
+     class="light:sl-hidden" />
 
 #### Usage Example
 
@@ -417,13 +402,12 @@ Internal (auto-initialised): `DeltaP`, `P0`, `Q0`, `Vac`, `switch`.
 
 #### Control Structure
 
-```
-ω1 ─────────────► Kwi·(1-ω1) ─►┐
-P0, ΔP ─► ΔP/Snom ──────────────┼─► N1 ─► [Int. 1/Kip] ─► N1a ─► idref_unlim
-                                 │               │                      │
-                                 └───────────────┘         Kpp·N1 ─────┘
-                                                                    [Lim] ─► idref ─► [Inner PI] ─► vmd
-```
+<img src="/images/models/twop-hvdc-vsc-sc-control-light.svg"
+     alt="The grid-forming HVDC_VSC_SC control. A frequency term Kwi times one minus omega1 and a power term delta P over Snom are summed into N1. N1 passes through an integrator of gain 1/Kip to give N1a, and in parallel through a proportional gain Kpp; the two are summed, limited, and become idref, which the inner current PI turns into vmd."
+     class="dark:sl-hidden" />
+<img src="/images/models/twop-hvdc-vsc-sc-control-dark.svg"
+     alt="The grid-forming HVDC_VSC_SC control. A frequency term Kwi times one minus omega1 and a power term delta P over Snom are summed into N1. N1 passes through an integrator of gain 1/Kip to give N1a, and in parallel through a proportional gain Kpp; the two are summed, limited, and become idref, which the inner current PI turns into vmd."
+     class="light:sl-hidden" />
 
 #### Usage Example
 
@@ -613,31 +597,14 @@ $$
 </TabItem>
 </Tabs>
 
-#### Control Structure
+#### Arrangement
 
-```
-Wind farm ─► Bus 1 (offshore AC)
-                  │
-          ┌───────┴────────┐
-          │  Converter 1   │  PLL → id/iq transform
-          │  Grid-forming  │
-          │  P/ω droop     │  idref ← P0+ΔP droop + Kwi·Δω
-          │  QV droop      │  iqref ← βV·ΔQ
-          └───────┬────────┘
-                  │ idc1, vdc1
-          ┌───────┴──────────────────────────┐
-          │   DC CABLE: Rdc, Hdc1, Hdc2      │
-          └───────┬──────────────────────────┘
-                  │ idc2, vdc2
-          ┌───────┴────────┐
-          │  Converter 2   │  PLL → id/iq transform
-          │  Grid-following│
-          │  Vdc control   │  idref ← Kpd·ΔVdc + Kpd·∫ΔVdc
-          │  Q/Vac droop   │  iqref ← α2·ΔQ + β2·ΔVac
-          └───────┬────────┘
-                  │
-          Bus 2 (onshore AC grid)
-```
+<img src="/images/models/twop-dcl-vsc-topology-light.svg"
+     alt="The DCL_VSC arrangement. A wind farm feeds bus 1 on the offshore AC side. Converter 1 is grid-forming, with a P-omega droop setting idref from P0, delta P and Kwi times delta omega, and a QV droop setting iqref. A DC cable with resistance Rdc and inertias Hdc1 and Hdc2 carries the power to converter 2, which is grid-following, controls DC voltage to set idref and uses a Q-Vac droop for iqref, and feeds bus 2 on the onshore AC grid."
+     class="dark:sl-hidden" />
+<img src="/images/models/twop-dcl-vsc-topology-dark.svg"
+     alt="The DCL_VSC arrangement. A wind farm feeds bus 1 on the offshore AC side. Converter 1 is grid-forming, with a P-omega droop setting idref from P0, delta P and Kwi times delta omega, and a QV droop setting iqref. A DC cable with resistance Rdc and inertias Hdc1 and Hdc2 carries the power to converter 2, which is grid-following, controls DC voltage to set idref and uses a Q-Vac droop for iqref, and feeds bus 2 on the onshore AC grid."
+     class="light:sl-hidden" />
 
 The offshore converter establishes the AC voltage and frequency for the wind farm. The onshore converter maintains DC voltage. An optional hub coordinator can inject a power correction $\Delta P$ to the offshore converter via the parameter `DeltaP`.
 
