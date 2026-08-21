@@ -8,11 +8,12 @@ flow in polar coordinates with reactive limit enforcement, transformer tap
 adjustment and SVC modelling, and it produces the operating point that
 initialises a RAMSES dynamic simulation.
 
-Helios is available three ways, all reading the same data files:
+Helios is reached two ways, both reading the same data files:
 
-- the `helios` command-line executable, which reaches you inside [STEPSS GUI](/getting-started/installation/#installing-stepss-gui) rather than as a download of its own;
-- `stepss.helios.HeliosSession` from Python, see [Power Flow with Helios](/python/helios/);
-- the C API shared library (`libhelios_api`), for embedding in other tools.
+- **Run power flow** on the [Power Flow Simulation tab](/gui/interface/#power-flow-simulation) of STEPSS GUI, which carries the engine rather than asking you to download it;
+- `stepss.helios.HeliosSession` from Python, see [Power Flow with Helios](/python/helios/).
+
+A C API shared library (`libhelios_api`) exists underneath both, for embedding the engine in another tool.
 
 The power flow uses the following network records documented in [Network Modeling](/user-guide/network/): BUS, LINE, SWITCH, TRANSFO, TRFO, NRTP.
 
@@ -309,29 +310,8 @@ LFRESV is the output that initializes RAMSES dynamic simulation.
 :::
 
 :::note
-The exported operating-point file (the `VT` menu command, `write_voltrat()` in the API) contains one LFRESV record per bus plus one TRANSFO record per in-service LTC transformer, carrying its *solved* ratio. Hand-maintained operating-point files (e.g. `volt_rat_B.dat` of the Nordic test system) often use TRFO records instead. The two styles are interchangeable as RAMSES input: RAMSES ignores the LTC fields of a TRFO record (see the record-sharing table below), and dynamic tap-changer behaviour is defined by the DCTL LTC records of the dynamic data.
+The exported operating-point file (**Add Helios results to data** in the GUI, `write_voltrat()` in the API) contains one LFRESV record per bus plus one TRANSFO record per in-service LTC transformer, carrying its *solved* ratio. Hand-maintained operating-point files (e.g. `volt_rat_B.dat` of the Nordic test system) often use TRFO records instead. The two styles are interchangeable as RAMSES input: RAMSES ignores the LTC fields of a TRFO record (see the record-sharing table below), and dynamic tap-changer behaviour is defined by the DCTL LTC records of the dynamic data.
 :::
-
-## Interactive Menu Commands
-
-After loading data and solving, Helios presents these commands:
-
-| Command | Description |
-|---------|-------------|
-| `P` | Take new control parameters from file |
-| `D` | Display output values |
-| `1` | Display outputs on 1-line diagram (SVG) |
-| `M` | Modify system (change loads, generators, topology) |
-| `RI` | Reset system to initial configuration |
-| `CA` | Perform contingency analysis |
-| `CL` | Check operating limits (voltage bounds, branch overloads) |
-| `O` | Change output file |
-| `DF` | Update all records and dump them to a file |
-| `VT` | Generate a file with voltages and adjustable transformer ratios (LFRESV format) |
-| `S` | Save operating point and Y matrix to MATLAB file |
-| `E` | Exit |
-
-The `VT` command produces the LFRESV file needed to initialize RAMSES.
 
 ## Computation Control Parameters
 
@@ -441,7 +421,7 @@ A **template** is an SVG file with placeholder codes typed into its text element
 `%I` and `%M` through `%Q` are recognised but not implemented: they need zone and sensitivity data the model does not carry, and render as the literal word `unknown`. They are documented here, not omitted, so that a code written into a template by mistake has something explaining the `unknown` it produces rather than nothing.
 :::
 
-The `1` command of the [interactive menu](#interactive-menu-commands) runs this substitution from the TUI. From Python, `pf.write_diagram('template.svg', 'diagram.svg')` does the same; see [Power Flow with Helios](/python/helios/).
+Every **Run power flow** in the GUI runs this substitution; from Python, `pf.write_diagram('template.svg', 'diagram.svg')` does the same, see [Power Flow with Helios](/python/helios/).
 
 ### In STEPSS GUI
 
