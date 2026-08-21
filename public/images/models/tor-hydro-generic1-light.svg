@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 300" width="1120" height="300" role="img">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 1 L 10 5 L 0 9 z" fill="#4b5162"/></marker></defs>
+<text x="14" y="63" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#23262f">1 &#8722; &#969;</text>
+<path d="M 76 57 L 117 57" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<circle cx="130" cy="57" r="13" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<path d="M 123.5 57 L 136.5 57 M 130 50.5 L 130 63.5" stroke="#b6becd" stroke-width="1"/>
+<text x="109" y="53" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">+</text>
+<text x="132" y="83" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="13" fill="#23262f">+</text>
+<text x="130" y="113" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#4b5162">(P0 &#8722; Pmeas)&#183;&#963;</text>
+<path d="M 130 99 L 130 70" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<path d="M 143 57.0 L 177 57.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="177" y="30" width="156" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="255.0" y="53.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">PI controller</text>
+<text x="255.0" y="68.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Kp + Ki / s</text>
+<path d="M 333 57.0 L 367 57.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="367" y="30" width="140" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="437.0" y="61.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Rate limit &#177; LIMz</text>
+<path d="M 507 57.0 L 541 57.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="541" y="30" width="140" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="611.0" y="61.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Gate limits 0 to 1</text>
+<path d="M 681 57.0 L 715 57.0" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="715" y="30" width="138" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="784.0" y="61.0" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Servo 1 / (1 + sTsm)</text>
+<path d="M 853 57 L 893 57" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="875" y="49" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#4b5162">z</text>
+<path d="M 893 57 L 1080 57 L 1080 215" fill="none" stroke="#4b5162" stroke-width="1.3"/>
+<path d="M 1080 215 L 1016 215" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<rect x="862" y="188" width="154" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="939.0" y="211.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Water column</text>
+<text x="939.0" y="226.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">TW&#183;dQ/dt = 1 &#8722; H</text>
+<path d="M 862 215 L 798 215" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="830" y="205" text-anchor="middle" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="10" fill="#4b5162">Q, H</text>
+<rect x="634" y="188" width="164" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
+<text x="716.0" y="211.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Turbine power</text>
+<text x="716.0" y="226.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">At&#183;H&#183;(Q &#8722; qNL)</text>
+<path d="M 634 215 L 570 215" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
+<text x="562" y="220" text-anchor="end" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#23262f">Pm</text>
+</svg>

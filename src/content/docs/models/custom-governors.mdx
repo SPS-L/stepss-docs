@@ -128,6 +128,13 @@ i.e.:
 - State 1 = HP torque `x(1)`, State 2 = LP torque `x(2)`
 - Observables: `HP torque`, `LP torque`
 
+<img src="/images/models/tor-1storder-light.svg"
+     alt="1ST_ORDER governor block diagram. The speed deviation omega minus one is subtracted from the initial torque Tm0 through the droop one over R to give the torque setpoint Tset. Tset passes a first-order lag of time constant T2 to give the high-pressure torque x1, and the shaft torque is one minus FHP times x1 plus FHP times Tset."
+     class="dark:sl-hidden" />
+<img src="/images/models/tor-1storder-dark.svg"
+     alt="1ST_ORDER governor block diagram. The speed deviation omega minus one is subtracted from the initial torque Tm0 through the droop one over R to give the torque setpoint Tset. Tset passes a first-order lag of time constant T2 to give the high-pressure torque x1, and the shaft torque is one minus FHP times x1 plus FHP times Tset."
+     class="light:sl-hidden" />
+
 ### Parameters
 
 | Parameter | Description |
@@ -317,6 +324,13 @@ $$
 - Additional: `prm(9) = P0` (initial electrical power)
 - Observables: `z`, `Q`, `H`, `Pm`
 
+<img src="/images/models/tor-hydro-generic1-light.svg"
+     alt="HYDRO_GENERIC1 block diagram. One minus omega plus the droop term, the power error times sigma, drives a PI controller with gains Kp and Ki. The gate demand is rate-limited, position-limited between zero and one, and follows a servo of time constant Tsm to give the gate z. The water column relates flow and head through the water-starting time TW, and the turbine power follows from the head and flow."
+     class="dark:sl-hidden" />
+<img src="/images/models/tor-hydro-generic1-dark.svg"
+     alt="HYDRO_GENERIC1 block diagram. One minus omega plus the droop term, the power error times sigma, drives a PI controller with gains Kp and Ki. The gate demand is rate-limited, position-limited between zero and one, and follows a servo of time constant Tsm to give the gate z. The water column relates flow and head through the water-starting time TW, and the turbine power follows from the head and flow."
+     class="light:sl-hidden" />
+
 ### Usage Example
 
 <Tabs>
@@ -402,6 +416,13 @@ precedes them with `SIGMA` (droop) and `Tmes` (speed measurement lag), and those
 - `nbxvar = 5`, `nbzvar = 2`, `nbdata = 6`, `nbaddpar = 1`
 - Additional: `prm(7) = Pset`, the initial electrical power, captured at initialisation
 - Observables: `z`, `Q`, `H`, `Pm`, `Pset`
+
+<img src="/images/models/tor-hydro-dg-light.svg"
+     alt="HYDRO_DG block diagram. The error is the power setpoint minus the instantaneous electrical power, with no droop and no speed term, and drives a PI regulator with gains Kp and Ki. The gate demand is rate-limited, position-limited between zero and one, and follows a servo of time constant Tsm. The penstock and turbine are exactly those of HYDRO_GENERIC1."
+     class="dark:sl-hidden" />
+<img src="/images/models/tor-hydro-dg-dark.svg"
+     alt="HYDRO_DG block diagram. The error is the power setpoint minus the instantaneous electrical power, with no droop and no speed term, and drives a PI regulator with gains Kp and Ki. The gate demand is rate-limited, position-limited between zero and one, and follows a servo of time constant Tsm. The penstock and turbine are exactly those of HYDRO_GENERIC1."
+     class="light:sl-hidden" />
 
 ### Usage Example
 

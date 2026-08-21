@@ -105,6 +105,13 @@ $$
 \Delta \omega + R \cdot (V_{60} - REF) = 0 \implies \text{error} = \Delta\omega + R \cdot V_{act}
 $$
 
+<img src="/images/models/tor-degov1-light.svg"
+     alt="DEGOV1 block diagram. The speed deviation is summed with the reference REF, which is V60 times the droop R, and drives a governor lead-lag with time constants T1, T2 and T3, then an actuator lead-lag of gain K with T4 and T6, then a lag T5. The result passes through an integrator limited between TMIN and TMAX, a Pade approximation of the engine dead time TD, and a lag TE, giving the mechanical torque Tm, from which Pm is Tm times omega."
+     class="dark:sl-hidden" />
+<img src="/images/models/tor-degov1-dark.svg"
+     alt="DEGOV1 block diagram. The speed deviation is summed with the reference REF, which is V60 times the droop R, and drives a governor lead-lag with time constants T1, T2 and T3, then an actuator lead-lag of gain K with T4 and T6, then a lag T5. The result passes through an integrator limited between TMIN and TMAX, a Pade approximation of the engine dead time TD, and a lag TE, giving the mechanical torque Tm, from which Pm is Tm times omega."
+     class="light:sl-hidden" />
+
 ### Parameters
 
 | Parameter | Description |
@@ -189,6 +196,13 @@ The final mechanical torque output accounting for shaft speed is:
 $$
 T_m \cdot \omega = P_m
 $$
+
+<img src="/images/models/tor-entsoe-simp-light.svg"
+     alt="ENTSOE_simp block diagram. The speed deviation omega minus one is subtracted from the load reference C, which is Tm times R, divided by the droop R, and drives a first-order lag of time constant T1 limited between VMIN and VMAX, then a lead-lag with zero T2 and pole T3, giving the mechanical power Pm and hence the torque Pm divided by omega."
+     class="dark:sl-hidden" />
+<img src="/images/models/tor-entsoe-simp-dark.svg"
+     alt="ENTSOE_simp block diagram. The speed deviation omega minus one is subtracted from the load reference C, which is Tm times R, divided by the droop R, and drives a first-order lag of time constant T1 limited between VMIN and VMAX, then a lead-lag with zero T2 and pole T3, giving the mechanical power Pm and hence the torque Pm divided by omega."
+     class="light:sl-hidden" />
 
 ### Parameters
 
@@ -282,6 +296,13 @@ $$
 T_m \cdot \omega = P_m
 $$
 
+<img src="/images/models/tor-gast-light.svg"
+     alt="GAST block diagram. The speed deviation is subtracted from the load reference LR, divided by the droop R, and meets a minimum gate that also takes the temperature limit. The gated signal passes a limiter between VMIN and VMAX, a lag T1 for the valve and a lag T2 for the compressor discharge to give p3. The damping term Dt times the speed deviation is added to give the mechanical power. A parallel path takes p3 through a lag T3 and the expression AT plus KT times AT minus p4 to form the temperature limit fed back to the minimum gate."
+     class="dark:sl-hidden" />
+<img src="/images/models/tor-gast-dark.svg"
+     alt="GAST block diagram. The speed deviation is subtracted from the load reference LR, divided by the droop R, and meets a minimum gate that also takes the temperature limit. The gated signal passes a limiter between VMIN and VMAX, a lag T1 for the valve and a lag T2 for the compressor discharge to give p3. The damping term Dt times the speed deviation is added to give the mechanical power. A parallel path takes p3 through a lag T3 and the expression AT plus KT times AT minus p4 to form the temperature limit fed back to the minimum gate."
+     class="light:sl-hidden" />
+
 ### Parameters
 
 | Parameter | Description |
@@ -365,6 +386,13 @@ Hence the mechanical torque:
 $$
 T_m = \frac{P_m}{\omega}
 $$
+
+<img src="/images/models/tor-tgov1-light.svg"
+     alt="TGOV1 block diagram. The speed deviation is subtracted from the load reference C, which is Tm times R, divided by the droop R, and drives a first-order lag T1 limited between VMIN and VMAX, then a lead-lag with zero T2 and pole T3 representing the steam chest and reheater. The damping term Dt times the speed deviation is added to the turbine output to give the mechanical power Pm, and the torque is Pm divided by omega."
+     class="dark:sl-hidden" />
+<img src="/images/models/tor-tgov1-dark.svg"
+     alt="TGOV1 block diagram. The speed deviation is subtracted from the load reference C, which is Tm times R, divided by the droop R, and drives a first-order lag T1 limited between VMIN and VMAX, then a lead-lag with zero T2 and pole T3 representing the steam chest and reheater. The damping term Dt times the speed deviation is added to the turbine output to give the mechanical power Pm, and the torque is Pm divided by omega."
+     class="light:sl-hidden" />
 
 ### Parameters
 
@@ -471,6 +499,13 @@ $$
 $$
 P_m = T_m \cdot \omega
 $$
+
+<img src="/images/models/tor-hygov-light.svg"
+     alt="HYGOV block diagram. One minus omega, less the permanent droop R times the gate demand offset, passes a lag Tf to give the error e. That error is divided by r times Tr, rate-limited to plus or minus VELM and integrated between the gate limits Gmin and Gmax. Adding e over r and clipping gives the gate demand c, which drives a servo of time constant Tg to give the actual gate g. The water column relates the flow Q and head h through the water-starting time TW, and the turbine power is At times h times Q minus the no-load flow."
+     class="dark:sl-hidden" />
+<img src="/images/models/tor-hygov-dark.svg"
+     alt="HYGOV block diagram. One minus omega, less the permanent droop R times the gate demand offset, passes a lag Tf to give the error e. That error is divided by r times Tr, rate-limited to plus or minus VELM and integrated between the gate limits Gmin and Gmax. Adding e over r and clipping gives the gate demand c, which drives a servo of time constant Tg to give the actual gate g. The water column relates the flow Q and head h through the water-starting time TW, and the turbine power is At times h times Q minus the no-load flow."
+     class="light:sl-hidden" />
 
 ### Parameters
 

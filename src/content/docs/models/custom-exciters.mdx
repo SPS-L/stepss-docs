@@ -107,6 +107,13 @@ $$
 
 - With anti-windup: if the limiter is active, `f(1) = Vf - Vfmin` (or `Vfmax`).
 
+<img src="/images/models/exc-1storder-light.svg"
+     alt="1ST_ORDER exciter block diagram. The terminal voltage V is subtracted from the reference Vref and the error drives a first-order automatic voltage regulator of gain KA and time constant TA, limited between Vfmin and Vfmax, giving the field voltage vf. Vref is initialised as V0 plus Vf0 over KA."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-1storder-dark.svg"
+     alt="1ST_ORDER exciter block diagram. The terminal voltage V is subtracted from the reference Vref and the error drives a first-order automatic voltage regulator of gain KA and time constant TA, limited between Vfmin and Vfmax, giving the field voltage vf. Vref is initialised as V0 plus Vf0 over KA."
+     class="light:sl-hidden" />
+
 ### Parameters
 
 | Parameter | Description |
@@ -179,6 +186,13 @@ This is the standard two-stage phase-compensating PSS structure. The CODEGEN blo
 | PSS washout | `tfder1p` | $K_{STAB} \cdot sT_W/(1+sT_W)$ |
 | PSS lead–lag 1 | `tf1p1z` | $(1+sT_1)/(1+sT_2)$ |
 | PSS lead–lag 2 | `tf1p1z` | $(1+sT_3)/(1+sT_4)$ |
+
+<img src="/images/models/exc-kundur-light.svg"
+     alt="exc_kundur block diagram. The terminal voltage passes a transducer of time constant TR to give Vfil, which is subtracted from Vref and summed with the stabiliser output Vs. That error drives an automatic voltage regulator of gain KA with transient gain reduction, a lead-lag with zero TA and pole TB, giving the field voltage vf. The stabiliser takes rotor speed through a washout of gain KSTAB and time constant TW and two lead-lag stages with time constants T1 to T4."
+     class="dark:sl-hidden" />
+<img src="/images/models/exc-kundur-dark.svg"
+     alt="exc_kundur block diagram. The terminal voltage passes a transducer of time constant TR to give Vfil, which is subtracted from Vref and summed with the stabiliser output Vs. That error drives an automatic voltage regulator of gain KA with transient gain reduction, a lead-lag with zero TA and pole TB, giving the field voltage vf. The stabiliser takes rotor speed through a washout of gain KSTAB and time constant TW and two lead-lag stages with time constants T1 to T4."
+     class="light:sl-hidden" />
 
 ### Parameters
 
