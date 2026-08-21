@@ -319,10 +319,11 @@ actions, and both are remembered between sessions.
      alt="The Tools menu open, holding Save command file, Save observables file, Open in editor with Ctrl+N, Select external simulator with Ctrl+R, Select working directory, Open working folder with Ctrl+E, Open terminal in working folder with Ctrl+T and Close all curve windows with Ctrl+G, then below a separator the Dark theme tick, which is ticked, and Check for updates at startup."
      class="light:sl-hidden" />
 
-The command file that **Save command file** writes is the same one
-`ramses -t` reads, so a case set up here can be handed to the command line
-unchanged. [Quick Start](/getting-started/quickstart/) compares the three ways to
-drive the engines.
+**Save command file** writes out the file the engine reads, listing the data,
+disturbance, trajectory and observables files of the case in the order it
+expects. It is what a run is made of, in one file.
+[Quick Start](/getting-started/quickstart/) compares the two ways to drive the
+engines.
 
 ## The status bar
 

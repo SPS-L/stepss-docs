@@ -102,75 +102,6 @@ For the full walkthrough on a real case, see
 See the [Python API Reference](/python/api-reference/) for the complete interface.
 
 </TabItem>
-<TabItem label="Command Line">
-
-**The RAMSES command-line interface**
-
-The RAMSES executable accepts the following arguments:
-
-```bash
-ramses.exe [-t command_file] [-v]
-```
-
-| Flag | Description |
-|------|-------------|
-| `-t command_file` | Read inputs from a command file (non-interactive mode) |
-| `-v` | Print version information and exit |
-
-**Interactive mode** (no `-t` flag): RAMSES prompts for each input sequentially:
-
-```
-Dump settings, comments and initialization data in file [press enter to skip] :
-Disturbance file name [compulsory] :
-Dump system trajectory in file [press enter to skip] :
-Observable file name [compulsory] :
-Dump continuous simulation trace in file [press enter to skip] :
-Dump discrete simulation trace in file [press enter to skip] :
-```
-
-The observables prompt is shown only when a trajectory file was given; it is
-labelled compulsory because at that point it is.
-
-**Non-interactive mode** (`-t` flag): The command file provides the same inputs as lines, in order:
-
-<Steps>
-
-1. **Prepare data files**: Network data, dynamic data, solver settings, LFRESV (power flow solution)
-
-2. **Create a command file** (`cmd.txt`):
-   ```
-   data.dat volt_rat.dat settings.dat
-   
-   disturbance.dst
-   result.rtrj
-   obs.obs
-   cont.trace
-   disc.trace
-   ```
-
-   The command file contains, in order:
-   - **Data files** (one or more, space- or newline-separated), read until a blank line
-   - **Initialization dump file** (blank line to skip)
-   - **Disturbance file** (required)
-   - **Trajectory file** (blank line to skip)
-   - **Observables file** (required if trajectory file is given)
-   - **Continuous trace file** (blank line to skip)
-   - **Discrete trace file** (blank line to skip)
-
-3. **Run the simulation**:
-   ```bash
-   ramses.exe -tcmd.txt
-   ```
-
-4. **Process results**: Use the stepss extractor, DYNGRAPH, or other tools to read the trajectory file
-
-</Steps>
-
-:::note
-Lines starting with `#` in the command file are treated as comments and skipped.
-:::
-
-</TabItem>
 </Tabs>
 
 ---
@@ -201,53 +132,26 @@ Lines starting with `#` in the command file are treated as comments and skipped.
 See [The Interface](/gui/interface/#power-flow-simulation) for what each control does.
 
 </TabItem>
-<TabItem label="Command Line">
+<TabItem label="STEPSS in Python">
 
-**The Helios command-line interface**
+`HeliosSession` follows load, then modify, then solve, then query:
 
-The Helios executable accepts the following arguments:
+```python
+from stepss.helios import HeliosSession
 
-```bash
-helios [-t command_file] [--plain] [--tui]
+with HeliosSession() as pf:
+    pf.load_file('network.dat')
+    pf.load_file('powerflow.dat')
+    converged = pf.solve()
+
+    v, angle = pf.get_bus_voltage('1041')
+    pf.export_voltages('volt_rat.dat')   # the LFRESV file RAMSES initialises from
 ```
 
-| Flag | Description |
-|------|-------------|
-| `-t command_file` | Read inputs from a command file (non-interactive mode) |
-| `--plain` | Force plain-text output instead of the interactive terminal UI |
-| `--tui` | Force the interactive terminal UI |
-
-**Interactive mode** (no `-t` flag): Helios prompts for data files, then presents a command menu. On a TTY it uses a colour-coded terminal UI; when stdin is a pipe it falls back to plain text automatically.
-
-**Non-interactive mode** (`-t` flag): The command file provides data file names (one per line, blank line to end), followed by menu commands. Results go to stdout and errors to stderr with line numbers. Paths resolve relative to the working directory, so `cd` into the data directory first.
-
-<Steps>
-
-1. **Prepare data files**: Network data and power flow data (generators, loads, SVC, LTC-V, PSHIFT-P)
-
-2. **Create a command file** (`pf_cmd.txt`):
-   ```
-   network.dat
-   powerflow.dat
-
-   VT
-   volt_rat.dat
-   E
-   ```
-
-3. **Run the power flow**:
-   ```bash
-   helios -t pf_cmd.txt > output.txt
-   ```
-
-</Steps>
-
-The run's outcome is reported through the process exit status: `0` converged, `1` input or usage error, `2` solve did not converge. See [Exit Status](/user-guide/power-flow/#exit-status).
-
-Helios then presents an interactive menu. `VT` is the command that writes the
-LFRESV file needed to initialize RAMSES; see
-[Interactive Menu Commands](/user-guide/power-flow/#interactive-menu-commands)
-for the full list.
+`export_voltages` writes the same LFRESV file the GUI's **Add Helios results
+to data** feeds back into the case. See
+[Power Flow with Helios](/python/helios/) for the full interface, including
+redispatch and contingency screening.
 
 </TabItem>
 </Tabs>
@@ -258,11 +162,11 @@ for the full list.
 
 1. **Define the network**: Specify buses, lines, transformers, and shunts
 2. **Set up power flow data**: Define generators, loads, and the slack bus
-3. **Run the power flow**: Compute the initial operating point and export LFRESV
+3. **Run the power flow**: compute the initial operating point and export the LFRESV file
 4. **Add dynamic models**: Specify synchronous machines, excitation systems, speed governors, loads, and controllers
 5. **Configure solver**: Set integration method, time steps, and tolerances
 6. **Define disturbances**: Specify faults, line trips, parameter changes, etc.
-7. **Run RAMSES**: Execute the dynamic simulation
+7. **Run the dynamic simulation**: from **Dynamic Simulation** in the GUI, or `sim.execSim(case)` in Python
 8. **Analyze results**: Extract and visualize trajectories of voltages, frequencies, and powers
 
 ## Next Steps

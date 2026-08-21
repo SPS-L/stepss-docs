@@ -165,9 +165,9 @@ The user model is **compiled, not interpreted**, resulting in efficient number-c
 
 ## Simulation Interfaces
 
-STEPSS modules can be driven from the command line, from STEPSS GUI, or from
-Python through stepss. The [Quick Start](/getting-started/quickstart/) compares
-the three and gives the invocation for each.
+STEPSS modules are driven from STEPSS GUI or from Python through stepss. The
+[Quick Start](/getting-started/quickstart/) compares the two and gives the
+first steps for each.
 
 ## Platform Support
 
