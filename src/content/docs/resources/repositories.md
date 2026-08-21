@@ -79,10 +79,15 @@ tests need neither a RAMSES licence nor the engine itself.
 Browser-based visual editor for building CODEGEN user-defined models with drag-and-drop blocks.
 
 - **Repository**: [github.com/SPS-L/stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio)
-- **Requirements**: Python 3.10 or later
+- **Requirements**: Python 3.10 or later. On macOS also `brew install gcc`, which the bundled CODEGEN links against.
 - **Install**: `pip install stepss-cg-studio`
 - **Run**: `cg-studio` → open `http://localhost:8765`
 - **Documentation**: [CODEGEN Studio guide](/developer/cg-studio/) on this site
+
+The wheel bundles the CODEGEN executables for Linux, Windows and macOS, so Run
+Codegen works on a fresh install with nothing to configure. That makes it
+mixed-licence: see [License](/getting-started/license/#codegen-license). Its
+version names the CODEGEN it carries, so 5.3.0 and 5.3.1 both run CODEGEN 5.3.
 
 :::note
 Test-system data repositories (Nordic, 5-bus, Kundur, GB Network, and others) are not listed here; see the [Test Systems](/test-systems/) section of this site.

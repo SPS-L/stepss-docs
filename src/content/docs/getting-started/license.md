@@ -11,7 +11,7 @@ description: Licensing information for the STEPSS suite
 | stepss | Apache License 2.0 | [SPS-L/stepss-python-ui](https://github.com/SPS-L/stepss-python-ui) |
 | URAMSES | Apache License 2.0 | [SPS-L/stepss-uramses](https://github.com/SPS-L/stepss-uramses) |
 | stepss-eigenanalysis | Apache License 2.0 | [SPS-L/stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) |
-| CODEGEN Studio | Apache License 2.0 | [SPS-L/stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) |
+| CODEGEN Studio | Apache License 2.0, but its **PyPI wheel bundles CODEGEN**: see [CODEGEN License](#codegen-license) | [SPS-L/stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) |
 | stepss-dyngraph | Apache License 2.0 | SPS-L/stepss-dyngraph (private) |
 | RamsesNN | MIT License | [SPS-L/stepss-RamsesNN](https://github.com/SPS-L/stepss-RamsesNN) |
 | Helios | Academic Public License (free for non-commercial use), with a commercial option | See [Helios License](#helios-license) below |
@@ -58,6 +58,21 @@ For extensions to larger models or execution using more than two cores, contact 
 ## CODEGEN License
 
 **CODEGEN** (the model generator) is the property of **Dr. Thierry Van Cutsem**. It is distributed under the **Academic Public License for the use of STEPSS** as a compiled executable that is **free to use for non-commercial purposes**; commercial use requires contacting the Authors. It is not open-source: its source code is not included in any of the public STEPSS repositories.
+
+Two things ship CODEGEN, and both are therefore mixed-licence rather than the
+Apache 2.0 their own source is under:
+
+- **STEPSS GUI**, which carries the whole toolchain.
+- **CODEGEN Studio**, whose PyPI wheel (`pip install stepss-cg-studio`) bundles
+  the CODEGEN executables for Linux, Windows and macOS so that its Run Codegen
+  action works on a fresh install. The licence text ships inside the wheel as
+  `cg_studio/bin/LICENSE-CODEGEN`, and the two leading components of the
+  package's version name the CODEGEN release it carries: `stepss-cg-studio`
+  5.3.0 and 5.3.1 both run CODEGEN 5.3.
+
+Installing either means accepting these terms for the bundled generator. The
+Apache 2.0 licence in each of those repositories covers the code written there,
+not the executables shipped alongside it.
 
 ## Requesting a Commercial License
 
