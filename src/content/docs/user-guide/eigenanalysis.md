@@ -141,7 +141,7 @@ wrongly. Check the first line.
 
 Participation factors, one line per mode and state:
 `mode`, `state`, `pf`, `family`, `device`, `variable`. The `pf` column is the
-participation factor itself, which STEPSS GUI abbreviates to **PF**.
+participation factor itself.
 
 The participation of state $k$ in mode $i$ is $p_{ki} = \lvert w_{ki}\,v_{ki}\rvert$,
 built from the left and right eigenvectors and normalised so each mode's largest
@@ -285,33 +285,35 @@ In STEPSS GUI the same run is read from the small-signal results window, which
 [Analysis tab](/gui/interface/#analysis) opens on the run it just made:
 
 <img src="/images/screenshots/gui-ssa-results-light.png"
-     alt="The small-signal results window for the Kundur case. Above the table are three filters: an electromechanical only tick, a real part above tick with a value beside it, and a PF at least field, with a count of how many modes are shown. The table lists the electromechanical modes with frequency, damping ratio and real and imaginary parts; the 0.6237 Hz inter-area mode at a damping ratio of 0.1087 is selected. An s-plane plot on the right places every mode against a stability boundary at the imaginary axis, with Reset zoom and Save plot buttons beneath it. Below, the Participation panel lists the selected mode's largest contributions, the machines' speed and angle states, and a polar mode-shape plot shows the machines of one area swinging opposite to the other."
+     alt="The small-signal results window for the Kundur case. Above the table are an electromechanical only tick, a real part above tick with a value beside it and a damping ray zeta box set to 0.05, and a participation factor at least field, with a count of how many modes are shown. The table lists the electromechanical modes with frequency, damping ratio and real and imaginary parts; the 0.6237 Hz inter-area mode at a damping ratio of 0.1087 is selected. An s-plane plot on the right places every mode against a stability boundary at the imaginary axis and a dashed constant-damping ray, with the origin in view and Reset zoom and Save plot buttons beneath it. Below, the Participation panel lists the selected mode's largest contributions, the machines' speed and angle states, and a polar mode-shape plot shows the machines of one area swinging opposite to the other."
      class="dark:sl-hidden" />
 <img src="/images/screenshots/gui-ssa-results-dark.png"
-     alt="The small-signal results window for the Kundur case. Above the table are three filters: an electromechanical only tick, a real part above tick with a value beside it, and a PF at least field, with a count of how many modes are shown. The table lists the electromechanical modes with frequency, damping ratio and real and imaginary parts; the 0.6237 Hz inter-area mode at a damping ratio of 0.1087 is selected. An s-plane plot on the right places every mode against a stability boundary at the imaginary axis, with Reset zoom and Save plot buttons beneath it. Below, the Participation panel lists the selected mode's largest contributions, the machines' speed and angle states, and a polar mode-shape plot shows the machines of one area swinging opposite to the other."
+     alt="The small-signal results window for the Kundur case. Above the table are an electromechanical only tick, a real part above tick with a value beside it and a damping ray zeta box set to 0.05, and a participation factor at least field, with a count of how many modes are shown. The table lists the electromechanical modes with frequency, damping ratio and real and imaginary parts; the 0.6237 Hz inter-area mode at a damping ratio of 0.1087 is selected. An s-plane plot on the right places every mode against a stability boundary at the imaginary axis and a dashed constant-damping ray, with the origin in view and Reset zoom and Save plot buttons beneath it. Below, the Participation panel lists the selected mode's largest contributions, the machines' speed and angle states, and a polar mode-shape plot shows the machines of one area swinging opposite to the other."
      class="light:sl-hidden" />
 
 Reading that window across is the whole method in one view. The table gives the
 frequency and damping of each mode; the s-plane shows how much margin each one
 has, with the boundary drawn at the imaginary axis, so a mode crossing it is the
 instability. Every mode is one circle there, crimson if it is unstable and
-filled if it is the one selected. The **Participation** panel answers which
-machines make up that mode, its last column **PF** being the participation
-factor, normalised so the largest in each mode is 1. The mode shape answers how
-those machines move relative to each other: here G1 and G2 swing against G3 and
-G4, which is what makes 0.62 Hz the inter-area mode rather than a local one.
+filled if it is the one selected. The dashed line beside the boundary is a
+constant-damping ray, described [below](#the-damping-ray). The
+**Participation** panel answers which machines make up that mode, its last
+column giving the participation factor, normalised so the largest in each mode
+is 1. The mode shape answers how those machines move relative to each other:
+here G1 and G2 swing against G3 and G4, which is what makes 0.62 Hz the
+inter-area mode rather than a local one.
 
 ### Filtering and zooming
 
-Three controls sit above the table, and all of them act on results already in
-hand. Changing one re-filters what is on screen; none of them requires the
-analysis to be run again.
+Four controls sit above the table, and all of them act on results already in
+hand. None requires the analysis to be run again.
 
 | Control | What it does |
 |---|---|
 | **electromechanical only** | Restricts to the 0.1 to 2.5 Hz band, where rotor-angle modes live. On by default |
 | **real part above** | Hides modes at or below the value beside it. Off by default |
-| **PF at least** | Trims the Participation panel to entries at or above the value beside it |
+| **damping ray $\zeta$** | Moves the dashed ray on the s-plane to another damping ratio. A display option: it hides nothing |
+| **participation factor at least** | Trims the Participation panel to entries at or above the value beside it |
 
 The count underneath says how many modes survive, so a filter that empties the
 table reads as a filter rather than as a broken load.
@@ -324,10 +326,36 @@ until everything worth reading is squashed against the boundary. The plot refits
 its axes whenever the filter changes, so hiding those modes closes the plane in
 around what is left.
 
+The fitted window always contains the **origin**, whatever the modes do, so the
+imaginary axis and the foot of the damping ray are in every picture and two
+runs of different systems can be compared by eye.
+
 For a closer look than a filter gives, **drag a rectangle on the s-plane** to
-zoom into it. **Reset zoom**, beside **Save plot...**, goes back to the fitted
-window, and double-clicking the plot does the same. A zoomed plot exports
-zoomed: **Save plot...** writes what is on screen, not the whole plane.
+zoom into it. A zoom is yours and is not widened back to the origin.
+**Reset zoom**, beside **Save plot...**, goes back to the fitted window, and
+double-clicking the plot does the same. A zoomed plot exports zoomed:
+**Save plot...** writes what is on screen, not the whole plane.
+
+### The damping ray
+
+The dashed line running up beside the stability boundary is a line of constant
+damping ratio. It leaves the origin at $\arcsin\zeta$ from the imaginary axis,
+so a mode to the **left** of it is better damped than that $\zeta$ and a mode to
+the right is worse. Because $\zeta$ is a ratio rather than a distance, the real
+part a mode is allowed grows with its frequency, which is exactly what the slant
+encodes: a 1.7 Hz mode has to sit further left than a 0.35 Hz one to reach the
+same damping.
+
+It is drawn at **0.05** by default, the usual planning criterion, and the box
+beside **real part above** moves it. Type any value from 0 up to (but not
+including) 1; anything else is refused and the box returns to what it was.
+
+:::note
+Earlier releases drew two rays, at 0.05 and 0.10. On any window wide enough to
+hold a real spectrum they are indistinguishable, because $\arcsin 0.05$ and
+$\arcsin 0.10$ are 2.87° and 5.74°: both arrive as a single smudge beside the
+boundary. One adjustable ray answers more questions than two fixed ones.
+:::
 
 :::note
 This screenshot is light in both site themes. The window itself follows the
