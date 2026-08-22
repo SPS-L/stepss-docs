@@ -169,6 +169,140 @@ BRANCH  *
 At least one request has to be accepted. A file where none is leaves the
 trajectory without a header, and nothing is recorded.
 
+## Scenario File (`.cfg`)
+
+A scenario file records **which files a case is made of**, not what is in them.
+STEPSS GUI writes one with **File > Save configuration** and reads it back with
+**Load configuration**, so a case set up once reopens in two clicks. It is a
+plain text file and is meant to be writable by hand or by a script.
+
+It carries exactly what the two engines are told to read: the ten system data
+rows, the disturbance file, the one-line diagram, the observables file and the
+wizard tick, the three run-time observable rows, and the four recording
+checkboxes. Nothing else. The small-signal parameters, the working directory
+and the window geometry are all deliberately absent, because a run does not
+depend on them and restoring them would change something the case did not ask
+for.
+
+### Syntax
+
+`key = value`, one per line, UTF-8, with `#` starting a comment line. Blank
+lines are ignored. A key that appears twice keeps the last value.
+
+Values are read with Java's properties parser, so a hand-written file has three
+rules to respect:
+
+- `=` and `:` both separate a key from its value. A key containing either must
+  escape it; no key defined below does.
+- `#` and `!` start a comment only at the beginning of a line.
+- A backslash escapes: write `\\` for a literal backslash, and `\t`, `\n`,
+  `\r`, `\f` for the control characters. A **leading** space in a value must
+  be written `\ `; spaces anywhere else are literal, which is why
+  `runtime.1.type = Bus Voltage` needs no quoting.
+
+Windows paths are the case that bites: write `C:/cases/lf.dat` or
+`C:\\cases\\lf.dat`, never `C:\cases\lf.dat`.
+
+### Keys
+
+`stepss.format` is mandatory and must be the format number this build reads.
+Everything else is optional; an absent key means an empty field.
+
+| Key | Value |
+|---|---|
+| `stepss.format` | Format number. **`1`** today |
+| `data.1` … `data.10` | The ten system data rows, in order. Empty rows are not written |
+| `disturbance` | The disturbance `.dst` |
+| `diagram` | The annotated one-line diagram SVG |
+| `observables.file` | The [observables file](#observables-file) |
+| `observables.wizard` | `true` to build the observables from the dialog instead of the file |
+| `runtime.1.type` … `runtime.3.type` | Run-time plot row: the observable type, **by its label** (see below) |
+| `runtime.1.name` … `runtime.3.name` | Run-time plot row: the bus, machine, branch or injector name |
+| `record.trajectory` | `true` to write the output trajectory |
+| `record.continuous` | `true` to write the continuous trace |
+| `record.discrete` | `true` to write the discrete trace |
+| `record.dump` | `true` to write the initialisation dump |
+
+Booleans are `true` or `false`. Anything else is reported and the field is left
+at its default.
+
+`runtime.N.type` stores the **label** shown in the dropdown, not a code: one of
+`Bus Voltage`, `Machine Speed`, `Omega-delta of machine`, `Active power-delta
+of machine`, `Center of Inertia`, `Wall-clock time per step`, `Solutions per
+step`, `Latency`, `Branch Active Power Origin`, `Branch Active Power
+Extremity`, `Branch Reactive Power Origin`, `Branch Reactive Power Extremity`,
+`Injector Observable`, `Two-port injector Observable`. A label this build does
+not know is reported and that row is left empty.
+
+### Paths
+
+**A path inside the `.cfg`'s own folder is stored relative to it, with forward
+slashes on every platform.** Anything outside that folder is stored absolute.
+Relative paths are resolved against the `.cfg`'s directory, never against the
+working directory, and never leave the file: everything downstream of a load
+sees an absolute path.
+
+That rule is what makes a case folder portable. Keep the `.cfg` beside the data
+it names and the whole folder can be moved, copied or sent to a colleague. A
+path that would need `..` to express is stored absolute instead, so a file
+outside the folder is never silently repointed at a different one after a move.
+
+### Example
+
+A Kundur two-area case, saved beside its data:
+
+```ini
+# STEPSS scenario. Save configuration wrote this; Load configuration reads it.
+# Paths inside this file's own directory are stored relative to it, so the
+# folder can be moved or copied whole. Everything else is absolute.
+# Saved by STEPSS 3.81
+
+stepss.format = 1
+
+# System data
+data.1 = lf.dat
+data.2 = dyn.dat
+data.3 = solveroptions.dat
+disturbance = disturb.dst
+diagram = kundur.svg
+
+# Observables
+observables.file = obs.dat
+observables.wizard = false
+runtime.1.type = Bus Voltage
+runtime.1.name = 9
+runtime.2.type = Machine Speed
+runtime.2.name = G1
+runtime.3.type = 
+runtime.3.name = 
+
+# Recording
+record.trajectory = true
+record.continuous = false
+record.discrete = false
+record.dump = false
+```
+
+The section comments and the blank lines are for the reader. Nothing depends on
+them and a file without them loads identically.
+
+### What a loader should do with a bad file
+
+Loading is deliberately tolerant, and a hand-written file benefits from the same
+rule: **apply every key you understand and report the rest**, rather than
+refusing the file over one bad line. A key nobody knows, a boolean that is not
+a boolean, an observable label that has been retired, a file that has since been
+deleted: each is one sentence to the user, and the rest of the scenario still
+loads.
+
+Only three things are fatal, and all three are about the format number:
+
+| `stepss.format` | Outcome |
+|---|---|
+| Absent | Refused. Files this old predate the format and hold absolute paths from another machine |
+| Not a number | Refused, as not being a scenario file |
+| Higher than this build reads | Refused, naming the version needed |
+
 ## Next Steps
 
 - [Network Modeling](/user-guide/network/), Define buses, lines, transformers, and shunts
