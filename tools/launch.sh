@@ -1,10 +1,16 @@
 #!/usr/bin/env bash
 # Seeds a private preferences node and starts STEPSS GUI on the capture display.
 #
-# Private, because a screenshot run must not touch the operator's own theme,
-# window geometry or working directory - and because seeding is the only way to
-# get a deterministic 1600x760 window: windowMaximised defaults to true, so an
-# unseeded launch fills the screen and openbox then refuses the resize.
+# Private, because a screenshot run must not touch the operator's own theme or
+# working directory.
+#
+# It does NOT seed the window geometry, and must not: this used to write
+# windowMaximised, windowX, windowY, windowWidth and windowHeight, and nothing
+# in STEPSS has read any of them since the geometry memory was removed. They
+# survive only in PreferenceMigration's key list and two test files. Leaving
+# them here cost an afternoon, because they look exactly like the mechanism
+# that sizes the window and are inert. The window is sized by the Xvfb screen;
+# see shotlib.sh.
 #
 # Usage: launch.sh light|dark
 #
@@ -57,11 +63,6 @@ cat > "$DIR/prefs.xml" <<EOF
 $FIRST_ENTRY
   <entry key="checkUpdatesAtStartup" value="false"/>
   <entry key="darkTheme" value="$DARK"/>
-  <entry key="windowMaximised" value="false"/>
-  <entry key="windowX" value="60"/>
-  <entry key="windowY" value="60"/>
-  <entry key="windowWidth" value="1600"/>
-  <entry key="windowHeight" value="760"/>
   <entry key="workingDirectory" value="$WORK/run"/>
 </map>
 EOF

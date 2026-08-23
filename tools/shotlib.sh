@@ -14,8 +14,20 @@ set -u
 export DISPLAY="${SHOT_DISPLAY:-:44}"
 WORK="${SHOT_WORK:-${TMPDIR:-/tmp}/stepss-shots}"
 OUT="$WORK/shots"
-SCREEN_W=2200
-SCREEN_H=1400
+# The screen IS the main window. STEPSS calls setExtendedState(MAXIMIZED_BOTH)
+# on every launch, and FlatLaf draws its own title bar inside the client area
+# (setDefaultLookAndFeelDecorated), so openbox gives the frame no decoration
+# and a maximised window is exactly the screen, at (0,0). Sizing the screen is
+# therefore the only way left to size the window, and it is a reliable one:
+# the assertion in start_x below fails the run if the server came up any other
+# size, so a figure can never be captured at a size the coordinates were not
+# written for.
+#
+# It also pins every other window, since anything larger than the screen loses
+# whatever falls off it. That is affordable here and was checked: the largest
+# window in the set is the one-line diagram at 902x636.
+SCREEN_W=1600
+SCREEN_H=830
 
 mkdir -p "$OUT"
 

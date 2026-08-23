@@ -22,8 +22,10 @@ source "$WORK/shotlib.sh"
 mkdir -p "$OUT/$THEME"
 
 # Window origin, and the offset from window coordinates to screen coordinates.
-WX=60
-WY=60
+# Zero, because the window is maximised to the whole screen and openbox gives
+# it no frame; window coordinates and screen coordinates are the same thing.
+WX=0
+WY=0
 c() { click $((WX + $1)) $((WY + $2)); }   # click at window coordinates
 
 # --- fixed points in the 1600x760 window ------------------------------------
@@ -37,7 +39,11 @@ OBS_TYPE1_X=103; OBS_TYPE1_Y=166
 OBS_NAME1_X=900; OBS_NAME1_Y=166
 OBS_NAME2_X=900; OBS_NAME2_Y=196
 OBS_WIZ_X=24;    OBS_WIZ_Y=423
-BTN_Y=706
+# The action bars sit in BorderLayout.SOUTH, so this one is measured from the
+# bottom of the window and moves with its height: 54 px up from 830. Every
+# other coordinate here is anchored at the top and does not. This is the line
+# to change if the screen size in shotlib.sh ever does.
+BTN_Y=776
 PF_RUN=76; PF_BUSOV=637; PF_BRANCH=761; PF_GEN=903; PF_BAL=1274
 DYN_RUN=105
 ANA_EXTRACT=78; ANA_SSA=145
@@ -69,6 +75,22 @@ E=$(wait_win "Open Examples" 30) || exit 1
 sleep 1.5
 shot "$THEME/gui-open-examples" "$E" 1.0
 click_in "$E" 530 542          # Open example
+
+# STEPSS asks where to keep examples the first time it needs a root, and it
+# asks AFTER Open example rather than before, so this cannot be answered up
+# front. Nothing in the preferences answers it either: examplesDirectory is
+# one of the keys the application stopped reading, in the same pass that took
+# the window geometry, so the seed that used to cover this is inert. Without
+# this block the chooser simply stays up, every later click lands in the
+# window behind it, and the run captures thirteen figures of an empty case
+# before failing on the fourteenth.
+C=$(wait_win "Choose a directory to keep examples in" 20) && {
+    click_in "$C" 345 262      # the Folder name field
+    xdotool key ctrl+a; sleep 0.3
+    type_text "$EXAMPLES"
+    click_in "$C" 462 337      # Open
+    sleep 4
+}
 sleep 8
 
 M=$(win "^STEPSS")
@@ -89,15 +111,15 @@ c $OBS_NAME2_X $OBS_NAME2_Y; type_text "9"
 sleep 0.8
 shot "$THEME/gui-observables" "$M" 1.0
 
-# The picker panel is taller than the tab, so this one figure gets a taller
-# window rather than a clipped panel.
+# The picker panel is taller than the rest of the tab needs, and the window
+# can no longer be grown for it: it is maximised, so its size is the screen's.
+# The screen is 830 rather than 760 for exactly this figure, and every other
+# one is that tall too as a result.
 c $OBS_WIZ_X $OBS_WIZ_Y; sleep 1.2
-xdotool windowsize "$M" 1600 830; sleep 1.5
 c 446 480; type_text "9";  c 783 480; sleep 1     # Buses:  add bus 9
 c 446 616; type_text "G1"; c 783 616; sleep 1.5   # Sync machines: add G1
 shot "$THEME/gui-observable-picker" "$M" 1.0
 c $OBS_WIZ_X $OBS_WIZ_Y; sleep 1                  # untick
-xdotool windowsize "$M" 1600 760; sleep 1.5
 
 # ------------------------------------------------------------ 4. power flow
 banner "$THEME: power flow"
