@@ -177,12 +177,10 @@ STEPSS GUI writes one with **File > Save configuration** and reads it back with
 plain text file and is meant to be writable by hand or by a script.
 
 It carries exactly what the two engines are told to read: the ten system data
-rows, the disturbance file, the one-line diagram, the observables file and the
-wizard tick, the three run-time observable rows, and the four recording
-checkboxes. Nothing else. The small-signal parameters, the working directory
-and the window geometry are all deliberately absent, because a run does not
-depend on them and restoring them would change something the case did not ask
-for.
+rows, the disturbance file, the one-line diagram, the observables file, the
+three run-time observable rows, and the four recording checkboxes. Nothing
+else, and what is left out is left out on purpose; see [What the file
+deliberately does not carry](#what-the-file-deliberately-does-not-carry).
 
 ### Syntax
 
@@ -205,34 +203,88 @@ Windows paths are the case that bites: write `C:/cases/lf.dat` or
 
 ### Keys
 
-`stepss.format` is mandatory and must be the format number this build reads.
-Everything else is optional; an absent key means an empty field.
+**`stepss.format` is the only mandatory key.** Without it the file is refused
+outright, and no other key in it is read. Every other key is optional *to the
+loader*: an absent key means an empty field or a cleared tick, and the load
+still succeeds. Whether the scenario that comes back can be **run** is a
+separate question, answered under [What a runnable scenario
+needs](#what-a-runnable-scenario-needs).
 
-| Key | Value |
-|---|---|
-| `stepss.format` | Format number. **`1`** today |
-| `data.1` … `data.10` | The ten system data rows, in order. Empty rows are not written |
-| `disturbance` | The disturbance `.dst` |
-| `diagram` | The annotated one-line diagram SVG |
-| `observables.file` | The [observables file](#observables-file) |
-| `observables.wizard` | `true` to build the observables from the dialog instead of the file |
-| `runtime.1.type` … `runtime.3.type` | Run-time plot row: the observable type, **by its label** (see below) |
-| `runtime.1.name` … `runtime.3.name` | Run-time plot row: the bus, machine, branch or injector name |
-| `record.trajectory` | `true` to write the output trajectory |
-| `record.continuous` | `true` to write the continuous trace |
-| `record.discrete` | `true` to write the discrete trace |
-| `record.dump` | `true` to write the initialisation dump |
+| Key | Required | Value |
+|---|---|---|
+| `stepss.format` | **Yes** | Format number. **`1`** today |
+| `data.1` … `data.10` | To run | The ten system data rows, in order. Empty rows are not written |
+| `disturbance` | To simulate | The disturbance `.dst` |
+| `observables.file` | If recording | The [observables file](#observables-file) |
+| `diagram` | No | The annotated one-line diagram SVG |
+| `runtime.1.type` … `runtime.3.type` | No | Run-time plot row: the observable type, **by its label** (see below) |
+| `runtime.1.name` … `runtime.3.name` | No | Run-time plot row: the bus, machine, branch or injector name |
+| `record.trajectory` | No | `true` to write the output trajectory (`output.trj`) |
+| `record.continuous` | No | `true` to write the continuous trace (`cont.trace`) |
+| `record.discrete` | No | `true` to write the discrete trace (`disc.trace`) |
+| `record.init` | No | `true` to write the initialisation trace (`init.trace`) |
+
+The four `record.*` keys default to `false`, so a file that omits them loads
+with all four ticks cleared and the run writes nothing but its log. The three
+`runtime.N` rows default to empty, which is a row that plots nothing; a type
+with no name, or a name with no type, is an incomplete row rather than an
+error, and it is simply not plotted.
 
 Booleans are `true` or `false`. Anything else is reported and the field is left
 at its default.
 
 `runtime.N.type` stores the **label** shown in the dropdown, not a code: one of
 `Bus Voltage`, `Machine Speed`, `Omega-delta of machine`, `Active power-delta
-of machine`, `Center of Inertia`, `Wall-clock time per step`, `Solutions per
-step`, `Latency`, `Branch Active Power Origin`, `Branch Active Power
+of machine`, `Center of Inertia`, `Wall Time`, `Injector solutions`,
+`Latency`, `Branch Active Power Origin`, `Branch Active Power
 Extremity`, `Branch Reactive Power Origin`, `Branch Reactive Power Extremity`,
 `Injector Observable`, `Two-port injector Observable`. A label this build does
 not know is reported and that row is left empty.
+
+### What a runnable scenario needs
+
+Loading is tolerant; running is not. These are checked when you press **Run**,
+not when the file is loaded, so a `.cfg` missing one of them loads without a
+word and then refuses to start:
+
+- **At least one `data.N`.** Both the dynamic simulation and the power flow
+  refuse a case with no system data at all.
+- **`disturbance`, to simulate.** A dynamic run needs one; a power flow does
+  not. The `.dst` must also end in a `STOP` record, which is checked when the
+  run starts rather than when the path is set, because the file can be edited
+  in between.
+- **`observables.file`, whenever `record.trajectory` is `true`.** The
+  trajectory needs something to say which quantities it should contain. Setting
+  `record.trajectory = true` with no observables file is the one combination
+  that is refused outright.
+
+`diagram` is needed only by the power flow's one-line diagram output, and only
+when it is set; an unreadable template stops that run, an absent one does not.
+
+### What the file deliberately does not carry
+
+A scenario records **which files a case is made of**, and nothing about the
+session it was saved in. Absent by design, not by omission:
+
+- **The Analysis tab's small-signal parameters**, the working directory and the
+  window geometry. A run does not depend on them.
+- **Show observable dialog**, and the eight picker lists behind it. The lists
+  are session state that no `.cfg` has ever carried, so saving the tick alone
+  restored a choice whose other half was gone: the tab came back ticked over
+  eight empty lists. The tick is left exactly as you set it when a
+  configuration is loaded.
+
+Two key names retired with that last change. A file saved by STEPSS 3.81 or
+earlier may carry them, and both now get one sentence in the load report and
+are otherwise ignored:
+
+| Retired key | What happened to it |
+|---|---|
+| `record.dump` | Renamed `record.init`, matching the `init.trace` it writes |
+| `observables.wizard` | Dropped; see above |
+
+Nothing else about such a file is affected, and re-saving the scenario writes
+it without them.
 
 ### Paths
 
@@ -268,7 +320,6 @@ diagram = kundur.svg
 
 # Observables
 observables.file = obs.dat
-observables.wizard = false
 runtime.1.type = Bus Voltage
 runtime.1.name = 9
 runtime.2.type = Machine Speed
@@ -280,7 +331,7 @@ runtime.3.name =
 record.trajectory = true
 record.continuous = false
 record.discrete = false
-record.dump = false
+record.init = false
 ```
 
 The section comments and the blank lines are for the reader. Nothing depends on
