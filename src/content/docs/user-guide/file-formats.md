@@ -350,7 +350,7 @@ Only three things are fatal, and all three are about the format number:
 
 | `stepss.format` | Outcome |
 |---|---|
-| Absent | Refused. Files this old predate the format and hold absolute paths from another machine |
+| Absent | Refused, as not being a scenario file |
 | Not a number | Refused, as not being a scenario file |
 | Higher than this build reads | Refused, naming the version needed |
 
