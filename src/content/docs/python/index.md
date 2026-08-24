@@ -23,6 +23,12 @@ the one capability carried only by the GUI.
 | [API Reference](/python/api-reference/) | Complete reference for `cfg`, `sim`, and `extractor` |
 | [Helios Power-Flow API](/python/helios/) | Running AC power flows from Python with `HeliosSession` |
 
+## Watch it
+
+Episode 8 of the [video series](/resources/videos/), *Scripting STEPSS in Python*, covers this page.
+
+<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/Wk7kIkVsCWQ" title="STEPSS Episode 8: Scripting STEPSS in Python" loading="lazy" allowfullscreen allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>
+
 ## Next Steps
 
 - [Quick Start](/getting-started/quickstart/), a first simulation end to end

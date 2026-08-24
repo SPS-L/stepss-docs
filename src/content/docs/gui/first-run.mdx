@@ -52,6 +52,11 @@ and fills in every file slot, so **Run** works immediately.
 
 4. Click **Open example**.
 
+5. Answer **Choose a directory to keep examples in**. This is asked once per
+   session rather than once ever, because the choice is not remembered between
+   launches. Any directory you can write to will do, and the same one every
+   time keeps your cases together.
+
 </Steps>
 
 <img src="/images/screenshots/gui-open-examples-light.png"
@@ -94,16 +99,19 @@ case.
 
 ## Where the files go
 
-Two directories are remembered separately, and the distinction matters once you
-open more than one example.
+Two directories are kept separately, and the distinction matters once you open
+more than one example.
 
-- The **examples directory** is where copies are unpacked. Opening a second
-  example puts it beside the first rather than inside it.
+- The **examples directory** is where copies are unpacked. You are asked for it
+  the first time you open an example, and it is kept for as long as the
+  application stays open. Opening a second example puts it beside the first
+  rather than inside it.
 - The **working directory** is where a run reads and writes. Opening an example
   moves it into that example.
 
-Set either from the **Tools** menu, which also offers **Open working folder** and
-**Open terminal in working folder** for getting at the files directly.
+Neither survives quitting, and neither is set from a menu: opening an example
+is what chooses them. The banner that reports where the copy landed has an
+**Open folder** button for getting at the files directly.
 
 An example is copied rather than run in place, so editing it is safe and the
 copy survives quitting. That is the point of copying: work on it freely.

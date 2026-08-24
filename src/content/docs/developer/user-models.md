@@ -5,6 +5,12 @@ description: Creating custom models with CODEGEN
 
 CODEGEN allows you to define custom models that are compiled into Fortran 2003 code and linked with RAMSES. This page covers the model framework, state variables, equations, discrete transitions, and the complete model file syntax specification.
 
+## Watch it
+
+Episode 6 of the [video series](/resources/videos/), *Writing Your Own Model with CODEGEN*, covers this page.
+
+<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/7vs1fXFxm38" title="STEPSS Episode 6: Writing Your Own Model with CODEGEN" loading="lazy" allowfullscreen allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>
+
 ## Model Categories
 
 | Category | Acronym | Description |

@@ -5,6 +5,12 @@ description: Configuration parameters for the RAMSES solver
 
 Solver settings control the behavior of the RAMSES simulation engine. They are specified as records starting with `$` in the data files.
 
+## Watch it
+
+Episode 4 of the [video series](/resources/videos/), *Solvers, Tolerances and Parallelism*, covers this page.
+
+<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/AkI3k0xcRuQ" title="STEPSS Episode 4: Solvers, Tolerances and Parallelism" loading="lazy" allowfullscreen allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>
+
 ## Sampling and Output
 
 ### Plot Step

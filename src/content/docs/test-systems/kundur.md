@@ -9,6 +9,12 @@ The Kundur two-area system is the standard benchmark for inter-area oscillation 
 
 ---
 
+## Watch it
+
+Episode 9 of the [video series](/resources/videos/), *Inter-area Oscillations on Kundur Two-Area*, covers this page.
+
+<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/oqHgJd-A4cw" title="STEPSS Episode 9: Inter-area Oscillations on Kundur Two-Area" loading="lazy" allowfullscreen allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>
+
 ## Quick Start
 
 ```python

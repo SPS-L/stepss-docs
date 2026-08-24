@@ -158,6 +158,7 @@ export default defineConfig({
 				{
 					label: 'Resources',
 					items: [
+						{ label: 'Video Tutorials', slug: 'resources/videos' },
 						{ label: 'Repositories',  slug: 'resources/repositories' },
 						{ label: 'Releases',      slug: 'resources/releases' },
 						{ label: 'Publications',  slug: 'resources/references' },

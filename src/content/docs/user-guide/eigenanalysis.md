@@ -14,6 +14,12 @@ An older engine accepts the `EIG` disturbance and writes no results files. The
 `stepss.__version__` tells you directly.
 :::
 
+## Watch it
+
+Episode 7 of the [video series](/resources/videos/), *Small Signal Stability and Eigenanalysis*, covers this page.
+
+<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/boL3wMKNC50" title="STEPSS Episode 7: Small Signal Stability and Eigenanalysis" loading="lazy" allowfullscreen allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>
+
 ## What is computed
 
 The linearised model is a set of differential-algebraic equations,
