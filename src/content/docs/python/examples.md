@@ -258,35 +258,57 @@ for disturbance_time in [5.0, 10.0, 20.0]:
 
 ## Eigenanalysis Workflow
 
-RAMSES performs the small-signal analysis itself. Schedule an `EIG` event at the
-operating point and it writes the modes, participation factors and mode shapes:
+RAMSES performs the small-signal analysis itself, and `stepss.ssa` drives it,
+reads its three output files and plots them. One call runs the analysis at the
+operating point:
 
 ```python
 import stepss
+from stepss import ssa
 
 case = stepss.cfg('cmd.txt')
-ram = stepss.sim()
-
-ram.execSim(case, 0.0)               # pause at the steady-state operating point
-ram.addDisturb(0.001, "EIG 'ssa'")   # writes ssa_modes.dat, ssa_pf.dat, ssa_ms.dat
-ram.contSim(0.01)                    # advance past the event so it fires
-ram.endSim()
+res = ssa.run(case, basename='ssa', workdir='run1')
+res.summary()
 ```
 
-Reading the result needs nothing beyond numpy:
+`ssa.run()` copies the case rather than modifying it, supplies the two solver
+settings the analysis requires, clears any previous run under the same
+basename, and returns the results.
+
+Filtering happens on the results you already have, so widening a limit costs
+nothing:
 
 ```python
-import numpy as np
+em = res.electromechanical()      # the rotor band, 0.1 to 2.5 Hz
+em.table()                        # index, frequency, damping ratio, lambda
 
-m = np.loadtxt('ssa_modes.dat', comments='#')
-freq, zeta = m[:, 4], m[:, 3]
-
-interarea = m[(freq > 0.4) & (freq < 0.9) & (m[:, 2] > 0)]
-print('inter-area mode: %.4f Hz, zeta = %+.4f' % (interarea[0, 4], interarea[0, 3]))
+res.dominant(-1.0).table()        # the modes above a real part limit
 ```
 
-A complete annotated walkthrough ships with the package under
+Reading one mode, and plotting:
+
+```python
+mode = res.electromechanical(0.4, 0.9)[0]        # the inter-area mode
+print('%.4f Hz, zeta = %+.4f' % (mode['freq'], mode['zeta']))
+
+for row in res.participation(mode, floor=0.05):  # which states take part
+    print('  %-8s %-8s %.3f' % (row.device.strip(), row.variable, row.pf))
+
+em.splane()                                      # the conventional summary plot
+res.mode_shape_plot(mode)                        # the rotor-speed dial
+```
+
+Each plot takes and returns an `Axes`, so two runs go side by side in one
+figure. A complete annotated walkthrough ships with the package under
 `examples/eigenanalysis/`.
+
+Results made anywhere else are read the same way, including a `.ssa` archive
+saved from the graphical interface:
+
+```python
+res = ssa.load('run1', 'ssa')                    # three files on disk
+res, manifest = ssa.load_archive('kundur.ssa.zip')
+```
 
 **To drive your own solver instead**, `getJac()` returns the descriptor-form pair
 as SciPy sparse matrices. This is the route for systems above `$EIG_MAX_STATES`,
@@ -294,16 +316,19 @@ where the engine's dense solve is not practical and sparse shift-invert methods
 are needed:
 
 ```python
+ram = stepss.sim()
 ram.execSim(case, 0.0)
 A, E = ram.getJac()   # scipy.sparse.csc_matrix
 ram.endSim()
 ```
 
 :::note
-Both routes need `$OMEGA_REF SYN ;` and `$SCHEME DE ;` in the solver settings.
-`EIG` refuses without them, exiting 78 with the reason in the log; the `JAC`
-export skips with a warning under COI. See
-[Eigenanalysis](/user-guide/eigenanalysis/).
+The analysis needs `$OMEGA_REF SYN ;` and `$SCHEME DE ;`. `ssa.run()` supplies
+both itself, in a generated file read after the case's own data files, so a case
+of your own needs no edit. A run driven by hand still needs them: `EIG` refuses
+without them, exiting 78 with the reason in the log, and the `JAC` export skips
+with a warning under COI. See [Eigenanalysis](/user-guide/eigenanalysis/) and the
+[`stepss.ssa` reference](/python/api-reference/#stepssssa-small-signal-stability-analysis).
 :::
 
 ## Test System Examples
