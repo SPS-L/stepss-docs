@@ -100,10 +100,12 @@ is quadratic in the state count, in the same family as `$EIG_MAX_STATES`, and
 not a threshold anyone is meant to tune per analysis; see
 [`<name>_pf.dat`](#namepfdat) below.
 
-They are yours to set on the command line and from Python. The graphical
-interface's **Run small-signal stability analysis** writes both itself, into an
-extra data file read after the case's own, so a case configured for time-domain
-runs analyses without being edited. Settings are applied in the order they are
+They are yours to set on the command line and from Python, and `ssa.run()`
+above does exactly that, writing both into a generated file read last so the
+case itself needs no edit for the two settings. The graphical interface's
+**Run small-signal stability analysis** writes both itself, into an extra data
+file read after the case's own, so a case configured for time-domain runs
+analyses without being edited. Settings are applied in the order they are
 read and the last of each kind wins, which is what makes that an override rather
 than a conflict.
 
