@@ -1075,8 +1075,46 @@ res = ssa.load('run1', 'ssa')
 
 #### `ssa.load_archive(path, into=None)`
 
-Open a `.ssa` archive written by the graphical interface, in `.zip` or
-`.tar.gz`. Returns `(results, manifest)`. `res.save(path)` writes one.
+Open a `.ssa` archive, in `.zip` or `.tar.gz`, whichever interface wrote it.
+Returns `(results, manifest)`. The manifest records the run's basename, the
+engine version and the analysis time, and an archive with none, one written by
+something other than STEPSS, is refused rather than read.
+
+`into` names where to unpack; a temporary directory is used when it is omitted.
+The results are read from there and the returned `Results` goes on naming it, so
+that directory has to outlive the object.
+
+#### `ssa.save_archive(results, path, saved_by=None)`
+
+Write one run to a `.ssa` archive the graphical interface opens with **Load
+dynamic Jacobian**. `res.save(path)` is the same thing as a method.
+
+```python
+absent = res.save('kundur.ssa.zip')                 # as a method
+absent = ssa.save_archive(res, 'kundur.ssa.zip')    # or as a function
+```
+
+The format comes from the file name: `.tar.gz` or `.tgz` for a gzipped tar,
+anything else for a zip. Everything goes under one directory named for the run,
+manifest first, so unpacking by hand gives a folder rather than eight loose
+files.
+
+The return value is the member names that were **not** on disk, which for a run
+made without `jacobian=True` is the four Jacobian tables. An empty list means
+every one of the seven was archived.
+
+Two refusals worth knowing. A run whose modes file is gone is refused, because
+there is no analysis to archive. And a basename of 45 characters or more is
+refused on the tar path alone: member names would pass the 100-byte limit that
+format allows, and the resulting archive is one the Java reader mangles without
+saying so. Save as `.zip`, or shorten the basename.
+
+The archive is written through a `.part` file and moved into place, so a failure
+partway through leaves no truncated file that looks like an archive until
+someone opens it.
+
+`ssa.save` is kept as an alias for the same function, because releases 3.81.1
+and 3.81.2 shipped under that name.
 
 ---
 
