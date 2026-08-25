@@ -120,7 +120,7 @@ told what to do.
 Check with:
 
 ```sh
-grep -rniE 'ssa\(|requires matlab|R20[0-9][0-9][ab]|QZ|ARPACK|JDQR' src
+grep -rniE '\bssa\(|requires matlab|R20[0-9][0-9][ab]|QZ|ARPACK|JDQR' src
 ```
 
 It must come back empty. A bare `grep -rni matlab src` is **not** the test: it has

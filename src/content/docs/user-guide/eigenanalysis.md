@@ -59,25 +59,27 @@ Add an `EIG` event to the disturbance file:
 1.000 EIG 'ssa'
 ```
 
-or inject it from Python:
+or drive it from Python, which supplies the two solver settings itself:
 
 ```python
 import stepss
+from stepss import ssa
 
 case = stepss.cfg()
-case.addData('lf.dat')
-case.addData('dyn.dat')
-case.addData('solveroptions.dat')
-case.addDst('nothing.dst')
-case.addObs('obs.dat')
-case.addTrj('out.trj')
+case.addData("lf.dat")
+case.addData("dyn.dat")
+case.addDst("nothing.dst")
+case.addObs("obs.dat")
+case.addTrj("out.trj")
 
-ram = stepss.sim()
-ram.execSim(case, 0.0)               # pause at the operating point
-ram.addDisturb(0.001, "EIG 'ssa'")   # schedule the analysis
-ram.contSim(0.01)                    # advance past it so the event fires
-ram.endSim()
+res = ssa.run(case, basename="ssa")
+res.electromechanical().table()
+res.electromechanical().splane()
 ```
+
+See the [`stepss.ssa` reference](/python/api-reference/#stepssssa-small-signal-stability-analysis)
+for the filters, the participation and mode-shape accessors, and the archive
+both interfaces exchange.
 
 Results are computed at the instant the event fires, so where you pause
 determines what you get. Small-signal results are only meaningful at an
@@ -98,19 +100,24 @@ is quadratic in the state count, in the same family as `$EIG_MAX_STATES`, and
 not a threshold anyone is meant to tune per analysis; see
 [`<name>_pf.dat`](#namepfdat) below.
 
-They are yours to set on the command line and from Python. The graphical
-interface's **Run small-signal stability analysis** writes both itself, into an
-extra data file read after the case's own, so a case configured for time-domain
-runs analyses without being edited. Settings are applied in the order they are
+They are yours to set on the command line and from Python, and `ssa.run()`
+above does exactly that, writing both into a generated file read last so the
+case itself needs no edit for the two settings. The graphical interface's
+**Run small-signal stability analysis** writes both itself, into an extra data
+file read after the case's own, so a case configured for time-domain runs
+analyses without being edited. Settings are applied in the order they are
 read and the last of each kind wins, which is what makes that an override rather
 than a conflict.
 
 ## Output files
 
-Three files per analysis, named from the basename given to `EIG`. All are plain
-whitespace-separated text with `#` comment headers, so `numpy.loadtxt` reads
-them directly. Names are left-justified and contain no spaces, so splitting on
-whitespace is safe.
+Three files per analysis, named from the basename given to `EIG`, each starting
+with a `#` comment header. `<name>_modes.dat` is numeric throughout, so
+`numpy.loadtxt` reads it directly. `<name>_pf.dat` and `<name>_ms.dat` also
+carry a device name, written as the engine stored it rather than justified for
+splitting, so a name may carry a leading or embedded blank and splitting on
+whitespace misreads those columns silently. Both are read by fixed column
+offset instead, and `stepss.ssa` does this for you.
 
 **All three carry every mode.** Nothing the engine writes decides which modes
 are worth looking at; that is the reader's job, and both interfaces filter live
@@ -210,8 +217,9 @@ into an empty window.
 Both formats are ordinary archives that `unzip` and `tar xzf` read, and
 everything sits under one directory named for the run. The archive is also the
 only way back into the interface: results sitting loose in a directory, from a
-run made at a terminal for instance, are read by the Python API rather than by
-STEPSS GUI, which opens a run either by producing it or by loading one of these.
+run made at a terminal for instance, are read by `ssa.load()` rather than by
+STEPSS GUI, which opens a run either by producing it or by loading one of
+these.
 
 ## Degenerate modes, and why the `smp` column matters
 
