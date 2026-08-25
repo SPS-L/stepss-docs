@@ -59,25 +59,27 @@ Add an `EIG` event to the disturbance file:
 1.000 EIG 'ssa'
 ```
 
-or inject it from Python:
+or drive it from Python, which supplies the two solver settings itself:
 
 ```python
 import stepss
+from stepss import ssa
 
 case = stepss.cfg()
-case.addData('lf.dat')
-case.addData('dyn.dat')
-case.addData('solveroptions.dat')
-case.addDst('nothing.dst')
-case.addObs('obs.dat')
-case.addTrj('out.trj')
+case.addData("lf.dat")
+case.addData("dyn.dat")
+case.addDst("nothing.dst")
+case.addObs("obs.dat")
+case.addTrj("out.trj")
 
-ram = stepss.sim()
-ram.execSim(case, 0.0)               # pause at the operating point
-ram.addDisturb(0.001, "EIG 'ssa'")   # schedule the analysis
-ram.contSim(0.01)                    # advance past it so the event fires
-ram.endSim()
+res = ssa.run(case, basename="ssa")
+res.electromechanical().table()
+res.electromechanical().splane()
 ```
+
+See the [`stepss.ssa` reference](/python/api-reference/#stepssssa-small-signal-stability-analysis)
+for the filters, the participation and mode-shape accessors, and the archive
+both interfaces exchange.
 
 Results are computed at the instant the event fires, so where you pause
 determines what you get. Small-signal results are only meaningful at an
@@ -210,8 +212,9 @@ into an empty window.
 Both formats are ordinary archives that `unzip` and `tar xzf` read, and
 everything sits under one directory named for the run. The archive is also the
 only way back into the interface: results sitting loose in a directory, from a
-run made at a terminal for instance, are read by the Python API rather than by
-STEPSS GUI, which opens a run either by producing it or by loading one of these.
+run made at a terminal for instance, are read by `ssa.load()` rather than by
+STEPSS GUI, which opens a run either by producing it or by loading one of
+these.
 
 ## Degenerate modes, and why the `smp` column matters
 

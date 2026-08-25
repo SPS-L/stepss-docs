@@ -1028,6 +1028,118 @@ the window mid-run stops the redraws and leaves the run going.
 
 ---
 
+## `stepss.ssa`: Small-Signal Stability Analysis
+
+RAMSES performs the analysis itself and writes three files named from a
+basename. `stepss.ssa` drives that run and reads them back, so no parsing is
+needed.
+
+Needs RAMSES 3.79 or newer, which is what writes the v2 files this module
+reads.
+
+### Running
+
+#### `ssa.run(case, basename='ssa', t=None, workdir=None, jacobian=False, ram=None, keep_open=False)`
+
+Run one analysis and return its results. `t` is when to linearise, in
+seconds; left at `None` it defaults to the earliest instant the engine
+accepts, 0.001 s. The case is copied rather than modified, and the copy is
+given `$SCHEME DE` and `$OMEGA_REF SYN` in a generated file read last, because
+the engine refuses the analysis under either of the values a case that says
+nothing about them lands on. Anything already on disk under `basename` is
+cleared first, since the only evidence a run produced results is that its
+modes file is there afterwards.
+
+```python
+import stepss
+from stepss import ssa
+
+case = stepss.cfg('cmd.txt')
+res = ssa.run(case, basename='ssa', workdir='run1')
+res.summary()
+```
+
+Pass `jacobian=True` to write the four Jacobian tables at the instant of the
+reduction as well.
+
+#### `ssa.load(directory, basename)` and `ssa.basenames(directory)`
+
+Read a run produced anywhere, and list the runs in a directory.
+
+```python
+print(ssa.basenames('run1'))     # ['ssa']
+res = ssa.load('run1', 'ssa')
+```
+
+#### `ssa.load_archive(path)`
+
+Open a `.ssa` archive written by the graphical interface, in `.zip` or
+`.tar.gz`. Returns `(results, manifest)`. `res.save(path)` writes one.
+
+### Filtering
+
+#### `res.electromechanical(lo=0.1, hi=2.5)`
+
+The rotor band, one member of each conjugate pair, sorted by frequency.
+
+#### `res.dominant(real_limit=-1.0)`
+
+The modes whose real part is above the limit, strictly greater than. This is
+the filter that used to be a parameter of the run, and it is now a question
+asked of results already in hand: widening it costs nothing.
+
+Both return a `ModeView`, which composes and carries `.rows`, `.lam`,
+`.table()` and `.to_frame()`:
+
+```python
+res.electromechanical().dominant(-1.0).table()
+```
+
+### Reading one mode
+
+#### `res.participation(mode, floor=0.05, allow_degenerate=False)`
+
+Participation factors, largest first. `floor` is applied here, not by the
+engine: the file carries every entry above the run's own `pf_floor`, so
+lowering it shows more without re-running anything.
+
+#### `res.mode_shape(mode, allow_degenerate=False)`
+
+Each machine's rotor-speed phasor: magnitude normalised so the largest is 1,
+angle relative to that entry.
+
+Both refuse a mode whose `simple` flag is false. In a degenerate eigenspace the
+eigenvectors are not unique, so both quantities are basis-dependent and would
+come out differently on another machine.
+
+### Plotting
+
+#### `view.splane(ax=None, zeta=0.05, annotate=True, interactive=None)`
+
+The s-plane, fitted to the modes on screen. Under an interactive backend
+(`%matplotlib widget`) clicking a pole prints it, dragging a rectangle zooms,
+and a double click restores the fitted window.
+
+#### `res.mode_shape_plot(mode, ax=None)` and `res.participation_plot(mode, floor=0.05, ax=None)`
+
+The polar dial and a horizontal bar chart. Each takes and returns an `Axes`, so
+two runs go side by side in one figure.
+
+### The state matrix
+
+#### `res.state_matrix`
+
+The matrix the engine reduced, as an `(nstates, nstates)` array. It lives in
+the engine rather than in any file, so it is available on a live run only, and
+a later analysis replaces it: read it before starting the next one.
+
+#### `sim.runSsa(basename, t=None)` and `sim.getStateMatrix()`
+
+The low-level entries `ssa.run` is built on, for a caller driving the run
+themselves.
+
+---
+
 ## Complete Example
 
 ```python
