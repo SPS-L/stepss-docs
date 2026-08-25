@@ -111,10 +111,13 @@ than a conflict.
 
 ## Output files
 
-Three files per analysis, named from the basename given to `EIG`. All are plain
-whitespace-separated text with `#` comment headers, so `numpy.loadtxt` reads
-them directly. Names are left-justified and contain no spaces, so splitting on
-whitespace is safe.
+Three files per analysis, named from the basename given to `EIG`, each starting
+with a `#` comment header. `<name>_modes.dat` is numeric throughout, so
+`numpy.loadtxt` reads it directly. `<name>_pf.dat` and `<name>_ms.dat` also
+carry a device name, written as the engine stored it rather than justified for
+splitting, so a name may carry a leading or embedded blank and splitting on
+whitespace misreads those columns silently. Both are read by fixed column
+offset instead, and `stepss.ssa` does this for you.
 
 **All three carry every mode.** Nothing the engine writes decides which modes
 are worth looking at; that is the reader's job, and both interfaces filter live

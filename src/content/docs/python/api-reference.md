@@ -1037,6 +1037,8 @@ needed.
 Needs RAMSES 3.79 or newer, which is what writes the v2 files this module
 reads.
 
+---
+
 ### Running
 
 #### `ssa.run(case, basename='ssa', t=None, workdir=None, jacobian=False, ram=None, keep_open=False)`
