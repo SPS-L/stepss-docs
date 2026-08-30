@@ -1,0 +1,63 @@
+---
+title: Mailing List
+description: The STEPSS mailing list at stepss-list@googlegroups.com, how to subscribe with or without a Google account, and what belongs on it.
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+`stepss-list@googlegroups.com` is the public channel for STEPSS: release
+announcements, questions about the engines, and discussion among users. Its
+archive is open, so a question asked here is answered once and stays readable
+for everyone who later hits the same problem.
+
+## Subscribing
+
+<CardGrid>
+<LinkCard
+  title="Subscribe by email"
+  href="mailto:stepss-list+subscribe@googlegroups.com"
+  description="Send an empty message, then reply to the confirmation you receive. No Google account is required, so an institutional address works."
+/>
+<LinkCard
+  title="Subscribe on the web"
+  href="https://groups.google.com/g/stepss-list"
+  description="Open the group and press Join. This route asks you to sign in to Google, and lets you read the archive and choose digest delivery."
+/>
+</CardGrid>
+
+Both routes reach the same list. The email route is documented first because a
+Google account is not something every reader has, or wants to attach to a work
+address; the web route suits anyone who would rather read in a browser than in
+an inbox.
+
+## What belongs here
+
+The three engines are distributed as compiled binaries and their repositories
+are not public, so this list is the only place where a problem in **RAMSES**,
+**Helios** or **CODEGEN** can be reported. Such a report is most useful when it
+carries the STEPSS version, the operating system, and a case small enough for
+someone else to run.
+
+Anything with a public repository is better raised on its own issue tracker,
+where it stays attached to the code that has to change:
+
+- [stepss-java-ui](https://github.com/SPS-L/stepss-java-ui/issues) for the desktop application
+- [stepss-python-ui](https://github.com/SPS-L/stepss-python-ui/issues) for the `stepss` Python package
+- [the remaining components](/resources/repositories/) for everything else
+
+Licensing questions, including commercial use, go to the addresses on the
+[License](/getting-started/license/) page rather than to the list.
+
+:::caution[The archive is public]
+Anyone on the web can read this list, and search engines index it. Do not post
+network data, operating points or model parameters that your organisation
+treats as confidential. Reduce the case to one of the
+[bundled test systems](/test-systems/) first, or write to `stepss@sps-lab.org`
+instead.
+:::
+
+## Leaving, and reaching the owners
+
+Send an empty message to `stepss-list+unsubscribe@googlegroups.com` to leave the
+list. To reach the people who run it without writing to every subscriber, use
+`stepss-list+owner@googlegroups.com`.

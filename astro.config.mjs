@@ -158,6 +158,9 @@ export default defineConfig({
 				{
 					label: 'Resources',
 					items: [
+						// First in Resources: the list is the support channel, and the only
+						// route to the engines, whose repositories are private.
+						{ label: 'Mailing List',  slug: 'resources/mailing-list' },
 						{ label: 'Video Tutorials', slug: 'resources/videos' },
 						{ label: 'Repositories',  slug: 'resources/repositories' },
 						{ label: 'Releases',      slug: 'resources/releases' },

@@ -174,6 +174,39 @@ you find the same fact in two places, delete one and link instead. A tutorial pa
 (`quickstart`, `examples`) shows one path and links out; it does not carry
 reference tables.
 
+### The mailing list is the only support channel for the engines
+
+`stepss-list@googlegroups.com`, a public Google Group, is the project's user
+channel. Per the rule above, `resources/mailing-list.mdx` owns every fact about
+it: the address, the two subscribe routes, what belongs on it, and the mail
+commands. The Quick Links card on the landing page and the sidebar entry under
+Resources are links to that page, never second copies.
+
+Three things about it are load-bearing and easy to undo by accident.
+
+**Subscribing by email needs no Google account, which is why two routes are
+documented rather than one.** An empty message to
+`stepss-list+subscribe@googlegroups.com` subscribes any address, `+unsubscribe`
+leaves, and `+owner` reaches the owners alone. Pressing Join on the group page
+instead requires signing in to Google, which many institutional addresses cannot
+do, so do not reduce the page to the web link because one card looks tidier than
+two.
+
+**A reader who hits a solver bug has no issue tracker to open.** `stepss-ramses`,
+`stepss-helios`, `stepss-Codegen`, `stepss-pfc`, `stepss-dyngraph`,
+`stepss-license-gen`, `stepss-test-systems` and `stepss-videos` are private
+repositories; the interfaces and the packaging repositories are public. That
+split is the entire reason the page routes reports by component, and replacing
+it with a general "open an issue on GitHub" line would misdirect every report
+about the three engines a user actually runs.
+
+**The group's email footer hard-codes two URLs on this site**, the root and
+`/getting-started/license/`, and Google appends it to every message the list
+delivers. Renaming either path breaks a link in mail that has already been sent
+and in a public archive where it cannot be corrected, and nothing in this
+repository will report the breakage. Add an entry to the `redirects` block in
+`astro.config.mjs` rather than moving the page.
+
 ### Model pages follow the RAMSES code
 
 This site documents an engine it does not contain. **`stepss-ramses` is the
