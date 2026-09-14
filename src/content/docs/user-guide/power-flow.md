@@ -23,7 +23,7 @@ The additional records specific to power flow computations are documented below.
 
 Episode 3 of the [video series](/resources/videos/), *Helios in Depth*, covers this page.
 
-<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/4ggqi35HkCI" title="STEPSS Episode 3: Helios in Depth" loading="lazy" allowfullscreen allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>
+<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/gM7FrQYJ0l0" title="STEPSS Episode 3: Helios in Depth" loading="lazy" allowfullscreen allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>
 
 ## Load and Shunt Data
 

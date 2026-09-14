@@ -9,7 +9,7 @@ Solver settings control the behavior of the RAMSES simulation engine. They are s
 
 Episode 4 of the [video series](/resources/videos/), *Solvers, Tolerances and Parallelism*, covers this page.
 
-<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/AkI3k0xcRuQ" title="STEPSS Episode 4: Solvers, Tolerances and Parallelism" loading="lazy" allowfullscreen allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>
+<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/D5n5mvveT3c" title="STEPSS Episode 4: Solvers, Tolerances and Parallelism" loading="lazy" allowfullscreen allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>
 
 ## Sampling and Output
 

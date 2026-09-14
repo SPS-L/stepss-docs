@@ -27,7 +27,7 @@ the one capability carried only by the GUI.
 
 Episode 8 of the [video series](/resources/videos/), *Scripting STEPSS in Python*, covers this page.
 
-<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/Wk7kIkVsCWQ" title="STEPSS Episode 8: Scripting STEPSS in Python" loading="lazy" allowfullscreen allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>
+<div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/h0oOgTH0iJE" title="STEPSS Episode 8: Scripting STEPSS in Python" loading="lazy" allowfullscreen allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>
 
 ## Next Steps
 
