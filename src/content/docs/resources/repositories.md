@@ -15,6 +15,7 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 | [stepss-uramses](https://github.com/SPS-L/stepss-uramses) | User-defined device models framework | Fortran | Public |
 | [stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) | Reference data and validation suite for small-signal analysis | Python | Public |
 | [stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) | Visual block diagram editor for CODEGEN models | Python/JS | Public |
+| [homebrew-stepss](https://github.com/SPS-L/homebrew-stepss) | Homebrew tap that installs STEPSS GUI on macOS | Ruby | Public |
 | stepss-ramses | Core RAMSES simulation engine | Fortran | Private |
 | stepss-test-systems | Curated collection of test cases and network models | RAMSES data | Private |
 | stepss-helios | AC power-flow engine (Newton-Raphson), with a C API shared library wrapped by stepss (`stepss.helios`); releases ship CLI and C API binaries for Linux/macOS/Windows | C++ | Private |

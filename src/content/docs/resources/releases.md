@@ -41,7 +41,7 @@ The GUI also checks for new releases on startup, and **Help**, then **Check for
 updates** (`F3`) asks immediately. Whether it checks at startup is a setting in
 the **Tools** menu.
 
-## The four ways to get it
+## The ways to get it
 
 Each is set up on the [Installation](/getting-started/installation/) page; this is
 only a map of what exists.
@@ -52,6 +52,7 @@ only a map of what exists.
 | `stepss.jar` | STEPSS GUI, needing a Java you supply | Download the new one |
 | APT repository | STEPSS GUI, on Debian and Ubuntu | `apt upgrade`, with the rest of the system |
 | Scoop bucket | STEPSS GUI, on Windows | `scoop update stepss` |
+| Homebrew tap | STEPSS GUI, on macOS | `brew upgrade --cask stepss` |
 | PyPI | STEPSS in Python | `pip install --upgrade stepss` |
 
 The package-manager routes track the same releases as the installers, so which one

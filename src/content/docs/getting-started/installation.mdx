@@ -21,7 +21,7 @@ Episode 1 of the [video series](/resources/videos/), *Installation and Setup*, c
 
 ## Installing STEPSS GUI
 
-STEPSS GUI comes two ways: an **installer**, which needs nothing else on the machine, or the **`stepss.jar`** on its own, which needs a Java runtime you already have. Both are on every [release](https://github.com/SPS-L/stepss-java-ui/releases). There is also a package manager on each of the two platforms that has one, delivering the same application so that later releases arrive on their own: an **APT repository** on Debian and Ubuntu, and a **Scoop bucket** on Windows.
+STEPSS GUI comes two ways: an **installer**, which needs nothing else on the machine, or the **`stepss.jar`** on its own, which needs a Java runtime you already have. Both are on every [release](https://github.com/SPS-L/stepss-java-ui/releases). There is also a package manager on each platform, delivering the same application so that later releases arrive on their own: an **APT repository** on Debian and Ubuntu, a **Scoop bucket** on Windows, and a **Homebrew tap** on macOS.
 
 :::note[Which Linux]
 **Debian and Ubuntu are the Linux distributions STEPSS is packaged for**, from Ubuntu 24.04 and its Debian contemporary onwards, on x86-64. That is what the `.deb` and the APT repository are built and tested against, and no package is produced for any other distribution or architecture.
@@ -32,7 +32,7 @@ On anything else, including older Debian and Ubuntu releases, use **`stepss.jar`
 <Tabs>
 <TabItem label="Installer">
 
-The installers bundle a Java runtime, so **nothing else needs installing** and an existing Java on the machine is neither required nor disturbed.
+The installers bundle a Java runtime, so an existing Java on the machine is neither required nor disturbed. On Windows and Linux **nothing else needs installing**. On macOS the simulation engines also need two Homebrew packages, which the `.dmg` cannot bring with it.
 
 <LinkButton href="https://github.com/SPS-L/stepss-java-ui/releases/latest" icon="cloud-download">Go to the latest release</LinkButton>
 
@@ -40,7 +40,7 @@ The installers bundle a Java runtime, so **nothing else needs installing** and a
 
 1. Download the one for your system from the release's assets:
    - **Windows**: `STEPSS-<version>.msi`, though the **Windows (Scoop)** tab is the better route if you can use it: same application, later releases arrive on their own, and it needs no administrator rights.
-   - **macOS** (Apple Silicon): `STEPSS-<version>.dmg`
+   - **macOS** (Apple Silicon): `STEPSS-<version>.dmg`, and run `brew install gcc openblas` once, or the application opens normally and the first simulation fails. The **macOS (Homebrew)** tab is the better route if you can use it: same application, both packages come with it, and later releases arrive on their own.
    - **Linux** (Debian, Ubuntu): `stepss_<version>_amd64.deb`, though the **Debian and Ubuntu (apt)** tab is the better route if you can use it: same package, and later releases arrive on their own.
 2. Open it and follow the installer.
 3. Launch **STEPSS** from the Start menu, Applications, or your desktop's application list.
@@ -133,6 +133,35 @@ You get STEPSS on the Start menu under **Scoop Apps**, an icon on your **desktop
 - **The current release only.** The bucket serves one version. To install a specific older build, take its `.msi` from the [releases page](https://github.com/SPS-L/stepss-java-ui/releases).
 - **STEPSS is not Apache 2.0 taken as a whole**, whatever the interface's own repository says. RAMSES is proprietary and free for non-commercial use only, and Helios and CODEGEN are under Academic Public Licences. Installing through Scoop agrees to nothing, since the licence appears the first time you launch STEPSS. Read [Licensing](/getting-started/license/) before you run it, and please do not mirror the bucket's release assets: the licence granted for RAMSES is non-transferable.
 - **This is not an official Scoop bucket**, and nothing in it has been through the Scoop maintainers' review. `scoop bucket add` takes the URL above precisely because the bucket is ours rather than theirs.
+</Aside>
+
+</TabItem>
+<TabItem label="macOS (Homebrew)">
+
+STEPSS has a [Homebrew](https://brew.sh/) tap, so it installs from the command line and every later release arrives through `brew upgrade` instead of being downloaded by hand. It is the same application as the `.dmg`.
+
+**It brings what the engines need.** The simulation engines load the gfortran runtime and OpenBLAS from Homebrew, and this route installs both as dependencies. With the `.dmg` you install them yourself.
+
+```bash
+brew install --cask sps-l/stepss/stepss
+```
+
+From that point on, upgrade with the rest of your Homebrew applications:
+
+```bash
+brew upgrade --cask stepss
+```
+
+You get **STEPSS** in Applications. Remove it with `brew uninstall --cask stepss`.
+
+If STEPSS is already in Applications from a `.dmg`, move it to the Trash first: Homebrew does not overwrite an application it did not install, and stops with `It seems there is already an App at '/Applications/STEPSS.app'`.
+
+<Aside type="caution" title="What this route requires and what it is not">
+- **Apple Silicon.** There is no Intel macOS build of the engines.
+- **The current release only.** The tap serves one version. To install a specific older build, take its `.dmg` from the [releases page](https://github.com/SPS-L/stepss-java-ui/releases).
+- **A network connection the first time you open it.** The application is signed and notarized, and macOS confirms that with Apple on first launch.
+- **STEPSS is not Apache 2.0 taken as a whole**, whatever the interface's own repository says. RAMSES is proprietary and free for non-commercial use only, and Helios and CODEGEN are under Academic Public Licences. Installing through Homebrew agrees to nothing, since the licence appears the first time you launch STEPSS. Read [Licensing](/getting-started/license/) before you run it, and please do not mirror the release assets: the licence granted for RAMSES is non-transferable.
+- **This is not an official Homebrew cask**, and nothing in it has been through the Homebrew maintainers' review. Naming the cask in full, as the command above does, is what tells Homebrew you trust it.
 </Aside>
 
 </TabItem>
@@ -242,6 +271,9 @@ macOS ships no Fortran compiler, so it comes from [Homebrew](https://brew.sh/):
 ```bash
 brew install gcc openblas
 ```
+
+Installing STEPSS through [Homebrew](#installing-stepss-gui) brings both with
+it, so on that route they are already there.
 
 Apple Silicon only; Intel Macs are not supported.
 
