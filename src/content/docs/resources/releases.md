@@ -49,7 +49,6 @@ only a map of what exists.
 | Channel | Gets you | Updates |
 |---|---|---|
 | Platform installer | STEPSS GUI with its own Java | Download the new one |
-| `stepss.jar` | STEPSS GUI, needing a Java you supply | Download the new one |
 | APT repository | STEPSS GUI, on Debian and Ubuntu | `apt upgrade`, with the rest of the system |
 | Scoop bucket | STEPSS GUI, on Windows | `scoop update stepss` |
 | Homebrew tap | STEPSS GUI, on macOS | `brew upgrade --cask stepss` |

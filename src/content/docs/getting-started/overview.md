@@ -66,7 +66,7 @@ two editions, which drive the same engines and read the same data files:
 
 | Edition | Distributed as | Use it for |
 |---|---|---|
-| **STEPSS GUI** | a desktop application: an installer for Windows, macOS or Linux, or `stepss.jar` | Interactive work: load a network, run it, plot curves, build models |
+| **STEPSS GUI** | a desktop application: an installer for Windows, macOS or Linux | Interactive work: load a network, run it, plot curves, build models |
 | **STEPSS in Python** | the `stepss` package, `pip install stepss` | Scripting, parameter sweeps, and the scientific Python stack |
 
 Neither edition wraps the other. Both are front ends onto the same Fortran
@@ -173,7 +173,7 @@ first steps for each.
 
 | Feature | Details |
 |---------|---------|
-| **STEPSS GUI** | Windows, Linux and macOS (Apple Silicon), 64-bit Java 11 or later |
+| **STEPSS GUI** | Windows, Linux and macOS (Apple Silicon), Java bundled |
 | **stepss** | Windows, Linux and macOS (Apple Silicon), Python 3.x |
 | **Command-line executables** | Windows, Linux and macOS (Apple Silicon) for ramses, helios, codegen and dyngraph |
 | **Custom model compilation** | gfortran, GNU make and OpenBLAS (MSYS2 on Windows) |

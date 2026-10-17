@@ -21,12 +21,10 @@ Episode 1 of the [video series](/resources/videos/), *Installation and Setup*, c
 
 ## Installing STEPSS GUI
 
-STEPSS GUI comes two ways: an **installer**, which brings its own Java, or the **`stepss.jar`** on its own, which needs a Java runtime you already have. Both are on every [release](https://github.com/SPS-L/stepss-java-ui/releases). There is also a package manager on each platform, delivering the same application so that later releases arrive on their own: an **APT repository** on Debian and Ubuntu, a **Scoop bucket** on Windows, and a **Homebrew tap** on macOS.
+STEPSS GUI comes as an **installer**, which brings its own Java, on every [release](https://github.com/SPS-L/stepss-java-ui/releases). There is also a package manager on each platform, delivering the same application so that later releases arrive on their own: an **APT repository** on Debian and Ubuntu, a **Scoop bucket** on Windows, and a **Homebrew tap** on macOS.
 
 :::note[Which Linux]
 **Debian and Ubuntu are the Linux distributions STEPSS is packaged for**, from Ubuntu 24.04 and its Debian contemporary onwards, on x86-64. That is what the `.deb` and the APT repository are built and tested against, and no package is produced for any other distribution or architecture.
-
-On anything else, including older Debian and Ubuntu releases, use **`stepss.jar`**. It needs a 64-bit Java 11 or later and nothing else, and it carries the same engines. It is not tested there, but nothing in it is Debian-specific.
 :::
 
 <Tabs>
@@ -47,7 +45,7 @@ The installers bundle a Java runtime, so an existing Java on the machine is neit
 
 </Steps>
 
-On Linux, install the `.deb` with `sudo apt install ./stepss_<version>_amd64.deb` rather than `dpkg -i`, so that the libraries it needs are pulled in with it. It requires **Ubuntu 24.04 or newer**, or a Debian of the same vintage or later; on an older release, use the jar.
+On Linux, install the `.deb` with `sudo apt install ./stepss_<version>_amd64.deb` rather than `dpkg -i`, so that the libraries it needs are pulled in with it. It requires **Ubuntu 24.04 or newer**, or a Debian of the same vintage or later.
 
 Uninstall the way you would any other application on your system: Add or Remove Programs on Windows, dragging it to the Trash on macOS, `sudo apt remove stepss` on Debian and Ubuntu.
 
@@ -163,35 +161,6 @@ If STEPSS is already in Applications from a `.dmg`, move it to the Trash first: 
 - **STEPSS is not Apache 2.0 taken as a whole**, whatever the interface's own repository says. RAMSES is proprietary and free for non-commercial use only, and Helios and CODEGEN are under Academic Public Licences. Installing through Homebrew agrees to nothing, since the licence appears the first time you launch STEPSS. Read [Licensing](/getting-started/license/) before you run it, and please do not mirror the release assets: the licence granted for RAMSES is non-transferable.
 - **This is not an official Homebrew cask**, and nothing in it has been through the Homebrew maintainers' review. Naming the cask in full, as the command above does, is what tells Homebrew you trust it.
 </Aside>
-
-</TabItem>
-<TabItem label="Just the jar">
-
-The jar is a single file that leaves nothing behind: it unpacks what it needs into a temporary folder at launch, and deleting the file removes STEPSS entirely. It needs a **64-bit Java Runtime Environment, version 11 or later** already on the machine. Any recent JRE or JDK will do, and there is no need to remove a Java you already have as long as it meets that minimum.
-
-<LinkButton href="https://github.com/SPS-L/stepss-java-ui/releases/latest/download/stepss.jar" icon="cloud-download">Download stepss.jar</LinkButton>
-
-<Steps>
-
-1. **Check for Java**. At a command prompt:
-   ```bash
-   java -version
-   ```
-   If that reports a 64-bit Java 11 or later, skip the next step.
-
-2. **Install Java** if it did not: a 64-bit JDK from [Adoptium](https://adoptium.net/) or [oracle.com](https://www.oracle.com/java/technologies/downloads/).
-
-3. **Put the jar** wherever is convenient. Do not uncompress it.
-
-4. **Launch it**, by double-clicking or with:
-   ```bash
-   java -jar stepss.jar
-   ```
-   On Windows, if a double-click does nothing, right-click the jar, choose "Open with", and point it at Java.
-
-</Steps>
-
-The jar installs nothing alongside itself and needs nothing installed for plotting: STEPSS draws its own curves, during a run and after one.
 
 </TabItem>
 </Tabs>
