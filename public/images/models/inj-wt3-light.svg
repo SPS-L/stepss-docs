@@ -15,7 +15,7 @@
 <text x="850.0" y="78.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">REGC_A</text>
 <path d="M 940 67 L 1040 67" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
 <text x="1048" y="72" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#23262f">ix, iy</text>
-<text x="14" y="282" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#23262f">Wind speed</text>
+<text x="14" y="282" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#23262f">Pmo = Pe0</text>
 <path d="M 112 277 L 140 277" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
 <rect x="140" y="250" width="180" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>
 <text x="230.0" y="273.5" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="12" fill="#23262f">Aerodynamic rotor</text>
@@ -32,7 +32,7 @@
 <path d="M 540 94 L 540 250" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
 <text x="552" y="178" text-anchor="start" font-family="JetBrains Mono, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#4b5162">Te</text>
 <path d="M 900 277 L 1010 277 L 1010 160 L 600 160 L 600 94" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
-<text x="806" y="152" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" fill="#4b5162" font-style="italic">Te,ref from the speed-power table</text>
+<text x="806" y="152" text-anchor="middle" font-family="Inter, -apple-system, Segoe UI, Helvetica, Arial, sans-serif" font-size="11" fill="#4b5162" font-style="italic">Pref (torque order; times &#969;g when PFlag = 1)</text>
 <circle cx="650" cy="277" r="2.6" fill="#4b5162"/>
 <path d="M 650 277 L 650 407 L 580 407" fill="none" stroke="#4b5162" stroke-width="1.3" marker-end="url(#arrow)"/>
 <rect x="380" y="380" width="200" height="54" rx="4" fill="#f2f4f8" stroke="#b6becd" stroke-width="1.2"/>

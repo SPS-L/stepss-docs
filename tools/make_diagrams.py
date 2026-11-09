@@ -1267,7 +1267,7 @@ def inj_wt3(t):
     c.label(1048, ey + 5, "ix, iy", anchor="start", mono=True, size=13)
 
     my = 277
-    c.label(14, my + 5, "Wind speed", anchor="start", mono=True, size=12)
+    c.label(14, my + 5, "Pmo = Pe0", anchor="start", mono=True, size=12)
     c.arrow(112, my, 140, my)
     c.box(140, 250, 180, 54, ["Aerodynamic rotor", "WTGAR_A"], size=12)
     c.arrow(320, my, 380, my)
@@ -1280,9 +1280,9 @@ def inj_wt3(t):
     c.path("M 540 94 L 540 250", arrow=True)
     c.label(552, 178, "Te", anchor="start", mono=True, size=12, muted=True)
 
-    # the speed-power characteristic sets the active power order
+    # the torque controller's output is the active power (torque) reference
     c.path("M 900 277 L 1010 277 L 1010 160 L 600 160 L 600 94", arrow=True)
-    c.label(806, 152, "Te,ref from the speed-power table", size=11, muted=True, italic=True)
+    c.label(806, 152, "Pref (torque order; times &#969;g when PFlag = 1)", size=11, muted=True, italic=True)
 
     # and the same speed drives the pitch
     c.dot(650, my)
@@ -1309,11 +1309,14 @@ def inj_wt4(t):
     c.label(1178, ey + 5, "ix, iy", anchor="start", mono=True, size=13)
 
     my = 257
-    c.label(452, my + 5, "Tm", anchor="start", mono=True, size=12)
-    c.arrow(500, my, 630, my)
+    c.label(400, my + 5, "Tmo = Pe0/wo", anchor="start", mono=True, size=12)
+    c.arrow(520, my, 630, my)
     c.box(630, 230, 240, 54, ["Two-mass drivetrain", "WTGT_A"], size=12)
     c.arrow(870, my, 970, my)
     c.label(978, my + 5, "&#969;g", anchor="start", mono=True, size=13)
+    # with PFlag = 1 the power order is Pref times the generator speed
+    c.path("M 920 257 L 920 160 L 790 160 L 790 94", arrow=True)
+    c.label(932, 168, "&#969;g (PFlag = 1)", anchor="start", size=11, muted=True, italic=True)
     c.path("M 710 94 L 710 230", arrow=True)
     c.label(722, 168, "Te", anchor="start", mono=True, size=12, muted=True)
     c.label(680, 330, "There is no pitch controller or aerodynamic rotor: all the power "
