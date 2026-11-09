@@ -217,13 +217,32 @@ $T_LOAD_REST time(s) ;
 
 ### Network Frequency Update
 
-Update network elements (admittances) with frequency:
-
-<img src="/images/freq_upd_vminmax.svg" alt="Network frequency update model" style="width:60%" />
+Rescale the network admittances with the frequency of the island they belong to:
 
 ```
 $NET_FREQ_UPD T/F ;
 ```
+
+Default: `F`. With `F`, every admittance is computed once at the nominal frequency $f_N$, which is the usual quasi-static phasor assumption. With `T`, each network element is rescaled at every time step with the per-unit center-of-inertia speed of its island,
+
+$$
+\nu = \frac{\omega_{COI}}{\omega_N},
+$$
+
+taken from the previous time step. The rescaling applies under both reference frames, `$OMEGA_REF SYN` and `$OMEGA_REF COI`. An inductive reactance $X = \omega L$ and a capacitive susceptance $B = \omega C$ grow with frequency, a capacitive reactance $X = -1/(\omega C)$ and an inductive susceptance $B = -1/(\omega L)$ shrink with it, and resistances are unchanged:
+
+| Element | Nominal value | Value at speed $\nu$ |
+|---|---|---|
+| Series reactance of a line or transformer, inductive ($X > 0$) | $X$ | $\nu X$ |
+| Series reactance of a line or transformer, capacitive ($X < 0$) | $X$ | $X/\nu$ |
+| Shunt susceptance of a branch end or a `SHUNT`, capacitive ($B > 0$) | $B$ | $\nu B$ |
+| Shunt susceptance of a branch end or a `SHUNT`, inductive ($B < 0$) | $B$ | $B/\nu$ |
+| Reactance of an `IMPLOAD`, inductive ($X > 0$) | $X$ | $\nu X$ |
+| Reactance of an `IMPLOAD`, capacitive ($X < 0$) | $X$ | $X/\nu$ |
+
+A series admittance $g + jb$ is converted to $R + jX$ with $R = g/(g^2+b^2)$ and $X = -b/(g^2+b^2)$, its reactance is rescaled, and the result is converted back, so the resistance of a branch stays at its nominal value. The origin side of a branch uses the speed of the island of its origin bus, and the extremity side that of its extremity bus.
+
+The branch flows reported as observables, shown in the run-time display, and read by discrete controllers are computed with the same rescaled admittances, so they always agree with the network solution. The network Jacobian keeps the nominal admittances; this affects the Newton iterations only, not the converged solution.
 
 ## Parallel Computing
 
