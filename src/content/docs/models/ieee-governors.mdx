@@ -137,23 +137,124 @@ $$
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-SYNC_MACH g1  g1  1. 1.  0.  0.   600. 570. 6. 0. 2.05
-                    XT   0.15  2.2  0.3   0.2   2.   0.4  0.2  0.1  6.0257  0.  7.00  0.05  1.5  0.05
-              EXC GENERIC1   3.0618 -0.1  1.  0.  100. -1. -20.0  10.  120. 5.  12.5 0.1  0.  5.
-                                1     75.   15.    0.22    0.012     0.22    0.012    -0.1    0.1
-              TOR DEGOV1  0      ! SWM: 0 = torque input, 1 = power input
-                          0.02   ! T1: governor lead time constant (s)
-                          0.02   ! T2: governor lag time constant (s)
-                          0.20   ! T3: governor second-order denominator (s)
-                          1.0    ! K: actuator gain
-                          0.25   ! T4: actuator lead time constant (s)
-                          0.009  ! T5: first-order actuator lag (s)
-                          0.038  ! T6: actuator lag time constant (s)
-                          0.0    ! TMIN: minimum fuel/torque limit (pu)
-                          1.05   ! TMAX: maximum fuel/torque limit (pu)
-                          0.01   ! TD: engine dead time (s)
-                          0.05   ! R: speed droop (pu/pu)
-                          0.05 ; ! TE: engine time constant (s)
+SYNC_MACH  g1  g1
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
+      600.
+      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
+      570.
+      # H: Inertia constant (s)
+      6.
+      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
+      0.
+      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
+      2.05
+      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
+      XT
+      # Xl: Leakage reactance L_l (pu)
+      0.15
+      # Xd: d-axis synchronous reactance (pu)
+      2.2
+      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
+      0.3
+      # X"d: d-axis subtransient reactance (pu)
+      0.2
+      # Xq: q-axis synchronous reactance (pu)
+      2.
+      # X'q: q-axis transient reactance (pu)
+      0.4
+      # X"q: q-axis subtransient reactance (pu)
+      0.2
+      # m: Saturation coefficient (set to 0 to neglect saturation)
+      0.1
+      # n: Saturation exponent (ignored when m = 0)
+      6.0257
+      # Ra: Armature resistance (pu)
+      0.
+      # T'do: d-axis open-circuit transient time constant (s)
+      7.00
+      # T"do: d-axis open-circuit subtransient time constant (s)
+      0.05
+      # T'qo: q-axis open-circuit transient time constant (s)
+      1.5
+      # T"qo: q-axis open-circuit subtransient time constant (s)
+      0.05
+EXC  GENERIC1
+      # IFLIM: OEL field current threshold (pu)
+      3.0618
+      # d: OEL timer band, usually negative: timer runs down at rate 1 below IFLIM+d, holds between IFLIM+d and IFLIM (pu)
+      -0.1
+      # f: OEL timer charging rate offset above IFLIM
+      1.
+      # S: OEL timer charging rate per unit of field overcurrent (1/pu)
+      0.
+      # K1: Not used by the code
+      100.
+      # K2: OEL gain on (if - IFLIM), negative so that the OEL lowers excitation (pu/pu)
+      -1.
+      # L1: OEL timer lower limit and initial value, negative; the OEL acts when the timer exceeds 0 (s)
+      -20.0
+      # L2: OEL timer upper limit (s)
+      10.
+      # G: AVR gain (pu/pu)
+      120.
+      # TA: AVR lead time constant (s)
+      5.
+      # TB: AVR lag time constant (s)
+      12.5
+      # TE: Exciter time constant (s)
+      0.1
+      # L3: Minimum field voltage (pu)
+      0.
+      # L4: Maximum field voltage (pu)
+      5.
+      # SPEEDIN: PSS input weight: 1 = speed, 0 = active power
+      1
+      # KPSS: PSS gain, derivative washout KPSS s/(1+sTw); 0 disables PSS (pu s)
+      75.
+      # Tw: PSS washout time constant (s)
+      15.
+      # T1: PSS first lead-lag numerator time constant (s)
+      0.22
+      # T2: PSS first lead-lag denominator time constant (s)
+      0.012
+      # T3: PSS second lead-lag numerator time constant (s)
+      0.22
+      # T4: PSS second lead-lag denominator time constant (s)
+      0.012
+      # DVMIN: PSS output lower limit (pu)
+      -0.1
+      # DVMAX: PSS output upper limit (pu)
+      0.1
+TOR  DEGOV1
+      # SWM: droop feedback switch, 0 = actuator output, 1 = electrical power
+      0
+      # T1: control box denominator time constant (s term) (s)
+      0.02
+      # T2: control box second time constant, s2 coefficient T1*T2; ignored if T1*T2 < 0.005 (s)
+      0.02
+      # T3: control box lead time constant (s)
+      0.20
+      # K: actuator gain; the actuator is K(1+sT4)/(s(1+sT5)(1+sT6)) (1/s)
+      1.0
+      # T4: actuator lead time constant (s)
+      0.25
+      # T5: actuator lag time constant (s)
+      0.009
+      # T6: actuator lead-lag denominator time constant (s)
+      0.038
+      # TMIN: minimum actuator output (pu)
+      0.0
+      # TMAX: maximum actuator output (pu)
+      1.05
+      # TD: engine dead time, Pade approximation; second order only if TD >= 0.245 s (s)
+      0.01
+      # R: speed droop (pu)
+      0.05
+      # TE: electrical power measurement time constant (s)
+      0.05
+;
 ```
 </TabItem>
 <TabItem label="Notes">
@@ -222,16 +323,110 @@ $$
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-SYNC_MACH g1  g1  1. 1.  0.  0.   400. 360. 6. 0. 2.05
-                    XT   0.15  2.2  0.3   0.2   2.   0.4  0.2  0.1  6.0257  0.  7.00  0.05  1.5  0.05
-              EXC GENERIC1   3.0618 -0.1  1.  0.  100. -1. -20.0  10.  120. 5.  12.5 0.1  0.  5.
-                                1     75.   15.    0.22    0.012     0.22    0.012    -0.1    0.1
-              TOR ENTSOE_simp  0.05   ! R: permanent droop (pu/pu)
-                               0.50   ! T1: governor/valve time constant (s)
-                               0.0    ! VMIN: minimum valve position (pu)
-                               1.1    ! VMAX: maximum valve position (pu)
-                               0.0    ! T2: turbine lead time constant (s)
-                               10.0 ; ! T3: turbine lag time constant (s)
+SYNC_MACH  g1  g1
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
+      400.
+      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
+      360.
+      # H: Inertia constant (s)
+      6.
+      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
+      0.
+      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
+      2.05
+      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
+      XT
+      # Xl: Leakage reactance L_l (pu)
+      0.15
+      # Xd: d-axis synchronous reactance (pu)
+      2.2
+      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
+      0.3
+      # X"d: d-axis subtransient reactance (pu)
+      0.2
+      # Xq: q-axis synchronous reactance (pu)
+      2.
+      # X'q: q-axis transient reactance (pu)
+      0.4
+      # X"q: q-axis subtransient reactance (pu)
+      0.2
+      # m: Saturation coefficient (set to 0 to neglect saturation)
+      0.1
+      # n: Saturation exponent (ignored when m = 0)
+      6.0257
+      # Ra: Armature resistance (pu)
+      0.
+      # T'do: d-axis open-circuit transient time constant (s)
+      7.00
+      # T"do: d-axis open-circuit subtransient time constant (s)
+      0.05
+      # T'qo: q-axis open-circuit transient time constant (s)
+      1.5
+      # T"qo: q-axis open-circuit subtransient time constant (s)
+      0.05
+EXC  GENERIC1
+      # IFLIM: OEL field current threshold (pu)
+      3.0618
+      # d: OEL timer band, usually negative: timer runs down at rate 1 below IFLIM+d, holds between IFLIM+d and IFLIM (pu)
+      -0.1
+      # f: OEL timer charging rate offset above IFLIM
+      1.
+      # S: OEL timer charging rate per unit of field overcurrent (1/pu)
+      0.
+      # K1: Not used by the code
+      100.
+      # K2: OEL gain on (if - IFLIM), negative so that the OEL lowers excitation (pu/pu)
+      -1.
+      # L1: OEL timer lower limit and initial value, negative; the OEL acts when the timer exceeds 0 (s)
+      -20.0
+      # L2: OEL timer upper limit (s)
+      10.
+      # G: AVR gain (pu/pu)
+      120.
+      # TA: AVR lead time constant (s)
+      5.
+      # TB: AVR lag time constant (s)
+      12.5
+      # TE: Exciter time constant (s)
+      0.1
+      # L3: Minimum field voltage (pu)
+      0.
+      # L4: Maximum field voltage (pu)
+      5.
+      # SPEEDIN: PSS input weight: 1 = speed, 0 = active power
+      1
+      # KPSS: PSS gain, derivative washout KPSS s/(1+sTw); 0 disables PSS (pu s)
+      75.
+      # Tw: PSS washout time constant (s)
+      15.
+      # T1: PSS first lead-lag numerator time constant (s)
+      0.22
+      # T2: PSS first lead-lag denominator time constant (s)
+      0.012
+      # T3: PSS second lead-lag numerator time constant (s)
+      0.22
+      # T4: PSS second lead-lag denominator time constant (s)
+      0.012
+      # DVMIN: PSS output lower limit (pu)
+      -0.1
+      # DVMAX: PSS output upper limit (pu)
+      0.1
+TOR  ENTSOE_simp
+      # R: permanent speed droop (pu)
+      0.05
+      # T1: governor valve time constant (s)
+      0.50
+      # VMIN: minimum valve position (pu)
+      0.0
+      # VMAX: maximum valve position (pu)
+      1.1
+      # T2: turbine lead time constant (s)
+      0.0
+      # T3: turbine lag time constant (s)
+      10.0
+;
 ```
 </TabItem>
 <TabItem label="Notes">
@@ -324,19 +519,116 @@ $$
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-SYNC_MACH g1  g1  1. 1.  0.  0.   400. 360. 6. 0. 2.05
-                    XT   0.15  2.2  0.3   0.2   2.   0.4  0.2  0.1  6.0257  0.  7.00  0.05  1.5  0.05
-              EXC GENERIC1   3.0618 -0.1  1.  0.  100. -1. -20.0  10.  120. 5.  12.5 0.1  0.  5.
-                                1     75.   15.    0.22    0.012     0.22    0.012    -0.1    0.1
-              TOR GAST  0.05   ! R: permanent droop (pu/pu)
-                        0.40   ! T1: governor/valve time constant (s)
-                        0.10   ! T2: compressor discharge time constant (s)
-                        3.00   ! T3: exhaust temperature lag (s)
-                        1.00   ! AT: ambient temperature load limit (pu)
-                        2.50   ! KT: temperature control loop gain
-                        1.05   ! VMAX: maximum valve position (pu)
-                        0.0    ! VMIN: minimum valve position (pu)
-                        0.0  ; ! DTURB: turbine damping factor
+SYNC_MACH  g1  g1
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
+      400.
+      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
+      360.
+      # H: Inertia constant (s)
+      6.
+      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
+      0.
+      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
+      2.05
+      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
+      XT
+      # Xl: Leakage reactance L_l (pu)
+      0.15
+      # Xd: d-axis synchronous reactance (pu)
+      2.2
+      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
+      0.3
+      # X"d: d-axis subtransient reactance (pu)
+      0.2
+      # Xq: q-axis synchronous reactance (pu)
+      2.
+      # X'q: q-axis transient reactance (pu)
+      0.4
+      # X"q: q-axis subtransient reactance (pu)
+      0.2
+      # m: Saturation coefficient (set to 0 to neglect saturation)
+      0.1
+      # n: Saturation exponent (ignored when m = 0)
+      6.0257
+      # Ra: Armature resistance (pu)
+      0.
+      # T'do: d-axis open-circuit transient time constant (s)
+      7.00
+      # T"do: d-axis open-circuit subtransient time constant (s)
+      0.05
+      # T'qo: q-axis open-circuit transient time constant (s)
+      1.5
+      # T"qo: q-axis open-circuit subtransient time constant (s)
+      0.05
+EXC  GENERIC1
+      # IFLIM: OEL field current threshold (pu)
+      3.0618
+      # d: OEL timer band, usually negative: timer runs down at rate 1 below IFLIM+d, holds between IFLIM+d and IFLIM (pu)
+      -0.1
+      # f: OEL timer charging rate offset above IFLIM
+      1.
+      # S: OEL timer charging rate per unit of field overcurrent (1/pu)
+      0.
+      # K1: Not used by the code
+      100.
+      # K2: OEL gain on (if - IFLIM), negative so that the OEL lowers excitation (pu/pu)
+      -1.
+      # L1: OEL timer lower limit and initial value, negative; the OEL acts when the timer exceeds 0 (s)
+      -20.0
+      # L2: OEL timer upper limit (s)
+      10.
+      # G: AVR gain (pu/pu)
+      120.
+      # TA: AVR lead time constant (s)
+      5.
+      # TB: AVR lag time constant (s)
+      12.5
+      # TE: Exciter time constant (s)
+      0.1
+      # L3: Minimum field voltage (pu)
+      0.
+      # L4: Maximum field voltage (pu)
+      5.
+      # SPEEDIN: PSS input weight: 1 = speed, 0 = active power
+      1
+      # KPSS: PSS gain, derivative washout KPSS s/(1+sTw); 0 disables PSS (pu s)
+      75.
+      # Tw: PSS washout time constant (s)
+      15.
+      # T1: PSS first lead-lag numerator time constant (s)
+      0.22
+      # T2: PSS first lead-lag denominator time constant (s)
+      0.012
+      # T3: PSS second lead-lag numerator time constant (s)
+      0.22
+      # T4: PSS second lead-lag denominator time constant (s)
+      0.012
+      # DVMIN: PSS output lower limit (pu)
+      -0.1
+      # DVMAX: PSS output upper limit (pu)
+      0.1
+TOR  GAST
+      # R: permanent speed droop (pu)
+      0.05
+      # T1: fuel valve time constant (s)
+      0.40
+      # T2: fuel system time constant (s)
+      0.10
+      # T3: load limit (exhaust temperature) time constant (s)
+      3.00
+      # AT: ambient temperature load limit (pu)
+      1.00
+      # KT: temperature limiter gain
+      2.50
+      # VMAX: maximum valve position (pu)
+      1.05
+      # VMIN: minimum valve position (pu)
+      0.0
+      # DTURB: turbine damping (pu)
+      0.0
+;
 ```
 </TabItem>
 <TabItem label="Notes">
@@ -413,17 +705,112 @@ $$
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-SYNC_MACH g1  g1  1. 1.  0.  0.   400. 360. 6. 0. 2.05
-                    XT   0.15  2.2  0.3   0.2   2.   0.4  0.2  0.1  6.0257  0.  7.00  0.05  1.5  0.05
-              EXC GENERIC1   3.0618 -0.1  1.  0.  100. -1. -20.0  10.  120. 5.  12.5 0.1  0.  5.
-                                1     75.   15.    0.22    0.012     0.22    0.012    -0.1    0.1
-              TOR TGOV1  0.05   ! R: permanent droop (pu/pu)
-                          0.50   ! T1: steam chest/valve actuator time constant (s)
-                          1.05   ! VMAX: maximum valve position (pu)
-                          0.0    ! VMIN: minimum valve position (pu)
-                          2.10   ! T2: lead time constant, reheater zero (s)
-                          7.00   ! T3: lag time constant, reheater pole (s)
-                          0.0  ; ! Dt: turbine damping coefficient
+SYNC_MACH  g1  g1
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
+      400.
+      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
+      360.
+      # H: Inertia constant (s)
+      6.
+      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
+      0.
+      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
+      2.05
+      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
+      XT
+      # Xl: Leakage reactance L_l (pu)
+      0.15
+      # Xd: d-axis synchronous reactance (pu)
+      2.2
+      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
+      0.3
+      # X"d: d-axis subtransient reactance (pu)
+      0.2
+      # Xq: q-axis synchronous reactance (pu)
+      2.
+      # X'q: q-axis transient reactance (pu)
+      0.4
+      # X"q: q-axis subtransient reactance (pu)
+      0.2
+      # m: Saturation coefficient (set to 0 to neglect saturation)
+      0.1
+      # n: Saturation exponent (ignored when m = 0)
+      6.0257
+      # Ra: Armature resistance (pu)
+      0.
+      # T'do: d-axis open-circuit transient time constant (s)
+      7.00
+      # T"do: d-axis open-circuit subtransient time constant (s)
+      0.05
+      # T'qo: q-axis open-circuit transient time constant (s)
+      1.5
+      # T"qo: q-axis open-circuit subtransient time constant (s)
+      0.05
+EXC  GENERIC1
+      # IFLIM: OEL field current threshold (pu)
+      3.0618
+      # d: OEL timer band, usually negative: timer runs down at rate 1 below IFLIM+d, holds between IFLIM+d and IFLIM (pu)
+      -0.1
+      # f: OEL timer charging rate offset above IFLIM
+      1.
+      # S: OEL timer charging rate per unit of field overcurrent (1/pu)
+      0.
+      # K1: Not used by the code
+      100.
+      # K2: OEL gain on (if - IFLIM), negative so that the OEL lowers excitation (pu/pu)
+      -1.
+      # L1: OEL timer lower limit and initial value, negative; the OEL acts when the timer exceeds 0 (s)
+      -20.0
+      # L2: OEL timer upper limit (s)
+      10.
+      # G: AVR gain (pu/pu)
+      120.
+      # TA: AVR lead time constant (s)
+      5.
+      # TB: AVR lag time constant (s)
+      12.5
+      # TE: Exciter time constant (s)
+      0.1
+      # L3: Minimum field voltage (pu)
+      0.
+      # L4: Maximum field voltage (pu)
+      5.
+      # SPEEDIN: PSS input weight: 1 = speed, 0 = active power
+      1
+      # KPSS: PSS gain, derivative washout KPSS s/(1+sTw); 0 disables PSS (pu s)
+      75.
+      # Tw: PSS washout time constant (s)
+      15.
+      # T1: PSS first lead-lag numerator time constant (s)
+      0.22
+      # T2: PSS first lead-lag denominator time constant (s)
+      0.012
+      # T3: PSS second lead-lag numerator time constant (s)
+      0.22
+      # T4: PSS second lead-lag denominator time constant (s)
+      0.012
+      # DVMIN: PSS output lower limit (pu)
+      -0.1
+      # DVMAX: PSS output upper limit (pu)
+      0.1
+TOR  TGOV1
+      # R: permanent speed droop (pu)
+      0.05
+      # T1: steam valve time constant (s)
+      0.50
+      # VMAX: maximum valve position (pu)
+      1.05
+      # VMIN: minimum valve position (pu)
+      0.0
+      # T2: reheater lead time constant (s)
+      2.10
+      # T3: reheater lag time constant (s)
+      7.00
+      # Dt: turbine damping (pu)
+      0.0
+;
 ```
 </TabItem>
 <TabItem label="Notes">
@@ -531,22 +918,122 @@ $$
 <Tabs>
 <TabItem label="RAMSES Data File">
 ```
-SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
-                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
-              EXC GENERIC1   1.8991 -0.1  0.  1.  100. -1. -11  10.  70.  10.  20. 0.1  0.  4.
-                                1     75.   15.    0.2    0.01     0.2    0.01    -0.1    0.1
-              TOR HYGOV  0.05   ! R: permanent droop (pu/pu)
-                         0.30   ! r: transient droop (pu/pu)
-                         5.00   ! Tr: transient droop reset time (s)
-                         0.05   ! Tf: filter time constant for speed error (s)
-                         0.20   ! Tg: gate servo time constant (s)
-                         0.20   ! VELM: gate velocity limit (pu/s)
-                         1.00   ! Gmax: maximum gate opening (pu)
-                         0.0    ! Gmin: minimum gate opening (pu)
-                         1.50   ! Tw: water starting time (s)
-                         1.10   ! At: turbine gain (pu power / pu flow)
-                         0.50   ! Dturb: turbine damping factor
-                         0.05 ; ! Qnl: no-load water flow (pu)
+SYNC_MACH  g1  g1
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
+      800.
+      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
+      760.
+      # H: Inertia constant (s)
+      3.
+      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
+      0.
+      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
+      0.95
+      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
+      XT
+      # Xl: Leakage reactance L_l (pu)
+      0.15
+      # Xd: d-axis synchronous reactance (pu)
+      1.1
+      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
+      0.25
+      # X"d: d-axis subtransient reactance (pu)
+      0.2
+      # Xq: q-axis synchronous reactance (pu)
+      0.7
+      # X'q: q-axis transient reactance (pu)
+      *
+      # X"q: q-axis subtransient reactance (pu)
+      0.2
+      # m: Saturation coefficient (set to 0 to neglect saturation)
+      0.1
+      # n: Saturation exponent (ignored when m = 0)
+      6.0257
+      # Ra: Armature resistance (pu)
+      0.
+      # T'do: d-axis open-circuit transient time constant (s)
+      5.00
+      # T"do: d-axis open-circuit subtransient time constant (s)
+      0.05
+      # T'qo: q-axis open-circuit transient time constant (s)
+      *
+      # T"qo: q-axis open-circuit subtransient time constant (s)
+      0.1
+EXC  GENERIC1
+      # IFLIM: OEL field current threshold (pu)
+      1.8991
+      # d: OEL timer band, usually negative: timer runs down at rate 1 below IFLIM+d, holds between IFLIM+d and IFLIM (pu)
+      -0.1
+      # f: OEL timer charging rate offset above IFLIM
+      0.
+      # S: OEL timer charging rate per unit of field overcurrent (1/pu)
+      1.
+      # K1: Not used by the code
+      100.
+      # K2: OEL gain on (if - IFLIM), negative so that the OEL lowers excitation (pu/pu)
+      -1.
+      # L1: OEL timer lower limit and initial value, negative; the OEL acts when the timer exceeds 0 (s)
+      -11
+      # L2: OEL timer upper limit (s)
+      10.
+      # G: AVR gain (pu/pu)
+      70.
+      # TA: AVR lead time constant (s)
+      10.
+      # TB: AVR lag time constant (s)
+      20.
+      # TE: Exciter time constant (s)
+      0.1
+      # L3: Minimum field voltage (pu)
+      0.
+      # L4: Maximum field voltage (pu)
+      4.
+      # SPEEDIN: PSS input weight: 1 = speed, 0 = active power
+      1
+      # KPSS: PSS gain, derivative washout KPSS s/(1+sTw); 0 disables PSS (pu s)
+      75.
+      # Tw: PSS washout time constant (s)
+      15.
+      # T1: PSS first lead-lag numerator time constant (s)
+      0.2
+      # T2: PSS first lead-lag denominator time constant (s)
+      0.01
+      # T3: PSS second lead-lag numerator time constant (s)
+      0.2
+      # T4: PSS second lead-lag denominator time constant (s)
+      0.01
+      # DVMIN: PSS output lower limit (pu)
+      -0.1
+      # DVMAX: PSS output upper limit (pu)
+      0.1
+TOR  HYGOV
+      # R: permanent droop (pu)
+      0.05
+      # r: temporary droop (pu)
+      0.30
+      # Tr: temporary droop reset time (s)
+      5.00
+      # Tf: filter time constant (s)
+      0.05
+      # Tg: gate servo time constant (s)
+      0.20
+      # VELM: gate velocity limit (pu/s)
+      0.20
+      # Gmax: maximum gate opening (pu)
+      1.00
+      # Gmin: minimum gate opening (pu)
+      0.0
+      # Tw: water starting time (s)
+      1.50
+      # At: turbine gain (pu)
+      1.10
+      # Dturb: turbine damping; RAMSES 3.84 adds +Dturb*(omega-1)*g to the power, so positive is destabilising (pu)
+      0.0
+      # Qnl: no-load water flow (pu)
+      0.05
+;
 ```
 </TabItem>
 <TabItem label="Notes">

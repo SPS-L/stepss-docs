@@ -31,8 +31,58 @@ LINE A-B BUS_A BUS_B 3.030.0 150.0 1400.0 1 ;     ❌ Missing space
 A record may **span multiple lines**; the semicolon indicates the end. Spanning over several lines is highly recommended for records that include many fields. Note that, depending on the text editor and its settings, a long record could appear truncated when displayed.
 
 ```
-INJEC GFOL VSC1 A 1.0 1.0 0.0 0.0 0.005 0.15 1.02 1200.0 0.005 0.15 0.573 6.0
- 0.0033 0.0333 10.0 0.002 -999.0 10.0 0.1667 50.0 0.10 0.4 0.5 1.0 -1000. -2000. 1.001 1 ;
+INJEC  GFOL  VSC1  A
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.0  1.0  0.0  0.0
+      # R: Phase reactor resistance (pu)
+      0.005
+      # L: Phase reactor inductance (pu)
+      0.15
+      # r: Ratio of the ideal connection transformer (pu/pu)
+      1.02
+      # Snom: Nominal apparent power (MVA)
+      1200.0
+      # Rc: Resistance used in compensated voltage (pu)
+      0.005
+      # Xc: Reactance used in compensated voltage (pu)
+      0.15
+      # Kp: Current control: proportional gain
+      0.573
+      # Ki: Current control: integral gain
+      6.0
+      # Tlpf: Measurement time constant (low-pass filter) (s)
+      0.0033
+      # Kpp: Active power control: proportional gain
+      0.0333
+      # Kip: Active power control: integral gain
+      10.0
+      # Trlim: Time constant of the I_d^max rate limiter (s)
+      0.002
+      # dPdt_min: Min rate of change of the d-current limit (pu/s)
+      -999.0
+      # dPdt_max: Max rate of change of the d-current limit (pu/s)
+      10.0
+      # Kpv: Reactive power control: proportional gain
+      0.1667
+      # Kiv: Reactive power control: integral gain
+      50.0
+      # tau: Response time of PLL (s)
+      0.10
+      # Vpllb: Voltage below which the PLL is blocked (pu)
+      0.4
+      # Vpllu: Voltage above which the PLL is unblocked (pu)
+      0.5
+      # Imax: Maximum current (typically 1–1.2) (pu)
+      1.0
+      # Vs1: Voltage below which dynamic reactive support starts (pu)
+      -1000.
+      # Vs2: Voltage below which reactive support is maximum and the V/Q PI is frozen (pu)
+      -2000.
+      # iqmax: Limit (±) on quadrature current component i_q1 (pu)
+      1.001
+      # vqswitch: 1 = voltage control, 0 = reactive power control (flag)
+      1
+;
 ```
 
 Some records have optional fields, which are always located at the end of the record.
@@ -65,11 +115,30 @@ There are three ways to insert comments:
 3. **After semicolon**: Anything after the `;` terminator is ignored
 
 ```
-# Example: using # comments to label fields
-#           name bus FP  FQ  P   Q    SNOM  RS    LLS LSR   RR    LLR
-INJEC INDMACH1  SM   2  0.2 0.2 0. 0. 0. 0.031 0.1 3.2 0.018 0.180
-#              H   A   B   LF
-               0.7 0.5 0.0 0.6 ;
+INJEC  INDMACH1  SM  2
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      0.2  0.2  0.  0.
+      # SNOM: Machine nominal apparent power, 0 = infer from LF (MVA)
+      0.
+      # RS: Stator resistance (pu (machine base))
+      0.031
+      # Lls: Stator leakage inductance (pu (machine base))
+      0.1
+      # LSR: Magnetizing inductance (pu (machine base))
+      3.2
+      # RR: Rotor resistance (pu (machine base))
+      0.018
+      # Llr: Rotor leakage inductance (pu (machine base))
+      0.180
+      # H: Inertia constant (s)
+      0.7
+      # A: Quadratic coefficient of load torque vs speed
+      0.5
+      # B: Linear coefficient of load torque vs speed
+      0.0
+      # LF: Load factor, initial P over SNOM, used only when SNOM = 0
+      0.6
+;
 ```
 
 Comments do not span multiple lines. If several lines are needed, each must start with `!` or `#`. Empty lines are ignored.

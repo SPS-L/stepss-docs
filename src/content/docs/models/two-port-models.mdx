@@ -151,27 +151,48 @@ The rectifier minimises $\alpha$ (advances firing) to maintain the current order
 #### Usage Example
 
 ```
-TWOP  HVDC_LCC  HVDClink  BUS_RECT  BUS_INV  S
-      0. 0. 0. 0.     ! FP/FQ/P/Q at origin (rectifier) bus
-      0. 0. 0. 0.     ! FP/FQ/P/Q at extremity (inverter) bus
-        2          ! p: bipolar
-        1          ! rec_ctl: current control
-        1          ! inv_ctl: voltage control
-        2          ! Br
-        2          ! Bi
-        200.0      ! Er (kV)
-        200.0      ! Ei (kV)
-        0.5        ! Rcr (ohm)
-        10.0       ! Xcr (ohm)
-        0.5        ! Rci (ohm)
-        10.0       ! Xci (ohm)
-        5.0        ! RL (ohm)
-        20.0       ! Rcomp (ohm)
-        0.01       ! Tp (s)
-        1.5        ! Idset (kA)
-        1.0        ! nr
-        1.0        ! ni
-        ;
+TWOP  HVDC_LCC  HVDClink  BUS_RECT  BUS_INV
+      # IND: placeholder, required but not read by RAMSES
+      S
+      # FP FQ P Q at the origin bus (first bus)
+      0.  0.  -1470.  0.
+      # FP FQ P Q at the extremity bus (second bus)
+      0.  0.  0.  0.
+      # p: Number of poles (1 = monopolar, 2 = bipolar)
+      2
+      # rec_ctl: Rectifier control mode (1=current, 2=power, −1=αmin, 3=blocked)
+      1
+      # inv_ctl: Inverter control mode (1=voltage, 2=γ, −2=γmin, −1=reduced Id, 3=blocked)
+      1
+      # Br: Number of bridges in series at rectifier
+      2
+      # Bi: Number of bridges in series at inverter
+      2
+      # Er: Rectifier open-circuit secondary voltage (at 1 pu AC) (kV)
+      200.0
+      # Ei: Inverter open-circuit secondary voltage (at 1 pu AC) (kV)
+      200.0
+      # Rcr: Rectifier commutating resistance per bridge (Ω)
+      0.5
+      # Xcr: Rectifier commutating reactance per bridge (Ω)
+      10.0
+      # Rci: Inverter commutating resistance per bridge (Ω)
+      0.5
+      # Xci: Inverter commutating reactance per bridge (Ω)
+      10.0
+      # RL: DC line series resistance (Ω)
+      5.0
+      # Rcomp: Compounding resistance for voltage control (Ω)
+      20.0
+      # Tp: Time constant for power/current order filter (s)
+      0.01
+      # Idset: Initial (and setpoint) DC current (kA)
+      1.5
+      # nr: Initial rectifier transformer ratio (pu/pu)
+      1.0
+      # ni: Initial inverter transformer ratio (pu/pu)
+      1.0
+;
 ```
 
 ---
@@ -311,29 +332,52 @@ Internal (auto-initialised) parameters: `Pref`, `Vdcref`, `Qref`, `Vacref`, `swi
 #### Usage Example
 
 ```
-TWOP  HVDC_VSC  VSC1  AC_BUS  DC_BUS  S
-      0. 0. 0. 0.     ! FP/FQ/P/Q at AC bus
-      0. 0. 0. 0.     ! FP/FQ/P/Q at DC bus
-        0.003   ! R (pu)
-        0.15    ! L (pu)
-        3.5     ! Hdc (s)
-        1000.0  ! Snom (MVA)
-        900.0   ! Pnom (MW)
-        1.0     ! Kp
-        50.0    ! Ki
-        0.0     ! Kpd
-        10.0    ! Kid
-        0.0     ! Kpq
-        20.0    ! Kiq
-        2.0     ! Kpw
-        40.0    ! Kiw
-        1.0     ! alpha1
-        0.0     ! beta1
-        1.0     ! alpha2
-        0.0     ! beta2
-        0.9     ! Vs1
-        0.5     ! Vs2
-        ;
+TWOP  HVDC_VSC  VSC1  AC_BUS  DC_BUS
+      # IND: placeholder, required but not read by RAMSES
+      S
+      # FP FQ P Q at the origin bus (first bus)
+      0.  0.  0.  0.
+      # FP FQ P Q at the extremity bus (second bus)
+      0.  0.  0.  0.
+      # R: Phase reactor resistance (pu)
+      0.003
+      # L: Phase reactor inductance (pu)
+      0.15
+      # Hdc: DC capacitor electrostatic inertia (s)
+      3.5
+      # Snom: Nominal apparent power (MVA)
+      1000.0
+      # Pnom: Nominal active power (DC side rating) (MW)
+      900.0
+      # Kp: Inner current controller proportional gain
+      1.0
+      # Ki: Inner current controller integral gain
+      50.0
+      # Kpd: Outer d-axis loop proportional gain
+      0.0
+      # Kid: Outer d-axis loop integral gain
+      10.0
+      # Kpq: Outer q-axis loop proportional gain
+      0.0
+      # Kiq: Outer q-axis loop integral gain
+      20.0
+      # Kpw: PLL proportional gain
+      2.0
+      # Kiw: PLL integral gain
+      40.0
+      # alpha1: P–V outer loop: active power coefficient
+      1.0
+      # beta1: P–V outer loop: DC voltage coefficient
+      0.0
+      # alpha2: Q–V_ac outer loop: reactive power coefficient
+      1.0
+      # beta2: Q–V_ac outer loop: AC voltage coefficient
+      0.0
+      # Vs1: AC voltage threshold for reactive support activation (pu)
+      0.9
+      # Vs2: AC voltage for full reactive support (pu)
+      0.5
+;
 ```
 
 ---
@@ -412,26 +456,46 @@ Internal (auto-initialised): `DeltaP`, `P0`, `Q0`, `Vac`, `switch`.
 #### Usage Example
 
 ```
-TWOP  HVDC_VSC_SC  VSC_SC1  AC_BUS  DC_BUS  S
-      0. 0. 0. 0.     ! FP/FQ/P/Q at AC bus
-      0. 0. 0. 0.     ! FP/FQ/P/Q at DC bus
-        0.003   ! R (pu)
-        0.15    ! L (pu)
-        3.5     ! Hdc (s)
-        1000.0  ! Snom (MVA)
-        900.0   ! Pnom (MW)
-        1.0     ! Kp
-        50.0    ! Ki
-        2.0     ! Kpp (outer P loop P gain)
-        5.0     ! Kip (outer P loop I gain)
-        10.0    ! Kwi (frequency droop gain)
-        0.0     ! Kpq
-        20.0    ! Kiq
-        2.0     ! Kpw
-        40.0    ! Kiw
-        0.9     ! Vs1
-        0.5     ! Vs2
-        ;
+TWOP  HVDC_VSC_SC  VSC_SC1  AC_BUS  DC_BUS
+      # IND: placeholder, required but not read by RAMSES
+      S
+      # FP FQ P Q at the origin bus (first bus)
+      0.  0.  0.  0.
+      # FP FQ P Q at the extremity bus (second bus)
+      0.  0.  0.  0.
+      # R: Phase reactor resistance (pu)
+      0.003
+      # L: Phase reactor inductance (pu)
+      0.15
+      # Hdc: DC capacitor electrostatic inertia (s)
+      3.5
+      # Snom: Nominal apparent power (MVA)
+      1000.0
+      # Pnom: Nominal active power (MW)
+      900.0
+      # Kp: Inner current controller proportional gain
+      1.0
+      # Ki: Inner current controller integral gain
+      50.0
+      # Kpp: Outer active power loop proportional gain
+      2.0
+      # Kip: Outer active power loop integral gain
+      5.0
+      # Kwi: Gain on the speed deviation (1 - omega) added to the active power error
+      10.0
+      # Kpq: Outer reactive power loop proportional gain
+      0.0
+      # Kiq: Outer reactive power loop integral gain
+      20.0
+      # Kpw: PLL proportional gain
+      2.0
+      # Kiw: PLL integral gain
+      40.0
+      # Vs1: AC voltage threshold for reactive support (pu)
+      0.9
+      # Vs2: AC voltage for full reactive support (pu)
+      0.5
+;
 ```
 
 ---
@@ -611,35 +675,66 @@ The offshore converter establishes the AC voltage and frequency for the wind far
 #### Usage Example
 
 ```
-TWOP  DCL_WCL  WF_HVDC  OFFSHORE_BUS  ONSHORE_BUS  S
-      0. 0. 0. 0.     ! FP/FQ/P/Q at offshore bus
-      0. 0. 0. 0.     ! FP/FQ/P/Q at onshore bus
-        0.003    ! R_1 (pu)
-        0.15     ! L_1 (pu)
-        3.5      ! Hdc_1 (s)
-        900.0    ! Snom_1 (MVA)
-        2.0      ! Kpp_1
-        5.0      ! Kip_1
-        10.0     ! Kwi_1
-        0.0      ! Kpq_1
-        20.0     ! Kiq_1
-        2.0      ! Kpw_1
-        40.0     ! Kiw_1
-        0.05     ! betaV_1
-        0.003    ! R_2 (pu)
-        0.15     ! L_2 (pu)
-        3.5      ! Hdc_2 (s)
-        900.0    ! Snom_2 (MVA)
-        0.0      ! Kpd_2
-        10.0     ! Kid_2
-        0.0      ! Kpq_2
-        20.0     ! Kiq_2
-        2.0      ! Kpw_2
-        40.0     ! Kiw_2
-        1.0      ! alpha2_2
-        0.0      ! beta2_2
-        800.0    ! Pnom (MW)
-        0.05     ! R_dc (pu)
-        1.0      ! Vdc0 (pu)
-        ;
+TWOP  DCL_WCL  WF_HVDC  OFFSHORE_BUS  ONSHORE_BUS
+      # IND: placeholder, required but not read by RAMSES
+      S
+      # FP FQ P Q at the origin bus (first bus)
+      0.  0.  0.  0.
+      # FP FQ P Q at the extremity bus (second bus)
+      0.  0.  0.  0.
+      # R_1: Phase reactor resistance (pu)
+      0.003
+      # L_1: Phase reactor inductance (pu)
+      0.15
+      # Hdc_1: DC capacitor electrostatic inertia (s)
+      3.5
+      # Snom_1: Nominal apparent power (MVA)
+      900.0
+      # Kpp_1: Outer active power loop proportional gain
+      2.0
+      # Kip_1: Outer active power loop integral gain
+      5.0
+      # Kwi_1: Speed/frequency droop gain
+      10.0
+      # Kpq_1: Outer reactive power loop proportional gain
+      0.0
+      # Kiq_1: Outer reactive power loop integral gain
+      20.0
+      # Kpw_1: PLL proportional gain
+      2.0
+      # Kiw_1: PLL integral gain
+      40.0
+      # betaV_1: QV droop slope (pu/pu)
+      0.05
+      # R_2: Phase reactor resistance (pu)
+      0.003
+      # L_2: Phase reactor inductance (pu)
+      0.15
+      # Hdc_2: DC capacitor electrostatic inertia (s)
+      3.5
+      # Snom_2: Nominal apparent power (MVA)
+      900.0
+      # Kpd_2: Outer d-axis (DC voltage) loop proportional gain
+      0.0
+      # Kid_2: Outer d-axis (DC voltage) loop integral gain
+      10.0
+      # Kpq_2: Outer q-axis (Q/Vac) loop proportional gain
+      0.0
+      # Kiq_2: Outer q-axis (Q/Vac) loop integral gain
+      20.0
+      # Kpw_2: PLL proportional gain
+      2.0
+      # Kiw_2: PLL integral gain
+      40.0
+      # alpha2_2: Q–V_ac droop: reactive power coefficient
+      1.0
+      # beta2_2: Q–V_ac droop: AC voltage coefficient
+      0.0
+      # Pnom: Nominal active power (DC link rating) (MW)
+      800.0
+      # R_dc: DC line series resistance (pu)
+      0.05
+      # Vdc0: Initial offshore DC voltage (pu)
+      1.0
+;
 ```

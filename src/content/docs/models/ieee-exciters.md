@@ -154,10 +154,98 @@ where $S_E(V_E)$ is the saturation function interpolated from the two-point satu
 #### Usage Example
 
 ```
-SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
-                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
-              EXC AC1A   0. 0. 0. 0.02 200.0 0.02 10.0 1.0 7.32 -7.32 1.0 1.0 0.03 1.0 6.03 -5.43 4.18 0.1 3.14 0.033 0.2 0.38 99999
-              TOR CONSTANT ;
+SYNC_MACH  g1  g1
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
+      800.
+      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
+      760.
+      # H: Inertia constant (s)
+      3.
+      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
+      0.
+      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
+      0.95
+      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
+      XT
+      # Xl: Leakage reactance L_l (pu)
+      0.15
+      # Xd: d-axis synchronous reactance (pu)
+      1.1
+      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
+      0.25
+      # X"d: d-axis subtransient reactance (pu)
+      0.2
+      # Xq: q-axis synchronous reactance (pu)
+      0.7
+      # X'q: q-axis transient reactance (pu)
+      *
+      # X"q: q-axis subtransient reactance (pu)
+      0.2
+      # m: Saturation coefficient (set to 0 to neglect saturation)
+      0.1
+      # n: Saturation exponent (ignored when m = 0)
+      6.0257
+      # Ra: Armature resistance (pu)
+      0.
+      # T'do: d-axis open-circuit transient time constant (s)
+      5.00
+      # T"do: d-axis open-circuit subtransient time constant (s)
+      0.05
+      # T'qo: q-axis open-circuit transient time constant (s)
+      *
+      # T"qo: q-axis open-circuit subtransient time constant (s)
+      0.1
+EXC  AC1A
+      # Kv: weight of the terminal voltage in the measured voltage |Kv V + (Rc+jXc) I|; 1 = terminal voltage
+      1.
+      # Rc: Resistance for line drop compensation
+      0.
+      # Xc: Reactance for line drop compensation
+      0.
+      # TR: Voltage transducer time constant
+      0.02
+      # KA: Voltage regulator gain
+      200.0
+      # TA: Voltage regulator time constant
+      0.02
+      # TB: Lead-lag denominator time constant
+      10.0
+      # TC: Lead-lag numerator time constant
+      1.0
+      # VAMAX: Maximum regulator output
+      7.32
+      # VAMIN: Minimum regulator output
+      -7.32
+      # KE: Exciter constant (self-excitation term)
+      1.0
+      # TE: Exciter time constant
+      1.0
+      # KF: Rate feedback gain
+      0.03
+      # TF: Rate feedback time constant
+      1.0
+      # VRMAX: upper limit of the regulator output after the UEL and OEL gates (pu)
+      6.03
+      # VRMIN: lower limit of the regulator output after the UEL and OEL gates (pu)
+      -5.43
+      # VE1: Saturation factor voltage point 1
+      4.18
+      # SE1: Saturation factor at V_E1
+      0.1
+      # VE2: Saturation factor voltage point 2
+      3.14
+      # SE2: Saturation factor at V_E2
+      0.033
+      # KC: Commutation factor (rectifier regulation)
+      0.2
+      # KD: Demagnetization factor
+      0.38
+      # VUEL: UEL signal into the high-value gate; a large negative value disables it (pu)
+      -99999
+TOR  CONSTANT
+;
 ```
 
 ---
@@ -224,10 +312,80 @@ The variable upper limit is updated algebraically at each time step, making AC4A
 #### Usage Example
 
 ```
-SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
-                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
-              EXC AC4A   0. 0. 0. 0.02 8.0 -8.0 1.0 10.0 0.0 200.0 0.015 4.44 -4.44 0.0
-              TOR CONSTANT ;
+SYNC_MACH  g1  g1
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
+      800.
+      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
+      760.
+      # H: Inertia constant (s)
+      3.
+      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
+      0.
+      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
+      0.95
+      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
+      XT
+      # Xl: Leakage reactance L_l (pu)
+      0.15
+      # Xd: d-axis synchronous reactance (pu)
+      1.1
+      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
+      0.25
+      # X"d: d-axis subtransient reactance (pu)
+      0.2
+      # Xq: q-axis synchronous reactance (pu)
+      0.7
+      # X'q: q-axis transient reactance (pu)
+      *
+      # X"q: q-axis subtransient reactance (pu)
+      0.2
+      # m: Saturation coefficient (set to 0 to neglect saturation)
+      0.1
+      # n: Saturation exponent (ignored when m = 0)
+      6.0257
+      # Ra: Armature resistance (pu)
+      0.
+      # T'do: d-axis open-circuit transient time constant (s)
+      5.00
+      # T"do: d-axis open-circuit subtransient time constant (s)
+      0.05
+      # T'qo: q-axis open-circuit transient time constant (s)
+      *
+      # T"qo: q-axis open-circuit subtransient time constant (s)
+      0.1
+EXC  AC4A
+      # Kv: weight of the terminal voltage in the measured voltage |Kv V + (Rc+jXc) I|; 1 = terminal voltage
+      1.
+      # Rc: Line drop compensation resistance
+      0.
+      # Xc: Line drop compensation reactance
+      0.
+      # TR: Measurement filter time constant
+      0.02
+      # VIMAX: Maximum input error signal
+      8.0
+      # VIMIN: Minimum input error signal
+      -8.0
+      # TC: Lead numerator time constant
+      1.0
+      # TB: Lag denominator time constant
+      10.0
+      # VUEL: UEL signal into the high-value gate; a large negative value disables it (pu)
+      -99999
+      # KA: Regulator gain
+      200.0
+      # TA: Regulator time constant
+      0.015
+      # VRMAX: Maximum output (at zero field current)
+      4.44
+      # VRMIN: Minimum output
+      -4.44
+      # KC: Field current derating factor
+      0.0
+TOR  CONSTANT
+;
 ```
 
 ---
@@ -310,10 +468,100 @@ $$\dot{V}_E = \frac{1}{T_E}(V_R - V_{FE}), \quad V_{EMIN} \le V_E \le \frac{V_{F
 #### Usage Example
 
 ```
-SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
-                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
-              EXC AC8B   0. 0. 0. 0.02 1.0 5.0 0.1 0.1 8.0 -8.0 1.0 0.1 6.5 -6.5 0.2 1.0 1.0 0.5 6.5 0.0 4.0 0.3 3.0 0.33
-              TOR CONSTANT ;
+SYNC_MACH  g1  g1
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
+      800.
+      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
+      760.
+      # H: Inertia constant (s)
+      3.
+      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
+      0.
+      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
+      0.95
+      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
+      XT
+      # Xl: Leakage reactance L_l (pu)
+      0.15
+      # Xd: d-axis synchronous reactance (pu)
+      1.1
+      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
+      0.25
+      # X"d: d-axis subtransient reactance (pu)
+      0.2
+      # Xq: q-axis synchronous reactance (pu)
+      0.7
+      # X'q: q-axis transient reactance (pu)
+      *
+      # X"q: q-axis subtransient reactance (pu)
+      0.2
+      # m: Saturation coefficient (set to 0 to neglect saturation)
+      0.1
+      # n: Saturation exponent (ignored when m = 0)
+      6.0257
+      # Ra: Armature resistance (pu)
+      0.
+      # T'do: d-axis open-circuit transient time constant (s)
+      5.00
+      # T"do: d-axis open-circuit subtransient time constant (s)
+      0.05
+      # T'qo: q-axis open-circuit transient time constant (s)
+      *
+      # T"qo: q-axis open-circuit subtransient time constant (s)
+      0.1
+EXC  AC8B
+      # Kv: weight of the terminal voltage in the measured voltage |Kv V + (Rc+jXc) I|; 1 = terminal voltage
+      1.
+      # Rc: Line drop resistance
+      0.
+      # Xc: Line drop reactance
+      0.
+      # TR: Measurement time constant
+      0.02
+      # KPR: PID proportional gain
+      1.0
+      # KIR: PID integral gain
+      5.0
+      # KDR: PID derivative gain
+      0.1
+      # TDR: PID derivative filter time constant
+      0.1
+      # VPIDMAX: RAMSES 3.84 applies this value as the LOWER limit of the PID output (pu)
+      -8.0
+      # VPIDMIN: RAMSES 3.84 applies this value as the UPPER limit of the PID output (pu)
+      8.0
+      # KA: Amplifier gain
+      1.0
+      # TA: Amplifier time constant
+      0.1
+      # VRMAX: Maximum regulator output
+      6.5
+      # VRMIN: Minimum regulator output
+      -6.5
+      # KC: Rectifier commutation factor
+      0.2
+      # KD: Demagnetization factor
+      1.0
+      # KE: Exciter self-excitation constant
+      1.0
+      # TE: Exciter time constant
+      0.5
+      # VFEMAX: Maximum field excitation voltage
+      6.5
+      # VEMIN: Minimum exciter output
+      0.0
+      # VE1: Saturation voltage point 1
+      4.0
+      # SE1: Saturation factor at V_E1
+      0.3
+      # VE2: Saturation voltage point 2
+      3.0
+      # SE2: Saturation factor at V_E2
+      0.1
+TOR  CONSTANT
+;
 ```
 
 ---
@@ -375,10 +623,80 @@ $$\dot{E}_{fd} = \frac{1}{T_E}\left[V_R - \left(K_E + S_E(E_{fd})\right) E_{fd}\
 #### Usage Example
 
 ```
-SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
-                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
-              EXC DC3A   0. 0. 0. 0.0 1.0 1.0 1.0 -1.0 0.8 1.0 3.1 0.33 2.3 0.1
-              TOR CONSTANT ;
+SYNC_MACH  g1  g1
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
+      800.
+      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
+      760.
+      # H: Inertia constant (s)
+      3.
+      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
+      0.
+      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
+      0.95
+      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
+      XT
+      # Xl: Leakage reactance L_l (pu)
+      0.15
+      # Xd: d-axis synchronous reactance (pu)
+      1.1
+      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
+      0.25
+      # X"d: d-axis subtransient reactance (pu)
+      0.2
+      # Xq: q-axis synchronous reactance (pu)
+      0.7
+      # X'q: q-axis transient reactance (pu)
+      *
+      # X"q: q-axis subtransient reactance (pu)
+      0.2
+      # m: Saturation coefficient (set to 0 to neglect saturation)
+      0.1
+      # n: Saturation exponent (ignored when m = 0)
+      6.0257
+      # Ra: Armature resistance (pu)
+      0.
+      # T'do: d-axis open-circuit transient time constant (s)
+      5.00
+      # T"do: d-axis open-circuit subtransient time constant (s)
+      0.05
+      # T'qo: q-axis open-circuit transient time constant (s)
+      *
+      # T"qo: q-axis open-circuit subtransient time constant (s)
+      0.1
+EXC  DC3A
+      # Kvcomp: weight of the terminal voltage in the measured voltage |Kv V + (Rc+jXc) I|; 1 = terminal voltage
+      1.
+      # Rc: Line drop resistance
+      0.
+      # Xc: Line drop reactance
+      0.
+      # TR: Measurement time constant
+      0.0
+      # TRH: Rheostat traversal time
+      1.0
+      # KV: voltage error band; beyond +/-KV the output is forced to VRMAX or VRMIN (pu)
+      0.05
+      # VRMAX: upper limit of the rheostat output, also the forced value when the error exceeds KV (pu)
+      5.0
+      # VRMIN: lower limit of the rheostat output, also the forced value when the error is below -KV (pu)
+      0.0
+      # TE: Exciter time constant
+      0.8
+      # KE: Exciter self-excitation constant
+      1.0
+      # E1: Saturation voltage point 1
+      3.1
+      # SE1: Saturation factor at E_1
+      0.33
+      # E2: Saturation voltage point 2
+      2.3
+      # SE2: Saturation factor at E_2
+      0.1
+TOR  CONSTANT
+;
 ```
 
 ---
@@ -486,10 +804,98 @@ $$V_F(s) = E_{fd} \cdot \frac{sK_F/T_F}{1 + sT_F}$$
 #### Usage Example
 
 ```
-SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
-                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
-              EXC ST1A   0. 0. 0. 0.02 1 -0.87 0.87 0.0 1.0 10.0 0.0 1.0 200.0 0.001 7.8 -6.7 0.038 0.0 999.0 0.0 99.0 0.0 0.0
-              TOR CONSTANT ;
+SYNC_MACH  g1  g1
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
+      800.
+      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
+      760.
+      # H: Inertia constant (s)
+      3.
+      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
+      0.
+      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
+      0.95
+      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
+      XT
+      # Xl: Leakage reactance L_l (pu)
+      0.15
+      # Xd: d-axis synchronous reactance (pu)
+      1.1
+      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
+      0.25
+      # X"d: d-axis subtransient reactance (pu)
+      0.2
+      # Xq: q-axis synchronous reactance (pu)
+      0.7
+      # X'q: q-axis transient reactance (pu)
+      *
+      # X"q: q-axis subtransient reactance (pu)
+      0.2
+      # m: Saturation coefficient (set to 0 to neglect saturation)
+      0.1
+      # n: Saturation exponent (ignored when m = 0)
+      6.0257
+      # Ra: Armature resistance (pu)
+      0.
+      # T'do: d-axis open-circuit transient time constant (s)
+      5.00
+      # T"do: d-axis open-circuit subtransient time constant (s)
+      0.05
+      # T'qo: q-axis open-circuit transient time constant (s)
+      *
+      # T"qo: q-axis open-circuit subtransient time constant (s)
+      0.1
+EXC  ST1A
+      # Kv: weight of the terminal voltage in the measured voltage |Kv V + (Rc+jXc) I|; 1 = terminal voltage
+      1.
+      # Rc: Line drop resistance
+      0.
+      # Xc: Line drop reactance
+      0.
+      # TR: Measurement filter time constant
+      0.02
+      # UEL: UEL connection mode (1=summation, 2=HV gate after V1, 3=HV gate after VA)
+      1
+      # VIMIN: Input error lower limit
+      -0.87
+      # VIMAX: Input error upper limit
+      0.87
+      # VUEL: UEL signal value
+      0.0
+      # TC: First lead-lag numerator
+      1.0
+      # TB: First lead-lag denominator
+      10.0
+      # TC1: Second lead-lag numerator
+      0.0
+      # TB1: Second lead-lag denominator
+      0.0
+      # KA: Regulator gain
+      200.0
+      # TA: Regulator time constant
+      0.001
+      # VAMIN: Regulator lower limit
+      -999.0
+      # VAMAX: Regulator upper limit
+      999.0
+      # VRMIN: Output lower limit scaling factor
+      -6.7
+      # VRMAX: Output upper limit scaling factor
+      7.8
+      # KC: Field current derating factor
+      0.038
+      # KF: Rate feedback gain
+      0.0
+      # TF: Rate feedback time constant
+      1.0
+      # KLR: Field current limiter gain
+      0.0
+      # ILR: Field current limiter reference
+      0.0
+TOR  CONSTANT
+;
 ```
 
 ---
@@ -564,10 +970,88 @@ $$\dot{E}_{fd} = \frac{1}{T_E}\left[V_R \cdot V_B - K_E \cdot E_{fd}\right], \qu
 #### Usage Example
 
 ```
-SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
-                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
-              EXC EXPIC1   0. 0. 0. 0.02 0.0 200.0 0.02 99.0 -99.0 0.0 1.0 1.0 8.0 -8.0 0.5 0.0 1.0 0.0
-              TOR CONSTANT ;
+SYNC_MACH  g1  g1
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
+      800.
+      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
+      760.
+      # H: Inertia constant (s)
+      3.
+      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
+      0.
+      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
+      0.95
+      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
+      XT
+      # Xl: Leakage reactance L_l (pu)
+      0.15
+      # Xd: d-axis synchronous reactance (pu)
+      1.1
+      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
+      0.25
+      # X"d: d-axis subtransient reactance (pu)
+      0.2
+      # Xq: q-axis synchronous reactance (pu)
+      0.7
+      # X'q: q-axis transient reactance (pu)
+      *
+      # X"q: q-axis subtransient reactance (pu)
+      0.2
+      # m: Saturation coefficient (set to 0 to neglect saturation)
+      0.1
+      # n: Saturation exponent (ignored when m = 0)
+      6.0257
+      # Ra: Armature resistance (pu)
+      0.
+      # T'do: d-axis open-circuit transient time constant (s)
+      5.00
+      # T"do: d-axis open-circuit subtransient time constant (s)
+      0.05
+      # T'qo: q-axis open-circuit transient time constant (s)
+      *
+      # T"qo: q-axis open-circuit subtransient time constant (s)
+      0.1
+EXC  EXPIC1
+      # Kvcomp: weight of the terminal voltage in the measured voltage |Kv V + (Rc+jXc) I|; 1 = terminal voltage
+      1.
+      # Rc: Compensation resistance (pu)
+      0.
+      # Xc: Compensation reactance (pu)
+      0.
+      # TR: Voltage measurement time constant (s)
+      0.02
+      # VUEL: UEL signal, lower bound of the voltage error (pu)
+      -99999
+      # KA: PI amplifier integral gain, KA(1+sTA)/s (1/s)
+      200.0
+      # TA: PI amplifier time constant (s)
+      0.02
+      # VRMAX: Maximum regulator output (pu)
+      99.0
+      # VRMIN: Minimum regulator output (pu)
+      -99.0
+      # KF: Rate feedback gain (pu)
+      0.0
+      # TF: Rate feedback time constant (s)
+      1.0
+      # KE: Exciter self-excitation constant (pu)
+      1.0
+      # EFDMAX: Maximum field voltage (pu)
+      8.0
+      # EFDMIN: Minimum field voltage (pu)
+      -8.0
+      # TE: Field integrator time constant (s)
+      0.5
+      # KP: Potential source gain on terminal voltage (pu)
+      0.0
+      # KI: Current source gain on terminal current (pu)
+      1.0
+      # KC: Rectifier commutation factor (pu)
+      0.0
+TOR  CONSTANT
+;
 ```
 
 ---
@@ -668,10 +1152,64 @@ where $V_o = V_t + E_{fd,0}/K_E$ is computed from initial conditions to achieve 
 #### Usage Example
 
 ```
-SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
-                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
-              EXC SEXS   0.1 10.0 25.0 0.5 -5.0 5.0
-              TOR CONSTANT ;
+SYNC_MACH  g1  g1
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
+      800.
+      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
+      760.
+      # H: Inertia constant (s)
+      3.
+      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
+      0.
+      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
+      0.95
+      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
+      XT
+      # Xl: Leakage reactance L_l (pu)
+      0.15
+      # Xd: d-axis synchronous reactance (pu)
+      1.1
+      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
+      0.25
+      # X"d: d-axis subtransient reactance (pu)
+      0.2
+      # Xq: q-axis synchronous reactance (pu)
+      0.7
+      # X'q: q-axis transient reactance (pu)
+      *
+      # X"q: q-axis subtransient reactance (pu)
+      0.2
+      # m: Saturation coefficient (set to 0 to neglect saturation)
+      0.1
+      # n: Saturation exponent (ignored when m = 0)
+      6.0257
+      # Ra: Armature resistance (pu)
+      0.
+      # T'do: d-axis open-circuit transient time constant (s)
+      5.00
+      # T"do: d-axis open-circuit subtransient time constant (s)
+      0.05
+      # T'qo: q-axis open-circuit transient time constant (s)
+      *
+      # T"qo: q-axis open-circuit subtransient time constant (s)
+      0.1
+EXC  SEXS
+      # TA: Lead-lag numerator time constant
+      0.1
+      # TB: Lead-lag denominator time constant
+      10.0
+      # KE: Exciter gain
+      25.0
+      # TE: Exciter time constant
+      0.5
+      # EMIN: Minimum field voltage
+      -5.0
+      # EMAX: Maximum field voltage
+      5.0
+TOR  CONSTANT
+;
 ```
 
 
@@ -732,10 +1270,82 @@ $$E_{fd}(s) = G_{lag}(\Delta V_{AVR}) \cdot \frac{K_E}{1 + sT_E}, \quad E_{MIN} 
 #### Usage Example
 
 ```
-SYNC_MACH g1  g1  1. 1.  0.  0.   800. 760. 3. 0. 0.95
-                    XT   0.15  1.1  0.25  0.2  0.7  *  0.2  0.1  6.0257  0.  5.00  0.05  *  0.1
-              EXC ENTSOE_simp   10.0 3.0 10.0 0.2 0.1 0.1 0.1 -0.05 0.05 0.05 0.1 25.0 1.0 -10.0 10.0
-              TOR CONSTANT ;
+SYNC_MACH  g1  g1
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
+      800.
+      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
+      760.
+      # H: Inertia constant (s)
+      3.
+      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
+      0.
+      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
+      0.95
+      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
+      XT
+      # Xl: Leakage reactance L_l (pu)
+      0.15
+      # Xd: d-axis synchronous reactance (pu)
+      1.1
+      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
+      0.25
+      # X"d: d-axis subtransient reactance (pu)
+      0.2
+      # Xq: q-axis synchronous reactance (pu)
+      0.7
+      # X'q: q-axis transient reactance (pu)
+      *
+      # X"q: q-axis subtransient reactance (pu)
+      0.2
+      # m: Saturation coefficient (set to 0 to neglect saturation)
+      0.1
+      # n: Saturation exponent (ignored when m = 0)
+      6.0257
+      # Ra: Armature resistance (pu)
+      0.
+      # T'do: d-axis open-circuit transient time constant (s)
+      5.00
+      # T"do: d-axis open-circuit subtransient time constant (s)
+      0.05
+      # T'qo: q-axis open-circuit transient time constant (s)
+      *
+      # T"qo: q-axis open-circuit subtransient time constant (s)
+      0.1
+EXC  ENTSOE_simp
+      # TW1: First PSS washout time constant (s)
+      10.0
+      # TW2: Second PSS washout time constant (s)
+      3.0
+      # KS1: PSS gain, applied in the first lead-lag (pu/pu)
+      10.0
+      # T1: PSS first lead-lag numerator time constant (s)
+      0.2
+      # T2: PSS first lead-lag denominator time constant (s)
+      0.1
+      # T3: PSS second lead-lag numerator time constant (s)
+      0.1
+      # T4: PSS second lead-lag denominator time constant (s)
+      0.1
+      # VSTMIN: PSS output lower limit (pu)
+      -0.05
+      # VSTMAX: PSS output upper limit (pu)
+      0.05
+      # TA: AVR lead-lag numerator time constant (s)
+      0.05
+      # TB: AVR lead-lag denominator time constant (s)
+      0.1
+      # KE: Exciter gain (pu/pu)
+      25.0
+      # TE: Exciter time constant (s)
+      1.0
+      # EMIN: Minimum field voltage (pu)
+      -10.0
+      # EMAX: Maximum field voltage (pu)
+      10.0
+TOR  CONSTANT
+;
 ```
 
 ---

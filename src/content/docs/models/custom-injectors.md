@@ -90,7 +90,34 @@ Internal computed parameters include the steady-state exponents for each compone
 #### Usage Example
 
 ```
-INJEC  LOAD  LOAD1  BUS1  1.  1.  0.  0.  1.5  0.3  1.0  0.2  2.0  0.5  1.8  0.4  2.5  0.1  3.0  2.0  ;
+INJEC  LOAD  LOAD1  BUS1
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # DP: Frequency sensitivity of active power (pu/pu)
+      1.5
+      # A1: Proportion of type-1 component in P
+      0.3
+      # alpha1: Voltage exponent of the A1 term of P
+      1.0
+      # A2: Proportion of type-2 component in P
+      0.2
+      # alpha2: Voltage exponent of the A2 term of P
+      2.0
+      # alpha3: Voltage exponent of the remaining (1-A1-A2) term of P
+      0.5
+      # DQ: Frequency sensitivity of reactive power (pu/pu)
+      1.8
+      # B1: Proportion of type-1 component in Q
+      0.4
+      # beta1: Voltage exponent of the B1 term of Q
+      2.5
+      # B2: Proportion of type-2 component in Q
+      0.1
+      # beta2: Voltage exponent of the B2 term of Q
+      3.0
+      # beta3: Voltage exponent of the remaining (1-B1-B2) term of Q
+      2.0
+;
 ```
 *Parameters: `DP A1 alpha1 A2 alpha2 alpha3 DQ B1 beta1 B2 beta2 beta3`*
 
@@ -167,9 +194,42 @@ The initial voltage $V_0$ can differ from the transmission bus voltage if a dist
 #### Usage Example
 
 ```
-INJEC  vfd_load  VFD1  BUS_IND  1.  1.  0.  0.  1.5  0.7  2.0  0.2  1.0  0.5
-                                 1.2  0.5  2.5  0.1  1.5  0.8
-                                 0.0  0.6  0  0.1  ;
+INJEC  vfd_load  VFD1  BUS_IND
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # Dp: Frequency sensitivity of active power (pu/pu)
+      1.5
+      # a1: Fraction of type-1 component in P
+      0.7
+      # alpha1: Voltage exponent of type-1 P component
+      2.0
+      # a2: Fraction of type-2 component in P
+      0.2
+      # alpha2: Voltage exponent of type-2 P component
+      1.0
+      # alpha3: Voltage exponent of type-3 P component
+      0.5
+      # Dq: Frequency sensitivity of reactive power (pu/pu)
+      1.2
+      # b1: Fraction of type-1 component in Q
+      0.5
+      # beta1: Voltage exponent of type-1 Q component
+      2.5
+      # b2: Fraction of type-2 component in Q
+      0.1
+      # beta2: Voltage exponent of type-2 Q component
+      1.5
+      # beta3: Voltage exponent of type-3 Q component
+      0.8
+      # Vinit: Initial distribution-bus voltage (0 = use transmission voltage) (pu)
+      0.0
+      # Vlow: Voltage threshold for constant-admittance regime (recommended 0.5–0.7) (pu)
+      0.6
+      # foption: 1 = use local bus frequency; 0 = use COI speed (flag)
+      0
+      # Tmes: Frequency measurement time constant (s)
+      0.1
+;
 ```
 
 ---
@@ -231,7 +291,32 @@ where the ratio $V/V_0$ governs the voltage dependence through `vrat`.
 #### Usage Example
 
 ```
-INJEC  RESTLD  RESTLD1  BUS2  1.  1.  0.  0.  1.5  0.5  2.0  0.0  2.0  1.2  0.5  2.5  0.0  2.0  60.0  ;
+INJEC  RESTLD  RESTLD1  BUS2
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # DP: Frequency sensitivity of active power (pu/pu)
+      1.5
+      # alphat: Active power exponent multiplying xP in the recovery equation
+      2.0
+      # alphas: Active power steady-state exponent in the recovery equation
+      0.0
+      # xP_min: Lower limit of active power recovery state xP
+      0.0
+      # xP_max: Upper limit of active power recovery state xP
+      2.0
+      # DQ: Frequency sensitivity of reactive power (pu/pu)
+      1.2
+      # betat: Reactive power exponent multiplying xQ in the recovery equation
+      2.0
+      # betas: Reactive power steady-state exponent in the recovery equation
+      0.0
+      # xQ_min: Lower limit of reactive power recovery state xQ
+      0.0
+      # xQ_max: Upper limit of reactive power recovery state xQ
+      2.0
+      # Tr: Load recovery time constant (s)
+      60.0
+;
 ```
 
 ---
@@ -284,7 +369,12 @@ Initial conditions $P_0$, $Q_0$, $V_0$ are computed automatically at initializat
 #### Usage Example
 
 ```
-INJEC  inj_PQ  LOAD_PQ  BUS3  1.  1.  0.  0.  0.01  ;
+INJEC  inj_PQ  LOAD_PQ  BUS3
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # Tout: Output filter time constant (recommended: 0.01 s) (s)
+      0.01
+;
 ```
 
 ---
@@ -338,7 +428,12 @@ Internal parameters `ETH` (Thévenin voltage magnitude, pu) and `phase` (interna
 #### Usage Example
 
 ```
-INJEC  THEVEQ  EQUIV1  SLACK_BUS  1.  1.  0.  0.  2000.0  ;
+INJEC  THEVEQ  EQUIV1  SLACK_BUS
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # XTH: Short-circuit power of the equivalent (MVA)
+      2000.0
+;
 ```
 
 ---
@@ -414,7 +509,30 @@ $$T_m = T_{m0}\left(A\,\omega_m^2 + B\,\omega_m + 1 - A - B\right)$$
 #### Usage Example
 
 ```
-INJEC  INDMACH1  MTR1  BUS_MV  1.  1.  0.  0.  10.0  0.01  0.10  2.50  0.015  0.10  1.5  0.8  0.1  0.0  ;
+INJEC  INDMACH1  MTR1  BUS_MV
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Machine nominal apparent power, 0 = infer from LF (MVA)
+      10.0
+      # RS: Stator resistance (pu (machine base))
+      0.01
+      # Lls: Stator leakage inductance (pu (machine base))
+      0.10
+      # LSR: Magnetizing inductance (pu (machine base))
+      2.50
+      # RR: Rotor resistance (pu (machine base))
+      0.015
+      # Llr: Rotor leakage inductance (pu (machine base))
+      0.10
+      # H: Inertia constant (s)
+      1.5
+      # A: Quadratic coefficient of load torque vs speed
+      0.8
+      # B: Linear coefficient of load torque vs speed
+      0.1
+      # LF: Load factor, initial P over SNOM, used only when SNOM = 0
+      0.0
+;
 ```
 
 ---
@@ -480,7 +598,34 @@ The swing equation is identical to `inj_indmach1`.
 #### Usage Example
 
 ```
-INJEC  INDMACH2  MTR2  BUS_MV  1.  1.  0.  0.  10.0  0.01  0.08  2.00  0.02  0.06  0.04  0.10  1.5  0.8  0.1  0.0  ;
+INJEC  INDMACH2  MTR2  BUS_MV
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Machine nominal apparent power, 0 = infer from LF (MVA)
+      10.0
+      # R1: Stator resistance (pu (machine base))
+      0.01
+      # L1: Stator leakage inductance (pu (machine base))
+      0.08
+      # Lm: Magnetizing inductance (pu (machine base))
+      2.00
+      # R2: First cage resistance (pu (machine base))
+      0.02
+      # L2: First cage leakage inductance (pu (machine base))
+      0.06
+      # R3: Second cage resistance (pu (machine base))
+      0.04
+      # L3: Second cage leakage inductance (pu (machine base))
+      0.10
+      # H: Inertia constant (s)
+      1.5
+      # A: Quadratic coefficient of load torque vs speed
+      0.8
+      # B: Linear coefficient of load torque vs speed
+      0.1
+      # LF: Load factor, initial P over SNOM, used only when SNOM = 0
+      0.0
+;
 ```
 
 ---
@@ -543,7 +688,30 @@ Computed internally: `BSH` (shunt susceptance), `TM0` (initial mechanical torque
 #### Usage Example
 
 ```
-INJEC  INDM1  MTR3  BUS_MV  1.  1.  0.  0.  10.0  0.01  0.10  2.50  0.015  0.10  1.5  0.8  0.1  0.0  ;
+INJEC  INDM1  MTR3  BUS_MV
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Machine MVA rating (MVA)
+      10.0
+      # RS: Stator resistance (pu)
+      0.01
+      # Lls: Stator leakage inductance (pu)
+      0.10
+      # LSR: Magnetizing inductance (pu)
+      2.50
+      # RR: Rotor resistance (pu)
+      0.015
+      # Llr: Rotor leakage inductance (pu)
+      0.10
+      # H: Inertia constant (s)
+      1.5
+      # A: Quadratic torque-speed coefficient
+      0.8
+      # B: Linear torque-speed coefficient
+      0.1
+      # LF: Load factor
+      0.0
+;
 ```
 
 ---
@@ -640,10 +808,76 @@ $$i_y = I_p \sin\theta_{\mathrm{PLL}} + I_q \cos\theta_{\mathrm{PLL}}$$
 #### Usage Example
 
 ```
-INJEC  IBG  IBG1  BUS_GEN  1.  1.  0.  0.  1.2  1.0  0.5  0.02  0.01  0.5  1.0  0.05
-                            1.1  20.0  0.1  2.0  0.1  0.5  0.95  1.05
-                            0.0  2.0  1.0  1.0  0.0  0.05  1  2.0  1.5
-                            2.0  2.0  -0.02  0.02  1  1  1  0.85  ;
+INJEC  IBG  IBG1  BUS_GEN
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  0.  0.  0.
+      # Imax: Maximum current magnitude (pu)
+      1.1
+      # IN: Nominal current (pu)
+      1.0
+      # Iprate: Maximum rate of rise of the active current, in multiples of IN (pu/s)
+      0.5
+      # Tg: Generator time constant (s)
+      0.02
+      # Tm: Measurement filter time constant (s)
+      0.01
+      # tLVRT1: LVRT trip delay for Vmin <= Vm < Vint (s)
+      0.15
+      # tLVRT2: LVRT trip delay at Vm = a, upper end of the linear ramp (s)
+      1.5
+      # tLVRTint: LVRT trip delay at Vm = Vint, lower end of the linear ramp (s)
+      0.3
+      # Vmax: Maximum voltage for operation (pu)
+      1.2
+      # tau: PLL response time (ms)
+      20.0
+      # Vminpll: Voltage below which PLL is frozen (pu)
+      0.1
+      # a: Voltage below which the LVRT timer runs; upper end of the LVRT curve (pu)
+      0.9
+      # Vmin: Minimum LVRT voltage (pu)
+      0.1
+      # Vint: Intermediate LVRT voltage (pu)
+      0.3
+      # fmin: Underfrequency trip threshold on the filtered frequency, 50 Hz system (Hz)
+      47.5
+      # fmax: Overfrequency trip threshold on the filtered frequency, 50 Hz system (Hz)
+      51.5
+      # fstart: Frequency above which active power is reduced (Hz)
+      50.2
+      # b: Overfrequency power reduction gain: fraction of initial P per pu frequency above fstart (pu/pu)
+      20.0
+      # fr: While the frequency stays at or above fr the power reduction is held at its maximum (Hz)
+      50.05
+      # Tr: Reconnection delay after trip (s)
+      1.0
+      # Re: Resistance between the terminal bus and the controlled converter-side voltage (pu)
+      0.0
+      # Xe: Reactance between the terminal bus and the controlled converter-side voltage (pu)
+      0.05
+      # CM1: 1 enables the m and kRCI injection below dbmin with reactive current limit IN; 0 disables
+      1
+      # kRCI: Reactive current injection gain below dbmin, in IN per pu voltage (pu/pu)
+      2.0
+      # kRCA: Reactive current absorption gain above dbmax, in IN per pu voltage (pu/pu)
+      1.5
+      # m: Step of reactive current injected below dbmin, in multiples of IN; needs CM1 or CM2 = 1 (pu)
+      0.0
+      # n: Step of reactive current absorbed above dbmax, in multiples of IN (pu)
+      0.0
+      # dbmin: Lower edge of the voltage dead-band; reactive injection and Q priority below it (pu)
+      0.9
+      # dbmax: Upper edge of the voltage dead-band; reactive absorption above it (pu)
+      1.1
+      # HVRT: 1 enables the kRCA absorption term above dbmax; 0 disables it
+      1
+      # LVRT: 1 uses Vmin and Vint as the LVRT curve breakpoints; 0 replaces both with Vtrip
+      1
+      # CM2: 1 enables the m and kRCI injection below dbmin with reactive current limit 0.707 Imax; 0 disables
+      0
+      # Vtrip: Undervoltage trip threshold, used only when LVRT = 0 (pu)
+      0.85
+;
 ```
 
 ---
@@ -1043,36 +1277,266 @@ RAMSES stops the simulation if the initial point violates the current limits or 
 A 1.667 MVA unit taking its whole operating point from the power flow (`FP` = `FQ` = 1), with the plant controller disconnected (`FreqFlag` = `QextFlag` = 0), constant reactive power and the drivetrain coupled to the output (`PFlag` = 1). This is the record of the `3-bus` case in `stepss-test-systems`. Lines starting with `#` inside a record are ignored.
 
 ```
-INJEC  WT3  DFIGB03  B03  1.  1.  0.  0.
-# 1 SNOM
-        1.667
-# 2-32 REPC_A
-        0  0  0  0  0.02  1  0  0.1
-        -0.1  18  5  0.44  -0.44  0  0.05  0.7
-        0.05  -0.0006  0.0006  20  0  999  -999  0.05
-        0.1  1  0  0.1  0  0.02  0
-# 33-46 WTGTRQ_A
-        30  0.6  3  1.2  0  0.2  0.58  0.4
-        0.72  0.6  0.86  0.8  1  1
-# 47-56 WTGPT_A
-        0  0.6  0.3  0  27  0.3  0.6  3
-        -10  10
-# 57-58 WTGAR_A, 59-62 WTGT_A
-        0.007  0
-        3.395  0.962  2.344  1.387
-# 63-111 REEC_A
-        0.9  1.1  0.02  1  1  -0.05  0.05  2
-        1.05  -1.05  0.44  -0.44  1.1  0.9  0  0.1
-        0  40  0.02  0.2  1  0.4  1  0.8
-        1  1  1  0.2  1  0.4  1  0.8
-        1  1  1
-        999  -999  1  0  0.02  1.11  0  0
-        0  0  0  0  0  1
-# 112-124 REGC_A
-        999  -999  0.02  1.2  0.7  -1.3  0.4  0.8
-        0.9  0.4  1.22  0  10
-# 125-128 PLL
-        0.2  3  30  1 ;
+INJEC  WT3  DFIGB03  B03
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Rating, base of every per-unit quantity in the model (MVA)
+      1.667
+      # Rc: Compensation resistance (pu)
+      0
+      # Xc: Compensation reactance (droop or line-drop) (pu)
+      0
+      # vcompFlag: 1: regulate lvertbar v_conrvert (line-drop compensation); 0: regulate v_t + K_c Q_branch (droop)
+      0
+      # Kc: Reactive droop gain (used when vcompFlag = 0) (pu/pu)
+      0
+      # Tfltr: Voltage and Q measurement filter; also the REGC_A voltage filter and the PLL input filter (s)
+      0.02
+      # RefFlag: 1: voltage control; 0: reactive power control
+      1
+      # dbd: Deadband on the V/Q error, symmetric, geq 0 (pu)
+      0
+      # emax: Upper limit on the V/Q error (pu)
+      0.1
+      # emin: Lower limit on the V/Q error (pu)
+      -0.1
+      # Kp: V/Q PI proportional gain (pu/pu)
+      18
+      # Ki: V/Q PI integral gain (pu/(pu·s))
+      5
+      # Qmax: Upper limit of the V/Q PI (pu)
+      0.44
+      # Qmin: Lower limit of the V/Q PI (pu)
+      -0.44
+      # Tft: Lead time constant (s)
+      0
+      # Tfv: Lag time constant; below 0.005 the lead-lag is bypassed (s)
+      0.05
+      # vfrz: Voltage below which the V/Q integrator is frozen (pu)
+      0.7
+      # Tp: Filter on P_branch; also the P_e filter of WTGTRQ_A (WT3) and of the power-factor reference (s)
+      0.05
+      # fdbd1: Frequency deadband, lower edge, leq 0 (pu)
+      -0.0006
+      # fdbd2: Frequency deadband, upper edge, geq 0 (pu)
+      0.0006
+      # Ddn: Droop for over-frequency (pu/pu)
+      20
+      # Dup: Droop for under-frequency (pu/pu)
+      0
+      # femax: Upper limit on the power error (pu)
+      999
+      # femin: Lower limit on the power error (pu)
+      -999
+      # kpg: Power PI proportional gain (pu/pu)
+      0.05
+      # kig: Power PI integral gain (pu/(pu·s))
+      0.1
+      # Pmax: Upper limit of the power PI (pu)
+      1
+      # Pmin: Lower limit of the power PI (pu)
+      0
+      # Tlag: Lag on the plant power output (s)
+      0.1
+      # FreqFlag: 1: plant power loop sets P_refo; 0: P_refo held at its initial value
+      0
+      # Tmesf: Frequency measurement time constant, raised to 0.05 if smaller (s)
+      0.02
+      # QextFlag: 1: plant V/Q loop sets Q_ext; 0: Q_ext held at its initial value
+      0
+      # Twref: Speed reference time constant (s)
+      30
+      # Kip: Torque PI integral gain (pu/(pu·s))
+      0.6
+      # Kpp: Torque PI proportional gain (pu/pu)
+      3
+      # Temax: Maximum torque order (pu)
+      1.2
+      # Temin: Minimum torque order (pu)
+      0
+      # p1: Power-speed table, power of point 1 (pu)
+      0.2
+      # spd1: Power-speed table, speed of point 1 (pu)
+      0.58
+      # p2: Point 2, power (pu)
+      0.4
+      # spd2: Point 2, speed (pu)
+      0.72
+      # p3: Point 3, power (pu)
+      0.6
+      # spd3: Point 3, speed (pu)
+      0.86
+      # p4: Point 4, power (pu)
+      0.8
+      # spd4: Point 4, speed (pu)
+      1
+      # Tflag: 1: PI on power error; 0: PI on speed error
+      1
+      # Kcc: Gain of the power error added to the speed error (pu/pu)
+      0
+      # Kiw: Pitch control integral gain (deg/(pu·s))
+      0.6
+      # Kpw: Pitch control proportional gain (deg/pu)
+      0.3
+      # ThetaMin: Minimum pitch angle (also limits both PIs) (deg)
+      0
+      # ThetaMax: Maximum pitch angle (also limits both PIs) (deg)
+      27
+      # Ttheta: Pitch actuator time constant (s)
+      0.3
+      # Kic: Pitch compensation integral gain (deg/(pu·s))
+      0.6
+      # Kpc: Pitch compensation proportional gain (deg/pu)
+      3
+      # dThetaMin: Minimum pitch rate (deg/s)
+      -10
+      # dThetaMax: Maximum pitch rate (deg/s)
+      10
+      # Ka: Aerodynamic gain (pu/deg²)
+      0.007
+      # Thetao: Initial pitch angle theta_0 (deg)
+      0
+      # Ht: Turbine inertia (s)
+      3.395
+      # Hg: Generator inertia (s)
+      0.962
+      # Dshaft: Shaft damping (pu/pu)
+      2.344
+      # Kshaft: Shaft stiffness, per pu·s of twist (pu)
+      1.387
+      # vdip: Voltage below which a dip is declared (pu)
+      0.9
+      # vup: Voltage above which a dip is declared (pu)
+      1.1
+      # Trv: Terminal voltage filter (s)
+      0.02
+      # vref0: Reference for the dip injection; used as given, so 0 is not replaced by the initial voltage (pu)
+      1
+      # vref1: Bias added to Q_r when vFlag = 0 (pu)
+      1
+      # dbd1: Dip injection deadband, lower edge, leq 0 (pu)
+      -0.05
+      # dbd2: Dip injection deadband, upper edge, geq 0 (pu)
+      0.05
+      # kqv: Dip reactive current gain (pu/pu)
+      2
+      # Iqh1: Upper limit of the dip injection (pu)
+      1.05
+      # Iql1: Lower limit of the dip injection (pu)
+      -1.05
+      # qmax: Upper limit of the reactive power reference (pu)
+      0.44
+      # qmin: Lower limit of the reactive power reference (pu)
+      -0.44
+      # vmax: Upper limit of V_ref and of the Q PI (pu)
+      1.1
+      # vmin: Lower limit of V_ref and of the Q PI (pu)
+      0.9
+      # kqp: Q PI proportional gain (pu/pu)
+      0
+      # kqi: Q PI integral gain (pu/(pu·s))
+      0.1
+      # kvp: V PI proportional gain (pu/pu)
+      0
+      # kvi: V PI integral gain (pu/(pu·s))
+      40
+      # Tiq: Reactive current lag (QFlag = 0) (s)
+      0.02
+      # vq1: VDL1, voltage of point 1 (pu)
+      0.2
+      # Iq1: VDL1, reactive current limit at point 1 (pu)
+      1
+      # vq2: VDL1, point 2 (pu)
+      0.4
+      # Iq2:  (pu)
+      1
+      # vq3: VDL1, point 3 (pu)
+      0.8
+      # Iq3:  (pu)
+      1
+      # vq4: VDL1, point 4 (pu)
+      1
+      # Iq4:  (pu)
+      1
+      # vp1: VDL2, voltage of point 1 (pu)
+      0.2
+      # Ip1: VDL2, active current limit at point 1 (pu)
+      1
+      # vp2: VDL2, point 2 (pu)
+      0.4
+      # Ip2:  (pu)
+      1
+      # vp3: VDL2, point 3 (pu)
+      0.8
+      # Ip3:  (pu)
+      1
+      # vp4: VDL2, point 4 (pu)
+      1
+      # Ip4:  (pu)
+      1
+      # dPmax: Upper rate limit of P_ref (pu/s)
+      999
+      # dPmin: Lower rate limit of P_ref (pu/s)
+      -999
+      # pmax: Upper limit of the power order Pord (pu)
+      1
+      # pmin: Lower limit of the power order Pord (pu)
+      0
+      # Tpord: Power order lag (s)
+      0.02
+      # Imax: Converter current limit (pu)
+      1.11
+      # Thld: Post-dip hold of the reactive injection; its sign selects the mode (s)
+      0
+      # Thld2: Post-dip hold of I_pmax (s)
+      0
+      # Iqfrz: Reactive injection held after a dip when Thld > 0 (pu)
+      0
+      # PFFlag: 1: constant power factor; 0: reactive power reference Q_ext
+      0
+      # vFlag: 1: V_ref from the Q PI; 0: V_ref = Q_r + v_ref1
+      0
+      # QFlag: 1: reactive current from the voltage PI; 0: from Q_r/v_t
+      0
+      # PQFlag: 1: active current priority; 0: reactive current priority
+      0
+      # PFlag: 1: power order is P_ref,omega_g; 0: power order is P_ref
+      1
+      # Iqrmax: Reactive current rate limit, used when Q_0 > 0 (pu/s)
+      999
+      # Iqrmin: Reactive current rate limit, used when Q_0 < 0 (pu/s)
+      -999
+      # Tg: Converter current lag (s)
+      0.02
+      # vtmax: High-voltage threshold (WECC Volim) (pu)
+      1.2
+      # accel: High-voltage reactive current gain (WECC Khv) (pu/pu)
+      0.7
+      # QMIN: Lower limit of the converter reactive output after the high-voltage reduction (pu)
+      -1.3
+      # lvpnt0: Active current is zero below this voltage (pu)
+      0.4
+      # lvpnt1: Active current is unreduced above this voltage (pu)
+      0.8
+      # Brkpt: Low-voltage power logic breakpoint (pu)
+      0.9
+      # zerox: Low-voltage power logic zero crossing (pu)
+      0.4
+      # Lvpl1: Low-voltage power logic limit at Brkpt (pu)
+      1.22
+      # Lvplsw: 1: low-voltage power logic on; 0: off
+      0
+      # rrpwr: Active current rise rate limit (pu/s)
+      10
+      # vPLL: Voltage below which the PLL angle is frozen (pu)
+      0.2
+      # kpPLL: PLL proportional gain (rad/s/pu)
+      3
+      # kiPLL: PLL integral gain (rad/s²/pu)
+      30
+      # wrefPLL: PLL frequency offset; cancels, no effect on the response
+      1
+;
 ```
 
 :::note
@@ -1164,29 +1628,216 @@ The initialization and its checks are those of [WT3](#wt3-inj_wt3-type-3-wind-tu
 The WT3 example unit as a full converter: the same REPC_A, REEC_A, REGC_A and PLL values, with the drivetrain block in place of WTGTRQ_A, WTGPT_A, WTGAR_A and WTGT_A.
 
 ```
-INJEC  WT4  WT4B03  B03  1.  1.  0.  0.
-# 1 SNOM
-        1.667
-# 2-32 REPC_A
-        0  0  0  0  0.02  1  0  0.1
-        -0.1  18  5  0.44  -0.44  0  0.05  0.7
-        0.05  -0.0006  0.0006  20  0  999  -999  0.05
-        0.1  1  0  0.1  0  0.02  0
-# 33-37 WTGT_A: Ht Hg wo Dshaft Kshaft
-        3.395  0.962  1  2.344  1.387
-# 38-86 REEC_A
-        0.9  1.1  0.02  1  1  -0.05  0.05  2
-        1.05  -1.05  0.44  -0.44  1.1  0.9  0  0.1
-        0  40  0.02  0.2  1  0.4  1  0.8
-        1  1  1  0.2  1  0.4  1  0.8
-        1  1  1
-        999  -999  1  0  0.02  1.11  0  0
-        0  0  0  0  0  1
-# 87-99 REGC_A
-        999  -999  0.02  1.2  0.7  -1.3  0.4  0.8
-        0.9  0.4  1.22  0  10
-# 100-103 PLL
-        0.2  3  30  1 ;
+INJEC  WT4  WT4B03  B03
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Rating, base of every per-unit quantity in the model (MVA)
+      1.667
+      # Rc: Compensation resistance (pu)
+      0
+      # Xc: Compensation reactance (droop or line-drop) (pu)
+      0
+      # vcompFlag: 1: regulate lvertbar v_conrvert (line-drop compensation); 0: regulate v_t + K_c Q_branch (droop)
+      0
+      # Kc: Reactive droop gain (used when vcompFlag = 0) (pu/pu)
+      0
+      # Tfltr: Voltage and Q measurement filter; also the REGC_A voltage filter and the PLL input filter (s)
+      0.02
+      # RefFlag: 1: voltage control; 0: reactive power control
+      1
+      # dbd: Deadband on the V/Q error, symmetric, geq 0 (pu)
+      0
+      # emax: Upper limit on the V/Q error (pu)
+      0.1
+      # emin: Lower limit on the V/Q error (pu)
+      -0.1
+      # Kp: V/Q PI proportional gain (pu/pu)
+      18
+      # Ki: V/Q PI integral gain (pu/(pu·s))
+      5
+      # Qmax: Upper limit of the V/Q PI (pu)
+      0.44
+      # Qmin: Lower limit of the V/Q PI (pu)
+      -0.44
+      # Tft: Lead time constant (s)
+      0
+      # Tfv: Lag time constant; below 0.005 the lead-lag is bypassed (s)
+      0.05
+      # vfrz: Voltage below which the V/Q integrator is frozen (pu)
+      0.7
+      # Tp: Filter on P_branch and on the power-factor reference (s)
+      0.05
+      # fdbd1: Frequency deadband, lower edge, leq 0 (pu)
+      -0.0006
+      # fdbd2: Frequency deadband, upper edge, geq 0 (pu)
+      0.0006
+      # Ddn: Droop for over-frequency (pu/pu)
+      20
+      # Dup: Droop for under-frequency (pu/pu)
+      0
+      # femax: Upper limit on the power error (pu)
+      999
+      # femin: Lower limit on the power error (pu)
+      -999
+      # kpg: Power PI proportional gain (pu/pu)
+      0.05
+      # kig: Power PI integral gain (pu/(pu·s))
+      0.1
+      # Pmax: Upper limit of the power PI (pu)
+      1
+      # Pmin: Lower limit of the power PI (pu)
+      0
+      # Tlag: Lag on the plant power output (s)
+      0.1
+      # FreqFlag: 1: plant power loop sets P_refo; 0: P_refo held at its initial value
+      0
+      # Tmesf: Frequency measurement time constant, raised to 0.05 if smaller (s)
+      0.02
+      # QextFlag: 1: plant V/Q loop sets Q_ext; 0: Q_ext held at its initial value
+      0
+      # Ht: Turbine inertia (s)
+      3.395
+      # Hg: Generator inertia (s)
+      0.962
+      # wo: Initial generator speed, the reference of Deltaomega_g (pu)
+      1
+      # Dshaft: Shaft damping (pu/pu)
+      2.344
+      # Kshaft: Shaft stiffness, per pu·s of twist (pu)
+      1.387
+      # vdip: Voltage below which a dip is declared (pu)
+      0.9
+      # vup: Voltage above which a dip is declared (pu)
+      1.1
+      # Trv: Terminal voltage filter (s)
+      0.02
+      # vref0: Reference for the dip injection; used as given, so 0 is not replaced by the initial voltage (pu)
+      1
+      # vref1: Bias added to Q_r when vFlag = 0 (pu)
+      1
+      # dbd1: Dip injection deadband, lower edge, leq 0 (pu)
+      -0.05
+      # dbd2: Dip injection deadband, upper edge, geq 0 (pu)
+      0.05
+      # kqv: Dip reactive current gain (pu/pu)
+      2
+      # Iqh1: Upper limit of the dip injection (pu)
+      1.05
+      # Iql1: Lower limit of the dip injection (pu)
+      -1.05
+      # qmax: Upper limit of the reactive power reference (pu)
+      0.44
+      # qmin: Lower limit of the reactive power reference (pu)
+      -0.44
+      # vmax: Upper limit of V_ref and of the Q PI (pu)
+      1.1
+      # vmin: Lower limit of V_ref and of the Q PI (pu)
+      0.9
+      # kqp: Q PI proportional gain (pu/pu)
+      0
+      # kqi: Q PI integral gain (pu/(pu·s))
+      0.1
+      # kvp: V PI proportional gain (pu/pu)
+      0
+      # kvi: V PI integral gain (pu/(pu·s))
+      40
+      # Tiq: Reactive current lag (QFlag = 0) (s)
+      0.02
+      # vq1: VDL1, voltage of point 1 (pu)
+      0.2
+      # Iq1: VDL1, reactive current limit at point 1 (pu)
+      1
+      # vq2: VDL1, point 2 (pu)
+      0.4
+      # Iq2:  (pu)
+      1
+      # vq3: VDL1, point 3 (pu)
+      0.8
+      # Iq3:  (pu)
+      1
+      # vq4: VDL1, point 4 (pu)
+      1
+      # Iq4:  (pu)
+      1
+      # vp1: VDL2, voltage of point 1 (pu)
+      0.2
+      # Ip1: VDL2, active current limit at point 1 (pu)
+      1
+      # vp2: VDL2, point 2 (pu)
+      0.4
+      # Ip2:  (pu)
+      1
+      # vp3: VDL2, point 3 (pu)
+      0.8
+      # Ip3:  (pu)
+      1
+      # vp4: VDL2, point 4 (pu)
+      1
+      # Ip4:  (pu)
+      1
+      # dPmax: Upper rate limit of P_ref (pu/s)
+      999
+      # dPmin: Lower rate limit of P_ref (pu/s)
+      -999
+      # pmax: Upper limit of the power order Pord (pu)
+      1
+      # pmin: Lower limit of the power order Pord (pu)
+      0
+      # Tpord: Power order lag (s)
+      0.02
+      # Imax: Converter current limit (pu)
+      1.11
+      # Thld: Post-dip hold of the reactive injection; its sign selects the mode (s)
+      0
+      # Thld2: Post-dip hold of I_pmax (s)
+      0
+      # Iqfrz: Reactive injection held after a dip when Thld > 0 (pu)
+      0
+      # PFFlag: 1: constant power factor; 0: reactive power reference Q_ext
+      0
+      # vFlag: 1: V_ref from the Q PI; 0: V_ref = Q_r + v_ref1
+      0
+      # QFlag: 1: reactive current from the voltage PI; 0: from Q_r/v_t
+      0
+      # PQFlag: 1: active current priority; 0: reactive current priority
+      0
+      # PFlag: 1: power order is P_ref,omega_g; 0: power order is P_ref
+      1
+      # Iqrmax: Reactive current rate limit, used when Q_0 > 0 (pu/s)
+      999
+      # Iqrmin: Reactive current rate limit, used when Q_0 < 0 (pu/s)
+      -999
+      # Tg: Converter current lag (s)
+      0.02
+      # vtmax: High-voltage threshold (WECC Volim) (pu)
+      1.2
+      # accel: High-voltage reactive current gain (WECC Khv) (pu/pu)
+      0.7
+      # QMIN: Lower limit of the converter reactive output after the high-voltage reduction (pu)
+      -1.3
+      # lvpnt0: Active current is zero below this voltage (pu)
+      0.4
+      # lvpnt1: Active current is unreduced above this voltage (pu)
+      0.8
+      # Brkpt: Low-voltage power logic breakpoint (pu)
+      0.9
+      # zerox: Low-voltage power logic zero crossing (pu)
+      0.4
+      # Lvpl1: Low-voltage power logic limit at Brkpt (pu)
+      1.22
+      # Lvplsw: 1: low-voltage power logic on; 0: off
+      0
+      # rrpwr: Active current rise rate limit (pu/s)
+      10
+      # vPLL: Voltage below which the PLL angle is frozen (pu)
+      0.2
+      # kpPLL: PLL proportional gain (rad/s/pu)
+      3
+      # kiPLL: PLL integral gain (rad/s²/pu)
+      30
+      # wrefPLL: PLL frequency offset; cancels, no effect on the response
+      1
+;
 ```
 
 :::note
@@ -1246,9 +1897,78 @@ Low-voltage power-logic (LVPL) limits active current during deep voltage sags vi
 #### Usage Example
 
 ```
-INJEC  PV  PV1  BUS_PV  1.  1.  0.  0.  1.2  1.0  0.5  0.02  0.01  0.5  1.0  0.05  1.1
-                          20.0  0.1  2.0  0.1  0.5  0.95  1.05  0.0  2.0  1.0
-                          1.0  0.0  0.05  1  2.0  1.5  2.0  2.0  -0.02  0.02  1  1  1  0.85  0  ;
+INJEC  PV  PV1  BUS_PV
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # Imax: Maximum converter current; total current limit while Vm < 0.9 pu, and lower reactive current limit in normal operation (pu)
+      1.1
+      # IN: Nominal current; active and reactive current limit when Vm >= 0.9 pu, reactive absorption limit during a dip, and base of m and n (pu)
+      1.0
+      # ratemax: Maximum rate of rise of the active current Ip (decrease is not rate limited) (pu/s)
+      0.5
+      # Tg: Time constant of the active and reactive current lags (Ip and Iq) (s)
+      0.02
+      # Tm: Voltage measurement time constant (Vm and the voltage components used by the PLL) (s)
+      0.01
+      # tLVRT1: LVRT trip delay for Vmin <= Vm < Vint (s)
+      0.15
+      # tLVRT2: LVRT trip delay at Vm = a (upper end of the linear ramp) (s)
+      1.5
+      # tLVRTint: LVRT trip delay at Vm = Vint (lower end of the linear ramp up to tLVRT2 at Vm = a) (s)
+      0.3
+      # Vmax: Overvoltage threshold on the unfiltered voltage behind Re + jXe; reaching it trips the unit permanently (pu)
+      1.2
+      # kpll: PLL proportional gain from q-axis voltage to angle rate (integral gain fixed at zero) (rad/s/pu)
+      20.0
+      # Vminpll: Voltage below which the PLL angle is frozen (pu)
+      0.1
+      # a: Voltage below which the LVRT timer runs; upper end of the LVRT curve (pu)
+      0.9
+      # Vmin: LVRT curve: below this voltage the unit trips at once (used when LVRT = 1) (pu)
+      0.1
+      # Vint: LVRT curve intermediate voltage between the tLVRT1 plateau and the ramp (used when LVRT = 1) (pu)
+      0.3
+      # fmin: Underfrequency threshold on the filtered frequency; below it the unit trips permanently (Hz)
+      47.5
+      # fmax: Overfrequency threshold on the filtered frequency; above it the unit trips permanently (Hz)
+      51.5
+      # fstart: Frequency above which active power is reduced (Hz)
+      50.2
+      # b: Overfrequency active power reduction gain: fraction of initial P per pu frequency above fstart (50 Hz base) (pu/pu)
+      20.0
+      # fr: While filtered frequency >= fr the power reduction is held at its maximum; below fr it follows frequency again (Hz)
+      50.05
+      # Tr: Time the current output stays at zero after an LVRT trip before it is restored (at most 5 s takes effect) (s)
+      1.0
+      # Re: Resistance between the terminal bus and the controlled (converter side) voltage (pu)
+      0.0
+      # Xe: Reactance between the terminal bus and the controlled (converter side) voltage (pu)
+      0.05
+      # CM1: Reactive current injection mode 1: 1 enables the m and kRCI injection below dbmin, dip Iq limit Imax; 0 disables
+      1
+      # kRCI: Reactive current injection gain per pu voltage below dbmin (active if CM1, CM2 or CM3 is 1) (pu/pu)
+      2.0
+      # kRCA: Reactive current absorption gain per pu voltage above dbmax (active only if HVRT = 1) (pu/pu)
+      1.5
+      # m: Step reactive current injected below dbmin, as a multiple of IN (active if CM1, CM2 or CM3 is 1) (pu)
+      0.0
+      # n: Step reactive current absorbed above dbmax, as a multiple of IN (always active, independent of HVRT) (pu)
+      0.0
+      # dbmin: Lower edge of the voltage deadband on Vm; reactive injection below it (pu)
+      0.9
+      # dbmax: Upper edge of the voltage deadband on Vm; reactive absorption above it (pu)
+      1.1
+      # HVRT: 1 enables the kRCA absorption term above dbmax; 0 disables it (does not affect the Vmax trip)
+      1
+      # LVRT: 1 uses Vmin and Vint as LVRT curve breakpoints; 0 replaces both with 0.8 pu
+      1
+      # CM2: Reactive current injection mode 2: 1 enables m and kRCI injection and caps dip Iq at 0.707 Imax; 0 disables
+      0
+      # CM3: Reactive current injection mode 3: 1 enables m and kRCI injection, dip Iq limit sqrt(Imax^2 - Ipcmd^2) and a PI voltage term; 0 disables
+      0
+      # BM: Blocking mode: 1 zeroes the active current and drops the initial reactive current while Vm < 0.9 pu; 0 keeps both
+      0
+;
 ```
 
 ---
@@ -1369,8 +2089,30 @@ The model has 33 states (2 output currents + 31 internal). Key internal states:
 A 1100 MVA grid-forming converter:
 
 ```
-#                 name   bus  FP   FQ   P   Q    R      L     r     Snom   H     D    Tpll  Rdroop Imax   Te
-INJEC    GFOR     HVDC    A   1.   1.   0.  0.  0.005  0.15  1.02  1100.  5.0   300.  0.100  999.   1.0  0.001 ;
+INJEC  GFOR  HVDC  A
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # R: Resistance of connection transformer (pu)
+      0.005
+      # L: Inductance of connection transformer (pu)
+      0.15
+      # r: Ratio of the ideal connection transformer (pu/pu)
+      1.02
+      # Snom: Nominal apparent power (MVA)
+      1100.
+      # H: Inertia constant (s)
+      5.0
+      # D: Damping constant of virtual synchronous machine
+      300.
+      # Tpll: Time constant of PLL (s)
+      0.100
+      # Rdroop: Droop of primary frequency control (pu)
+      999.
+      # Imax: Maximum current (typically 1–1.2) (pu)
+      1.0
+      # Te: Time constant of current saturation (s)
+      0.001
+;
 ```
 
 :::note
@@ -1523,10 +2265,58 @@ The model has 52 states (2 output currents + 50 internal). Key internal states:
 A 1200 MVA grid-following converter (record spanning multiple lines):
 
 ```
-#              name    bus  FP   FQ   P   Q    R      L      r     Snom    Rc     Xc      Kp     Ki   Tlpf     Kpp    Kip   Trlim  dPdt_min dPdt_max  Kpv     Kiv
-INJEC  GFOL    HVDC1    A   1.   1.   0.  0.  0.005  0.15   1.02   1200.  0.005   0.15   0.5730   6.  0.0033  0.0333   10.   0.002    -999.    10.    0.1667  50.
-# tau   Vpllb  Vpllu   Imax    Vs1    Vs2    iq1max   vqswitch
-  0.10    0.4    0.5   1.000   -1000  -2000  1.001        1     ;
+INJEC  GFOL  HVDC1  A
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # R: Phase reactor resistance (pu)
+      0.005
+      # L: Phase reactor inductance (pu)
+      0.15
+      # r: Ratio of the ideal connection transformer (pu/pu)
+      1.02
+      # Snom: Nominal apparent power (MVA)
+      1200.
+      # Rc: Resistance used in compensated voltage (pu)
+      0.005
+      # Xc: Reactance used in compensated voltage (pu)
+      0.15
+      # Kp: Current control: proportional gain
+      0.5730
+      # Ki: Current control: integral gain
+      6.
+      # Tlpf: Measurement time constant (low-pass filter) (s)
+      0.0033
+      # Kpp: Active power control: proportional gain
+      0.0333
+      # Kip: Active power control: integral gain
+      10.
+      # Trlim: Time constant of the I_d^max rate limiter (s)
+      0.002
+      # dPdt_min: Min rate of change of the d-current limit (pu/s)
+      -999.
+      # dPdt_max: Max rate of change of the d-current limit (pu/s)
+      10.
+      # Kpv: Reactive power control: proportional gain
+      0.1667
+      # Kiv: Reactive power control: integral gain
+      50.
+      # tau: Response time of PLL (s)
+      0.10
+      # Vpllb: Voltage below which the PLL is blocked (pu)
+      0.4
+      # Vpllu: Voltage above which the PLL is unblocked (pu)
+      0.5
+      # Imax: Maximum current (typically 1–1.2) (pu)
+      1.000
+      # Vs1: Voltage below which dynamic reactive support starts (pu)
+      -1000
+      # Vs2: Voltage below which reactive support is maximum and the V/Q PI is frozen (pu)
+      -2000
+      # iqmax: Limit (±) on quadrature current component i_q1 (pu)
+      1.001
+      # vqswitch: 1 = voltage control, 0 = reactive power control (flag)
+      1
+;
 ```
 
 ---
@@ -1591,13 +2381,206 @@ The BESS model uses over 40 internal states reflecting the three sub-models. Key
 #### Usage Example
 
 ```
-INJEC  BESS  BESS1  BUS_ST  1.  1.  0.  0.
-    100.0  0.0  0.02  0  0.0  0.05  0  0.0  0.3  -0.3  2.0  0.4
-    0.3  -0.3  0.0  0.15  0.9  0.05  0.0  -0.06  0.06  -0.05  0.05
-    0.05  -0.05  2.0  1.0  1.0  -1.0  0.02  0  0
-    0.1  0.1  0.02  1.0  0.0  -0.2  0.2  0.2  -0.2  0.6  0.4  0.6  -0.6  1.1  0.9
-    1.0  0.5  0.01  0.01  0.05  0.9  0.2  0.9  0.1  0.9  -0.1  0.5  -0.5  0.5  -0.5  1.0  -1.0  0.5  -0.5
-    50.0  0.7  0.9  0.1  5.0  -5.0  1.0  -1.0  0.05  1.1  0.0  2  0.01  ;
+INJEC  BESS  BESS1  BUS_ST
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      1.  1.  0.  0.
+      # SNOM: Rating, base of every per-unit quantity in the model (MVA)
+      100.
+      # Rc: Compensation resistance (pu)
+      0
+      # Xc: Compensation reactance (droop or line-drop) (pu)
+      0
+      # vcompFlag: 1: regulate lvertbar v_conrvert (line-drop compensation); 0: regulate v_t + K_c Q_branch (droop)
+      0
+      # Kc: Reactive droop gain (used when vcompFlag = 0) (pu/pu)
+      0
+      # Tfltr: Voltage and Q measurement filter; also the REGC_A voltage filter and the PLL input filter (s)
+      0.02
+      # RefFlag: 1: voltage control; 0: reactive power control
+      1
+      # dbd: Deadband on the V/Q error, symmetric, geq 0 (pu)
+      0
+      # emax: Upper limit on the V/Q error (pu)
+      0.1
+      # emin: Lower limit on the V/Q error (pu)
+      -0.1
+      # Kp: V/Q PI proportional gain (pu/pu)
+      18
+      # Ki: V/Q PI integral gain (pu/(pu·s))
+      5
+      # Qmax: Upper limit of the V/Q PI (pu)
+      0.44
+      # Qmin: Lower limit of the V/Q PI (pu)
+      -0.44
+      # Tft: Lead time constant (s)
+      0
+      # Tfv: Lag time constant; below 0.005 the lead-lag is bypassed (s)
+      0.05
+      # vfrz: Voltage below which the V/Q integrator is frozen (pu)
+      0.7
+      # Tp: Filter on P_branch and on the power-factor reference (s)
+      0.05
+      # fdbd1: Frequency deadband, lower edge, leq 0 (pu)
+      -0.0006
+      # fdbd2: Frequency deadband, upper edge, geq 0 (pu)
+      0.0006
+      # Ddn: Droop for over-frequency (pu/pu)
+      20
+      # Dup: Droop for under-frequency (pu/pu)
+      0
+      # femax: Upper limit on the power error (pu)
+      999
+      # femin: Lower limit on the power error (pu)
+      -999
+      # kpg: Power PI proportional gain (pu/pu)
+      0.05
+      # kig: Power PI integral gain (pu/(pu·s))
+      0.1
+      # Pmax: Upper limit of the power PI (pu)
+      1
+      # Pmin: Lower limit of the power PI (pu)
+      -1
+      # Tlag: Lag on the plant power output (s)
+      0.1
+      # FreqFlag: 1: plant power loop sets P_refo; 0: P_refo held at its initial value
+      0
+      # Tmesf: Frequency measurement time constant, raised to 0.05 if smaller (s)
+      0.02
+      # QextFlag: 1: plant V/Q loop sets Q_ext; 0: Q_ext held at its initial value
+      0
+      # vdip: Voltage below which a dip is declared (pu)
+      0.9
+      # vup: Voltage above which a dip is declared (pu)
+      1.1
+      # Trv: Terminal voltage filter (s)
+      0.02
+      # vref0: Reference for the dip injection; used as given, so 0 is not replaced by the initial voltage (pu)
+      1
+      # dbd1: Dip injection deadband, lower edge, leq 0 (pu)
+      -0.05
+      # dbd2: Dip injection deadband, upper edge, geq 0 (pu)
+      0.05
+      # kqv: Dip reactive current gain (pu/pu)
+      2
+      # Iqh1: Upper limit of the dip injection (pu)
+      1.05
+      # Iql1: Lower limit of the dip injection (pu)
+      -1.05
+      # qmax: Upper limit of the reactive power reference (pu)
+      0.44
+      # qmin: Lower limit of the reactive power reference (pu)
+      -0.44
+      # vmax: Upper limit of V_ref and of the Q PI (pu)
+      1.1
+      # vmin: Lower limit of V_ref and of the Q PI (pu)
+      0.9
+      # kqp: Q PI proportional gain (pu/pu)
+      0
+      # kqi: Q PI integral gain (pu/(pu·s))
+      0.1
+      # kvp: V PI proportional gain (pu/pu)
+      0
+      # kvi: V PI integral gain (pu/(pu·s))
+      40
+      # Tiq: Reactive current lag (QFlag = 0) (s)
+      0.02
+      # vq1: VDL1, voltage of point 1 (pu)
+      0.2
+      # Iq1: VDL1, reactive current limit at point 1 (pu)
+      1
+      # vq2: VDL1, point 2 (pu)
+      0.4
+      # Iq2:  (pu)
+      1
+      # vq3: VDL1, point 3 (pu)
+      0.8
+      # Iq3:  (pu)
+      1
+      # vq4: VDL1, point 4 (pu)
+      1
+      # Iq4:  (pu)
+      1
+      # vp1: VDL2, voltage of point 1 (pu)
+      0.2
+      # Ip1: VDL2, active current limit at point 1 (pu)
+      1
+      # vp2: VDL2, point 2 (pu)
+      0.4
+      # Ip2:  (pu)
+      1
+      # vp3: VDL2, point 3 (pu)
+      0.8
+      # Ip3:  (pu)
+      1
+      # vp4: VDL2, point 4 (pu)
+      1
+      # Ip4:  (pu)
+      1
+      # Paux: Constant added to the active current command after dividing Pord by voltage (Ipcmd = Pord/V + Paux), on SNOM base (pu)
+      0.
+      # CapBat: Battery energy capacity (MWh)
+      100.
+      # SOCini: Initial state of charge as a fraction of CapBat; must lie strictly between SOCmin and SOCmax (pu)
+      0.5
+      # SOCmax: Upper SOC limit; at it the battery is full and charging current is blocked (Ipmin = 0) (pu)
+      0.9
+      # SOCmin: Lower SOC limit; at it the battery is empty and discharging current is blocked (Ipmax = 0) (pu)
+      0.1
+      # dPmax: Upper rate limit of P_ref (pu/s)
+      999
+      # dPmin: Lower rate limit of P_ref (pu/s)
+      -999
+      # pmax: Upper limit of the power order Pord (pu)
+      1
+      # pmin: Lower limit of the power order Pord (pu)
+      -1
+      # Tpord: Active power order time constant (s)
+      0.02
+      # Imax: Converter current limit (pu)
+      1.11
+      # PFFlag: 1: constant power factor; 0: reactive power reference Q_ext
+      0
+      # vFlag: 1: V_ref from the Q PI; 0: V_ref = Q_r + v_ref1
+      0
+      # QFlag: 1: reactive current from the voltage PI; 0: from Q_r/v_t
+      0
+      # PQFlag: 1: active current priority; 0: reactive current priority
+      0
+      # Iqrmax: Reactive current rate limit, used when Q_0 > 0 (pu/s)
+      999
+      # Iqrmin: Reactive current rate limit, used when Q_0 < 0 (pu/s)
+      -999
+      # Tg: Converter current lag (s)
+      0.02
+      # vtmax: High-voltage threshold (WECC Volim) (pu)
+      1.2
+      # accel: High-voltage reactive current gain (WECC Khv) (pu/pu)
+      0.7
+      # QMIN: Lower limit of the converter reactive output after the high-voltage reduction (pu)
+      -1.3
+      # lvpnt0: Active current is zero below this voltage (pu)
+      0.4
+      # lvpnt1: Active current is unreduced above this voltage (pu)
+      0.8
+      # Brkpt: Low-voltage power logic breakpoint (pu)
+      0.9
+      # zerox: Low-voltage power logic zero crossing (pu)
+      0.4
+      # Lvpl1: Low-voltage power logic limit at Brkpt (pu)
+      1.22
+      # Lvplsw: 1: low-voltage power logic on; 0: off
+      0
+      # rrpwr: Active current rise rate limit (pu/s)
+      10
+      # vPLL: Voltage below which the PLL angle is frozen (pu)
+      0.2
+      # kpPLL: PLL proportional gain (rad/s/pu)
+      3
+      # kiPLL: PLL integral gain (rad/s²/pu)
+      30
+      # wrefPLL: PLL frequency offset; cancels, no effect on the response
+      1
+;
 ```
 
 ---
@@ -1723,7 +2706,12 @@ so both stay at zero.
 #### Usage Example
 
 ```
-INJEC  PMU  PMU_1041  1041  0.  0.  0.  0.  0.05 ;
+INJEC  PMU  PMU_1041  1041
+      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
+      0.  0.  0.  0.
+      # Tf: Frequency measurement time constant, recommended 0.05 to 0.10; values below 0.05 are clamped (s)
+      0.05
+;
 ```
 
 All four participation and power fields are zero: the model neither consumes nor

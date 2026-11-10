@@ -102,7 +102,26 @@ The ratio limits are given in **percent**, not per unit: the model divides `rati
 #### Usage Example
 
 ```
-DCTL  LTC  LTC_TR1  TR1-HV-MV  BUS_MV  1  85.  115.  33  0.01  30.0  10.0 ;
+DCTL  LTC  LTC_TR1
+      # branch: transformer whose ratio is controlled
+      TR1-HV-MV
+      # bus: bus whose voltage is controlled
+      BUS_MV
+      # direction: sign of the ratio change that raises the voltage (only the sign is used, 0 is refused)
+      1
+      # ratio_min: minimum ratio (%)
+      85.
+      # ratio_max: maximum ratio (%)
+      115.
+      # nb_positions: number of tap positions, at least 2
+      33
+      # half_deadband: half of the voltage deadband (pu)
+      0.01
+      # delay_first: delay before the first tap change (s)
+      30.0
+      # delay_next: delay between subsequent tap changes (s)
+      10.0
+;
 ```
 
 ---
@@ -139,7 +158,28 @@ $$
 #### Usage Example
 
 ```
-DCTL  LTC2  LTC2_TR1  TR1-HV-MV  BUS_MV  -1  88.  120.  33  0.01  1.0  30  8 ;
+DCTL  LTC2  LTC2_TR1
+      # branch: transformer whose ratio is controlled
+      TR1-HV-MV
+      # bus: bus whose voltage is controlled
+      BUS_MV
+      # direction: sign of the ratio change that raises the voltage (only the sign is used, 0 is refused)
+      -1
+      # ratio_min: minimum ratio (%)
+      88.
+      # ratio_max: maximum ratio (%)
+      120.
+      # nb_positions: number of tap positions, at least 2
+      33
+      # half_deadband: half of the voltage deadband (pu)
+      0.01
+      # Vset: voltage setpoint (pu)
+      1.0
+      # delay_first: delay before the first tap change (s)
+      30
+      # delay_next: delay between subsequent tap changes (s)
+      8
+;
 ```
 
 ---
@@ -188,7 +228,28 @@ where $\tau_{max}$ is the maximum delay and `accel` is the acceleration factor (
 #### Usage Example
 
 ```
-DCTL  LTCINV  LTCINV_TR1  TR1-HV-MV  BUS_MV  1  85.  115.  33  0.01  1.025  60.0  0.1 ;
+DCTL  LTCINV  LTCINV_TR1
+      # branch: transformer whose ratio is controlled
+      TR1-HV-MV
+      # bus: bus whose voltage is controlled
+      BUS_MV
+      # direction: sign of the ratio change that raises the voltage (only the sign is used, 0 is refused)
+      1
+      # ratio_min: minimum ratio (%)
+      85.
+      # ratio_max: maximum ratio (%)
+      115.
+      # nb_positions: number of tap positions, at least 2
+      33
+      # half_deadband: half of the voltage deadband (pu)
+      0.01
+      # Vset: voltage setpoint (pu)
+      1.025
+      # delay_max: delay for a voltage error equal to the half deadband (s)
+      60.0
+      # accel: time subtracted from the inverse-time delay (s)
+      0.1
+;
 ```
 
 ---
@@ -236,8 +297,36 @@ End-stop flags `w(15)` and `w(16)` prevent further tap changes when the ratio is
 #### Usage Example
 
 ```
-DCTL  OLTC2  OLTC_TR2  FROM_BUS  TO_BUS  1  1  0.88  1.12  25  0.0075
-             1.02  45.0  15.0  0.0  0.0 ;
+DCTL  OLTC2  OLTC_TR2
+      # branch: transformer whose ratio is controlled
+      TR1-HV-MV
+      # bus: bus whose voltage is controlled
+      BUS_MV
+      # direction: sign of the ratio change that raises the voltage (0 locks the tap)
+      1
+      # ratio_min: minimum ratio (%)
+      88.
+      # ratio_max: maximum ratio (%)
+      112.
+      # nb_positions: number of tap positions, at least 2
+      25
+      # half_deadband: half of the voltage deadband (pu)
+      0.0075
+      # Vset: voltage setpoint; the initial voltage must lie within Vset +/- half_deadband (pu)
+      1.02
+      # delay_first: delay before the first tap change (s)
+      45.0
+      # delay_next: delay between subsequent tap changes (s)
+      15.0
+      # R_comp: line-drop compensation resistance (pu)
+      0.0
+      # X_comp: line-drop compensation reactance (pu)
+      0.0
+      # verbose: 1 = full log messages; any other value gives fewer
+      1
+      # ratio2_factor: scales the tap ratio printed in log messages only
+      1.0
+;
 ```
 
 ---
@@ -289,7 +378,16 @@ Internal variables: `w(5)` = measured voltage, `w(6)` = start time of violation,
 #### Usage Example
 
 ```
-DCTL  UVPROT  UV_GEN1  BUS_HV  GEN1  0.85  0.5 ;
+DCTL  UVPROT  UV_GEN1
+      # bus: monitored bus
+      BUS_HV
+      # generator: must name an existing synchronous machine; RAMSES 3.84 does not use it to pick the tripped unit
+      GEN1
+      # Vmin: voltage threshold, 0 < Vmin <= 1 (pu)
+      0.85
+      # T_delay: time below Vmin before tripping, > 0 (s)
+      0.5
+;
 ```
 
 ---
@@ -345,7 +443,30 @@ Internal variables: `w(12)`–`w(18)` (previous voltage, timers, area accumulato
 #### Usage Example
 
 ```
-DCTL  UVLS  UVLS1  BUS_MV  LOAD1  0.90  0.5  5.0  20.0  0.3  2.0  5.0  50.0  5 ;
+DCTL  UVLS  UVLS1
+      # bus: monitored bus
+      BUS_MV
+      # load: injector shed by the controller (needs parameters P0 and Q0)
+      LOAD1
+      # V_th: voltage threshold (pu)
+      0.90
+      # C: area of voltage deficit that triggers shedding (pu s)
+      0.5
+      # T_min: minimum delay from arming to shedding (s)
+      5.0
+      # T_max: maximum delay from arming; shedding is forced after it (s)
+      20.0
+      # frac_load: fraction of the load that may be shed, capped at 1
+      0.3
+      # K: gain: shed amount per unit of mean voltage deficit (MW/pu)
+      2.0
+      # P_min_step: minimum load shed per step (MW)
+      5.0
+      # P_max_step: maximum load shed per step (MW)
+      50.0
+      # max_steps: maximum number of shedding steps
+      5
+;
 ```
 
 ---
@@ -390,7 +511,24 @@ Two internal timers (`w(8)`, `w(9)`) track time spent in violation zones.
 #### Usage Example
 
 ```
-DCTL  FRT  FRT_WTG1  WT1  0.90  0.15  0.70  0.5  0.20  1.0  0.05 ;
+DCTL  FRT  FRT_WTG1
+      # injector: injector tripped by the relay
+      WT1
+      # Val1: trip voltage between t1 and t2 after timer 1 starts (pu)
+      0.30
+      # t1: end of the no-trip period of timer 1 (s)
+      0.15
+      # Val2: trip voltage after t2 on timer 1 (pu)
+      0.70
+      # t2: time on timer 1 from which Val2 applies (s)
+      0.5
+      # Val3: voltage below which timer 1 starts; must be below Val4 (pu)
+      0.50
+      # t3: time on timer 2 from which Val4 applies (s)
+      1.5
+      # Val4: voltage below which timer 2 starts; both timers reset when the voltage rises above it (pu)
+      0.90
+;
 ```
 
 ---
@@ -436,7 +574,18 @@ The controller latches once tripped and cannot reset. State variable `w(7)`:
 #### Usage Example
 
 ```
-DCTL  injprot  PROT_WTG1  WT1  I  0.0  1.2  0.1 ;
+DCTL  injprot  PROT_WTG1
+      # injector: injector tripped by the relay
+      WT1
+      # observable: name of an observable of that injector's model
+      vt
+      # lower_bound: lower bound on the observable, below upper_bound
+      0.85
+      # upper_bound: upper bound on the observable
+      1.15
+      # T_trip: read but not used in RAMSES 3.84, where the trip delay is fixed at 1 s (s)
+      1.0
+;
 ```
 
 ---
@@ -475,7 +624,14 @@ The timer resets if the speed returns within bounds. The controller latches perm
 #### Usage Example
 
 ```
-DCTL  LOSPROT  LOS_GEN2  GEN2  1.05  0.2 ;
+DCTL  LOSPROT  LOS_GEN2
+      # generator: synchronous machine tripped by the relay
+      GEN2
+      # omega_max: speed threshold, > 0 (pu)
+      1.05
+      # T_delay: time above omega_max before tripping, >= 0 (s)
+      0.2
+;
 ```
 
 ---
@@ -511,7 +667,16 @@ The action is immediate (no time delay); the oversize factor allows temporary ov
 #### Usage Example
 
 ```
-DCTL  line_prot  LINEPROT1  1.05  2  L1-L2  L3-L4 ;
+DCTL  line_prot  LINEPROT1
+      # oversize: trip threshold as a multiple of the branch rating
+      1.05
+      # nb_lines: number of protected branches
+      2
+      # branch: protected branch
+      L1-L2
+      # branch: protected branch
+      L3-L4
+;
 ```
 
 ---
@@ -556,7 +721,26 @@ The direction parameter defines whether increasing the tap increases or decrease
 #### Usage Example
 
 ```
-DCTL  PST  PST_L1  PST-TR1  LINE-MON  1  -0.5  0.5  21  0.02  30.0  10.0 ;
+DCTL  PST  PST_L1
+      # branch: phase-shifting transformer, which is also the branch whose power is controlled
+      PST-TR1
+      # mon_branch: not read by RAMSES 3.84: any name
+      LINE-MON
+      # direction: sign of the phase change that raises the power (only the sign is used, 0 is refused)
+      1
+      # phase_min: minimum phase angle (deg)
+      -30.
+      # phase_max: maximum phase angle (deg)
+      30.
+      # nb_positions: number of tap positions, at least 2
+      21
+      # half_deadband: half of the power deadband (pu)
+      0.02
+      # delay_first: delay before the first tap change (s)
+      30.0
+      # delay_next: delay between subsequent tap changes (s)
+      10.0
+;
 ```
 
 ---
@@ -583,7 +767,12 @@ Observable: `elapsed` (wall-clock elapsed time in seconds).
 #### Usage Example
 
 ```
-DCTL  RT  RT_CTL  1.0  0.01 ;
+DCTL  RT  RT_CTL
+      # ratio: simulated time per second of wall time
+      1.0
+      # lead_time: how far the simulation may run ahead of scaled wall time (optional, default 0) (s)
+      0.01
+;
 ```
 
 ---
@@ -641,13 +830,44 @@ It interacts directly with the HVDC two-port model's internal parameters.
 #### Usage Example
 
 ```
-DCTL  HVDC_LIM  HVDCLIM1  HVDClink
-      0.85  1.15  0.00625
-      0.85  1.15  0.00625
-      15.0  18.0  15.0  18.0
-      400.0  600.0
-      10.0  10.0
-      5.0  0.0  15.0 ;
+DCTL  HVDC_LIM  HVDCLIM1
+      # twop: HVDC_LCC two-port controlled
+      HVDClink
+      # nr_min: minimum rectifier transformer ratio
+      0.85
+      # nr_max: maximum rectifier transformer ratio
+      1.15
+      # nr_step: rectifier ratio step
+      0.00625
+      # ni_min: minimum inverter transformer ratio
+      0.85
+      # ni_max: maximum inverter transformer ratio
+      1.15
+      # ni_step: inverter ratio step
+      0.00625
+      # alpha_min_des: lower edge of the desired firing angle band (deg)
+      15.0
+      # alpha_max_des: upper edge of the desired firing angle band (deg)
+      18.0
+      # gamma_min_des: lower edge of the desired extinction angle band (deg)
+      15.0
+      # gamma_max_des: upper edge of the desired extinction angle band (deg)
+      18.0
+      # V_min_des: lower edge of the desired DC voltage band (kV)
+      400.0
+      # V_max_des: upper edge of the desired DC voltage band (kV)
+      600.0
+      # delay_rect: delay between rectifier tap changes (s)
+      10.0
+      # delay_inv: delay between inverter tap changes (s)
+      10.0
+      # alphamin: minimum firing angle (deg)
+      5.0
+      # deltaI: DC current reduction when alpha reaches alphamin and the inverter takes current control (kA)
+      0.0
+      # gammamin: minimum extinction angle (deg)
+      15.0
+;
 ```
 
 ---
@@ -687,7 +907,16 @@ Parameter names exported: `SPEEDMIN`, `SPEEDMAX`, `DEADTIME`.
 #### Usage Example
 
 ```
-DCTL  SIM_MINMAXSPEED  SPEEDMON  1.2  0.5  0.5  1 ;
+DCTL  SIM_MINMAXSPEED  SPEEDMON
+      # SPEEDMIN: lowest machine speed allowed (pu)
+      0.5
+      # SPEEDMAX: highest machine speed allowed (pu)
+      1.2
+      # start_time: monitoring starts at this time (s)
+      0.5
+      # warn_only: 0 = stop the simulation on a violation, otherwise log a warning only
+      0
+;
 ```
 
 ---
@@ -723,7 +952,16 @@ Parameter names exported: `VMIN`, `VMAX`, `DEADTIME`.
 #### Usage Example
 
 ```
-DCTL  SIM_MINMAXVOLT  VOLTMON  1.15  0.80  1.0  0 ;
+DCTL  SIM_MINMAXVOLT  VOLTMON
+      # VMIN: lowest bus voltage allowed (pu)
+      0.80
+      # VMAX: highest bus voltage allowed (pu)
+      1.15
+      # start_time: monitoring starts at this time (s)
+      1.0
+      # warn_only: 0 = stop the simulation on a violation, otherwise log a warning only
+      0
+;
 ```
 
 ---
@@ -756,5 +994,10 @@ The controller accumulates per-bus variances and a system-wide sum.
 #### Usage Example
 
 ```
-DCTL  VOLT_VAR  VVAR  60.0  5 ;
+DCTL  VOLT_VAR  VVAR
+      # window: averaging time window (s)
+      60.0
+      # nb_list: number of most variable buses written to the log at the end (an integer)
+      5
+;
 ```
