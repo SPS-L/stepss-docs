@@ -85,7 +85,7 @@ INJEC INJ_TYPE NAME BUS_NAME FP FQ P Q parameters_passed_to_INJ ;
 
 The trailing fields are the model's data parameters in declaration order. For the
 catalogue of injector models and their parameters, see
-[Injector Models](/models/custom-injectors/).
+[Injector Models](/models/injectors/).
 
 Two injectors are worth noting here because they affect the whole simulation rather
 than one bus:
@@ -94,7 +94,7 @@ than one bus:
   synchronous reference frame. Its single data parameter is the three-phase
   short-circuit power of the equivalent network, in MVA, which RAMSES converts to
   the Thévenin reactance at initialization. See
-  [Thévenin Equivalent](/models/custom-injectors/#theveq-inj_theveq-thévenin-equivalent).
+  [Thévenin Equivalent](/models/injectors/loads/#theveq-inj_theveq-thévenin-equivalent).
 - **`VFAULT`** is added automatically by RAMSES to apply voltage faults; you do not
   write it yourself.
 

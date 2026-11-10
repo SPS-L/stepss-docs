@@ -63,21 +63,21 @@ route.
 
 ## Injectors
 
-[Injector Models](/models/custom-injectors/)
+[Injector Models](/models/injectors/)
 
-| Data-file name | State |
-|----------------|-------|
-| `LOAD`, `RESTLD` | Built in |
-| `INDMACH1`, `INDMACH2` | Built in |
-| `SVC_GENERIC1` | Built in |
-| `THEVEQ` | Built in |
-| `PQ`, `IBG` | Registered |
-| `WT3`, `WT4` | Registered |
-| `BESS`, `GFOL`, `GFOR` | Registered |
-| `vfd_load`, `PMU` | Registered |
-| `VFAULT` | Registered, added automatically by RAMSES |
-| `INDM1`, `PV` | Registered, since 3.79 |
-| `inj_norton` | Excluded from the build |
+| Data-file name | State | Documented on |
+|----------------|-------|---------------|
+| `LOAD`, `RESTLD`, `THEVEQ` | Built in | [Loads and Equivalents](/models/injectors/loads/) |
+| `PQ`, `vfd_load` | Registered | [Loads and Equivalents](/models/injectors/loads/) |
+| `INDMACH1`, `INDMACH2` | Built in | [Induction Machines](/models/injectors/induction-machines/) |
+| `INDM1` | Registered, since 3.79 | [Induction Machines](/models/injectors/induction-machines/) |
+| `WT3`, `WT4`, `BESS` | Registered | [WECC Wind and Storage](/models/injectors/wecc/) |
+| `IBG`, `GFOL`, `GFOR` | Registered | [Converter Models](/models/injectors/converters/) |
+| `PV` | Registered, since 3.79 | [Converter Models](/models/injectors/converters/) |
+| `SVC_GENERIC1` | Built in | [Compensation and Measurement](/models/injectors/compensation-measurement/) |
+| `PMU` | Registered | [Compensation and Measurement](/models/injectors/compensation-measurement/) |
+| `VFAULT` | Registered, added automatically by RAMSES | [Dynamic Data Records](/user-guide/dynamic-models/) |
+| `inj_norton` | Excluded from the build | |
 
 ## Two-Port Models
 

@@ -13,6 +13,8 @@ export default defineConfig({
 	// it is now one page per block category under /developer/codegen-blocks/.
 	redirects: {
 		'/developer/codegen-library': '/developer/codegen-blocks/',
+		// The injectors page was split by family; test systems and notebooks link to the old URL.
+		'/models/custom-injectors': '/models/injectors/',
 	},
 	markdown: {
 		remarkPlugins: [remarkMath],
@@ -116,7 +118,17 @@ export default defineConfig({
 						{ label: 'Custom Exciters',         slug: 'models/custom-exciters' },
 						{ label: 'IEEE Governors',          slug: 'models/ieee-governors' },
 						{ label: 'Custom Governors',        slug: 'models/custom-governors' },
-						{ label: 'Injectors',               slug: 'models/custom-injectors' },
+						{
+							label: 'Injectors',
+							items: [
+								{ label: 'Injector Models',              slug: 'models/injectors' },
+								{ label: 'Loads and Equivalents',        slug: 'models/injectors/loads' },
+								{ label: 'Induction Machines',           slug: 'models/injectors/induction-machines' },
+								{ label: 'WECC Wind and Storage',        slug: 'models/injectors/wecc' },
+								{ label: 'Converter Models',             slug: 'models/injectors/converters' },
+								{ label: 'Compensation and Measurement', slug: 'models/injectors/compensation-measurement' },
+							],
+						},
 						{ label: 'Two-Port Models',         slug: 'models/two-port-models' },
 						{ label: 'Discrete Controllers',    slug: 'models/discrete-controllers' },
 					],

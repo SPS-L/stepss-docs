@@ -22,7 +22,11 @@ There are no tests or linters configured. **Always run `npm run build` after cha
 - **Content**: All documentation lives in `src/content/docs/` as `.md` or `.mdx` files. URL slugs map directly from file paths (e.g., `user-guide/network.md` → `/user-guide/network/`).
 - **Sidebar/Navigation**: Defined entirely in `astro.config.mjs` under the `sidebar` array. New pages **must** be registered there with their `slug` to appear in navigation. The sidebar supports nested `items` arrays for sub-sections.
   - Keep the tree **two levels deep at most**, and never create a group holding a
-    single page. `CODEGEN Blocks` is the one nested group, because it is a nine-page
+    single page. There are two nested groups, each because one page had become a
+    reference too long to scroll: `Injectors`, six pages under `models/injectors/`
+    (a section index and one page per model family; `/models/custom-injectors` is
+    kept as a redirect because test systems and notebooks link to it), and
+    `CODEGEN Blocks`, a nine-page
     reference.
   - A sidebar `label` that differs from the page's own `title` shows up as two
     names for one page (sidebar vs breadcrumb). Only diverge deliberately, as with
@@ -151,6 +155,13 @@ Every page requires YAML frontmatter with `title` and `description`. The landing
   is the reference implementation; match it when adding a model.
 - `<Tabs>`/`<TabItem>` are used **within** a usage example (data file vs notes),
   not to group model variants. Pages that need no components are `.md`.
+- On the injector pages each usage example is folded: the code fence sits in
+  `<details><summary>Show the data record</summary>`, with a blank line on each
+  side of the fence, and any sentence introducing the record stays outside. The
+  one-value-per-line records tripled the height of a model page, and the fold is
+  what keeps a family page readable. `tools/from_docs.py` in stepss-userguide
+  strips the wrapper for print, so keep the summary text exactly as written. The
+  exciter, governor, two-port and controller pages are not folded yet.
 
 ### One owner per topic
 
