@@ -35,6 +35,7 @@ There are no tests or linters configured. **Always run `npm run build` after cha
     root (`models/index.md`, `test-systems/index.md`). Link to **that**, never to an
     arbitrary member page standing in for the section.
 - **Styling**: Custom theme overrides in `src/styles/custom.css` (blue accent, Inter/JetBrains Mono fonts).
+- **Version label**: the `v3.84`-style label beside the GitHub icon in the header names the STEPSS release the site documents and links to its release notes. It comes from `src/version.mjs` through the `SocialIcons` override in `src/components/`, and is bumped by hand once the pages match a new release: no workflow updates it, so a release that changes nothing here still needs the one-line bump.
 - **Math**: KaTeX via `remark-math` + `rehype-katex` + `starlight-katex`. Use `$...$` inline and `$$...$$` display.
 - **Images**: Diagrams (SVGs) go in `public/images/` and are referenced as absolute paths (`/images/foo.svg`). Use `<img src="/images/..." alt="..." style="width:60%" />` for sizing control. Logos/icons are in `src/assets/`.
 - **Static files**: PDF user guide, CNAME, and favicon in `public/`. `public/stepss_docs.pdf` is a copy of the compiled `stepss_doc.pdf` from the `stepss-userguide` repo; refresh it whenever the user guide is rebuilt.

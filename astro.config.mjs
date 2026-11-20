@@ -34,6 +34,10 @@ export default defineConfig({
 				dark: './src/assets/icon-dark.svg',
 				replacesTitle: false,
 			},
+			// SocialIcons is overridden to put the documented STEPSS version beside the icons.
+			components: {
+				SocialIcons: './src/components/SocialIcons.astro',
+			},
 			social: [
 				{ icon: 'github', label: 'GitHub', href: 'https://github.com/SPS-L/stepss-docs' },
 				{ icon: 'email', label: 'Contact (stepss@sps-lab.org)', href: 'mailto:stepss@sps-lab.org' },
