@@ -202,6 +202,7 @@ export default defineConfig({
 						{ label: 'Kundur Two-Area System', slug: 'test-systems/kundur' },
 						{ label: 'Nordic Test System',     slug: 'test-systems/nordic' },
 						{ label: 'GB Network',             slug: 'test-systems/gb-network' },
+						{ label: 'Victorian Transmission System', slug: 'test-systems/victorian' },
 					],
 				},
 				{

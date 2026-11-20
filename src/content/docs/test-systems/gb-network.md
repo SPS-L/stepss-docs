@@ -3,7 +3,7 @@ title: GB Network
 description: Reduced Great Britain transmission system with HVDC-LCC links for dynamic simulation and wide-area monitoring studies
 ---
 
-The GB Network is a 50 Hz reduced-order representation of the Great Britain transmission grid with 87 buses and 37 synchronous machines (thermal and CCGT units with AVR/PSS and governor models), shunt compensation, and HVDC interconnections modelled as two-port converter injectors. It is used for dynamic simulation and wide-area monitoring/control studies; a one-line diagram is included in the repository.
+The GB Network is a 50 Hz reduced-order representation of the Great Britain transmission grid with 87 buses and 36 synchronous machines (thermal and CCGT units with AVR/PSS and governor models), shunt compensation, and HVDC interconnections modelled as two-port converter injectors. It is used for dynamic simulation and wide-area monitoring/control studies; a one-line diagram is included in the repository.
 
 **Repository:** [SPS-L/stepss-GB-Network](https://github.com/SPS-L/stepss-GB-Network)
 

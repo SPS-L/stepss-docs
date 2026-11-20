@@ -1,9 +1,9 @@
 ---
 title: Test Systems
-description: The four benchmark networks distributed for STEPSS, and which to pick
+description: The five benchmark networks distributed for STEPSS, and which to pick
 ---
 
-Four benchmark networks ship as ready-to-run RAMSES data sets, each in its own
+Five benchmark networks ship as ready-to-run RAMSES data sets, each in its own
 repository. They are ordered here from smallest to largest, which is also the
 order in which they are worth meeting.
 
@@ -12,7 +12,8 @@ order in which they are worth meeting.
 | [5-Bus](/test-systems/5bus/) | 5 | 1 | 50 Hz | Learning the tools |
 | [Kundur Two-Area](/test-systems/kundur/) | 11 | 4 | 60 Hz | Inter-area oscillations, PSS tuning |
 | [Nordic](/test-systems/nordic/) | 74 | 20 | 50 Hz | Long-term voltage stability |
-| [GB Network](/test-systems/gb-network/) | 87 | 37 | 50 Hz | HVDC, wide-area monitoring |
+| [GB Network](/test-systems/gb-network/) | 87 | 36 | 50 Hz | HVDC, wide-area monitoring |
+| [Victorian](/test-systems/victorian/) | 125 | 14 | 50 Hz | Fast frequency response, high renewable shares |
 
 ## Which One to Start With
 
@@ -30,10 +31,14 @@ order in which they are worth meeting.
 - **Converter-dominated and HVDC studies**: the
   [GB network](/test-systems/gb-network/) models its interconnections as two-port
   converters and carries ready-made disturbance templates.
+- **Frequency response with high renewable shares**: the
+  [Victorian system](/test-systems/victorian/) pairs 23 wind and solar plants with
+  thermal and hydro units, and its scripts generate operating points across a day
+  and three levels of heating electrification.
 
 ## Running Any of Them
 
-All four follow the same pattern: clone the repository, then point a stepss
+All five follow the same pattern: clone the repository, then point a stepss
 `cfg` at its data files.
 
 ```python
