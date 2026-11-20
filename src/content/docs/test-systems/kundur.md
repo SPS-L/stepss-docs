@@ -49,4 +49,4 @@ If you use this test system in your research, please cite the original source of
 
 - [Test Systems](/test-systems/), the other benchmark networks
 - [Eigenanalysis](/user-guide/eigenanalysis/), analyse the inter-area mode this system is built to show
-- [Custom Exciters](/models/custom-exciters/), the `exc_kundur` AVR/PSS used here
+- [Basic Exciters](/models/exciters/basic/#kundur-exc_kundur), the `exc_kundur` AVR/PSS used here

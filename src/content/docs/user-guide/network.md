@@ -174,7 +174,7 @@ TRFO NAME FROMBUS TOBUS CONBUS R X B N SNOM NFIRST NLAST NBPOS TOLV VDES BR ;
 
 This simplified model has $B_2 = 0$ and $\phi = 0$, and **combines the transformer model with load tap changer (LTC) data for the power flow** in a single record. The LTC fields (`CONBUS`, `NFIRST`, `NLAST`, `NBPOS`, `TOLV`, `VDES`) carry the information needed to adjust the transformer ratio during power flow computation. These fields are not used by RAMSES during dynamic simulation. It cannot be used for phase-shifting transformers.
 
-To control the transformer ratio during dynamic simulation, associate a [DCTL LTC](/models/discrete-controllers/#ltc-dctl_ltc-load-tap-changer-standard) controller with the transformer.
+To control the transformer ratio during dynamic simulation, associate a [DCTL LTC](/models/discrete-controllers/tap-changers/#ltc-dctl_ltc-load-tap-changer-standard) controller with the transformer.
 
 See [Power Flow](/user-guide/power-flow/) for details on ratio adjustment.
 

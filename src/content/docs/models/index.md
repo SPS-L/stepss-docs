@@ -32,34 +32,34 @@ route.
 
 ## Exciters
 
-[IEEE Exciters](/models/ieee-exciters/) and [Custom Exciters](/models/custom-exciters/)
+[Exciter Models](/models/exciters/)
 
 | Data-file name | State | Documented on |
 |----------------|-------|---------------|
-| `CONSTANT`, `1ST_ORDER` | Built in | [Custom Exciters](/models/custom-exciters/) |
-| `GENERIC1`, `GENERIC2` | Built in | [Custom Exciters](/models/custom-exciters/) |
-| `GENERIC` | Registered, since 3.57 | [Custom Exciters](/models/custom-exciters/) |
-| `kundur` | Registered | [Custom Exciters](/models/custom-exciters/) |
-| `AVR_DG` | Registered, since 3.76 | [Custom Exciters](/models/custom-exciters/) |
-| `AC1A`, `AC4A`, `IEEET5` | Registered | [IEEE Exciters](/models/ieee-exciters/) |
-| `ST1A`, `ST1A_IEEEST`, `ST1A_PSS2B`, `ST1A_PSS4B` | Registered | [IEEE Exciters](/models/ieee-exciters/) |
-| `SEXS`, `SEXS_IEEEST` | Registered | [IEEE Exciters](/models/ieee-exciters/) |
-| `EXPIC1_PSS2B` | Registered | [IEEE Exciters](/models/ieee-exciters/) |
-| `ENTSOE_simp` | Registered | [IEEE Exciters](/models/ieee-exciters/) |
-| `AC1A_MAXEX2`, `AC1A_RETRO`, `AC1A_RETRO_PSS4B`, `AC8B`, `AC8B_PSS3B_lim`, `DC3A`, `EXPIC1`, `EXPIC1_PSS2B_MAXEX2`, `SEXS_STAB3_lim`, `ST1A_IEEEST_MAXEX2`, `ST1A_lim`, `ST1A_PSS2B_MAXEX2`, `ST1A_PSS3B`, `ST1A_PSS4B_MAXEX2`, `ST2A` | Registered, since 3.79 | [IEEE Exciters](/models/ieee-exciters/) |
+| `CONSTANT`, `1ST_ORDER` | Built in | [Basic Exciters](/models/exciters/basic/) |
+| `GENERIC1`, `GENERIC2` | Built in | [Generic Exciters](/models/exciters/generic/) |
+| `GENERIC` | Registered, since 3.57 | [Generic Exciters](/models/exciters/generic/) |
+| `kundur` | Registered | [Basic Exciters](/models/exciters/basic/) |
+| `AVR_DG` | Registered, since 3.76 | [Generic Exciters](/models/exciters/generic/) |
+| `AC1A`, `AC4A`, `IEEET5` | Registered | [Exciter Models](/models/exciters/) |
+| `ST1A`, `ST1A_IEEEST`, `ST1A_PSS2B`, `ST1A_PSS4B` | Registered | [Exciter Models](/models/exciters/) |
+| `SEXS`, `SEXS_IEEEST` | Registered | [Exciter Models](/models/exciters/) |
+| `EXPIC1_PSS2B` | Registered | [Exciter Models](/models/exciters/) |
+| `ENTSOE_simp` | Registered | [Exciter Models](/models/exciters/) |
+| `AC1A_MAXEX2`, `AC1A_RETRO`, `AC1A_RETRO_PSS4B`, `AC8B`, `AC8B_PSS3B_lim`, `DC3A`, `EXPIC1`, `EXPIC1_PSS2B_MAXEX2`, `SEXS_STAB3_lim`, `ST1A_IEEEST_MAXEX2`, `ST1A_lim`, `ST1A_PSS2B_MAXEX2`, `ST1A_PSS3B`, `ST1A_PSS4B_MAXEX2`, `ST2A` | Registered, since 3.79 | [Exciter Models](/models/exciters/) |
 
 ## Governors
 
-[IEEE Governors](/models/ieee-governors/) and [Custom Governors](/models/custom-governors/)
+[Governor Models](/models/governors/)
 
 | Data-file name | State | Documented on |
 |----------------|-------|---------------|
-| `CONSTANT`, `1ST_ORDER` | Built in | [Custom Governors](/models/custom-governors/) |
-| `HYDRO_GENERIC1`, `THERMAL_GENERIC1` | Built in | [Custom Governors](/models/custom-governors/) |
-| `HYDRO_DG` | Registered, since 3.76 | [Custom Governors](/models/custom-governors/) |
-| `DEGOV1`, `ENTSOE_simp` | Registered, since 3.40 | [IEEE Governors](/models/ieee-governors/) |
-| `GAST`, `TGOV1`, `HYGOV` | Registered, since 3.50 | [IEEE Governors](/models/ieee-governors/) |
-| `GASTURBM`, `GOVCLASM`, `GOVHYDR`, `GOVNUC` | Built in, since 3.79 | [Custom Governors](/models/custom-governors/) |
+| `CONSTANT`, `1ST_ORDER` | Built in | [Basic and Generic Governors](/models/governors/generic/) |
+| `HYDRO_GENERIC1`, `THERMAL_GENERIC1` | Built in | [Basic and Generic Governors](/models/governors/generic/) |
+| `HYDRO_DG` | Registered, since 3.76 | [Basic and Generic Governors](/models/governors/generic/) |
+| `DEGOV1`, `ENTSOE_simp` | Registered, since 3.40 | [IEEE Governors](/models/governors/ieee/) |
+| `GAST`, `TGOV1`, `HYGOV` | Registered, since 3.50 | [IEEE Governors](/models/governors/ieee/) |
+| `GASTURBM`, `GOVCLASM`, `GOVHYDR`, `GOVNUC` | Built in, since 3.79 | [Plant Governors](/models/governors/plant/) |
 
 ## Injectors
 
@@ -97,16 +97,16 @@ route.
 Discrete controllers take no prefix in the data file, though the dispatcher
 prepends `dctl_` internally.
 
-| Data-file name | State |
-|----------------|-------|
-| `LTC`, `LTC2`, `LTCINV`, `OLTC2` | Built in |
-| `PST` | Built in |
-| `UVLS`, `UVPROT`, `FRT` | Built in |
-| `MAIS` | Built in |
-| `RT` | Built in |
-| `SIM_MINMAXVOLT`, `SIM_MINMAXSPEED` | Built in |
-| `VOLT_VAR` | Built in |
-| `line_prot` | Registered as `dctl_line_prot` |
+| Data-file name | State | Documented on |
+|----------------|-------|---------------|
+| `LTC`, `LTC2`, `LTCINV`, `OLTC2` | Built in | [Tap Changers](/models/discrete-controllers/tap-changers/) |
+| `PST` | Built in | [Protection and Control](/models/discrete-controllers/protection/) |
+| `UVLS`, `UVPROT`, `FRT` | Built in | [Protection and Control](/models/discrete-controllers/protection/) |
+| `MAIS` | Built in | [Discrete Controller Models](/models/discrete-controllers/) |
+| `RT` | Built in | [Protection and Control](/models/discrete-controllers/protection/) |
+| `SIM_MINMAXVOLT`, `SIM_MINMAXSPEED` | Built in | [Monitoring](/models/discrete-controllers/monitoring/) |
+| `VOLT_VAR` | Built in | [Monitoring](/models/discrete-controllers/monitoring/) |
+| `line_prot` | Registered as `dctl_line_prot` | [Protection and Control](/models/discrete-controllers/protection/) |
 
 ## The Synchronous Machine
 

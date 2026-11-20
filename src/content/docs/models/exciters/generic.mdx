@@ -1,389 +1,13 @@
 ---
-title: Custom Exciter Models
-description: Custom and simplified excitation system models in RAMSES
+title: Generic Exciters
+description: The GENERIC1, GENERIC2, GENERIC and AVR_DG excitation models in RAMSES
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-This page documents the custom excitation system models available in RAMSES. These models range from a trivial constant-voltage source to full-featured AVR with PSS and OEL. Models without a `.txt` definition file are implemented directly in Fortran and are described from their source headers.
+Generic voltage regulators with optional stabilizer and limiter stages, and the regulator of a diesel generator. `GENERIC1` and `GENERIC2` are built in and written in uppercase with no prefix; `GENERIC` and `AVR_DG` are registered, and RAMSES adds the `exc_` prefix automatically.
 
-:::note[Usage in Dynamic Data Files]
-Exciter models in RAMSES are defined as sub-records within a `SYNC_MACH` block using the `EXC` keyword, followed by the model name and its parameters. They are not standalone records. The `EXC` line appears after the machine parameters and before the `TOR` (torque/governor) line. The entire block ends with a single `;` after the `TOR` record.
-
-```
-SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
-                    XT  Xl  Xd  X'd  X"d  Xq  X'q  X"q  m  n  Ra  T'do  T"do  T'qo  T"qo
-              EXC model_name  param1  param2  ...
-              TOR model_name  param1  param2  ... ;
-```
-
-This page documents the exciters that are not IEEE-standard models: `CONSTANT`, `1ST_ORDER`, `GENERIC1` and `GENERIC2` (built in, uppercase, no prefix), plus `kundur`, `GENERIC` and `AVR_DG` (registered, and RAMSES adds the `exc_` prefix automatically).
-
-The IEEE-standard exciters are on the [IEEE Exciter Models](/models/ieee-exciters/) page. For the whole catalogue at a glance, including which models are compiled but not callable by name, see the [Model Reference index](/models/).
-:::
-
----
-
-## CONSTANT (`exc_constant`)
-
-The data-file model name is `CONSTANT`.
-
-### Scientific Description
-
-The `exc_constant` model provides a **constant field voltage** source. The field voltage $V_f$ is fixed at its load-flow initialisation value and does not respond to any input:
-
-$$
-V_f(t) = V_{f0} \quad \forall t
-$$
-
-The single algebraic state satisfies:
-
-$$
-f(1) = x(1) - V_{f0} = 0
-$$
-
-This model is useful for open-loop tests, for machines that are not equipped with a voltage regulator, or as a placeholder during model development.
-
-**Implementation details (from Fortran source):**
-- `nbxvar = 1`, `nbzvar = 0`, `nbdata = 0`
-- One additional parameter: `prm(1) = Vf0` (set at initialisation from the load-flow field voltage)
-- Observables: `vf`, `if`
-
-### Parameters
-
-| Parameter | Description |
-|-----------|-------------|
-| *(none)* | No user-supplied data parameters. The field voltage is taken from the initialisation (load-flow) value automatically. |
-
-### Usage Example
-
-<Tabs>
-<TabItem label="RAMSES Data File">
-```
-SYNC_MACH  GEN1  BUS1
-      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
-      1.  1.  0.  0.
-      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
-      600.
-      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
-      570.
-      # H: Inertia constant (s)
-      3.
-      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
-      0.
-      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
-      0.95
-      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
-      XT
-      # Xl: Leakage reactance L_l (pu)
-      0.15
-      # Xd: d-axis synchronous reactance (pu)
-      1.1
-      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
-      0.25
-      # X"d: d-axis subtransient reactance (pu)
-      0.2
-      # Xq: q-axis synchronous reactance (pu)
-      0.7
-      # X'q: q-axis transient reactance (pu)
-      *
-      # X"q: q-axis subtransient reactance (pu)
-      0.2
-      # m: Saturation coefficient (set to 0 to neglect saturation)
-      0.1
-      # n: Saturation exponent (ignored when m = 0)
-      6.0257
-      # Ra: Armature resistance (pu)
-      0.
-      # T'do: d-axis open-circuit transient time constant (s)
-      5.00
-      # T"do: d-axis open-circuit subtransient time constant (s)
-      0.05
-      # T'qo: q-axis open-circuit transient time constant (s)
-      *
-      # T"qo: q-axis open-circuit subtransient time constant (s)
-      0.1
-EXC  CONSTANT
-TOR  CONSTANT
-;
-```
-</TabItem>
-<TabItem label="Notes">
-- No parameters need to be supplied; the model self-initialises to the load-flow $V_f$ value.
-- Useful for simulation of machines operating in manual excitation mode.
-- The model name in the data file is `CONSTANT` (not `exc_constant`).
-</TabItem>
-</Tabs>
-
----
-
-## 1ST_ORDER (`exc_1storder`)
-
-The data-file model name is `1ST_ORDER` (uppercase, with the underscore).
-
-### Scientific Description
-
-The `exc_1storder` model is a **first-order automatic voltage regulator** (AVR). It represents the simplest dynamic exciter: a proportional gain $K_A$ acting on the terminal voltage error, filtered through a single first-order lag $T_A$, with output limits.
-
-The AVR computes the voltage error and drives the field voltage:
-
-$$
-\frac{d V_f}{dt} = \frac{1}{T_A}\left[K_A\left(V_{ref} - V\right) - V_f\right], \quad V_f \in [V_{f,min},\, V_{f,max}]
-$$
-
-The reference voltage $V_{ref}$ is initialised from:
-
-$$
-V_{ref} = V_0 + \frac{V_{f0}}{K_A}
-$$
-
-**Implementation details (from Fortran source):**
-- `nbxvar = 1`, `nbzvar = 1`, `nbdata = 4`
-- Parameters: `prm(1) = KA`, `prm(2) = TA`, `prm(3) = Vfmin`, `prm(4) = Vfmax`
-- Additional parameter: `prm(5) = V0` (voltage setpoint, computed at initialisation)
-- The ODE in the continuous mode is:
-
-$$
-f(1) = \frac{-V_f + K_A(V_{ref} - V)}{T_A}
-$$
-
-- With anti-windup: if the limiter is active, `f(1) = Vf - Vfmin` (or `Vfmax`).
-
-<img src="/images/models/exc-1storder-light.svg"
-     alt="1ST_ORDER exciter block diagram. The terminal voltage V is subtracted from the reference Vref and the error drives a first-order automatic voltage regulator of gain KA and time constant TA, limited between Vfmin and Vfmax, giving the field voltage vf. Vref is initialised as V0 plus Vf0 over KA."
-     class="dark:sl-hidden" />
-<img src="/images/models/exc-1storder-dark.svg"
-     alt="1ST_ORDER exciter block diagram. The terminal voltage V is subtracted from the reference Vref and the error drives a first-order automatic voltage regulator of gain KA and time constant TA, limited between Vfmin and Vfmax, giving the field voltage vf. Vref is initialised as V0 plus Vf0 over KA."
-     class="light:sl-hidden" />
-
-### Parameters
-
-| Parameter | Description |
-|-----------|-------------|
-| `KA` | AVR gain (pu/pu) |
-| `TA` | AVR time constant (s) |
-| `Vfmin` | Minimum field voltage (pu) |
-| `Vfmax` | Maximum field voltage (pu) |
-
-### Usage Example
-
-<Tabs>
-<TabItem label="RAMSES Data File">
-```
-SYNC_MACH  GEN1  BUS1
-      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
-      1.  1.  0.  0.
-      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
-      600.
-      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
-      570.
-      # H: Inertia constant (s)
-      3.
-      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
-      0.
-      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
-      0.95
-      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
-      XT
-      # Xl: Leakage reactance L_l (pu)
-      0.15
-      # Xd: d-axis synchronous reactance (pu)
-      1.1
-      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
-      0.25
-      # X"d: d-axis subtransient reactance (pu)
-      0.2
-      # Xq: q-axis synchronous reactance (pu)
-      0.7
-      # X'q: q-axis transient reactance (pu)
-      *
-      # X"q: q-axis subtransient reactance (pu)
-      0.2
-      # m: Saturation coefficient (set to 0 to neglect saturation)
-      0.1
-      # n: Saturation exponent (ignored when m = 0)
-      6.0257
-      # Ra: Armature resistance (pu)
-      0.
-      # T'do: d-axis open-circuit transient time constant (s)
-      5.00
-      # T"do: d-axis open-circuit subtransient time constant (s)
-      0.05
-      # T'qo: q-axis open-circuit transient time constant (s)
-      *
-      # T"qo: q-axis open-circuit subtransient time constant (s)
-      0.1
-EXC  1ST_ORDER
-      # KA: AVR gain (pu/pu)
-      200.0
-      # TA: AVR time constant (s)
-      0.05
-      # Vfmin: Minimum field voltage (pu)
-      0.0
-      # Vfmax: Maximum field voltage (pu)
-      6.0
-TOR  CONSTANT
-;
-```
-</TabItem>
-<TabItem label="Notes">
-- This model is the Fortran-coded equivalent of a simple `tf1plim` block with input $V_{ref} - V$.
-- `KA` and `TA` together set the closed-loop bandwidth.
-- The model name in the data file is `1ST_ORDER` (uppercase, with the underscore).
-</TabItem>
-</Tabs>
-
----
-
-## kundur (`exc_kundur`)
-
-The data-file model name is `kundur` or `exc_kundur`. The `exc_` prefix is added automatically.
-
-### Scientific Description
-
-The `exc_kundur` model implements the **excitation system from Kundur's textbook** (*Power System Stability and Control*, 1994). It includes a first-order voltage transducer, a proportional AVR with transient gain reduction (TGR), and a two-stage PSS acting on rotor speed deviation.
-
-**Voltage transducer:**
-
-$$
-\frac{d V_{fil}}{dt} = \frac{1}{T_R}(V - V_{fil})
-$$
-
-**AVR with transient gain reduction (lead–lag):**
-
-$$
-V_f(s) = K_A \cdot \frac{1 + s T_A}{1 + s T_B} \cdot \left(V_{ref} - V_{fil} + V_s\right)
-$$
-
-where $V_{ref} = V + V_f / K_A$ is computed at initialisation and $V_s$ is the PSS output.
-
-**PSS (two-stage lead–lag with washout):**
-
-$$
-x_{wash}(s) = \frac{K_{STAB} \cdot s T_W}{1 + s T_W} \cdot \omega(s)
-$$
-
-$$
-V_s(s) = \frac{1 + s T_1}{1 + s T_2} \cdot \frac{1 + s T_3}{1 + s T_4} \cdot x_{wash}(s)
-$$
-
-This is the standard two-stage phase-compensating PSS structure. The CODEGEN blocks in the `.txt` file are:
-
-| Block | CODEGEN type | Function |
-|-------|-------------|----------|
-| Voltage filter | `tf1p` | $1/(1+sT_R)$ |
-| Main summing junction | `algeq` | $V_{ref} - V_{fil} + V_s - dv$ |
-| AVR (TGR) | `tf1p1z` | $K_A(1+sT_A)/(1+sT_B)$ |
-| PSS washout | `tfder1p` | $K_{STAB} \cdot sT_W/(1+sT_W)$ |
-| PSS lead–lag 1 | `tf1p1z` | $(1+sT_1)/(1+sT_2)$ |
-| PSS lead–lag 2 | `tf1p1z` | $(1+sT_3)/(1+sT_4)$ |
-
-<img src="/images/models/exc-kundur-light.svg"
-     alt="exc_kundur block diagram. The terminal voltage passes a transducer of time constant TR to give Vfil, which is subtracted from Vref and summed with the stabiliser output Vs. That error drives an automatic voltage regulator of gain KA with transient gain reduction, a lead-lag with zero TA and pole TB, giving the field voltage vf. The stabiliser takes rotor speed through a washout of gain KSTAB and time constant TW and two lead-lag stages with time constants T1 to T4."
-     class="dark:sl-hidden" />
-<img src="/images/models/exc-kundur-dark.svg"
-     alt="exc_kundur block diagram. The terminal voltage passes a transducer of time constant TR to give Vfil, which is subtracted from Vref and summed with the stabiliser output Vs. That error drives an automatic voltage regulator of gain KA with transient gain reduction, a lead-lag with zero TA and pole TB, giving the field voltage vf. The stabiliser takes rotor speed through a washout of gain KSTAB and time constant TW and two lead-lag stages with time constants T1 to T4."
-     class="light:sl-hidden" />
-
-### Parameters
-
-| Parameter | Description |
-|-----------|-------------|
-| `TR` | Voltage measurement filter time constant (s) |
-| `KA` | AVR gain (pu/pu) |
-| `TA` | TGR lead time constant (s) |
-| `TB` | TGR lag time constant (s) |
-| `KSTAB` | PSS gain |
-| `TW` | PSS washout time constant (s) |
-| `T1` | PSS first lead–lag zero time constant (s) |
-| `T2` | PSS first lead–lag pole time constant (s) |
-| `T3` | PSS second lead–lag zero time constant (s) |
-| `T4` | PSS second lead–lag pole time constant (s) |
-
-**Computed at initialisation:** `Vref = V + Vf / KA`
-
-### Usage Example
-
-<Tabs>
-<TabItem label="RAMSES Data File">
-```
-SYNC_MACH  GEN1  BUS1
-      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
-      1.  1.  0.  0.
-      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
-      600.
-      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
-      570.
-      # H: Inertia constant (s)
-      3.
-      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
-      0.
-      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
-      0.95
-      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
-      XT
-      # Xl: Leakage reactance L_l (pu)
-      0.15
-      # Xd: d-axis synchronous reactance (pu)
-      1.1
-      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
-      0.25
-      # X"d: d-axis subtransient reactance (pu)
-      0.2
-      # Xq: q-axis synchronous reactance (pu)
-      0.7
-      # X'q: q-axis transient reactance (pu)
-      *
-      # X"q: q-axis subtransient reactance (pu)
-      0.2
-      # m: Saturation coefficient (set to 0 to neglect saturation)
-      0.1
-      # n: Saturation exponent (ignored when m = 0)
-      6.0257
-      # Ra: Armature resistance (pu)
-      0.
-      # T'do: d-axis open-circuit transient time constant (s)
-      5.00
-      # T"do: d-axis open-circuit subtransient time constant (s)
-      0.05
-      # T'qo: q-axis open-circuit transient time constant (s)
-      *
-      # T"qo: q-axis open-circuit subtransient time constant (s)
-      0.1
-EXC  kundur
-      # TR: Voltage measurement time constant (s)
-      0.02
-      # KA: AVR gain (pu/pu)
-      200.0
-      # TA: Transient gain reduction lead time constant (s)
-      0.02
-      # TB: Transient gain reduction lag time constant (s)
-      10.0
-      # KSTAB: PSS gain (pu/pu)
-      9.5
-      # TW: PSS washout time constant (s)
-      1.41
-      # T1: PSS first lead-lag numerator time constant (s)
-      0.154
-      # T2: PSS first lead-lag denominator time constant (s)
-      0.033
-      # T3: PSS second lead-lag numerator time constant (s)
-      0.154
-      # T4: PSS second lead-lag denominator time constant (s)
-      0.033
-TOR  CONSTANT
-;
-```
-</TabItem>
-<TabItem label="Notes">
-- Parameters match the Example 12.6 from Kundur (1994), applicable to a medium-speed generator.
-- The PSS stabilises local modes in the 0.5–2 Hz range.
-- No output limiter is defined in the base model; add clipping externally if required.
-- The model name in the data file is `kundur` (not `exc_kundur`).
-</TabItem>
-</Tabs>
-
----
+The `EXC` sub-record these models are entered with, and the table of IEEE model variants, are on the [Exciter Models](/models/exciters/) page.
 
 ## GENERIC1 (`exc_generic1`)
 
@@ -457,6 +81,10 @@ The OEL monitors field current $I_f$. When $I_f > IFLIM$, a timer begins accumul
 
 <Tabs>
 <TabItem label="RAMSES Data File">
+
+<details>
+<summary>Show the data record</summary>
+
 ```
 SYNC_MACH  GEN1  BUS1
       # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
@@ -551,6 +179,9 @@ EXC  GENERIC1
 TOR  CONSTANT
 ;
 ```
+
+</details>
+
 </TabItem>
 </Tabs>
 
@@ -615,6 +246,10 @@ follow are new:
 
 <Tabs>
 <TabItem label="RAMSES Data File">
+
+<details>
+<summary>Show the data record</summary>
+
 ```
 SYNC_MACH  G4  N4
       # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
@@ -729,6 +364,9 @@ TOR  HYDRO_DG
       1.0
 ;
 ```
+
+</details>
+
 </TabItem>
 <TabItem label="Notes">
 - The setpoint is **not** a parameter. `Qset` is captured from the power-flow solution at
@@ -738,7 +376,7 @@ TOR  HYDRO_DG
   distribution network under a connection agreement.
 - `KPSS = 0` disables the stabiliser. Note that this drives the PSS branch to its lower
   limit, so `DVMIN` should be 0 as well, as in the example above.
-- Pair it with [`HYDRO_DG`](/models/custom-governors/#hydro_dg-tor_hydro_dg) for a unit that
+- Pair it with [`HYDRO_DG`](/models/governors/generic/#hydro_dg-tor_hydro_dg) for a unit that
   regulates both its active and reactive power and provides no primary frequency response.
 </TabItem>
 </Tabs>
@@ -838,6 +476,10 @@ The OEL uses a three-level piecewise-linear characteristic $(s_1, T_{oel1})$, $(
 
 <Tabs>
 <TabItem label="RAMSES Data File">
+
+<details>
+<summary>Show the data record</summary>
+
 ```
 SYNC_MACH  GEN1  BUS1
       # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
@@ -964,6 +606,9 @@ EXC  GENERIC2
 TOR  CONSTANT
 ;
 ```
+
+</details>
+
 </TabItem>
 </Tabs>
 
@@ -1081,6 +726,10 @@ The CODEGEN block structure from the `.txt` file:
 
 <Tabs>
 <TabItem label="RAMSES Data File">
+
+<details>
+<summary>Show the data record</summary>
+
 ```
 SYNC_MACH  GEN1  BUS1
       # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
@@ -1169,11 +818,8 @@ EXC  exc_GENERIC
 TOR  CONSTANT
 ;
 ```
+
+</details>
+
 </TabItem>
 </Tabs>
-
-## See Also
-
-- [Model Reference](/models/), the full model catalogue
-- [IEEE Exciters](/models/ieee-exciters/), the IEEE-standard excitation models
-- [Dynamic Data Records](/user-guide/dynamic-models/), the `SYNC_MACH` record these models sit in

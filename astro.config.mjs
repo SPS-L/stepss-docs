@@ -15,6 +15,11 @@ export default defineConfig({
 		'/developer/codegen-library': '/developer/codegen-blocks/',
 		// The injectors page was split by family; test systems and notebooks link to the old URL.
 		'/models/custom-injectors': '/models/injectors/',
+		// The exciter and governor pages were split by family in the same way.
+		'/models/ieee-exciters': '/models/exciters/',
+		'/models/custom-exciters': '/models/exciters/',
+		'/models/ieee-governors': '/models/governors/ieee/',
+		'/models/custom-governors': '/models/governors/',
 	},
 	markdown: {
 		remarkPlugins: [remarkMath],
@@ -118,12 +123,31 @@ export default defineConfig({
 						{ label: 'Model Index',             slug: 'models' },
 						{ label: 'Synchronous Machine',     slug: 'models/synchronous-machine' },
 						{ label: 'SM Parameter Conversion', slug: 'models/synchronous-machine-param-conversion' },
-						{ label: 'IEEE Exciters',           slug: 'models/ieee-exciters' },
-						{ label: 'Custom Exciters',         slug: 'models/custom-exciters' },
-						{ label: 'IEEE Governors',          slug: 'models/ieee-governors' },
-						{ label: 'Custom Governors',        slug: 'models/custom-governors' },
+						{
+							label: 'Exciters',
+							collapsed: true,
+							items: [
+								{ label: 'Exciter Models', slug: 'models/exciters' },
+								{ label: 'IEEE AC and DC Exciters', slug: 'models/exciters/ieee-ac-dc' },
+								{ label: 'IEEE ST and Other Exciters', slug: 'models/exciters/ieee-st' },
+								{ label: 'Stabilizers and Limiters', slug: 'models/exciters/stabilizers-limiters' },
+								{ label: 'Basic Exciters', slug: 'models/exciters/basic' },
+								{ label: 'Generic Exciters', slug: 'models/exciters/generic' },
+							],
+						},
+						{
+							label: 'Governors',
+							collapsed: true,
+							items: [
+								{ label: 'Governor Models', slug: 'models/governors' },
+								{ label: 'IEEE Governors', slug: 'models/governors/ieee' },
+								{ label: 'Basic and Generic Governors', slug: 'models/governors/generic' },
+								{ label: 'Plant Governors', slug: 'models/governors/plant' },
+							],
+						},
 						{
 							label: 'Injectors',
+							collapsed: true,
 							items: [
 								{ label: 'Injector Models',              slug: 'models/injectors' },
 								{ label: 'Loads and Equivalents',        slug: 'models/injectors/loads' },
@@ -134,7 +158,16 @@ export default defineConfig({
 							],
 						},
 						{ label: 'Two-Port Models',         slug: 'models/two-port-models' },
-						{ label: 'Discrete Controllers',    slug: 'models/discrete-controllers' },
+						{
+							label: 'Discrete Controllers',
+							collapsed: true,
+							items: [
+								{ label: 'Discrete Controller Models', slug: 'models/discrete-controllers' },
+								{ label: 'Tap Changers', slug: 'models/discrete-controllers/tap-changers' },
+								{ label: 'Protection and Control', slug: 'models/discrete-controllers/protection' },
+								{ label: 'Monitoring', slug: 'models/discrete-controllers/monitoring' },
+							],
+						},
 					],
 				},
 				{

@@ -22,12 +22,16 @@ There are no tests or linters configured. **Always run `npm run build` after cha
 - **Content**: All documentation lives in `src/content/docs/` as `.md` or `.mdx` files. URL slugs map directly from file paths (e.g., `user-guide/network.md` → `/user-guide/network/`).
 - **Sidebar/Navigation**: Defined entirely in `astro.config.mjs` under the `sidebar` array. New pages **must** be registered there with their `slug` to appear in navigation. The sidebar supports nested `items` arrays for sub-sections.
   - Keep the tree **two levels deep at most**, and never create a group holding a
-    single page. There are two nested groups, each because one page had become a
-    reference too long to scroll: `Injectors`, six pages under `models/injectors/`
-    (a section index and one page per model family; `/models/custom-injectors` is
-    kept as a redirect because test systems and notebooks link to it), and
-    `CODEGEN Blocks`, a nine-page
-    reference.
+    single page. The nested groups all exist because one page had become a
+    reference too long to scroll. Four are model families, each a section index
+    plus one page per sub-family: `Exciters` (`models/exciters/`), `Governors`
+    (`models/governors/`), `Injectors` (`models/injectors/`) and `Discrete
+    Controllers` (`models/discrete-controllers/`). They are `collapsed: true` so
+    the sidebar opens only the one being read. The fifth is `CODEGEN Blocks`, a
+    nine-page reference. The old single-page URLs (`/models/ieee-exciters`,
+    `/models/custom-exciters`, `/models/ieee-governors`, `/models/custom-governors`,
+    `/models/custom-injectors`) are kept as redirects because test systems,
+    notebooks and the video scripts link to them.
   - A sidebar `label` that differs from the page's own `title` shows up as two
     names for one page (sidebar vs breadcrumb). Only diverge deliberately, as with
     the deliberately-shortened model page labels.
@@ -152,17 +156,17 @@ Every page requires YAML frontmatter with `title` and `description`. The landing
 - Data format documentation follows a consistent structure: concept explanation → circuit/block diagram (SVG) → data format code block → parameter table with Field/Description/Unit columns.
 - Model reference pages carry one section per model, in this order: scientific
   description (with a block-diagram SVG where one exists), parameter table, then
-  a usage example showing a RAMSES data-file excerpt. `models/ieee-governors.mdx`
+  a usage example showing a RAMSES data-file excerpt. `models/governors/ieee.mdx`
   is the reference implementation; match it when adding a model.
 - `<Tabs>`/`<TabItem>` are used **within** a usage example (data file vs notes),
   not to group model variants. Pages that need no components are `.md`.
-- On the injector pages each usage example is folded: the code fence sits in
+- On every model page each usage example is folded: the code fence sits in
   `<details><summary>Show the data record</summary>`, with a blank line on each
   side of the fence, and any sentence introducing the record stays outside. The
   one-value-per-line records tripled the height of a model page, and the fold is
   what keeps a family page readable. `tools/from_docs.py` in stepss-userguide
-  strips the wrapper for print, so keep the summary text exactly as written. The
-  exciter, governor, two-port and controller pages are not folded yet.
+  strips the wrapper for print, so keep the summary text exactly as written. Where
+  the example sits in `<Tabs>`, the fold goes inside the data-file tab.
 
 ### One owner per topic
 

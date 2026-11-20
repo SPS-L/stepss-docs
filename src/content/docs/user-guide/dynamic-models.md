@@ -72,8 +72,8 @@ The `parameters_passed_to_EXC` and `parameters_passed_to_TOR` fields are the mod
 data parameters, in the order the model declares them. That order is authoritative
 per model:
 
-- [IEEE Exciters](/models/ieee-exciters/) and [Custom Exciters](/models/custom-exciters/)
-- [IEEE Governors](/models/ieee-governors/) and [Custom Governors](/models/custom-governors/)
+- [Exciter Models](/models/exciters/)
+- [Governor Models](/models/governors/)
 
 ## Injectors
 

@@ -1,30 +1,13 @@
 ---
-title: Custom Governor Models
-description: Custom turbine-governor models in RAMSES
+title: Basic and Generic Governors
+description: The CONSTANT, 1ST_ORDER, THERMAL_GENERIC1, HYDRO_GENERIC1 and HYDRO_DG turbine-governor models in RAMSES
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
-This page documents the custom turbine-governor (`tor_`) models in RAMSES. These models are implemented in Fortran using the legacy multi-subroutine API and cover a wide range of prime-mover types: thermal (steam), gas turbine, hydraulic, nuclear, and simplified equivalents.
-
-:::note[Usage in Dynamic Data Files]
-Governor/torque models in RAMSES are defined as sub-records within a `SYNC_MACH` block using the `TOR` keyword, followed by the model name and its parameters. They are not standalone records. The `TOR` line appears after the `EXC` (exciter) line, and the `;` at the end closes the entire `SYNC_MACH` block.
-
-```
-SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
-                    XT  Xl  Xd  X'd  X"d  Xq  X'q  X"q  m  n  Ra  T'do  T"do  T'qo  T"qo
-              EXC model_name  param1  param2  ...
-              TOR model_name  param1  param2  ... ;
-```
-
 This page documents the four governors built into every RAMSES distribution, `CONSTANT`, `1ST_ORDER`, `HYDRO_GENERIC1` and `THERMAL_GENERIC1`, which take no prefix and are written in uppercase, together with `HYDRO_DG`, registered since 3.76.
 
-It also documents `GASTURBM`, `GOVCLASM`, `GOVHYDR` and `GOVNUC`, which the family dispatcher has handled directly since 3.79. Before 3.79 they were compiled under no name and RAMSES rejected them in a data file.
-
-The IEEE governors, `DEGOV1`, `ENTSOE_simp`, `GAST`, `TGOV1` and `HYGOV`, are on the [IEEE Governors](/models/ieee-governors/) page. For the whole catalogue at a glance, see the [Model Reference index](/models/).
-:::
-
----
+The `TOR` sub-record these models are entered with is described on the [Governor Models](/models/governors/) page.
 
 ## CONSTANT (`tor_constant`)
 
@@ -65,6 +48,10 @@ $$
 
 <Tabs>
 <TabItem label="RAMSES Data File">
+
+<details>
+<summary>Show the data record</summary>
+
 ```
 SYNC_MACH  g6  g6
       # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
@@ -159,6 +146,9 @@ EXC  GENERIC1
 TOR  CONSTANT
 ;
 ```
+
+</details>
+
 </TabItem>
 <TabItem label="Notes">
 - Useful for machines operating at fixed setpoint, for testing generator models in isolation, or as a placeholder.
@@ -234,6 +224,10 @@ i.e.:
 
 <Tabs>
 <TabItem label="RAMSES Data File">
+
+<details>
+<summary>Show the data record</summary>
+
 ```
 SYNC_MACH  g1  g1
       # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
@@ -334,6 +328,9 @@ TOR  1ST_ORDER
       0.05
 ;
 ```
+
+</details>
+
 </TabItem>
 <TabItem label="Notes">
 - `FHP = 0` makes the model a pure first-order lag on the total torque.
@@ -432,6 +429,10 @@ file.
 
 <Tabs>
 <TabItem label="RAMSES Data File">
+
+<details>
+<summary>Show the data record</summary>
+
 ```
 SYNC_MACH  g1  g1
       # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
@@ -550,6 +551,9 @@ TOR  THERMAL_GENERIC1
       0.50
 ;
 ```
+
+</details>
+
 </TabItem>
 <TabItem label="Notes">
 - The LP fraction is `1 - Fhp - Fmp`; ensure `Fhp + Fmp ≤ 1`.
@@ -643,6 +647,10 @@ $$
 
 <Tabs>
 <TabItem label="RAMSES Data File">
+
+<details>
+<summary>Show the data record</summary>
+
 ```
 SYNC_MACH  g1  g1
       # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
@@ -753,6 +761,9 @@ TOR  HYDRO_GENERIC1
       1.0
 ;
 ```
+
+</details>
+
 </TabItem>
 <TabItem label="Notes">
 - `TW` (water-starting time) is the most influential parameter; typical values are 0.5–3 s.
@@ -838,6 +849,10 @@ precedes them with `SIGMA` (droop) and `Tmes` (speed measurement lag), and those
 
 <Tabs>
 <TabItem label="RAMSES Data File">
+
+<details>
+<summary>Show the data record</summary>
+
 ```
 SYNC_MACH  G4  N4
       # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
@@ -952,6 +967,9 @@ TOR  HYDRO_DG
       1.0
 ;
 ```
+
+</details>
+
 </TabItem>
 <TabItem label="Notes">
 - The setpoint is **not** a parameter. `Pset` is captured from the power-flow solution at
@@ -962,775 +980,5 @@ TOR  HYDRO_DG
 - `Qv = 0` assumes no no-load losses.
 - The head relation divides by the gate position, which is floored at 1e-3 in the
   implementation so a fully closed gate cannot produce a division by zero.
-</TabItem>
-</Tabs>
-
----
-
-## tor_gasturbm
-
-:::note
-Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected.
-:::
-
-### Scientific Description
-
-The `tor_gasturbm` model is a **gas turbine** governor following a multi-stage combustion model. It captures the compressor, fuel system, combustion chamber delay, and turbine torque characteristic. The name suffix `m` indicates a modified version.
-
-**Speed governor:**
-
-The governor error drives a PI controller producing a fuel demand signal. The speed governor uses:
-
-$$
-e_{gov} = (\omega_{ref} - \omega) / TDSP - STAT \cdot P_{elec}
-$$
-
-with saturation limits $[MIN,\, MAX]$.
-
-**Fuel system and combustion:**
-
-The fuel valve position `g1` is driven through:
-- A speed governor with gain $ZZ$ and lead–lag time constants determined by $XX$, $YY$
-- A fuel flow path through first-order lag $TVALVE$
-- Combustion chamber lag $TGAZ$
-
-**Turbine output:**
-
-The turbine mechanical power follows:
-
-$$
-P_m = BF2 \cdot g_{comb} + AF2
-$$
-
-where $g_{comb}$ is the combustion output through lag $TCD$.
-
-Additional thermodynamic correction terms involve $TF$ (flame lag) and $ECR$ (exhaust correction ratio).
-
-**Parameters from Fortran source (prm array):**
-
-| Index | Name | Description |
-|-------|------|-------------|
-| 1 | `TDSP` | Speed droop time constant (s) |
-| 2 | `STAT` | Steady-state gain |
-| 3 | `ZZ` | Governor proportional gain |
-| 4 | `XX` | Lead numerator factor |
-| 5 | `YY` | Lag denominator factor |
-| 6 | `SACC` | Acceleration constant |
-| 7 | `MIN` | Minimum fuel valve position (pu) |
-| 8 | `MAX` | Maximum fuel valve position (pu) |
-| 9 | `TVALVE` | Fuel valve time constant (s) |
-| 10 | `TGAZ` | Combustion chamber time constant (s) |
-| 11 | `TF` | Flame lag time constant (s) |
-| 12 | `ECR` | Exhaust correction ratio |
-| 13 | `TCD` | Compressor discharge time constant (s) |
-| 14 | `BF2` | Turbine power output slope |
-| 15 | `AF2` | Turbine power output intercept (pu) |
-
-**Implementation details:**
-- `nbxvar = 10`, `nbzvar = 4`, `nbdata = 15`, `nbaddpar = 1`
-- Additional: `prm(16) = SETPOINT` (initialised from load-flow power)
-- Observables: `g2`, `x4`, `g1`
-
-### Usage Example
-
-<Tabs>
-<TabItem label="RAMSES Data File">
-```
-SYNC_MACH  g1  g1
-      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
-      1.  1.  0.  0.
-      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
-      800.
-      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
-      760.
-      # H: Inertia constant (s)
-      3.
-      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
-      0.
-      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
-      0.95
-      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
-      XT
-      # Xl: Leakage reactance L_l (pu)
-      0.15
-      # Xd: d-axis synchronous reactance (pu)
-      1.1
-      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
-      0.25
-      # X"d: d-axis subtransient reactance (pu)
-      0.2
-      # Xq: q-axis synchronous reactance (pu)
-      0.7
-      # X'q: q-axis transient reactance (pu)
-      *
-      # X"q: q-axis subtransient reactance (pu)
-      0.2
-      # m: Saturation coefficient (set to 0 to neglect saturation)
-      0.1
-      # n: Saturation exponent (ignored when m = 0)
-      6.0257
-      # Ra: Armature resistance (pu)
-      0.
-      # T'do: d-axis open-circuit transient time constant (s)
-      5.00
-      # T"do: d-axis open-circuit subtransient time constant (s)
-      0.05
-      # T'qo: q-axis open-circuit transient time constant (s)
-      *
-      # T"qo: q-axis open-circuit subtransient time constant (s)
-      0.1
-EXC  GENERIC1
-      # IFLIM: OEL field current threshold (pu)
-      1.8991
-      # d: OEL timer band, usually negative: timer runs down at rate 1 below IFLIM+d, holds between IFLIM+d and IFLIM (pu)
-      -0.1
-      # f: OEL timer charging rate offset above IFLIM
-      0.
-      # S: OEL timer charging rate per unit of field overcurrent (1/pu)
-      1.
-      # K1: Not used by the code
-      100.
-      # K2: OEL gain on (if - IFLIM), negative so that the OEL lowers excitation (pu/pu)
-      -1.
-      # L1: OEL timer lower limit and initial value, negative; the OEL acts when the timer exceeds 0 (s)
-      -11
-      # L2: OEL timer upper limit (s)
-      10.
-      # G: AVR gain (pu/pu)
-      70.
-      # TA: AVR lead time constant (s)
-      10.
-      # TB: AVR lag time constant (s)
-      20.
-      # TE: Exciter time constant (s)
-      0.1
-      # L3: Minimum field voltage (pu)
-      0.
-      # L4: Maximum field voltage (pu)
-      4.
-      # SPEEDIN: PSS input weight: 1 = speed, 0 = active power
-      1
-      # KPSS: PSS gain, derivative washout KPSS s/(1+sTw); 0 disables PSS (pu s)
-      75.
-      # Tw: PSS washout time constant (s)
-      15.
-      # T1: PSS first lead-lag numerator time constant (s)
-      0.2
-      # T2: PSS first lead-lag denominator time constant (s)
-      0.01
-      # T3: PSS second lead-lag numerator time constant (s)
-      0.2
-      # T4: PSS second lead-lag denominator time constant (s)
-      0.01
-      # DVMIN: PSS output lower limit (pu)
-      -0.1
-      # DVMAX: PSS output upper limit (pu)
-      0.1
-TOR  GASTURBM
-      # TDSP: rate gain of the load reference driven by SETPOINT (1/s)
-      0.05
-      # STAT: speed droop (pu)
-      0.04
-      # ZZ: constant term of lead-lag denominator, static gain is 1/ZZ
-      1.0
-      # XX: lead time constant of governor lead-lag (s)
-      0.50
-      # YY: s coefficient of the lead-lag denominator ZZ + YY s; the lag time constant is YY/ZZ (s)
-      1.0
-      # SACC: acceleration limit reference of acceleration control loop (pu/s)
-      1.0
-      # MIN: minimum fuel demand (pu)
-      0.0
-      # MAX: maximum fuel demand (pu)
-      1.0
-      # TVALVE: fuel valve time constant (s)
-      0.05
-      # TGAZ: fuel system lag time constant (s)
-      0.40
-      # TF: second fuel or combustion lag time constant (s)
-      0.01
-      # ECR: combustion delay, first-order Pade approximation; must be nonzero (s)
-      0.01
-      # TCD: compressor discharge time constant (s)
-      0.20
-      # BF2: slope of turbine power versus fuel flow (pu)
-      1.0
-      # AF2: intercept of turbine power versus fuel flow (pu)
-      0.0
-;
-```
-</TabItem>
-</Tabs>
-
----
-
-## tor_govclasm
-
-:::note
-Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected.
-:::
-
-### Scientific Description
-
-The `tor_govclasm` model is a **classical thermal governor** with a composite control law including deadband, droop, integral control, and combustion dynamics. The name stands for "governor classical model".
-
-**Speed governor with deadband and droop:**
-
-The speed error passes through a deadband $[DBON, DEADB]$ before entering a proportional–integral controller. The integral path has saturation at $MAXINT$ and gain $ALPHA$. The reset time $TRES$ determines the integration rate.
-
-**Valve and combustion dynamics:**
-
-The valve demand passes through:
-1. A governor integrator with time constant $TSM$, its rate held inside $[VFN,\, V0]$
-2. A first-order lag $TFV$ (valve actuator)
-3. A rate limiter $[PVARMIN,\, PVARMAX]$ (with gain $GPVAR$) representing fuel response
-4. A combustion/steam chest lag $KCR$, $TCR$ producing fuel flow
-5. Lower bound: $MINFUEL$
-6. Transport delay $TDELAY$ (approximated)
-7. Turbine output through lag $TCH$ with limits $[PMIN,\, PMAX]$
-
-**Parameters from Fortran source (prm array):**
-
-| Index | Name | Description |
-|-------|------|-------------|
-| 1 | `STAT` | Governor static characteristic selector |
-| 2 | `DEADB` | Deadband half-width (pu) |
-| 3 | `DBON` | Deadband onset (pu) |
-| 4 | `TSM` | Speed measurement / filter time constant (s) |
-| 5 | `V0` | Maximum valve opening rate, upper limit on the governor integrator rate (pu/s) |
-| 6 | `VFN` | Minimum valve rate, applied directly as the lower bound, so normally negative (pu/s) |
-| 7 | `TFV` | Valve actuator time constant (s) |
-| 8 | `VFR` | Fuel flow rate limit (pu/s) |
-| 9 | `MAXINT` | Maximum integral output (pu) |
-| 10 | `ALPHA` | Integral controller gain |
-| 11 | `TRES` | Integral reset time (s) |
-| 12 | `GOMP` | Governor proportional gain |
-| 13 | `PVARMAX` | Maximum power variation rate (pu) |
-| 14 | `PVARMIN` | Minimum power variation rate (pu) |
-| 15 | `GPVAR` | Power variation gain |
-| 16 | `KCR` | Combustion gain |
-| 17 | `TCR` | Combustion time constant (s) |
-| 18 | `MINFUEL` | Minimum fuel flow (pu) |
-| 19 | `TDELAY` | Combustion transport delay (s) |
-| 20 | `PMAX` | Maximum turbine output (pu) |
-| 21 | `TCH` | Steam chest / turbine lag (s) |
-| 22 | `PMIN` | Minimum turbine output (pu) |
-
-**Implementation details:**
-- `nbxvar = 6`, `nbzvar = 10`, `nbdata = 22`, `nbaddpar = 1`
-- Additional: `prm(23) = P0` (initialised from load-flow power)
-- Observables: `x2`, `b3`, `b4`
-
-### Usage Example
-
-<Tabs>
-<TabItem label="RAMSES Data File">
-```
-SYNC_MACH  g1  g1
-      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
-      1.  1.  0.  0.
-      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
-      800.
-      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
-      760.
-      # H: Inertia constant (s)
-      3.
-      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
-      0.
-      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
-      0.95
-      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
-      XT
-      # Xl: Leakage reactance L_l (pu)
-      0.15
-      # Xd: d-axis synchronous reactance (pu)
-      1.1
-      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
-      0.25
-      # X"d: d-axis subtransient reactance (pu)
-      0.2
-      # Xq: q-axis synchronous reactance (pu)
-      0.7
-      # X'q: q-axis transient reactance (pu)
-      *
-      # X"q: q-axis subtransient reactance (pu)
-      0.2
-      # m: Saturation coefficient (set to 0 to neglect saturation)
-      0.1
-      # n: Saturation exponent (ignored when m = 0)
-      6.0257
-      # Ra: Armature resistance (pu)
-      0.
-      # T'do: d-axis open-circuit transient time constant (s)
-      5.00
-      # T"do: d-axis open-circuit subtransient time constant (s)
-      0.05
-      # T'qo: q-axis open-circuit transient time constant (s)
-      *
-      # T"qo: q-axis open-circuit subtransient time constant (s)
-      0.1
-EXC  GENERIC1
-      # IFLIM: OEL field current threshold (pu)
-      1.8991
-      # d: OEL timer band, usually negative: timer runs down at rate 1 below IFLIM+d, holds between IFLIM+d and IFLIM (pu)
-      -0.1
-      # f: OEL timer charging rate offset above IFLIM
-      0.
-      # S: OEL timer charging rate per unit of field overcurrent (1/pu)
-      1.
-      # K1: Not used by the code
-      100.
-      # K2: OEL gain on (if - IFLIM), negative so that the OEL lowers excitation (pu/pu)
-      -1.
-      # L1: OEL timer lower limit and initial value, negative; the OEL acts when the timer exceeds 0 (s)
-      -11
-      # L2: OEL timer upper limit (s)
-      10.
-      # G: AVR gain (pu/pu)
-      70.
-      # TA: AVR lead time constant (s)
-      10.
-      # TB: AVR lag time constant (s)
-      20.
-      # TE: Exciter time constant (s)
-      0.1
-      # L3: Minimum field voltage (pu)
-      0.
-      # L4: Maximum field voltage (pu)
-      4.
-      # SPEEDIN: PSS input weight: 1 = speed, 0 = active power
-      1
-      # KPSS: PSS gain, derivative washout KPSS s/(1+sTw); 0 disables PSS (pu s)
-      75.
-      # Tw: PSS washout time constant (s)
-      15.
-      # T1: PSS first lead-lag numerator time constant (s)
-      0.2
-      # T2: PSS first lead-lag denominator time constant (s)
-      0.01
-      # T3: PSS second lead-lag numerator time constant (s)
-      0.2
-      # T4: PSS second lead-lag denominator time constant (s)
-      0.01
-      # DVMIN: PSS output lower limit (pu)
-      -0.1
-      # DVMAX: PSS output upper limit (pu)
-      0.1
-TOR  GOVCLASM
-      # STAT: speed droop (pu)
-      0.04
-      # DEADB: speed deadband half-width (pu)
-      0.003
-      # DBON: deadband switch, 1 = deadband applied, 0 = none
-      1.
-      # TSM: valve servomotor time constant (s)
-      0.10
-      # V0: maximum valve opening rate (pu/s)
-      1.0
-      # VFN: minimum valve rate, applied as given so normally negative (pu/s)
-      -1.0
-      # TFV: valve actuator time constant, read but not used (s)
-      0.30
-      # VFR: fast-valving rate, never used (fast valving not implemented) (pu/s)
-      0.5
-      # MAXINT: upper limit of valve position, fuel flow and reheater state (pu)
-      1.0
-      # ALPHA: HP fraction of turbine power
-      1.0
-      # TRES: reheater time constant (s)
-      5.0
-      # GOMP: intercept valve opening gain on valve position
-      25.0
-      # PVARMAX: upper load bound of sliding-pressure setpoint (pu)
-      0.10
-      # PVARMIN: lower load bound of sliding-pressure setpoint (pu)
-      -0.10
-      # GPVAR: pressure setpoint at zero load (pu)
-      0.05
-      # KCR: boiler pressure controller proportional gain
-      1.0
-      # TCR: boiler pressure controller integral time (s)
-      0.20
-      # MINFUEL: minimum fuel flow (pu)
-      0.05
-      # TDELAY: fuel transport delay, Pade approximation (s)
-      0.30
-      # PMAX: maximum steam pressure (pu)
-      1.05
-      # TCH: boiler steam storage time constant (s)
-      0.30
-      # PMIN: minimum steam pressure (pu)
-      0.05
-;
-```
-</TabItem>
-</Tabs>
-
----
-
-## tor_govhydr
-
-:::note
-Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected.
-:::
-
-### Scientific Description
-
-The `tor_govhydr` model is a **simplified hydraulic governor** with PI control and a non-linear penstock. It differs from `tor_hydro_generic1` in its simplified turbine characteristic and simpler water-column formulation.
-
-**PI governor:**
-
-$$
-\dot{x}_2 = K_I \cdot e, \quad x_2 \in [0, 1]
-$$
-
-$$
-z_{demand} = K_P \cdot e + x_2
-$$
-
-where the speed error $e = P_0/\omega - T_m - \omega \cdot STAT + \ldots$ accounts for the droop and steady-state bias.
-
-**Penstock (two-lag water column):**
-
-$$
-T_{CE1} \cdot \frac{dx_3}{dt} = P - x_3(1 + T_{CE2}/T_{CE1})
-$$
-
-The turbine mechanical power is computed via an empirical quadratic:
-
-$$
-P_m = 1.35 \cdot z - 0.7 z^2
-$$
-
-derived from the non-linear head-flow curve approximated at initialisation.
-
-**Parameters from Fortran source:**
-
-| Index | Name | Description |
-|-------|------|-------------|
-| 1 | `STAT` | Steady-state gain selector |
-| 2 | `KP` | Proportional gain |
-| 3 | `KI` | Integral gain |
-| 4 | `TC` | Governor/servo time constant (s) |
-| 5 | `V0` | Maximum gate opening rate, upper limit on gate velocity (pu/s) |
-| 6 | `VF` | Maximum gate closing rate, entered as a positive magnitude and applied as $-V_F$ (pu/s) |
-| 7 | `TCE2` | Second penstock time constant (s) |
-| 8 | `TCE1` | First penstock time constant (s) |
-
-**Implementation details:**
-- `nbxvar = 4`, `nbzvar = 4`, `nbdata = 8`, `nbaddpar = 1`
-- Additional: `prm(9) = P0` (initialised from load-flow power)
-- No observables defined (`nbobs = 0`)
-
-### Usage Example
-
-<Tabs>
-<TabItem label="RAMSES Data File">
-```
-SYNC_MACH  g1  g1
-      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
-      1.  1.  0.  0.
-      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
-      800.
-      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
-      760.
-      # H: Inertia constant (s)
-      3.
-      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
-      0.
-      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
-      0.95
-      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
-      XT
-      # Xl: Leakage reactance L_l (pu)
-      0.15
-      # Xd: d-axis synchronous reactance (pu)
-      1.1
-      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
-      0.25
-      # X"d: d-axis subtransient reactance (pu)
-      0.2
-      # Xq: q-axis synchronous reactance (pu)
-      0.7
-      # X'q: q-axis transient reactance (pu)
-      *
-      # X"q: q-axis subtransient reactance (pu)
-      0.2
-      # m: Saturation coefficient (set to 0 to neglect saturation)
-      0.1
-      # n: Saturation exponent (ignored when m = 0)
-      6.0257
-      # Ra: Armature resistance (pu)
-      0.
-      # T'do: d-axis open-circuit transient time constant (s)
-      5.00
-      # T"do: d-axis open-circuit subtransient time constant (s)
-      0.05
-      # T'qo: q-axis open-circuit transient time constant (s)
-      *
-      # T"qo: q-axis open-circuit subtransient time constant (s)
-      0.1
-EXC  GENERIC1
-      # IFLIM: OEL field current threshold (pu)
-      1.8991
-      # d: OEL timer band, usually negative: timer runs down at rate 1 below IFLIM+d, holds between IFLIM+d and IFLIM (pu)
-      -0.1
-      # f: OEL timer charging rate offset above IFLIM
-      0.
-      # S: OEL timer charging rate per unit of field overcurrent (1/pu)
-      1.
-      # K1: Not used by the code
-      100.
-      # K2: OEL gain on (if - IFLIM), negative so that the OEL lowers excitation (pu/pu)
-      -1.
-      # L1: OEL timer lower limit and initial value, negative; the OEL acts when the timer exceeds 0 (s)
-      -11
-      # L2: OEL timer upper limit (s)
-      10.
-      # G: AVR gain (pu/pu)
-      70.
-      # TA: AVR lead time constant (s)
-      10.
-      # TB: AVR lag time constant (s)
-      20.
-      # TE: Exciter time constant (s)
-      0.1
-      # L3: Minimum field voltage (pu)
-      0.
-      # L4: Maximum field voltage (pu)
-      4.
-      # SPEEDIN: PSS input weight: 1 = speed, 0 = active power
-      1
-      # KPSS: PSS gain, derivative washout KPSS s/(1+sTw); 0 disables PSS (pu s)
-      75.
-      # Tw: PSS washout time constant (s)
-      15.
-      # T1: PSS first lead-lag numerator time constant (s)
-      0.2
-      # T2: PSS first lead-lag denominator time constant (s)
-      0.01
-      # T3: PSS second lead-lag numerator time constant (s)
-      0.2
-      # T4: PSS second lead-lag denominator time constant (s)
-      0.01
-      # DVMIN: PSS output lower limit (pu)
-      -0.1
-      # DVMAX: PSS output upper limit (pu)
-      0.1
-TOR  GOVHYDR
-      # STAT: permanent speed droop (pu)
-      0.04
-      # KP: PI proportional gain
-      2.0
-      # KI: PI integral gain (1/s)
-      0.5
-      # TC: gate servomotor time constant (s)
-      0.10
-      # V0: maximum gate opening rate (pu/s)
-      1.0
-      # VF: maximum gate closing rate, positive, applied as minus VF (pu/s)
-      1.0
-      # TCE2: water column numerator time constant, (1 - s TCE2)/(1 + s TCE1) (s)
-      1.0
-      # TCE1: water column denominator time constant (s)
-      5.0
-;
-```
-</TabItem>
-<TabItem label="Notes">
-- `TCE1` corresponds roughly to the water-starting time $T_W$.
-- `TCE2/TCE1` sets the ratio of the two penstock lags.
-</TabItem>
-</Tabs>
-
----
-
-## tor_govnuc
-
-:::note
-Callable since 3.79. Earlier releases compiled this model under no name, so a data file referring to it was rejected.
-:::
-
-### Scientific Description
-
-The `tor_govnuc` model is a **nuclear plant governor** with deadband, droop, integral control, and a non-linear turbine characteristic via `GOMP` (the gain of the output multiplier). It is structurally similar to `tor_govclasm` but tailored for the slower, tightly-regulated dynamics of nuclear steam supply systems.
-
-**Speed governor:**
-
-The speed error passes through a deadband $[DBON, DEADB]$:
-
-$$
-e = \text{deadband}(\omega_{ref} - \omega) - STAT \cdot (P - P_0)
-$$
-
-The error enters an integrator with rate limits $[GRADMIN, GRADMAX]$ (pu/s) filtered through a ramp time $TGRAD$. The integrator output $x_I$ passes through a servo $TSM$.
-
-**Turbine characteristic with GOMP:**
-
-The turbine output is non-linearly mapped through a gain $GOMP$:
-
-$$
-P_m = \min\!\left(\frac{x_I}{GOMP},\, 1\right) \cdot f(x_I)
-$$
-
-where the limiter prevents over-power and $f$ is a piecewise-linear characteristic.
-
-The steam-valve rate is held inside $[VFN,\, V0]$, then passes the valve actuator lag $TFV$, the reset lag $TRES$ and $GOMP$ to produce the final torque. $VFR$ overrides the rate during fast valving, a path the shipped model never takes: the code fixes its selector at 1 and leaves the fast-valving logic unwritten.
-
-**Parameters from Fortran source:**
-
-| Index | Name | Description |
-|-------|------|-------------|
-| 1 | `STAT` | Governor static characteristic selector |
-| 2 | `DEADB` | Deadband half-width (pu) |
-| 3 | `DBON` | Deadband onset (pu) |
-| 4 | `GRADMAX` | Maximum load gradient (pu/s) |
-| 5 | `GRADMIN` | Minimum load gradient / unloading rate (pu/s) |
-| 6 | `TGRAD` | Ramp filter time constant (s) |
-| 7 | `TSM` | Servo time constant (s) |
-| 8 | `V0` | Maximum valve opening rate, upper limit on the steam-valve rate (pu/s) |
-| 9 | `VFN` | Minimum valve rate, applied directly as the lower bound, so normally negative (pu/s) |
-| 10 | `TFV` | Valve actuator time constant (s) |
-| 11 | `VFR` | Valve rate limit (pu/s) |
-| 12 | `ALPHA` | Integral gain |
-| 13 | `TRES` | Reset time constant (s) |
-| 14 | `GOMP` | Output power gain |
-
-**Implementation details:**
-- `nbxvar = 4`, `nbzvar = 8`, `nbdata = 14`, `nbaddpar = 1`
-- Additional: `prm(15) = P0` (initialised from load-flow power)
-- Observable: `TM`
-
-### Usage Example
-
-<Tabs>
-<TabItem label="RAMSES Data File">
-```
-SYNC_MACH  g1  g1
-      # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
-      1.  1.  0.  0.
-      # SNOM: Nominal apparent power, used as base power in the machine model (MVA)
-      800.
-      # Pnom: Nominal active power of the turbine, used as base power for the turbine model (MW)
-      760.
-      # H: Inertia constant (s)
-      3.
-      # D: Damping coefficient (usually set to zero when the damper windings are modelled) (pu)
-      0.
-      # IBRATIO: Field current base ratio I_fB^mac/I_fB^exc (see above) (pu)
-      0.95
-      # TYPE_MOD: Parameter format keyword: RL or XT (case-insensitive)
-      XT
-      # Xl: Leakage reactance L_l (pu)
-      0.15
-      # Xd: d-axis synchronous reactance (pu)
-      1.1
-      # X'd: d-axis transient reactance (must be smaller than Xd) (pu)
-      0.25
-      # X"d: d-axis subtransient reactance (pu)
-      0.2
-      # Xq: q-axis synchronous reactance (pu)
-      0.7
-      # X'q: q-axis transient reactance (pu)
-      *
-      # X"q: q-axis subtransient reactance (pu)
-      0.2
-      # m: Saturation coefficient (set to 0 to neglect saturation)
-      0.1
-      # n: Saturation exponent (ignored when m = 0)
-      6.0257
-      # Ra: Armature resistance (pu)
-      0.
-      # T'do: d-axis open-circuit transient time constant (s)
-      5.00
-      # T"do: d-axis open-circuit subtransient time constant (s)
-      0.05
-      # T'qo: q-axis open-circuit transient time constant (s)
-      *
-      # T"qo: q-axis open-circuit subtransient time constant (s)
-      0.1
-EXC  GENERIC1
-      # IFLIM: OEL field current threshold (pu)
-      1.8991
-      # d: OEL timer band, usually negative: timer runs down at rate 1 below IFLIM+d, holds between IFLIM+d and IFLIM (pu)
-      -0.1
-      # f: OEL timer charging rate offset above IFLIM
-      0.
-      # S: OEL timer charging rate per unit of field overcurrent (1/pu)
-      1.
-      # K1: Not used by the code
-      100.
-      # K2: OEL gain on (if - IFLIM), negative so that the OEL lowers excitation (pu/pu)
-      -1.
-      # L1: OEL timer lower limit and initial value, negative; the OEL acts when the timer exceeds 0 (s)
-      -11
-      # L2: OEL timer upper limit (s)
-      10.
-      # G: AVR gain (pu/pu)
-      70.
-      # TA: AVR lead time constant (s)
-      10.
-      # TB: AVR lag time constant (s)
-      20.
-      # TE: Exciter time constant (s)
-      0.1
-      # L3: Minimum field voltage (pu)
-      0.
-      # L4: Maximum field voltage (pu)
-      4.
-      # SPEEDIN: PSS input weight: 1 = speed, 0 = active power
-      1
-      # KPSS: PSS gain, derivative washout KPSS s/(1+sTw); 0 disables PSS (pu s)
-      75.
-      # Tw: PSS washout time constant (s)
-      15.
-      # T1: PSS first lead-lag numerator time constant (s)
-      0.2
-      # T2: PSS first lead-lag denominator time constant (s)
-      0.01
-      # T3: PSS second lead-lag numerator time constant (s)
-      0.2
-      # T4: PSS second lead-lag denominator time constant (s)
-      0.01
-      # DVMIN: PSS output lower limit (pu)
-      -0.1
-      # DVMAX: PSS output upper limit (pu)
-      0.1
-TOR  GOVNUC
-      # STAT: speed droop (pu)
-      0.04
-      # DEADB: speed deadband half-width (pu)
-      0.005
-      # DBON: deadband switch, 1 = deadband applied, 0 = none
-      1.
-      # GRADMAX: upper clamp on load reference error, ramp rate is GRADMAX/TGRAD (pu)
-      0.02
-      # GRADMIN: lower clamp magnitude, positive, applied as minus GRADMIN (pu)
-      0.02
-      # TGRAD: load reference ramp time constant (s)
-      10.0
-      # TSM: valve servomotor time constant (s)
-      5.0
-      # V0: maximum valve opening rate (pu/s)
-      1.0
-      # VFN: minimum valve rate, applied as given so normally negative (pu/s)
-      -1.0
-      # TFV: valve actuator time constant, read but not used (s)
-      0.50
-      # VFR: fast-valving rate, never used (fast valving not implemented) (pu/s)
-      0.10
-      # ALPHA: HP fraction of turbine power
-      1.0
-      # TRES: reheater (moisture separator) time constant (s)
-      20.0
-      # GOMP: intercept valve opening gain on valve position
-      1.0
-;
-```
-</TabItem>
-<TabItem label="Notes">
-- Nuclear plants typically have slow load-following characteristics: `GRADMAX` is typically 0.005–0.02 pu/s.
-- The `DEADB` is important to prevent hunting around the setpoint.
-- `GOMP` scales the turbine output; set to 1.0 for standard normalisation.
 </TabItem>
 </Tabs>

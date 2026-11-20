@@ -2127,20 +2127,20 @@ def inj_svc_generic1(t):
 
 
 DIAGRAMS = {
-    # models/ieee-governors.mdx
+    # models/governors/ieee.mdx
     "tor-entsoe-simp": tor_entsoe_simp,
     "tor-tgov1": tor_tgov1,
     "tor-gast": tor_gast,
     "tor-degov1": tor_degov1,
     "tor-hygov": tor_hygov,
-    # models/custom-governors.mdx
+    # models/governors/ (generic.mdx, plant.mdx)
     "tor-1storder": tor_1storder,
     "tor-hydro-generic1": tor_hydro_generic1,
     "tor-hydro-dg": tor_hydro_dg,
-    # models/custom-exciters.mdx
+    # models/exciters/ (basic.mdx, generic.mdx)
     "exc-1storder": exc_1storder,
     "exc-kundur": exc_kundur,
-    # models/ieee-exciters.md
+    # models/exciters/ (ieee-ac-dc.md, ieee-st.md, stabilizers-limiters.md)
     "exc-ac1a": exc_ac1a,
     "exc-ac4a": exc_ac4a,
     "exc-ac8b": exc_ac8b,
@@ -2157,12 +2157,12 @@ DIAGRAMS = {
     "pss-stab3": pss_stab3,
     "exc-maxex2": exc_maxex2,
     "exc-integral-oel": exc_integral_oel,
-    # models/custom-exciters.mdx, continued
+    # models/exciters/ (basic.mdx, generic.mdx), continued
     "exc-generic1": exc_generic1,
     "exc-avr-dg": exc_avr_dg,
     "exc-generic2": exc_generic2,
     "exc-generic": exc_generic,
-    # models/custom-governors.mdx
+    # models/governors/ (generic.mdx, plant.mdx)
     "tor-thermal-generic1": tor_thermal_generic1,
     # models/custom-injectors.md, wind
     "inj-wt3": inj_wt3,
@@ -2174,7 +2174,7 @@ DIAGRAMS = {
     "inj-gfol-qctl": gfol_qctl,
     "inj-gfor-vsm": gfor_vsm,
     "inj-gfor-currentlim": gfor_currentlim,
-    # models/discrete-controllers.md
+    # models/discrete-controllers/
     "dctl-ltc-timing": dctl_ltc_timing,
     "dctl-relay-timing": dctl_relay_timing,
     # models/custom-injectors.md

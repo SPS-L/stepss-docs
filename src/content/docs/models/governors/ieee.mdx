@@ -1,22 +1,15 @@
 ---
-title: IEEE Governor Models
-description: IEEE-standard turbine-governor models available in RAMSES
+title: IEEE Governors
+description: "IEEE-standard turbine-governor models in RAMSES: DEGOV1, ENTSOE_simp, GAST, TGOV1 and HYGOV"
 ---
 
 import { Tabs, TabItem } from '@astrojs/starlight/components';
 
 This page documents the IEEE-standard turbine-governor models available in RAMSES, all using the `tor_` prefix. These models implement standardised transfer-function blocks for diesel, gas-turbine, steam-turbine, hydraulic, and simplified ENTSO-E governors.
 
-:::note[Usage in Dynamic Data Files]
-Governor/torque models in RAMSES are defined as sub-records within a `SYNC_MACH` block using the `TOR` keyword, followed by the model name and its parameters. They are not standalone records. The `TOR` line appears after the `EXC` (exciter) line, and the `;` at the end closes the entire `SYNC_MACH` block.
+The `TOR` sub-record these models are entered with is described on the [Governor Models](/models/governors/) page.
 
-```
-SYNC_MACH name bus FP FQ P Q SNOM Pnom H D IBRATIO
-                    XT  Xl  Xd  X'd  X"d  Xq  X'q  X"q  m  n  Ra  T'do  T"do  T'qo  T"qo
-              EXC model_name  param1  param2  ...
-              TOR model_name  param1  param2  ... ;
-```
-
+:::note[Names in a data file]
 RAMSES adds the `tor_` prefix to the model name automatically, so both `DEGOV1` and `tor_DEGOV1` resolve to the same model. The IEEE governor names are:
 
 | Data-file name | With explicit prefix | Implemented by | Available since |
@@ -44,8 +37,6 @@ If you see this, check the banner RAMSES prints at startup. Versions 3.50 and la
 :::caution[`TGOV1D` is not a valid data-file name]
 The TGOV1 model is implemented by a subroutine called `tor_TGOV1D`, but the name registered for data files is `TGOV1` (or `tor_TGOV1`), **without** the `D`. Writing `TGOV1D` or `tor_TGOV1D` after `TOR` produces the same "Torque model not found in definition" error, on every version.
 :::
-
----
 
 ## DEGOV1 (`tor_DEGOV1`)
 
@@ -136,6 +127,10 @@ $$
 
 <Tabs>
 <TabItem label="RAMSES Data File">
+
+<details>
+<summary>Show the data record</summary>
+
 ```
 SYNC_MACH  g1  g1
       # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
@@ -256,6 +251,9 @@ TOR  DEGOV1
       0.05
 ;
 ```
+
+</details>
+
 </TabItem>
 <TabItem label="Notes">
 - Set `SWM = 0` to use mechanical torque as the reference input, `SWM = 1` for electrical power.
@@ -322,6 +320,10 @@ $$
 
 <Tabs>
 <TabItem label="RAMSES Data File">
+
+<details>
+<summary>Show the data record</summary>
+
 ```
 SYNC_MACH  g1  g1
       # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
@@ -428,6 +430,9 @@ TOR  ENTSOE_simp
       10.0
 ;
 ```
+
+</details>
+
 </TabItem>
 <TabItem label="Notes">
 - Typical primary-frequency response studies use $R = 0.04$–$0.05$.
@@ -518,6 +523,10 @@ $$
 
 <Tabs>
 <TabItem label="RAMSES Data File">
+
+<details>
+<summary>Show the data record</summary>
+
 ```
 SYNC_MACH  g1  g1
       # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
@@ -630,6 +639,9 @@ TOR  GAST
       0.0
 ;
 ```
+
+</details>
+
 </TabItem>
 <TabItem label="Notes">
 - Based on the IEEE Committee Report on "Dynamic Models for Steam and Hydro Turbines in Power System Studies" (1973), later adapted for gas turbines.
@@ -704,6 +716,10 @@ $$
 
 <Tabs>
 <TabItem label="RAMSES Data File">
+
+<details>
+<summary>Show the data record</summary>
+
 ```
 SYNC_MACH  g1  g1
       # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
@@ -812,6 +828,9 @@ TOR  TGOV1
       0.0
 ;
 ```
+
+</details>
+
 </TabItem>
 <TabItem label="Notes">
 - This is essentially the IEEE TGOV1 model with an additional damping term $D_t$.
@@ -917,6 +936,10 @@ $$
 
 <Tabs>
 <TabItem label="RAMSES Data File">
+
+<details>
+<summary>Show the data record</summary>
+
 ```
 SYNC_MACH  g1  g1
       # FP FQ P Q: share of the power-flow injection (FP, FQ) or initial power (P in MW, Q in Mvar)
@@ -1035,6 +1058,9 @@ TOR  HYGOV
       0.05
 ;
 ```
+
+</details>
+
 </TabItem>
 <TabItem label="Notes">
 - `Tw` (water starting time) is the dominant parameter controlling frequency response; typical values are 0.5–2 s.
