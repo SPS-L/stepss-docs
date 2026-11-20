@@ -28,6 +28,21 @@ Only one BUS record per bus is allowed. All buses must be declared before being 
 For power flow computations, an extended version of the BUS record with six fields is used (see [Power Flow](/user-guide/power-flow/)). When RAMSES encounters the extended format, only the first two fields are read.
 :::
 
+### DC Buses
+
+A DC bus is declared with its own record. Its nominal voltage is the **pole-to-neutral** DC voltage, so the impedance base of a DC line is $Z_B = 2\,V_{NOM}^2/S_B$ instead of the $V_{NOM}^2/S_B$ of an AC line.
+
+```
+BUSDC NAME VNOM ;
+```
+
+| Field | Description | Unit |
+|-------|-------------|------|
+| `NAME` | Bus name, following the same rules as a BUS name | |
+| `VNOM` | Nominal pole-to-neutral DC voltage | kV |
+
+AC and DC buses share one set of names: a BUSDC record must not reuse the name of a BUS, and the reverse. A DC bus is joined to other DC buses by [DC lines](#dc-lines-and-cables), and to the AC network only through a converter, such as the DC side of [`HVDC_VSC`](/models/two-port-models/#twop_hvdc_vsc-voltage-source-converter-hvdc).
+
 ## Lines and Cables
 
 ### Modeling
@@ -65,6 +80,22 @@ To connect a line through a single end, add a bus at the open end and set BR to 
 
 :::note
 All lines are memorized, even those out of service. An out-of-service line has zero power flow but can be put into service during dynamic simulation.
+:::
+
+### DC Lines and Cables
+
+A LINE record whose two buses are both [DC buses](#dc-buses) is a DC line or cable. It uses the same record, but only the resistance enters the model: in DC steady state the series reactance and the shunt capacitance carry no current, so the branch is the pure conductance
+
+$$
+G = \frac{1}{R}, \qquad R \text{ in per unit on } Z_B = \frac{2\,V_{NOM}^2}{S_B}.
+$$
+
+`X` and `WC2` are ignored, and RAMSES writes one line per DC line that sets either, `X and WC2 ignored in the DC network`, to the log. A resistance below the minimum series impedance is raised to it and logged as `resistance changed to`.
+
+A LINE joining an AC bus to a DC bus is refused with the message `links an AC with a DC bus`.
+
+:::caution
+Up to RAMSES 3.85 a DC line was built with the AC formulas, so a nonzero `X` lowered its conductance and `WC2` added a susceptance to the DC bus equations. A case whose DC lines carry `X` or `WC2` starts from a different DC operating point on 3.85 and earlier than on later releases. Setting both to zero gives the same result on every release.
 :::
 
 ## Switches
