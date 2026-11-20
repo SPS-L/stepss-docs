@@ -98,7 +98,7 @@ One optional setting, `$PF_THRES x`, sets the floor below which a participation
 entry is not written, default `1e-3`. It is a size guard on the one output that
 is quadratic in the state count, in the same family as `$EIG_MAX_STATES`, and
 not a threshold anyone is meant to tune per analysis; see
-[`<name>_pf.dat`](#namepfdat) below.
+[`<name>_pf.dat`](#name_pfdat) below.
 
 They are yours to set on the command line and from Python, and `ssa.run()`
 above does exactly that, writing both into a generated file read last so the

@@ -176,7 +176,7 @@ limit the analysis refuses and exits 78 rather than attempting the allocation.
 ### Participation Factor Floor
 
 Floor below which a participation entry is not written to `<name>_pf.dat` by
-[small-signal analysis](/user-guide/eigenanalysis/#namepfdat):
+[small-signal analysis](/user-guide/eigenanalysis/#name_pfdat):
 
 ```
 $PF_THRES Number ;
