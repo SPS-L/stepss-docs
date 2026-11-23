@@ -23,8 +23,8 @@ both forms resolve to the same model:
 
 Model names are **case sensitive**. A name that is compiled into RAMSES but not
 registered in the dispatcher is rejected at load time; see
-[User-Defined Models](/developer/user-models/) for how to register one through
-URAMSES. The [Model Reference index](/models/) marks which models are callable
+[User-Defined Models](/developer/user-models/) for building your own model into
+the engine. The [Model Reference index](/models/) marks which models are callable
 out of the box and which are not.
 
 ## Common Injection Fields

@@ -190,6 +190,10 @@ you find the same fact in two places, delete one and link instead. A tutorial pa
 (`quickstart`, `examples`) shows one path and links out; it does not carry
 reference tables.
 
+### URAMSES is internal and is not documented here
+
+URAMSES, the kit RAMSES user models are compiled against, is an internal part of STEPSS GUI (and, later, of `stepss`), driven by the **Compile** button on the Codegen tab. The site has no page, section, repository entry or licence row for it, and does not name it: building a model is described as the GUI's Compile step, owned by `developer/user-models.md` and `gui/interface.mdx`. Check with `grep -rni uramses src astro.config.mjs README.md`, which must come back empty. The old `/developer/uramses/` URL was removed without a redirect.
+
 ### The mailing list is the only support channel for the engines
 
 `stepss-list@googlegroups.com`, a public Google Group, is the project's user
@@ -236,7 +240,7 @@ Check it against the source before publishing:
 | Parameter names and their **order** | the `parname(...)` assignments under `case (define_var_and_par)` in the model's `.f90` |
 | Number of data vs additional parameters | `nbdata` / `nbaddpar` in the same block |
 | Observables | `obsname(...)` under `case (define_obs)` |
-| Whether a model is compiled at all | `MODEL_DIRS` in `build/Makefile.gfortran`. `models/*/hq/` is excluded, so the Hydro-Québec families are neither built nor shipped: never tell a reader they can enable one through URAMSES |
+| Whether a model is compiled at all | `MODEL_DIRS` in `build/Makefile.gfortran`. `models/*/hq/` is excluded, so the Hydro-Québec families are neither built nor shipped: never tell a reader they can enable one by compiling it themselves |
 
 Three traps this has produced before:
 

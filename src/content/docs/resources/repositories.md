@@ -12,7 +12,6 @@ All STEPSS repositories are hosted under the [SPS-L GitHub organization](https:/
 | [stepss-java-ui](https://github.com/SPS-L/stepss-java-ui) | Java-based GUI front-end, bundling the whole toolchain | Java | Public |
 | [stepss-python-ui](https://github.com/SPS-L/stepss-python-ui) | Python API/wrapper for RAMSES and the Helios power-flow engine | Python | Public |
 | [stepss-userguide](https://github.com/SPS-L/stepss-userguide) | LaTeX user documentation and models reference | LaTeX | Public |
-| [stepss-uramses](https://github.com/SPS-L/stepss-uramses) | User-defined device models framework | Fortran | Public |
 | [stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) | Reference data and validation suite for small-signal analysis | Python | Public |
 | [stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) | Visual block diagram editor for CODEGEN models | Python/JS | Public |
 | [homebrew-stepss](https://github.com/SPS-L/homebrew-stepss) | Homebrew tap that installs STEPSS GUI on macOS | Ruby | Public |
@@ -52,17 +51,6 @@ The original LaTeX source for the STEPSS documentation (models reference and use
 - **Repository**: [github.com/SPS-L/stepss-userguide](https://github.com/SPS-L/stepss-userguide)
 - **Build**: `pdflatex stepss_doc.tex` (run twice)
 - **Main file**: `stepss_doc.tex`
-
-### stepss-uramses
-
-Framework for compiling and linking custom Fortran models with RAMSES.
-
-- **Repository**: [github.com/SPS-L/stepss-uramses](https://github.com/SPS-L/stepss-uramses)
-- **Platforms**: Linux (gfortran), macOS (gfortran, Apple Silicon), Windows (MinGW gfortran or Intel Fortran)
-- **Build (Linux)**: `make -f build/Makefile.linux all`
-- **Build (macOS)**: `make -f build/Makefile.macos all`
-- **Build (Windows/MinGW)**: `make -f build/Makefile.windows all`
-- **Build (Windows/Intel)**: Visual Studio with `build/msvs/URAMSES.sln`
 
 ### stepss-eigenanalysis
 

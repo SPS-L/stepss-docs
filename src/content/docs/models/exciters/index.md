@@ -20,7 +20,7 @@ RAMSES adds the `exc_` prefix to the model name automatically, so both `AC1A` an
 The **State** column of the [IEEE Model Variants](#ieee-model-variants) table says whether a model is compiled and callable, or only a DSL description:
 
 - **Registered**, callable from a data file as it stands. Every compiled exciter has been registered since 3.79; before that, fifteen of them were mapped to no name and RAMSES rejected them in a data file.
-- **DSL only**, present as a CODEGEN model description but not as compiled Fortran. `ENTSOE_lim` ships as a ready-made example in the URAMSES `custom_models/` directory; `AC8B_lim` is listed for reference only and is not distributed.
+- **DSL only**, present as a CODEGEN model description but not as compiled Fortran. `ENTSOE_lim` exists only as an example model description, to be compiled as a [user-defined model](/developer/user-models/); `AC8B_lim` is listed for reference only and is not distributed.
 
 The [Model Reference index](/models/) carries the same information across all model families.
 :::

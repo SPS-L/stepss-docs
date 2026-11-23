@@ -13,7 +13,6 @@ STEPSS is not under one license. The interfaces and tools are open source. The t
 |-----------|---------|------------|
 | STEPSS GUI | Apache License 2.0 | [SPS-L/stepss-java-ui](https://github.com/SPS-L/stepss-java-ui) |
 | stepss | Apache License 2.0 | [SPS-L/stepss-python-ui](https://github.com/SPS-L/stepss-python-ui) |
-| URAMSES | Apache License 2.0 | [SPS-L/stepss-uramses](https://github.com/SPS-L/stepss-uramses) |
 | stepss-eigenanalysis | Apache License 2.0 | [SPS-L/stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) |
 | CODEGEN Studio | Apache License 2.0 | [SPS-L/stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) |
 | stepss-dyngraph | Apache License 2.0 | SPS-L/stepss-dyngraph (private) |

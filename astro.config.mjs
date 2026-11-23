@@ -190,7 +190,6 @@ export default defineConfig({
 						},
 						{ label: 'CODEGEN Model Examples', slug: 'developer/codegen-examples' },
 						{ label: 'CODEGEN Studio',         slug: 'developer/cg-studio' },
-						{ label: 'URAMSES',                slug: 'developer/uramses' },
 					],
 				},
 				{

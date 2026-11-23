@@ -24,8 +24,7 @@ A model can be in one of three states, and the tables below say which:
 :::note[Every compiled model is reachable]
 As of 3.79 every model compiled into the library is mapped to a name and can be
 loaded by writing that name in a data file. Before 3.79 twenty-four of them
-shipped under no name and could only be reached by adding a case through
-[URAMSES](/developer/uramses/). The Hydro-Québec families (`models/*/hq/`) and
+shipped under no name and could not be loaded from a data file. The Hydro-Québec families (`models/*/hq/`) and
 `inj_norton` are excluded from the build entirely and are not reachable by any
 route.
 :::

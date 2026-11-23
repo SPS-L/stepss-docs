@@ -19,7 +19,7 @@ the source, or from inside the application: **Help**, then **Changelog** (`F2`).
 A STEPSS version identifies a **tested combination of components**, not the
 history of any one of them. The engines version independently and on their own
 cadences, and each STEPSS release pins one release of each: RAMSES, Helios,
-CODEGEN, DYNGRAPH and URAMSES, plus the three bundled
+CODEGEN and DYNGRAPH, plus the three bundled
 [test systems](/test-systems/). Those pins live in `versions.properties` in
 [stepss-java-ui](https://github.com/SPS-L/stepss-java-ui).
 

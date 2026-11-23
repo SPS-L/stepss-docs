@@ -437,14 +437,13 @@ The `IND` field is operationally important: setting `IND = S` causes RAMSES to t
 
 ## Building User Models
 
-After writing a model file, CODEGEN translates it into Fortran 2003 code. The workflow is:
+A model file is built into the engine in STEPSS GUI, on the [Codegen tab](/gui/interface/#codegen):
 
-1. Write the model description file
-2. Run CODEGEN (via GUI or command line) to generate Fortran source
-3. Compile the generated Fortran with gfortran
-4. Link against the pre-compiled RAMSES library to create a custom executable or shared library
+1. Write the model description file.
+2. Run CODEGEN, which translates it into Fortran 2003 code.
+3. Press **Compile**, which builds the generated Fortran and links it against the engine, giving a custom simulator that recognises the model's name in a data file.
 
-For compilation details, see [URAMSES](/developer/uramses/).
+Compiling needs a Fortran toolchain on the machine; [Installation](/getting-started/installation/#installing-stepss) says which routes bring it.
 
 See the [CODEGEN Blocks](/developer/codegen-blocks/) reference for the available modelling blocks.
 
@@ -452,4 +451,4 @@ See the [CODEGEN Blocks](/developer/codegen-blocks/) reference for the available
 
 - [CODEGEN Blocks](/developer/codegen-blocks/), Reference for all modeling blocks
 - [CODEGEN Model Examples](/developer/codegen-examples/), Complete model files for each type
-- [URAMSES](/developer/uramses/), Compile and link custom models with RAMSES
+- [The Codegen tab](/gui/interface/#codegen), Translate and compile a model in STEPSS GUI
