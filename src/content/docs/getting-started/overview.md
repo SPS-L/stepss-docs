@@ -54,8 +54,7 @@ In the figure above, files shown in blue are provided by the user; those in blac
 
 Each module can be used independently:
 
-- **Helios alone**: Run a power flow computation to inspect the system state and/or save the solution for RAMSES
-- **Helios alone**: Run a sequence of power flow computations until obtaining the desired system state, then save the solution for RAMSES
+- **Helios alone**: Run one power flow computation, or a sequence of them until the desired system state is obtained, to inspect that state and/or save the solution for RAMSES
 - **RAMSES alone**: With a pre-computed power flow solution, run multiple dynamic simulations from the same initial state
 - **CODEGEN alone**: Build and save models for future incorporation into a user-defined version of RAMSES
 
@@ -67,7 +66,7 @@ two editions, which drive the same engines and read the same data files:
 | Edition | Distributed as | Use it for |
 |---|---|---|
 | **STEPSS GUI** | a desktop application: an installer for Windows, macOS or Linux | Interactive work: load a network, run it, plot curves, build models |
-| **STEPSS in Python** | the `stepss` package, `pip install stepss` | Scripting, parameter sweeps, and the scientific Python stack |
+| **STEPSS in Python** | the `stepss` Python package | Scripting, parameter sweeps, and the scientific Python stack |
 
 Neither edition wraps the other. Both are front ends onto the same Fortran
 engines, so a case built in one runs unchanged in the other.
@@ -77,30 +76,44 @@ the DYNGRAPH trajectory extractor. `stepss` bundles RAMSES and Helios,
 so **CODEGEN is the one capability it lacks**: writing your own models needs the
 GUI, or the [CODEGEN toolchain](/developer/user-models/) directly.
 
-Trajectory viewing exists in both, by different means. The GUI launches
-DYNGRAPH, a separate viewer executable. STEPSS in Python carries its own
-equivalent, written in Python on top of Matplotlib: `extractor` reads a `.trj`
-file into NumPy arrays and `curplot`, or a curve's own `.plot()`, draws them.
-The curves stay in the process as ordinary arrays, so they can be sliced,
-compared across runs, or passed to any other Python library.
+Both editions plot the simulated curves: the GUI through the DYNGRAPH viewer, STEPSS in Python through Matplotlib.
 
 Install either from [Installation](/getting-started/installation/).
 
 ## Helios Module
 
-The power flow computation uses the Newton-Raphson method in polar coordinates; see [Power Flow](/user-guide/power-flow/) for the complete record and parameter reference. Input data consists of:
+Helios solves the AC power flow of the network and produces the operating point that initialises a RAMSES dynamic simulation. It takes as input:
 
 - Network data (buses, lines, transformers, etc.)
 - Power flow data specified at PV, PQ, and slack buses
 - Control parameters (tolerances, reactive power limits, etc.), optional, defaults are used if not provided
 
-Helios can optionally adjust transformer ratios to:
-- Bring voltage magnitudes inside specified deadbands (in-phase transformers)
-- Bring active power flows inside specified deadbands (phase-shifting transformers)
+### Solution Method
+
+The power flow equations are solved by the Newton-Raphson method in polar coordinates. A solution is accepted when the active and reactive power mismatches are below their thresholds, all transformer ratio and phase-shift controls are satisfied, and all generators and static var compensators are within their reactive limits.
+
+### Controls and Limits
+
+During the solution Helios:
+
+- enforces the reactive power limits of generators and static var compensators;
+- adjusts the ratios of in-phase transformers to bring voltage magnitudes inside specified deadbands;
+- adjusts phase-shifting transformers to bring active power flows inside specified deadbands.
+
+### AC/DC Networks
+
+Helios solves a combined AC-DC power flow. The AC network, the DC buses and lines of one or more DC grids, and the voltage-source converters joining them are solved together in the same Newton iteration, with optional DC voltage droop and converter losses.
+
+### Results
 
 Helios produces an output file including:
-- The voltage magnitudes and phase angles at all buses of the network
-- The adjustable transformer data with updated values of their ratios
+
+- the voltage magnitudes and phase angles at all buses of the network;
+- the adjustable transformer data with updated values of their ratios.
+
+It can also aggregate results by zone and by cut, and render a solved case onto an SVG one-line diagram of the network.
+
+[Power Flow](/user-guide/power-flow/) is the complete record and parameter reference.
 
 ## RAMSES Module
 
@@ -111,40 +124,22 @@ RAMSES simulates the dynamic response of power system models under the phasor (R
 - Solver control parameters (tolerances, time steps, reference speed, etc.)
 - Sequence of disturbances and actions
 
-### Integration Methods
+### Solution Method
 
-Three algebraization methods are available:
-
-- **Backward Euler**: $x_{k+1} = x_k + h \dot{x}_{k+1}$
-- **Trapezoidal**: $x_{k+1} = x_k + \frac{h}{2}(\dot{x}_{k+1} + \dot{x}_k)$
-- **BDF2**: $x_{k+1} = \frac{4}{3}x_k - \frac{1}{3}x_{k-1} + \frac{2h}{3}\dot{x}_{k+1}$
-
-All three methods are implicit, ensuring numerical robustness. BDF2 is an $L_1$-stable scheme allowing larger time steps when fast transients are not of interest.
+Three implicit integration methods are available: Backward Euler, Trapezoidal and BDF2. BDF2 allows larger time steps when fast transients are not of interest.
 
 ### Solver Acceleration
 
-The solver was developed in response to the growing demand for simulations that last longer (e.g. Long-term stability studies) or involve larger models (e.g. To account for the impact of active distribution networks).
+The solver was developed for simulations that last longer (long-term stability studies) or involve larger models (to account for active distribution networks). It gets its speed from two techniques:
 
-The solver achieves high computational efficiency through two techniques:
+- **Parallel processing.** The model is decomposed into the network, the injectors and the two-ports, and the work on injectors and two-ports is distributed among threads. A Schur-complement approach for the network equations gives exactly the same solution as a non-decomposed scheme. The implementation is general: there is no hand-crafted optimization particular to the computer system, the power system, or the disturbance.
+- **Localization.** After a disturbance, components show different levels of dynamic activity. At each time step RAMSES skips Newton iterations on converged injectors and two-ports, and replaces latent (inactive) injectors with sensitivity-based models. Injectors switch between categories according to their activity.
 
-**Parallel Processing**: The power system model is decomposed into the network, injectors, and two-ports. A Schur-complement approach for network equations ensures the exact same solution as a non-decomposed scheme. Tasks distributed among threads include:
-- Update and factorization of injector and two-port Jacobians
-- Computation of the mismatch vector of Newton method
-- Computation of injector contributions to the Schur-complement matrix
-- Solution of local linear systems
+### Results
 
-The implementation is general: there is no hand-crafted optimization particular to the computer system, the power system, or the disturbance.
+RAMSES records the trajectories of the observed variables during the simulation, for plotting in either edition. It can also perform a [small-signal stability analysis](/user-guide/eigenanalysis/) of an operating point.
 
-**Localization**: After a disturbance, components exhibit different levels of dynamic activity. This is exploited at each time step to:
-- Skip Newton iterations on converged injectors/two-ports
-- Replace latent (inactive) injectors with sensitivity-based models
-
-A fast-to-compute metric is used to classify injectors, which seamlessly switch between categories according to their activity.
-
-### Key References
-
-- D. Fabozzi, A. Chieh, B. Haut, and T. Van Cutsem, "Accelerated and localized Newton schemes for faster dynamic simulation of large power systems," *IEEE Trans. On Power Systems*, Vol. 28, No. 4, pp. 4936-4947, Dec. 2013. Doi: [10.1109/TPWRS.2013.2251915](https://doi.org/10.1109/TPWRS.2013.2251915)
-- P. Aristidou, D. Fabozzi, and T. Van Cutsem, "Dynamic simulation of large-scale power systems using a parallel Schur-complement-based decomposition method," *IEEE Trans. On Parallel and Distributed Systems*, Vol. 25, No. 10, pp. 2561-2570, Oct. 2014. Doi: [10.1109/TPDS.2013.252](https://doi.org/10.1109/TPDS.2013.252)
+The papers describing these methods are listed under [Publications](/resources/references/).
 
 ## CODEGEN Module
 
