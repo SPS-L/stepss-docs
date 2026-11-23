@@ -36,6 +36,10 @@ order in which they are worth meeting.
   thermal and hydro units, and its scripts generate operating points across a day
   and three levels of heating electrification.
 
+## Power-Flow Benchmarks
+
+**MatACDC cases.** The four DC test cases published with MatACDC 1.0 (J. Beerten, KU Leuven), converted for the Helios [AC/DC converter](/user-guide/power-flow/#acdc-converters-acdc) model, with MatACDC's own solution of each: a point-to-point link and a three-terminal grid with a DC slack and with droop, all on the 5-bus Stagg and El-Abiad system, and two DC grids joining the three zones of the IEEE RTS-96. Each case comes as published, with converter stations, quadratic losses and droop, and as a lossless twin. They are power-flow cases only, with no dynamic data, and are the regression check of the converter model. MatACDC's licence forbids redistributing works derived from it without permission, so the repository, [SPS-L/stepss-MatACDC-Cases](https://github.com/SPS-L/stepss-MatACDC-Cases), is private.
+
 ## Running Any of Them
 
 All five follow the same pattern: clone the repository, then point a stepss

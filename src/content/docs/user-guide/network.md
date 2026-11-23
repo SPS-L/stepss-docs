@@ -41,7 +41,9 @@ BUSDC NAME VNOM ;
 | `NAME` | Bus name, following the same rules as a BUS name | |
 | `VNOM` | Nominal pole-to-neutral DC voltage | kV |
 
-AC and DC buses share one set of names: a BUSDC record must not reuse the name of a BUS, and the reverse. A DC bus is joined to other DC buses by [DC lines](#dc-lines-and-cables), and to the AC network only through a converter, such as the DC side of [`HVDC_VSC`](/models/two-port-models/#twop_hvdc_vsc-voltage-source-converter-hvdc).
+AC and DC buses share one set of names: a BUSDC record must not reuse the name of a BUS, and the reverse. A DC bus is joined to other DC buses by [DC lines](#dc-lines-and-cables), and to the AC network only through a converter: in the power flow an [`ACDC` record](/user-guide/power-flow/#acdc-converters-acdc), in RAMSES a converter model such as the DC side of [`HVDC_VSC`](/models/two-port-models/#twop_hvdc_vsc-voltage-source-converter-hvdc).
+
+In the power flow a DC bus has no load, shunt or angle, and carries no generator, SVC or SLACK: power enters and leaves a DC grid only through ACDC converters, and each DC grid needs one converter regulating its voltage (see [DC Grids and AC Islands](/user-guide/power-flow/#dc-grids-and-ac-islands)).
 
 ## Lines and Cables
 
@@ -93,6 +95,8 @@ $$
 `X` and `WC2` are ignored, and RAMSES writes one line per DC line that sets either, `X and WC2 ignored in the DC network`, to the log. A resistance below the minimum series impedance is raised to it and logged as `resistance changed to`.
 
 A LINE joining an AC bus to a DC bus is refused with the message `links an AC with a DC bus`.
+
+The power flow builds DC lines the same way, on the same base, and writes one warning per DC line that sets `X` or `WC2`. It requires `R` greater than zero (at least $10^{-9}$ pu) and does not apply the minimum series impedance of AC lines. A TRANSFO, TRFO or SWITCH between two DC buses is an error in the power flow, and so is any branch with one AC end and one DC end.
 
 :::caution
 Up to RAMSES 3.85 a DC line was built with the AC formulas, so a nonzero `X` lowered its conductance and `WC2` added a susceptance to the DC bus equations. A case whose DC lines carry `X` or `WC2` starts from a different DC operating point on 3.85 and earlier than on later releases. Setting both to zero gives the same result on every release.
@@ -317,4 +321,5 @@ The SHUNT record is used by RAMSES. For the power flow, shunt data is specified 
 ## Next Steps
 
 - [Power Flow](/user-guide/power-flow/), Configure generators, loads, and compute the initial operating point
+- [AC/DC Converters](/user-guide/power-flow/#acdc-converters-acdc), Join DC grids to the AC network in the power flow
 - [Dynamic Data Records](/user-guide/dynamic-models/), Add synchronous machines and controllers
