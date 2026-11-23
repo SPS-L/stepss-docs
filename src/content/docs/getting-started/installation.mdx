@@ -3,15 +3,9 @@ title: Installation
 description: How to install STEPSS and its dependencies
 ---
 
-import { Tabs, TabItem, Steps, Aside, LinkButton } from '@astrojs/starlight/components';
+import { Tabs, TabItem, Aside, LinkButton } from '@astrojs/starlight/components';
 
-STEPSS comes in [two editions](/getting-started/overview/#two-editions), and this page installs either. **STEPSS GUI** is the desktop application: install it once, then work from windows and menus. **STEPSS in Python** is the `stepss` package: `pip install` it and drive the same engines from a script or a notebook. Both read the same data files, so a case built in one runs unchanged in the other, and installing one does not commit you to it.
-
-The last two sections, the Fortran toolchain and CODEGEN Studio, are for writing your own models. Skip them unless you intend to.
-
-:::tip[Only want the Python package?]
-`pip install stepss` is the whole installation and it needs no Java. Skip to [Installing STEPSS in Python](#installing-stepss-in-python).
-:::
+STEPSS comes in [two editions](/getting-started/overview/#two-editions). **STEPSS GUI** is the desktop application. **STEPSS in Python** is the `stepss` package, which drives the same engines from a script or a notebook and needs no Java. Both read the same data files, so a case built in one runs unchanged in the other.
 
 ## Watch it
 
@@ -19,42 +13,76 @@ Episode 1 of the [video series](/resources/videos/), *Installation and Setup*, c
 
 <div class="video-embed"><iframe src="https://www.youtube-nocookie.com/embed/VZPbw7cxfr0" title="STEPSS Episode 1: Installation and Setup" loading="lazy" allowfullscreen allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe></div>
 
-## Installing STEPSS GUI
+## Installing STEPSS
 
-STEPSS GUI comes as an **installer**, which brings its own Java, on every [release](https://github.com/SPS-L/stepss-java-ui/releases). There is also a package manager on each platform, delivering the same application so that later releases arrive on their own: an **APT repository** on Debian and Ubuntu, a **Scoop bucket** on Windows, and a **Homebrew tap** on macOS.
+STEPSS GUI is published on every [release](https://github.com/SPS-L/stepss-java-ui/releases) as an installer that brings its own Java, so an existing Java on the machine is neither required nor disturbed. Each platform also has a package manager route, recommended where you can use it: it delivers the same application, and later releases arrive with your other updates instead of being downloaded by hand.
 
-:::note[Which Linux]
-**Debian and Ubuntu are the Linux distributions STEPSS is packaged for**, from Ubuntu 24.04 and its Debian contemporary onwards, on x86-64. That is what the `.deb` and the APT repository are built and tested against, and no package is produced for any other distribution or architecture.
-:::
+Choose your platform, or **Python** for STEPSS in Python:
 
 <Tabs>
-<TabItem label="Installer">
+<TabItem label="Windows">
 
-The installers bundle a Java runtime, so an existing Java on the machine is neither required nor disturbed. On Windows and Linux **nothing else needs installing**. On macOS the simulation engines also need two Homebrew packages, which the `.dmg` cannot bring with it.
+Windows on x86-64. There is no Windows arm64 build of the engines.
+
+**Scoop (recommended).** STEPSS has a [Scoop](https://scoop.sh/) bucket. It installs into your own profile and **needs no administrator rights**, so it works on a managed machine where an installer cannot be run. If you do not have Scoop yet, install it in a normal (not elevated) PowerShell:
+
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
+```
+
+Then add the bucket once and install:
+
+```powershell
+scoop bucket add sps-l https://github.com/SPS-L/stepss-scoop
+scoop install stepss
+```
+
+Upgrade with `scoop update stepss` and remove with `scoop uninstall stepss`. You get STEPSS on the Start menu under **Scoop Apps**, an icon on your desktop, and a `stepss` command on your `PATH`.
+
+**Installer.** Download `STEPSS-<version>.msi` from the release's assets, open it and follow the installer. Remove it from Add or Remove Programs.
 
 <LinkButton href="https://github.com/SPS-L/stepss-java-ui/releases/latest" icon="cloud-download">Go to the latest release</LinkButton>
 
-<Steps>
+**Compiling your own models.** Neither Windows route installs a Fortran toolchain, because nothing but compiling your own models needs one. Install [MSYS2](https://www.msys2.org/), or run `scoop install msys2`, and from an MSYS2 shell:
 
-1. Download the one for your system from the release's assets:
-   - **Windows**: `STEPSS-<version>.msi`, though the **Windows (Scoop)** tab is the better route if you can use it: same application, later releases arrive on their own, and it needs no administrator rights.
-   - **macOS** (Apple Silicon): `STEPSS-<version>.dmg`, and run `brew install gcc openblas` once, or the application opens normally and the first simulation fails. The **macOS (Homebrew)** tab is the better route if you can use it: same application, both packages come with it, and later releases arrive on their own.
-   - **Linux** (Debian, Ubuntu): `stepss_<version>_amd64.deb`, though the **Debian and Ubuntu (apt)** tab is the better route if you can use it: same package, and later releases arrive on their own.
-2. Open it and follow the installer.
-3. Launch **STEPSS** from the Start menu, Applications, or your desktop's application list.
+```bash
+pacman -S mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-openblas make
+```
 
-</Steps>
-
-On Linux, install the `.deb` with `sudo apt install ./stepss_<version>_amd64.deb` rather than `dpkg -i`, so that the libraries it needs are pulled in with it. It requires **Ubuntu 24.04 or newer**, or a Debian of the same vintage or later.
-
-Uninstall the way you would any other application on your system: Add or Remove Programs on Windows, dragging it to the Trash on macOS, `sudo apt remove stepss` on Debian and Ubuntu.
+STEPSS finds MSYS2 in `C:\msys64`, in Scoop's applications directory, or wherever the `MSYS2_ROOT` environment variable points, so there is nothing to configure by hand.
 
 </TabItem>
-<TabItem label="Debian and Ubuntu (apt)">
+<TabItem label="macOS">
 
-STEPSS has an APT repository, so it installs like any other package and every later release arrives through `apt upgrade` instead of being downloaded by hand. It is the same `.deb` as the Installer tab, served from **[apt.sps-lab.org](https://apt.sps-lab.org/)**.
+Apple Silicon. There is no Intel macOS build of the engines.
 
-Set it up once:
+**Homebrew (recommended).** STEPSS has a [Homebrew](https://brew.sh/) tap. It also installs `gcc` and `openblas`, which the simulation engines load at run time and which compiling your own models needs:
+
+```bash
+brew install --cask sps-l/stepss/stepss
+```
+
+Upgrade with `brew upgrade --cask stepss` and remove with `brew uninstall --cask stepss`. If STEPSS is already in Applications from a `.dmg`, move it to the Trash first: Homebrew does not overwrite an application it did not install.
+
+**Installer.** Download `STEPSS-<version>.dmg` from the release's assets and drag STEPSS to Applications. The `.dmg` cannot bring the two Homebrew packages with it, so install them once yourself, or the application opens normally and the first simulation fails:
+
+```bash
+brew install gcc openblas
+```
+
+Remove it by dragging it to the Trash.
+
+<LinkButton href="https://github.com/SPS-L/stepss-java-ui/releases/latest" icon="cloud-download">Go to the latest release</LinkButton>
+
+The application is signed and notarized, and macOS confirms that with Apple the first time you open it, so that first launch needs a network connection.
+
+</TabItem>
+<TabItem label="Debian and Ubuntu">
+
+**Debian and Ubuntu are the Linux distributions STEPSS is packaged for**: Ubuntu 24.04 or newer, or a Debian of the same vintage or later, on x86-64. The package names its dependencies as 24.04 names them, so Ubuntu 22.04 and Debian 12 cannot install it, and no package is produced for any other distribution or architecture.
+
+**APT repository (recommended).** STEPSS has an APT repository at **[apt.sps-lab.org](https://apt.sps-lab.org/)**. Set it up once:
 
 ```bash
 sudo install -d -m 0755 /etc/apt/keyrings
@@ -78,214 +106,54 @@ sudo apt update
 sudo apt install stepss
 ```
 
-Run it with `stepss`, or from the Science section of the applications menu. Remove it with `sudo apt remove stepss`.
+`Architectures: amd64` is needed: without it, apt on an arm64 machine looks for an index that does not exist and errors on every `apt update`. `Components: non-free` is accurate, since RAMSES is proprietary.
 
 :::caution[If `apt update` says `NO_PUBKEY 3600A756077AD061`]
-That is apt naming the key it wanted and could not find, and it means one of three things, which look identical from apt: the keyring file is **not there**, because the download failed and `curl` correctly writes nothing when it does; the `Signed-By` line is missing from your `.sources` file; or the file holds some other key.
+apt could not find the key, for one of three reasons: the keyring file is **not there** (the download failed, and `curl` writes nothing when it does), the `Signed-By` line is missing from your `.sources` file, or the file holds another key. Check it with:
 
 ```bash
 gpg --show-keys /etc/apt/keyrings/sps-l-archive-keyring.asc
 ```
 
-It should print fingerprint `125ABE6917ED2F2965D6545B3600A756077AD061` for `SPS-L Packaging <stepss@sps-lab.org>`. If it reports no such file, run the `curl` command again. A different complaint mentioning `add_keyblock_resource` means the file exists but is empty, and has the same remedy.
+It should print fingerprint `125ABE6917ED2F2965D6545B3600A756077AD061` for `SPS-L Packaging <stepss@sps-lab.org>`. If it reports no such file, or complains about `add_keyblock_resource` (an empty file), run the `curl` command again.
 :::
 
-<Aside type="caution" title="What this route requires and what it is not">
-- **Ubuntu 24.04 or newer**, or a Debian of the same vintage or later, on **x86-64**. The package is built on 24.04 and names its dependencies as that release names them, so 22.04 and Debian 12 cannot install it. There is no Linux arm64 build of the engines, which is why `Architectures: amd64` is in the snippet: without that line, apt on an arm64 machine looks for an index that does not exist and errors on every `apt update`.
-- **The current release only.** The repository serves one version. To install a specific older build, take its `.deb` from the [releases page](https://github.com/SPS-L/stepss-java-ui/releases).
-- **`non-free` is accurate, not boilerplate.** STEPSS is not free software taken as a whole: RAMSES is proprietary and free for non-commercial use only, and Helios and CODEGEN are under Academic Public Licences. Installing through apt agrees to nothing, since the licence appears the first time you launch STEPSS. Read [Licensing](/getting-started/license/) before you run it, and please do not mirror the repository: the licence granted for RAMSES is non-transferable.
-- **This is not an official Ubuntu or Debian repository**, and nothing in it has been through Canonical's or Debian's review.
-</Aside>
-
-</TabItem>
-<TabItem label="Windows (Scoop)">
-
-STEPSS has a [Scoop](https://scoop.sh/) bucket, so it installs from the command line and every later release arrives through `scoop update` instead of being downloaded by hand. It is the same application as the `.msi`, delivered as a portable build.
-
-**It needs no administrator rights.** Scoop installs into your own profile, so this is the route that works on a managed or locked-down machine where an installer cannot be run at all.
-
-If you do not have Scoop yet, install it in a normal (not elevated) PowerShell:
-
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression
-```
-
-Then add the bucket once and install:
-
-```powershell
-scoop bucket add sps-l https://github.com/SPS-L/stepss-scoop
-scoop install stepss
-```
-
-From that point on, upgrade with the rest of your Scoop applications:
-
-```powershell
-scoop update stepss
-```
-
-You get STEPSS on the Start menu under **Scoop Apps**, an icon on your **desktop**, and a `stepss` command on your `PATH`. Remove it with `scoop uninstall stepss`, which takes both shortcuts with it.
-
-<Aside type="caution" title="What this route requires and what it is not">
-- **Windows on x86-64.** There is no Windows arm64 build of the engines.
-- **The current release only.** The bucket serves one version. To install a specific older build, take its `.msi` from the [releases page](https://github.com/SPS-L/stepss-java-ui/releases).
-- **STEPSS is not Apache 2.0 taken as a whole**, whatever the interface's own repository says. RAMSES is proprietary and free for non-commercial use only, and Helios and CODEGEN are under Academic Public Licences. Installing through Scoop agrees to nothing, since the licence appears the first time you launch STEPSS. Read [Licensing](/getting-started/license/) before you run it, and please do not mirror the bucket's release assets: the licence granted for RAMSES is non-transferable.
-- **This is not an official Scoop bucket**, and nothing in it has been through the Scoop maintainers' review. `scoop bucket add` takes the URL above precisely because the bucket is ours rather than theirs.
-</Aside>
-
-</TabItem>
-<TabItem label="macOS (Homebrew)">
-
-STEPSS has a [Homebrew](https://brew.sh/) tap, so it installs from the command line and every later release arrives through `brew upgrade` instead of being downloaded by hand. It is the same application as the `.dmg`.
-
-**It brings what the engines need.** The simulation engines load the gfortran runtime and OpenBLAS from Homebrew, and this route installs both as dependencies. With the `.dmg` you install them yourself.
+**Installer.** Download `stepss_<version>_amd64.deb` from the release's assets and install it with apt rather than `dpkg -i`, so that its dependencies come with it:
 
 ```bash
-brew install --cask sps-l/stepss/stepss
+sudo apt install ./stepss_<version>_amd64.deb
 ```
 
-From that point on, upgrade with the rest of your Homebrew applications:
+<LinkButton href="https://github.com/SPS-L/stepss-java-ui/releases/latest" icon="cloud-download">Go to the latest release</LinkButton>
 
-```bash
-brew upgrade --cask stepss
-```
-
-You get **STEPSS** in Applications. Remove it with `brew uninstall --cask stepss`.
-
-If STEPSS is already in Applications from a `.dmg`, move it to the Trash first: Homebrew does not overwrite an application it did not install, and stops with `It seems there is already an App at '/Applications/STEPSS.app'`.
-
-<Aside type="caution" title="What this route requires and what it is not">
-- **Apple Silicon.** There is no Intel macOS build of the engines.
-- **The current release only.** The tap serves one version. To install a specific older build, take its `.dmg` from the [releases page](https://github.com/SPS-L/stepss-java-ui/releases).
-- **A network connection the first time you open it.** The application is signed and notarized, and macOS confirms that with Apple on first launch.
-- **STEPSS is not Apache 2.0 taken as a whole**, whatever the interface's own repository says. RAMSES is proprietary and free for non-commercial use only, and Helios and CODEGEN are under Academic Public Licences. Installing through Homebrew agrees to nothing, since the licence appears the first time you launch STEPSS. Read [Licensing](/getting-started/license/) before you run it, and please do not mirror the release assets: the licence granted for RAMSES is non-transferable.
-- **This is not an official Homebrew cask**, and nothing in it has been through the Homebrew maintainers' review. Naming the cask in full, as the command above does, is what tells Homebrew you trust it.
-</Aside>
+Both routes also install `gfortran`, `make` and `libopenblas-dev` as recommended packages, which compiling your own models needs. Run STEPSS with `stepss`, or from the Science section of the applications menu, and remove it with `sudo apt remove stepss`.
 
 </TabItem>
-</Tabs>
+<TabItem label="Python">
 
-## Installing STEPSS in Python
-
-**STEPSS in Python** is the `stepss` package on PyPI. It needs Python 3 and no Java at all:
+**STEPSS in Python** is the `stepss` package on PyPI. It needs Python 3:
 
 ```bash
 pip install stepss
 ```
 
-That one command brings the engines with it: the package carries pre-compiled RAMSES and Helios binaries for Windows, Linux and macOS, so there is nothing to install alongside it and nothing to point it at. Trajectory plotting is built in, on top of Matplotlib, in place of the DYNGRAPH viewer the GUI launches.
+The package carries pre-compiled RAMSES and Helios binaries for Windows, Linux and macOS, so there is nothing to install alongside it. On Linux and macOS those binaries link against system runtime libraries (OpenBLAS, the gfortran and OpenMP runtimes) that your machine may not already have; the [Python API Installation Guide](/python/installation/) lists them, and covers version pinning.
 
-Two things it does not do for you, both covered by the [Python API Installation Guide](/python/installation/): on Linux and macOS the bundled binaries link against system runtime libraries (OpenBLAS, the gfortran and OpenMP runtimes) that your machine may not already have, and plotting observables while a run proceeds is your own loop over the curve file the engine writes, rather than something the package does for you. That page also covers version pinning, which is how you fix the engine version a script runs against.
-
-:::note[CODEGEN is not in this edition]
-`stepss` bundles RAMSES and Helios, not CODEGEN, so **writing your own models needs STEPSS GUI** or the toolchain below. Running a model someone else compiled works from either edition. [Two Editions](/getting-started/overview/#two-editions) sets out what each one carries.
-:::
-
-## Installing a Fortran Toolchain
-
-<Aside type="tip">
-This step can be **skipped** unless you intend to compile your own models. Both editions run their bundled engines, and every model already in them, without it.
-</Aside>
-
-Compiling a custom model produces a simulator built from the bundled URAMSES kit,
-which is a **gfortran** build. You therefore need `gfortran`, GNU `make` and
-OpenBLAS on your machine.
-
-This applies to **either edition**: [URAMSES](/developer/uramses/) links custom
-models into `stepss` and into STEPSS GUI alike. It is the compiling that needs a
-toolchain, and it is separate from writing the model in the first place, which is
-CODEGEN's job and ships only with the GUI.
-
-<Tabs>
-<TabItem label="Windows">
-
-Install [MSYS2](https://www.msys2.org/), or, if you installed STEPSS with Scoop
-and would rather not run a second installer, `scoop install msys2`. Then, from an
-MSYS2 shell:
-
-```bash
-pacman -S mingw-w64-x86_64-gcc-fortran mingw-w64-x86_64-openblas make
-```
-
-STEPSS looks for the installation in `C:\msys64`, in Scoop's applications
-directory, or wherever the `MSYS2_ROOT` environment variable points, so the MinGW
-`bin` directory does not have to be on the system `PATH` and there is nothing to
-configure by hand on either route. It searches every one of those that exists
-rather than stopping at the first, because `scoop install msys2` leaves an MSYS2
-already at `C:\msys64` alone and only one of the two is likely to be the one you
-ran `pacman` in.
-
-Note that the Scoop bucket **suggests** MSYS2 rather than depending on it, so
-`scoop install stepss` does not pull it in. That is deliberate: it is a large
-download, nothing else in STEPSS needs it, and `.mod` files are readable only by
-the gfortran release that wrote them, so installing whatever MSYS2's rolling
-repository holds on a given day would not guarantee a matching toolchain anyway.
-
-</TabItem>
-<TabItem label="Linux (Debian, Ubuntu)">
-
-```bash
-sudo apt install gfortran make libopenblas-dev
-```
-
-Installing STEPSS through [apt](#installing-stepss-gui) offers these three
-as recommended packages, so on that route they are already there unless you
-declined them.
-
-</TabItem>
-<TabItem label="macOS">
-
-macOS ships no Fortran compiler, so it comes from [Homebrew](https://brew.sh/):
-
-```bash
-brew install gcc openblas
-```
-
-Installing STEPSS through [Homebrew](#installing-stepss-gui) brings both with
-it, so on that route they are already there.
-
-Apple Silicon only; Intel Macs are not supported.
+`stepss` does not carry CODEGEN, so **writing your own models needs STEPSS GUI** or [CODEGEN Studio](#installing-codegen-studio). Running a model someone else compiled works from either edition.
 
 </TabItem>
 </Tabs>
 
-<Aside type="caution" title="The compiler must match the kit">
-Fortran `.mod` files can only be read by the gfortran release that wrote them.
-Each platform's default compiler normally matches its own bundled kit; when it
-does not, STEPSS reports the exact compiler version to install rather than
-failing in the middle of a build. See [URAMSES](/developer/uramses/) for the
-details.
+<Aside type="caution" title="What the package manager routes are and are not">
+- **They serve the current release only.** To install an older build, take its installer from the [releases page](https://github.com/SPS-L/stepss-java-ui/releases).
+- **They are ours, not the distributions'.** The APT repository, the Scoop bucket and the Homebrew tap are not official, and nothing in them has been through Canonical's, Debian's, Scoop's or Homebrew's review.
+- **Installing through them agrees to nothing.** STEPSS is not free software taken as a whole: the licence appears the first time you launch it. Read [License](/getting-started/license/) before you run it, and do not mirror the packages, since the licence granted for RAMSES is non-transferable.
 </Aside>
+
+Compiling your own models also needs the gfortran release that matches the bundled kit; [URAMSES](/developer/uramses/#prerequisites) covers that check.
 
 ## Installing CODEGEN Studio
 
-[CODEGEN Studio](/developer/cg-studio/) is the browser-based visual editor for
-building models: drag blocks onto a canvas, connect them, and export a DSL file
-instead of writing one by hand. It is its own Python package, tied to neither
-edition, and needs **Python 3.10 or newer**:
+[CODEGEN Studio](/developer/cg-studio/) is the browser-based visual editor for building models: drag blocks onto a canvas, connect them, and export a model file instead of writing one by hand. It is its own Python package, `stepss-cg-studio`, tied to neither edition, and needs **Python 3.10 or newer**. [CODEGEN Studio](/developer/cg-studio/) gives the install command, the command-line options and a source install.
 
-```bash
-pip install stepss-cg-studio
-cg-studio
-```
-
-`cg-studio` starts a local server and opens the editor at
-`http://localhost:8765`. If the script is not on your `PATH`,
-`python -m cg_studio` does the same thing. Browser-based here means the
-interface is a web page, not that anything leaves your machine: the server is
-local and so is every file it reads.
-
-<Aside type="note" title="CODEGEN comes with it">
-The wheel carries the CODEGEN executables for Linux, Windows and macOS, so
-**Run Codegen** generates Fortran on a fresh install with nothing to obtain and
-no path to set. On macOS, add `brew install gcc`: that build links against
-`libgfortran`, because Apple does not support fully static executables. See
-[User-Defined Models](/developer/user-models/) for what happens to the generated
-file next.
-
-CODEGEN is not Apache 2.0 like the editor around it, so this wheel is
-mixed-licence: see [License](/getting-started/license/#codegen-license).
-</Aside>
-
-See [CODEGEN Studio](/developer/cg-studio/) for the command-line options, a
-source install, and how to drive the editor itself.
+Its wheel carries the CODEGEN executables for Linux, Windows and macOS, so it generates Fortran on a fresh install. On macOS it also needs Homebrew's `gcc`, which either macOS route above already installs. CODEGEN is not Apache 2.0 like the editor around it: see [License](/getting-started/license/#codegen-license).

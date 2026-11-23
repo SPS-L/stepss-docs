@@ -280,9 +280,10 @@ exists, simulations run on it rather than on the bundled engine.
      alt="The Codegen tab after running CODEGEN on an IEEE AC1A exciter description. The pane logs each translated block in turn, an LV gate, a limiter, algebraic equations, the exciter integrator and a derivative feedback, each with its running count of differential-algebraic equations, states and discrete states, then reports merging the temporary files and Done. Save converted files and Compile are now enabled."
      class="light:sl-hidden" />
 
-Compiling needs a Fortran toolchain on the machine, which is
-[its own installation step](/getting-started/installation/#installing-a-fortran-toolchain);
-translating a model does not.
+Compiling needs a Fortran toolchain on the machine; translating a model does
+not. The apt and Homebrew routes install the toolchain with STEPSS, and the
+Windows tab of [Installation](/getting-started/installation/#installing-stepss)
+says what to add there.
 
 [User-Defined Models](/developer/user-models/) is the reference for the model
 language, and [CODEGEN Studio](/developer/cg-studio/) assembles models visually
