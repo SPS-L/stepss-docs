@@ -90,6 +90,19 @@ export default defineConfig({
 					],
 				},
 				{
+					label: 'Python API',
+					items: [
+						{ label: 'Introduction', slug: 'python' },
+						{ label: 'Overview',      slug: 'python/overview' },
+						{ label: 'Installation',  slug: 'python/installation' },
+						{ label: 'Examples',      slug: 'python/examples' },
+						{ label: 'API Reference', slug: 'python/api-reference' },
+						// Not "Power Flow (Helios)": that label belongs to the engine
+						// reference under Simulation Guide. This page is the Python API.
+						{ label: 'Helios Power-Flow API', slug: 'python/helios' },
+					],
+				},
+				{
 					// Flat, in workflow order: describe the network, solve the power
 					// flow, then set up and run the dynamic simulation, then analyse it.
 					label: 'Simulation Guide',
@@ -102,19 +115,6 @@ export default defineConfig({
 						{ label: 'Disturbances',        slug: 'user-guide/disturbances' },
 						{ label: 'Solver Settings',     slug: 'user-guide/solver-settings' },
 						{ label: 'Eigenanalysis',       slug: 'user-guide/eigenanalysis' },
-					],
-				},
-				{
-					label: 'Python API',
-					items: [
-						{ label: 'Introduction', slug: 'python' },
-						{ label: 'Overview',      slug: 'python/overview' },
-						{ label: 'Installation',  slug: 'python/installation' },
-						{ label: 'Examples',      slug: 'python/examples' },
-						{ label: 'API Reference', slug: 'python/api-reference' },
-						// Not "Power Flow (Helios)": that label belongs to the engine
-						// reference under Simulation Guide. This page is the Python API.
-						{ label: 'Helios Power-Flow API', slug: 'python/helios' },
 					],
 				},
 				{
