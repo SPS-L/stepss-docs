@@ -158,12 +158,6 @@ The user model is **compiled, not interpreted**, resulting in efficient number-c
 
 [CODEGEN Studio](/developer/cg-studio/) is a browser-based visual editor for building CODEGEN models. Instead of writing DSL files by hand, you drag blocks onto a canvas, connect them, and export a valid model file. It can also import existing DSL files for visual inspection and editing.
 
-## Simulation Interfaces
-
-STEPSS modules are driven from STEPSS GUI or from Python through stepss. The
-[Quick Start](/getting-started/quickstart/) compares the two and gives the
-first steps for each.
-
 ## Platform Support
 
 | Feature | Details |
