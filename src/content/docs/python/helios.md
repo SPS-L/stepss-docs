@@ -51,7 +51,43 @@ names = pf.bus_names()
 print(f"lowest voltage: {v_pu.min():.4f} pu at {names[v_pu.argmin()]}")
 ```
 
-Per-element dataclasses are available via `get_bus_info()`, `get_branch_info()`, and `get_generator_info()`.
+Per-element dataclasses are available via `get_bus_info()`, `get_branch_info()`, `get_generator_info()`, and `get_converter_info()`.
+
+## AC/DC Converters
+
+A case with `BUSDC` and `ACDC` records (see [AC/DC Converters (ACDC)](/user-guide/power-flow/#acdc-converters-acdc)) solves like any other, and its DC buses appear in `bus_names()` with `bus_type` `BusType.DC`. The converters have their own getters, which need `stepss` 3.85.2 or later (Helios 1.7.0):
+
+```python
+from stepss.helios import ConverterMode
+
+with HeliosSession() as pf:
+    pf.load_file('case5_mtdc_droop.dat')
+    pf.solve()
+
+    for name in pf.converter_names():
+        c = pf.get_converter_info(name)
+        print(f"{c.name} {c.mode.name:5} PAC {c.pac_mw:8.2f} MW  "
+              f"PDC {c.pdc_mw:8.2f} MW  loss {c.converter_loss_mw:5.2f} MW")
+
+    pac, qac, pdc, status = pf.get_converter_outputs()   # NumPy arrays
+```
+
+`get_converter_info()` returns a `ConverterInfo` with the same quantities as the converter table of the power-flow menu:
+
+| Field | Meaning |
+|-------|---------|
+| `ac_bus`, `dc_bus`, `in_service` | Connection and status |
+| `pac_mw`, `qac_mvar` | Power at the AC bus: `PAC` drawn from it, `QAC` injected into it |
+| `pdc_mw` | Power delivered into the DC bus; `PAC` and `PDC` are positive when rectifying |
+| `mode` | `ConverterMode`: `PQ`, `PV`, `VDC`, `DROOP`, `LIMIT` or `REF`, as the table's mode column |
+| `q_control` | `-2` holding `VAC`, `1` fixed Q, `2` at `QMAX`, `3` at `QMIN` |
+| `rectifying` | Direction of the active power |
+| `vc_pu`, `pc_mw`, `qc_mvar` | Converter node behind the station; without a station they equal the AC bus voltage, `PAC` and `-QAC` |
+| `station_loss_mw`, `converter_loss_mw` | `PAC - Pc` lost in the station and `Pc - PDC` in the converter |
+
+An out-of-service converter reports zero powers. A case that fails on its DC side ends with `pf.solver_status` set to `SolverStatus.NO_DC_REGULATION` or `SolverStatus.CONVERTER_INFEASIBLE`, and `pf.last_error` names the element (see [Solver Outcomes](/user-guide/power-flow/#solver-outcomes)).
+
+With an older bundled Helios, `pf.has_converter_api` is `False` and the converter getters raise `HeliosError`; the rest of the session works as before.
 
 ## Modifying the System
 

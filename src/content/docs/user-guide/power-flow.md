@@ -295,7 +295,7 @@ name,ac_bus,dc_bus,status,mode,qctl,pac_mw,qac_mvar,pdc_mw,loss_mw,direction,vc_
 
 where `loss_mw` is $P_{AC} - P_{DC}$, the sum of the station and converter losses.
 
-When the data are dumped, constant-voltage and island-reference converters are written with their solved `PAC` and `PDC`, which read back as starting guesses, so a dumped case solves to the same point. A droop converter keeps its $P_{SET}$ in `PDC`; its solved power appears in the converter table only.
+When the data are dumped, constant-voltage and island-reference converters are written with their solved `PAC` and `PDC`, which read back as starting guesses, so a dumped case solves to the same point. A droop converter keeps its $P_{SET}$ in `PDC`; its solved power appears in the converter table, and from Python in `get_converter_info()`, see [AC/DC Converters](/python/helios/#acdc-converters).
 
 ### Solver Outcomes
 
@@ -306,7 +306,7 @@ Two outcomes are specific to AC-DC cases. Both end the solve as not converged an
 | `NO_DC_REGULATION` | A DC grid has no converter regulating its voltage: no constant-voltage converter, and every droop converter is inside its deadband or at `PMIN` or `PMAX` | `the DC grid containing BUSDC '<name>' has no converter regulating its voltage` |
 | `CONVERTER_INFEASIBLE` | A converter cannot deliver the `PDC` it must through its losses and station, or free converter powers form a ring | `ACDC '<name>' cannot deliver PDC = <p> MW: its losses and station allow at most <pmax> MW at the PCC voltage reached` (for the first cause) |
 
-In non-interactive use both exit with status `2`, see [Exit Status](#exit-status). In the C API, `helios_get_solver_status` returns `5` for `NO_DC_REGULATION` and `6` for `CONVERTER_INFEASIBLE`, and `helios_get_last_error` carries the message. A DC bus reports bus type `4` (DC).
+In non-interactive use both exit with status `2`, see [Exit Status](#exit-status). In the C API, `helios_get_solver_status` returns `5` for `NO_DC_REGULATION` and `6` for `CONVERTER_INFEASIBLE`, and `helios_get_last_error` carries the message. A DC bus reports bus type `4` (DC). From Helios 1.7.0 the C API also reports each converter (`helios_get_converter_info`, `helios_get_converter_state` and `helios_copy_converter_outputs`), with the columns of the converter table.
 
 ### Example
 
