@@ -3,7 +3,11 @@ title: License
 description: Licensing information for the STEPSS suite
 ---
 
+STEPSS is not under one license. The interfaces and tools are open source. The three engines, Helios, RAMSES and CODEGEN, are free of charge for non-commercial use and need a license for anything commercial.
+
 ## Component Licenses
+
+**Open-source components**
 
 | Component | License | Repository |
 |-----------|---------|------------|
@@ -11,107 +15,86 @@ description: Licensing information for the STEPSS suite
 | stepss | Apache License 2.0 | [SPS-L/stepss-python-ui](https://github.com/SPS-L/stepss-python-ui) |
 | URAMSES | Apache License 2.0 | [SPS-L/stepss-uramses](https://github.com/SPS-L/stepss-uramses) |
 | stepss-eigenanalysis | Apache License 2.0 | [SPS-L/stepss-eigenanalysis](https://github.com/SPS-L/stepss-eigenanalysis) |
-| CODEGEN Studio | Apache License 2.0, but its **PyPI wheel bundles CODEGEN**: see [CODEGEN License](#codegen-license) | [SPS-L/stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) |
+| CODEGEN Studio | Apache License 2.0 | [SPS-L/stepss-cg-studio](https://github.com/SPS-L/stepss-cg-studio) |
 | stepss-dyngraph | Apache License 2.0 | SPS-L/stepss-dyngraph (private) |
 | RamsesNN | MIT License | [SPS-L/stepss-RamsesNN](https://github.com/SPS-L/stepss-RamsesNN) |
-| Helios | Academic Public License (free for non-commercial use), with a commercial option | See [Helios License](#helios-license) below |
-| RAMSES | Proprietary, free for non-commercial use | See [RAMSES Solver License](#ramses-solver-license) below |
-| CODEGEN | Proprietary, free executables (Academic Public License) | See [CODEGEN License](#codegen-license) below |
 
-## Documentation License
+**Engines**
 
-The STEPSS **documentation**, this website and the PDF user guide, is licensed
-under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
-You may share and adapt it, including for commercial purposes, provided you give
-appropriate credit.
+| Engine | Role | Owner | License |
+|--------|------|-------|---------|
+| Helios | Power flow | Dr. Petros Aristidou | [STEPSS-Helios Academic Public License](#helios-license) |
+| RAMSES | Dynamic simulation | University of Liège, Belgium | [Proprietary](#ramses-solver-license) |
+| CODEGEN | Model generator | Dr. Thierry Van Cutsem | [Academic Public License for the use of STEPSS](#codegen-license) |
 
-This applies to the documentation only. It grants **no rights over the STEPSS
-software itself**, which remains under the terms set out below.
+An open-source license covers the code written in that repository, not an engine shipped alongside it. See [Packages That Bundle an Engine](#packages-that-bundle-an-engine).
 
-## RAMSES Solver License
+## Engine Licenses
 
-**The RAMSES dynamic simulator (the solver of differential-algebraic equations) is NOT covered by the Apache License 2.0.** RAMSES is the property of the **University of Liège, Belgium**, and is distributed under a separate proprietary license with the following terms:
+The three engines share these terms:
 
-- Permission is granted to use RAMSES **free of charge** for any **non-commercial purpose**, including:
-  - Teaching and research at universities, colleges, and other educational institutions
-  - Research at non-profit research institutions
-  - Personal non-profit purposes
+- **Non-commercial use is free of charge.** This covers teaching and research at universities, colleges and other educational institutions, research at non-profit research institutions, and personal non-profit purposes.
+- **Commercial use needs a license.** This includes, but is not restricted to, consulting activities, the design of commercial hardware or software products, and participation by a commercial entity in research projects. See [Requesting a Commercial License](#requesting-a-commercial-license).
+- **No warranty.** Each engine is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement.
 
-- For **commercial use** of RAMSES (including but not restricted to consulting activities, design of commercial hardware or software products, or participation by a commercial entity in research projects), you must contact the Authors for an appropriate license.
+What follows is specific to each engine.
 
-- The free-of-charge version of RAMSES is limited to:
-  - Power system models of up to **1000 buses** (or nodes)
-  - Execution with parallelization using no more than **2 cores**
+### RAMSES Solver License
 
-- RAMSES is provided **"as is"**, without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and non-infringement.
+RAMSES, the solver of differential-algebraic equations, is the property of the University of Liège, which has granted to both [Authors](#authors) a personal, royalty-free, limited, non-exclusive, non-transferable and non-assignable license to distribute an executable version of it free of charge.
 
-For extensions to larger models or execution using more than two cores, contact the Authors.
+The free-of-charge version is limited to:
 
-## Helios License
+- power system models of up to **1000 buses** (or nodes);
+- execution with parallelization on no more than **2 cores**.
 
-**STEPSS-Helios** (the modern power-flow engine, also bundled as `libhelios_api` in stepss) is the property of **Dr. Petros Aristidou**, and is distributed under the **STEPSS-Helios Academic Public License**:
+For larger models or execution on more than two cores, contact the Authors.
 
-- Permission is granted to use Helios **free of charge** for any **non-commercial purpose**, including teaching and research at universities, colleges, and other educational institutions, research at non-profit research institutions, and personal non-profit purposes.
-- For **commercial use**, a commercial license is required: contact **info@sps-lab.org**.
-- Helios is provided **"as is"**, without warranty of any kind.
+### Helios License
 
-## CODEGEN License
+STEPSS-Helios is distributed under the STEPSS-Helios Academic Public License. Its license sets no limit on system size or number of cores.
 
-**CODEGEN** (the model generator) is the property of **Dr. Thierry Van Cutsem**. It is distributed under the **Academic Public License for the use of STEPSS** as a compiled executable that is **free to use for non-commercial purposes**; commercial use requires contacting the Authors. It is not open-source: its source code is not included in any of the public STEPSS repositories.
+### CODEGEN License
 
-Two things ship CODEGEN, and both are therefore mixed-licence rather than the
-Apache 2.0 their own source is under:
+CODEGEN is distributed under the Academic Public License for the use of STEPSS, as a compiled executable only. Its source code is not in any of the public STEPSS repositories.
 
-- **STEPSS GUI**, which carries the whole toolchain.
-- **CODEGEN Studio**, whose PyPI wheel (`pip install stepss-cg-studio`) bundles
-  the CODEGEN executables for Linux, Windows and macOS so that its Run Codegen
-  action works on a fresh install. The licence text ships inside the wheel as
-  `cg_studio/bin/LICENSE-CODEGEN`, and the two leading components of the
-  package's version name the CODEGEN release it carries: `stepss-cg-studio`
-  5.3.0 and 5.3.1 both run CODEGEN 5.3.
+## Packages That Bundle an Engine
 
-Installing either means accepting these terms for the bundled generator. The
-Apache 2.0 licence in each of those repositories covers the code written there,
-not the executables shipped alongside it.
+Some open-source components ship engine executables. Installing one means accepting the terms of each engine it carries.
+
+| Package | Engines it carries |
+|---------|--------------------|
+| STEPSS GUI | Helios, RAMSES and CODEGEN |
+| `stepss` (PyPI) | RAMSES and Helios |
+| CODEGEN Studio (PyPI, `stepss-cg-studio`) | CODEGEN |
+
+The CODEGEN Studio wheel bundles the CODEGEN executables for Linux, Windows and macOS so that its Run Codegen action works on a fresh install. The license text ships inside the wheel as `cg_studio/bin/LICENSE-CODEGEN`, and the two leading components of the package's version name the CODEGEN release it carries: every `stepss-cg-studio` X.Y.z runs CODEGEN X.Y.
 
 ## Requesting a Commercial License
 
-The free terms above cover teaching, academic research and personal non-profit
-use. Anything commercial needs a license, including consulting work, designing
-commercial hardware or software, and a commercial entity taking part in a research
-project.
+Which license, and from whom, depends on which engines you use, since they have different owners. A use that involves one engine is a narrower question than one that involves all three.
 
-Which license, and from whom, depends on **which components you use**. They have
-different owners, as the table at the top of this page sets out: RAMSES belongs to
-the University of Liège, Helios to Dr. Petros Aristidou, and CODEGEN to Dr. Thierry
-Van Cutsem. A use that involves only one of them is a narrower question than one
-that involves all three.
+Write to **stepss@sps-lab.org**. The Helios license text names info@sps-lab.org for a request that concerns Helios alone.
 
-Write to **stepss@sps-lab.org**. A first message that covers the following can be
-answered without a round of questions first:
+A first message that covers the following can be answered without a round of questions first:
 
-- **Which components** the work needs, from the table above. If you are unsure,
-  describe what you want to do and let the answer come back.
-- **What the use is**: consulting for a client, a product you sell, an internal
-  tool, or a funded project with a commercial partner.
-- **How large the systems are.** The free version of RAMSES is capped at 1000
-  buses, so the size you need is usually the reason for the request.
-- **How many cores** you need to run on. The free version is capped at two.
-- **Your timeframe**, so the reply can be useful rather than merely accurate.
+- **Which engines** the work needs. If you are unsure, describe what you want to do.
+- **What the use is**: consulting for a client, a product you sell, an internal tool, or a funded project with a commercial partner.
+- **How large the systems are** and **how many cores** you need to run on. The limits of the free RAMSES are usually the reason for the request.
+- **Your timeframe.**
+- **The organisation** the license would be granted to, which is not always the one asking.
 
-Identify the organisation the license would be granted to, which is not always the
-one asking.
+## Documentation License
+
+The STEPSS documentation, this website and the PDF user guide, is licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/). You may share and adapt it, including for commercial purposes, provided you give appropriate credit.
+
+This applies to the documentation only. It grants no rights over the STEPSS software.
 
 ## Authors
 
 STEPSS has been developed by:
+
 - **Dr. Petros Aristidou** (petros.aristidou@cut.ac.cy)
 - **Dr. Thierry Van Cutsem** (thierry.h.van.cutsem@gmail.com)
 
-For general inquiries, licensing questions, and commercial use, please use the default contact: **stepss@sps-lab.org**.
-
-## Intellectual Property Rights
-
-STEPSS is made up of three modules: **Helios** (power flow computations), **RAMSES** (the solver of differential-algebraic equations), and **CODEGEN** (a tool to develop models).
-
-Helios is the property of Dr. Petros Aristidou. CODEGEN is the property of Dr. Thierry Van Cutsem, distributed as a compiled executable free to use. RAMSES is the property of the **University of Liège, Belgium**, which has granted to both Authors a personal, royalty-free, limited, non-exclusive, non-transferable and non-assignable license to distribute free of charge an executable version of RAMSES.
+For general inquiries, use **stepss@sps-lab.org**.
